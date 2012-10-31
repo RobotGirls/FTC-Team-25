@@ -146,7 +146,7 @@ void displayInstructions()
 {
   nxtDisplayCenteredTextLine(0, "HiTechnic");
   nxtDisplayCenteredBigTextLine(1, "IR Seekr");
-  nxtDisplayCenteredTextLine(3, "Test 1");
+  nxtDisplayCenteredTextLine(3, "Test 2");
   nxtDisplayCenteredTextLine(5, "Press enter to");
   nxtDisplayCenteredTextLine(6, "switch between");
   nxtDisplayCenteredTextLine(7, "600 and 1200 Hz");
