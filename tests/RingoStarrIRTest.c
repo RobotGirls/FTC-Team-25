@@ -19,61 +19,60 @@
 
 task main()
 {
-  int dir;
+  	int dir;
 	int strength1, strength2, strength3, strength4, strength5;
 
 	// the default DSP mode is 1200 Hz.
-  tHTIRS2DSPMode mode = DSP_1200;
+  	tHTIRS2DSPMode mode = DSP_1200;
 
     // You can switch between the two different DSP modes by pressing the
     // orange enter button
 
     while (true)
     {
-      // set the DSP to the new mode
-      if (HTIRS2setDSPMode(IRSeeker, mode))
-        break; // Sensor initialized
+      	// set the DSP to the new mode
+      	if (HTIRS2setDSPMode(IRSeeker, mode))
+			break; // Sensor initialized
 
-      PlaySound(soundShortBlip);
-      nxtDisplayCenteredTextLine(6, "Connect Sensor");
-      nxtDisplayCenteredTextLine(7, "to Port S2");
-      wait1Msec(100);
+      	PlaySound(soundShortBlip);
+      	nxtDisplayCenteredTextLine(6, "Connect Sensor");
+      	nxtDisplayCenteredTextLine(7, "to Port S2");
+      	wait1Msec(100);
     }
 
     eraseDisplay();
 
     while (true)
     {
+      	// read the current modulated signal direction
+      	dir = HTIRS2readACDir(IRSeeker);
+      	if (dir < 0)
+        	break; // I2C read error occurred
 
-      // read the current modulated signal direction
-      dir = HTIRS2readACDir(IRSeeker);
-      if (dir < 0)
-        break; // I2C read error occurred
+      	if (!HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5 ))
+        	break; // I2C read error occurred
 
-      if (!HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5 ))
-        break; // I2C read error occurred
+      	string tmpStr;
 
-      string tmpStr;
+		StringFormat(tmpStr, "Direction: %d", dir);
+		nxtDisplayTextLine(3, tmpStr);
+		StringFormat(tmpStr, "Strength: %d", strength3);
+		nxtDisplayTextLine(4, tmpStr);
 
-      StringFormat(tmpStr, "Direction: %d", dir);
-      nxtDisplayTextLine(3, tmpStr);
-      StringFormat(tmpStr, "Strength: %d", strength3);
-      nxtDisplayTextLine(4, tmpStr);
-
-      if (dir < 5) {
-      	  // turn right
-          motor[driveRight] = 100;
-          motor[driveLeft] = -100;
-      } else if (dir > 5) {
-    	  // turn left
-          motor[driveRight] = -100;
-          motor[driveLeft] = 100;
-      } else if (strength3 < 110) {
-          motor[driveRight] = 100;
-          motor[driveLeft] = 100;
-      } else {
-          motor[driveRight] = 0;
-          motor[driveLeft] = 0;
-     }
+		if (dir < 5) {
+			// turn right
+			motor[driveRight] = 100;
+			motor[driveLeft] = -100;
+		} else if (dir > 5) {
+			// turn left
+			motor[driveRight] = -100;
+			motor[driveLeft] = 100;
+		} else if (strength3 < 110) {
+			motor[driveRight] = 100;
+			motor[driveLeft] = 100;
+		} else {
+			motor[driveRight] = 0;
+			motor[driveLeft] = 0;
+		}
     }
 }
