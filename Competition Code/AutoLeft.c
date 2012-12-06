@@ -110,7 +110,7 @@ void lookForIRBeacon(void)
 {
 	int dir;
 
-    dir = HTIRS2readACDir(IRSeeker);
+	dir = HTIRS2readACDir(IRSeeker);
 
 	if (dir != 5) {
 		motor[driveSide] = 50;
@@ -119,7 +119,7 @@ void lookForIRBeacon(void)
 	}
 
 	while (dir != 5) {
-		dir = HTIRS2readACDir(IRSeeker);
+    	dir = HTIRS2readACDir(IRSeeker);
 	}
 
 	motor[driveSide] = 0;
@@ -209,11 +209,11 @@ task main()
 {
 	direction_t dir;
 
-  	initializeRobot();
+	initializeRobot();
 
-  	// waitForStart(); // Wait for the beginning of autonomous phase.
+	// waitForStart(); // Wait for the beginning of autonomous phase.
 
-  	// Move forward a predetermined amount.
+	// Move forward a predetermined amount.
 	nMotorEncoder[driveRight] = 0;
 	nMotorEncoderTarget[driveRight] = 360;
 	motor[driveRight] = 50;
@@ -221,21 +221,21 @@ task main()
 
 	WAIT_UNTIL_MOTOR_OFF;
 
-  	// Read IR sensor.
+	// Read IR sensor.
 	lookForIRBeacon();
 
 	// We found the IR beacon, we should be to the
- 	// left of the white line.  Move to the line.
+	// left of the white line.  Move to the line.
 	lookForWhiteLine(RIGHT);
 
 	// If we were knocked off target, realign ourself.
 	dir = alignToPeg();
 
 	/*
-	 * The rotatation may have knocked us off the white line
-	 * If we rotated right, look back to the left, if we rotated
-	 * left, do the opposite.
-	 */
+	* The rotatation may have knocked us off the white line
+	* If we rotated right, look back to the left, if we rotated
+	* left, do the opposite.
+	*/
 	switch (dir) {
 		case RIGHT:
 			lookForWhiteLine(LEFT);
