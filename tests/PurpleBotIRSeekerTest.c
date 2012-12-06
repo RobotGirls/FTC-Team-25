@@ -9,11 +9,11 @@
 
 task main()
 {
-  int dir;
+  	int dir;
 	int strength1, strength2, strength3, strength4, strength5;
 
 	// the default DSP mode is 1200 Hz.
-  tHTIRS2DSPMode mode = DSP_1200;
+  	tHTIRS2DSPMode mode = DSP_1200;
 
   while(true)
   {
@@ -54,15 +54,15 @@ task main()
 
       if (dir < 5) {
       	  // turn right
-          motor[motorD] = 30;
-          motor[motorE] = -30;
-      } else if (dir > 5) {
-    	  // turn left
           motor[motorD] = -30;
           motor[motorE] = 30;
-      } else if (strength3 < 110) {
+      } else if (dir > 5) {
+    	  // turn left
           motor[motorD] = 30;
-          motor[motorE] = 30;
+          motor[motorE] = -30;
+      } else if (strength3 < 110) {
+          motor[motorD] = -30;
+          motor[motorE] = -30;
       } else {
           motor[motorD] = 0;
           motor[motorE] = 0;
