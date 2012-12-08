@@ -59,20 +59,5 @@ task main()
 		StringFormat(tmpStr, "Strength: %d", strength3);
 		nxtDisplayTextLine(4, tmpStr);
 
-		if (dir < 5) {
-			// turn right
-			motor[driveRight] = 100;
-			motor[driveLeft] = -100;
-		} else if (dir > 5) {
-			// turn left
-			motor[driveRight] = -100;
-			motor[driveLeft] = 100;
-		} else if (strength3 < 110) {
-			motor[driveRight] = 100;
-			motor[driveLeft] = 100;
-		} else {
-			motor[driveRight] = 0;
-			motor[driveLeft] = 0;
-		}
     }
 }

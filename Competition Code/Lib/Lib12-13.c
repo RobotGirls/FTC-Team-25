@@ -5,14 +5,14 @@
  * Depends upon the pragmas for the competition bot.
  */
 
-#define ENCPERINCH 110
-#define SHELFUP 0
-#define SHELFDOWN 228
-#define SHELFPLACE 0
+#define ENCPERINCH 140
+#define SHELFUP 5
+#define SHELFDOWN 240
+#define SHELFPLACE 86
 #define SHELFDISCHARGE 0
-#define IRUP 121
-#define IRDOWN 0
-#define IRRING 148
+#define IRUP 130
+#define IRDOWN 234
+#define IRRING 83
 #define BEACON_TARGET_STRENGTH 120
 
 typedef enum {
@@ -39,9 +39,15 @@ void showTarget(int val)
 	nxtDisplayTextLine(3, "Target:    %4d", val);
 }
 
-void showHeading()
+void showHeading(void)
 {
 	nxtDisplayTextLine(4, "Abs:   %4d", HTMCreadHeading(HTMC));
+}
+
+void pauseDebug(char *str, int seconds)
+{
+    nxtDisplayTextLine(3, str);
+    wait1Msec(seconds * 1000);
 }
 
 /**********************************************************************************
@@ -56,7 +62,7 @@ void rotateClockwise(int speed)
 
 void rotateCounterClockwise(int speed)
 {
-  	motor[driveRight] = speed;
+	motor[driveRight] = speed;
 	motor[driveLeft] = -speed;
 }
 
@@ -69,11 +75,11 @@ void moveForward (int inches)
 {
 	int encoderCounts = inches * ENCPERINCH;
 
-	nMotorEncoder[driveRight]=0;
-	nMotorEncoder[driveLeft]=0;
+	nMotorEncoder[driveRight] = 0;
+	nMotorEncoder[driveLeft] = 0;
 
-	motor[driveRight] = 50;
-	motor[driveLeft] = 50;
+	motor[driveRight] = 75;
+	motor[driveLeft] = 75;
 
 	while(abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
 	{
@@ -110,14 +116,16 @@ void moveBackward (int inches)
  * moveSideways
  *
  * Move the robot sideways a given number of inches.
+ * FIXME: This only moves one way.  Fix such that you can
+ *        move either right or left.
  */
 void moveSideways (int inches)
 {
 	int encoderCounts = inches * ENCPERINCH;
 
-	nMotorEncoder[driveSide]=0;
+	nMotorEncoder[driveSide] = 0;
 
-	motor[driveSide]=50;
+	motor[driveSide] = -50;
 
 	while(abs(nMotorEncoder[driveSide]) < encoderCounts)
 	{
@@ -126,6 +134,11 @@ void moveSideways (int inches)
 	motor[driveSide] = 0;
 }
 
+/*
+ * moveToBeacon
+ *
+ * Move toward the beacon until you see the given target strength
+ */
 void moveToBeacon(int targetStrength)
 {
 	int strength1;
@@ -155,7 +168,7 @@ void moveToBeacon(int targetStrength)
  * A positive value turns right, a negative value
  * turns left.
  */
-void turn(int deg)
+void turn(int deg, int speed)
 {
 	int dest;
 
@@ -171,9 +184,9 @@ void turn(int deg)
 	showTarget(dest);
 
 	if (deg < 0) {
-		rotateCounterClockwise(25);
+		rotateCounterClockwise(speed);
 	} else {
-		rotateClockwise(25);
+		rotateClockwise(speed);
 	}
 
 	while (HTMCreadHeading(HTMC) != dest) {

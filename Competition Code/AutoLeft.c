@@ -1,12 +1,12 @@
 #pragma config(Hubs,  S1, HTServo,  HTMotor,  HTMotor,  HTMotor)
-#pragma config(Sensor, S2,     IRSeeker,       sensorHiTechnicIRSeeker1200)
+#pragma config(Sensor, S2,     IRSeeker,       sensorI2CCustom)
 #pragma config(Sensor, S3,     HTMC,           sensorI2CCustom)
 #pragma config(Sensor, S4,     lightSensor,    sensorLightInactive)
 #pragma config(Motor,  motorA,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
-#pragma config(Motor,  mtr_S1_C2_1,     driveRight,    tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C2_2,     driveLeft,     tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_1,     driveRight,    tmotorTetrix, PIDControl, reversed)
+#pragma config(Motor,  mtr_S1_C2_2,     driveLeft,     tmotorTetrix, PIDControl)
 #pragma config(Motor,  mtr_S1_C3_1,     grabberArm,    tmotorTetrix, PIDControl)
 #pragma config(Motor,  mtr_S1_C3_2,     driveSide,     tmotorTetrix, PIDControl)
 #pragma config(Motor,  mtr_S1_C4_1,     motorH,        tmotorTetrix, openLoop)
@@ -30,13 +30,13 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
-
 #include "../library/sensors/drivers/hitechnic-irseeker-v2.h"
 #include "../library/sensors/drivers/hitechnic-compass.h"
 #include "../library/sensors/drivers/lego-light.h"
 
 #include "Lib/Lib12-13.c"
+
+#define FORWARDTOPEGS 2000
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -68,6 +68,11 @@ void initializeRobot()
 	nMotorPIDSpeedCtrl[driveLeft] = mtrSpeedReg;
 	nMotorPIDSpeedCtrl[driveRight] = mtrSpeedReg;
 	nMotorPIDSpeedCtrl[driveSide] = mtrSpeedReg;
+
+    /*
+     * Do not let the motors coast
+     */
+    bFloatDuringInactiveMotorPWM = false;
 
 	// the default DSP mode is 1200 Hz.
 	tHTIRS2DSPMode mode = DSP_1200;
@@ -106,16 +111,23 @@ void initializeRobot()
  * Drive sideways until we see the beacon in segment 5
  * of the IR receiver.
  */
-void lookForIRBeacon(void)
+direction_t lookForIRBeacon(void)
 {
 	int dir;
+    direction_t moved_dir;
 
 	dir = HTIRS2readACDir(IRSeeker);
 
 	if (dir != 5) {
-		motor[driveSide] = 50;
+        if (dir > 5) {
+		    motor[driveSide] = -20;
+            moved_dir = RIGHT;
+        } else {
+            motor[driveSide] = 20;
+            moved_dir = LEFT;
+        }
 	} else {
-		return;
+		return NO_DIR;
 	}
 
 	while (dir != 5) {
@@ -123,6 +135,9 @@ void lookForIRBeacon(void)
 	}
 
 	motor[driveSide] = 0;
+
+    pauseDebug("ir found", 5);
+    return (moved_dir);
 }
 
 /*
@@ -137,10 +152,10 @@ void lookForWhiteLine(direction_t dir)
 
 	switch (dir) {
 		case LEFT:
-			motor[driveSide] = -25;
+			motor[driveSide] = 5;
 			break;
 		case RIGHT:
-			motor[driveSide] = 25;
+			motor[driveSide] = -5;
 			break;
 		case NO_DIR:
 		default:
@@ -166,13 +181,18 @@ void lookForWhiteLine(direction_t dir)
 direction_t alignToPeg(void)
 {
 	int bearing;
+    char str[48];
 
 	// Are we aligned?  If so we do nothing.
 	bearing = HTMCreadRelativeHeading(HTMC);
+
+    sprintf(str, "Compass off %d", bearing);
+    pauseDebug(str, 5);
+
 	if (bearing == 0) {
 		return NO_DIR;
 	} else {
-		turn(bearing);
+		turn(bearing, 10);
 		if (bearing < 0) {
 			return LEFT;
 		} else {
@@ -194,14 +214,22 @@ void placeRing(void)
 {
 	raiseShelfToPlacePosition();
 
+    pauseDebug("shelf raised", 5);
+
+    moveForward(1);
+
+    pauseDebug("are we in place?", 5);
+
 	// We are aligned, and on the white line so
 	// move forward until we hit the proper strength
 	// value from the beacon.
-	moveToBeacon(BEACON_TARGET_STRENGTH);
+	//moveToBeacon(BEACON_TARGET_STRENGTH);
 
-	lowerShelfToDischargePosition();
+	motor[driveSide] = -40;
+    wait1Msec(1000);
+    motor[driveSide] = 0;
 
-	deployPusher();
+	//deployPusher();
 	moveBackward(3);
 }
 
@@ -214,22 +242,30 @@ task main()
 	// waitForStart(); // Wait for the beginning of autonomous phase.
 
 	// Move forward a predetermined amount.
-	nMotorEncoder[driveRight] = 0;
-	nMotorEncoderTarget[driveRight] = 360;
-	motor[driveRight] = 50;
-	motor[driveLeft] = 50;
 
-	WAIT_UNTIL_MOTOR_OFF;
+    moveForward(53);
+
+    pauseDebug("look for beacon", 3);
 
 	// Read IR sensor.
-	lookForIRBeacon();
+	dir = lookForIRBeacon();
 
 	// We found the IR beacon, we should be to the
-	// left of the white line.  Move to the line.
-	lookForWhiteLine(RIGHT);
+	// dir direction of the white line.  Move to the line.
+	// lookForWhiteLine(dir);
+
+    pauseDebug("I think i'm on the line", 5);
 
 	// If we were knocked off target, realign ourself.
-	dir = alignToPeg();
+    // FIXME: The compass does not appear to be accurate.
+    //        This is actually knocking us off the peg.
+	//dir = alignToPeg();
+
+    /*
+     * Don't do anything just below as the neither the line
+     * nor the compass sensors are currently accurate.
+     */
+    dir = NO_DIR;
 
 	/*
 	* The rotatation may have knocked us off the white line
