@@ -1,8 +1,8 @@
 #pragma config(Hubs,  S1, HTServo,  HTMotor,  HTMotor,  HTMotor)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S2,     IRSeeker,       sensorHiTechnicIRSeeker1200)
-#pragma config(Sensor, S3,     ,               sensorI2CHiTechnicCompass)
-#pragma config(Sensor, S4,     ,               sensorTouch)
+#pragma config(Sensor, S2,     IRSeeker,       sensorI2CCustom)
+#pragma config(Sensor, S3,     HTMC,           sensorI2CCustom)
+#pragma config(Sensor, S4,     lightSensor,    sensorLightInactive)
 #pragma config(Motor,  motorA,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
@@ -32,14 +32,10 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
-#define SHELFUP 54
-#define SHELFDOWN 221
-#define IRUP 121
-#define IRDOWN 0
-#define IRRING 187
-#define RAMP_START 96
-#define SHELFINCREMENT 17
-
+#include "../library/sensors/drivers/hitechnic-irseeker-v2.h"
+#include "../library/sensors/drivers/hitechnic-compass.h"
+#include "../library/sensors/drivers/lego-light.h"
+#include "Lib/Lib12-13.c"
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

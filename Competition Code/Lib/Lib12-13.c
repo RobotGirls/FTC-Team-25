@@ -14,6 +14,8 @@
 #define IRDOWN 234
 #define IRRING 83
 #define BEACON_TARGET_STRENGTH 120
+#define RAMP_START 96
+#define SHELFINCREMENT (SHELFDOWN - SHELFUP)/10
 
 typedef enum {
 	NO_DIR,
