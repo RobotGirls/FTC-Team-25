@@ -1,7 +1,6 @@
 #pragma config(Hubs,  S1, HTServo,  HTMotor,  HTMotor,  HTMotor)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     IRSeeker,       sensorI2CCustom)
-#pragma config(Sensor, S3,     HTMC,           sensorI2CCustom)
+#pragma config(Sensor, S3,     HTSMUX,         sensorI2CCustom)
 #pragma config(Sensor, S4,     lightSensor,    sensorLightInactive)
 #pragma config(Motor,  motorA,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop)
@@ -32,6 +31,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
+#include "../library/sensors/drivers/hitechnic-sensormux.h"
 #include "../library/sensors/drivers/hitechnic-irseeker-v2.h"
 #include "../library/sensors/drivers/hitechnic-compass.h"
 #include "../library/sensors/drivers/lego-light.h"
@@ -51,10 +51,13 @@
 
 void initializeRobot()
 {
-  servo[gravityShelf] = SHELFDOWN;
-  servo[IRServo] = IRDOWN;
+  	servo[gravityShelf] = SHELFDOWN;
+  	servo[IRServo] = IRDOWN;
 	servo[Ramp] = RAMP_START;
-  return;
+
+    bFloatDuringInactiveMotorPWM = false;
+
+	return;
 }
 
 
@@ -84,7 +87,8 @@ void initializeRobot()
 // At the end of the tele-op period, the FMS will autonmatically abort (stop) execution of the program.
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-void forwarddrivetrain ()//The function containing the code to run the forward drivetrain teleop
+
+void forwarddrivetrain()
 {
 	if(abs(joystick.joy1_y1) > 50)//If the absolute value of the right joystick is greater than 50 then:
  	{
@@ -107,7 +111,7 @@ void forwarddrivetrain ()//The function containing the code to run the forward d
    }
 }
 
-void sidewaysdrivetrain ()//The function containing the code to run the sideways drivetrain telop
+void sidewaysdrivetrain()
 {
    if (joy1Btn(8))//If button 8 is pressed
    {
@@ -125,13 +129,13 @@ void sidewaysdrivetrain ()//The function containing the code to run the sideways
    }
 }
 
-void movegravityShelf ()
+void movegravityShelf()
 {
 	int val;
 
     if (joy2Btn(5))
     {
-		servo[gravityShelf] = SHELFUP;
+		servo[gravityShelf] = SHELFREMOVE;
     }
 
 	if (joy2Btn(7))
@@ -142,23 +146,36 @@ void movegravityShelf ()
 	if (joy2Btn(2))
 	{
 		val = ServoValue[gravityShelf];
-		val -= SHELFINCREMENT;
+        nxtDisplayTextLine(3, "Current: %d", val);
+		val += SHELFINCREMENT;
+        nxtDisplayTextLine(3, "Dest: %d", val);
 		servo[gravityShelf] = val;
 	}
 
 	if (joy2Btn(4))
 	{
 		val = ServoValue[gravityShelf];
-		val += SHELFINCREMENT;
+        nxtDisplayTextLine(3, "Current: %d", val);
+		val -= SHELFINCREMENT;
+        nxtDisplayTextLine(3, "Dest: %d", val);
 		servo[gravityShelf] = val;
 	}
 }
 
 void IRarm()
 {
+    int val;
+
 	if(joy2Btn(6))
 	{
-		servo[IRServo] = IRUP;
+        val = ServoValue[IRServo];
+        if (val < (IRUP + 20)) {
+            servo[IRServo] = IRDOWN;
+            wait1Msec(500);
+        } else {
+            servo[IRServo] = IRUP;
+            wait1Msec(500);
+        }
 	}
 	else if(joy2Btn(8))
 	{
@@ -183,7 +200,14 @@ void arm ()
 }
 void ramp ()
 {
-    //ramp code
+    if (joy1Btn(1))
+    {
+        servo[Ramp] = RAMP_START;
+    }
+    else if (joy1Btn(3))
+    {
+        servo[Ramp] = RAMP_DEPLOY;
+    }
 }
 
 
@@ -202,5 +226,6 @@ task main()
   	movegravityShelf();
   	IRarm();
   	arm();
+    ramp();
   }
 }

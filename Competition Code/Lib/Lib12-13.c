@@ -5,17 +5,24 @@
  * Depends upon the pragmas for the competition bot.
  */
 
+const tMUXSensor HTMC = msensor_S3_1;
+const tMUXSensor touchSensor = msensor_S3_2;
+
 #define ENCPERINCH 140
 #define SHELFUP 5
 #define SHELFDOWN 240
 #define SHELFPLACE 86
+#define SHELFREMOVE 75
 #define SHELFDISCHARGE 0
 #define IRUP 130
 #define IRDOWN 234
-#define IRRING 83
+#define IR_DEPLOY_RING 116
+#define IRRING 110
 #define BEACON_TARGET_STRENGTH 120
-#define RAMP_START 96
-#define SHELFINCREMENT (SHELFDOWN - SHELFUP)/10
+#define RAMP_START 166
+#define RAMP_DEPLOY 48
+#define SHELFINCREMENT 1
+#define BEACON_CENTER 4
 
 typedef enum {
 	NO_DIR,
@@ -66,6 +73,28 @@ void rotateCounterClockwise(int speed)
 {
 	motor[driveRight] = speed;
 	motor[driveLeft] = -speed;
+}
+
+/*
+ * moveForwardOn
+ *
+ * Turns the motors on, never turns them off.
+ */
+void moveForwardOn(int speed)
+{
+	motor[driveRight] = speed;
+	motor[driveLeft] = speed;
+}
+
+/*
+ * moveForwardOff
+ *
+ * Turns the motors off.
+ */
+void moveForwardOff()
+{
+	motor[driveRight] = 0;
+	motor[driveLeft] = 0;
 }
 
 /*
@@ -126,7 +155,6 @@ void moveSideways (int inches)
 	int encoderCounts = inches * ENCPERINCH;
 
 	nMotorEncoder[driveSide] = 0;
-
 	motor[driveSide] = -50;
 
 	while(abs(nMotorEncoder[driveSide]) < encoderCounts)

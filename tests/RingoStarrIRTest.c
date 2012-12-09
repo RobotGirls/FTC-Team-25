@@ -56,8 +56,12 @@ task main()
 
 		StringFormat(tmpStr, "Direction: %d", dir);
 		nxtDisplayTextLine(3, tmpStr);
-		StringFormat(tmpStr, "Strength: %d", strength3);
+		StringFormat(tmpStr, "Strength 2: %d", strength2);
 		nxtDisplayTextLine(4, tmpStr);
+		StringFormat(tmpStr, "Strength 3: %d", strength3);
+		nxtDisplayTextLine(5, tmpStr);
+		StringFormat(tmpStr, "Strength 4: %d", strength4);
+		nxtDisplayTextLine(6, tmpStr);
 
     }
 }

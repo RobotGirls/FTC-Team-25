@@ -1,6 +1,6 @@
 #pragma config(Hubs,  S1, HTServo,  HTMotor,  HTMotor,  HTMotor)
 #pragma config(Sensor, S2,     IRSeeker,       sensorI2CCustom)
-#pragma config(Sensor, S3,     HTMC,           sensorI2CCustom)
+#pragma config(Sensor, S3,     HTSMUX,         sensorI2CCustom)
 #pragma config(Sensor, S4,     lightSensor,    sensorLightInactive)
 #pragma config(Motor,  motorA,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop)
@@ -30,9 +30,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "../library/sensors/drivers/hitechnic-sensormux.h"
 #include "../library/sensors/drivers/hitechnic-irseeker-v2.h"
 #include "../library/sensors/drivers/hitechnic-compass.h"
 #include "../library/sensors/drivers/lego-light.h"
+#include "../library/sensors/drivers/lego-touch.h"
 
 #include "Lib/Lib12-13.c"
 
@@ -115,28 +117,46 @@ direction_t lookForIRBeacon(void)
 {
 	int dir;
     direction_t moved_dir;
+	int strength1, strength2, strength3, strength4, strength5;
 
 	dir = HTIRS2readACDir(IRSeeker);
 
-	if (dir != 5) {
-        if (dir > 5) {
-		    motor[driveSide] = -20;
+	if (dir != BEACON_CENTER) {
+        if (dir > BEACON_CENTER) {
+		    motor[driveSide] = -40;
             moved_dir = RIGHT;
         } else {
-            motor[driveSide] = 20;
+            motor[driveSide] = 40;
             moved_dir = LEFT;
         }
 	} else {
 		return NO_DIR;
 	}
 
-	while (dir != 5) {
+    HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5);
+
+	while (dir != BEACON_CENTER) {
     	dir = HTIRS2readACDir(IRSeeker);
 	}
+
+    /*
+     * We are in the correct segment, so move until the strength
+     * is balanced.
+     */
+    HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5);
+
+    while (strength3 > strength2) {
+        HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5);
+    }
 
 	motor[driveSide] = 0;
 
     pauseDebug("ir found", 5);
+
+    moveSideways(7);
+
+    pauseDebug("IR Compensated", 5);
+
     return (moved_dir);
 }
 
@@ -152,10 +172,10 @@ void lookForWhiteLine(direction_t dir)
 
 	switch (dir) {
 		case LEFT:
-			motor[driveSide] = 5;
+			motor[driveSide] = 20;
 			break;
 		case RIGHT:
-			motor[driveSide] = -5;
+			motor[driveSide] = -20;
 			break;
 		case NO_DIR:
 		default:
@@ -214,9 +234,15 @@ void placeRing(void)
 {
 	raiseShelfToPlacePosition();
 
-    pauseDebug("shelf raised", 5);
+    pauseDebug("shelf raised, servo deployed", 5);
 
-    moveForward(1);
+    servo[IRServo] = IR_DEPLOY_RING;
+
+    // We are aligned.  Move forward until the
+    // the touch sensor is depressed.
+    moveForwardOn(40);
+	while (TSreadState(touchSensor) == 0) { }
+    moveForwardOff();
 
     pauseDebug("are we in place?", 5);
 
@@ -225,11 +251,8 @@ void placeRing(void)
 	// value from the beacon.
 	//moveToBeacon(BEACON_TARGET_STRENGTH);
 
-	motor[driveSide] = -40;
-    wait1Msec(1000);
-    motor[driveSide] = 0;
+    moveSideways(7);
 
-	//deployPusher();
 	moveBackward(3);
 }
 
@@ -243,7 +266,7 @@ task main()
 
 	// Move forward a predetermined amount.
 
-    moveForward(53);
+    moveForward(52);
 
     pauseDebug("look for beacon", 3);
 
