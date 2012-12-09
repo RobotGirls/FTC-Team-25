@@ -101,7 +101,7 @@ task main()
 	// dir direction of the white line.  Move to the line.
 	lookForWhiteLine(dir);
 
-    pauseDebug("I think i'm on the line", 5);
+    pauseDebug("I think i'm on the line", 3);
 
 	// If we were knocked off target, realign ourself.
     // FIXME: The compass does not appear to be accurate.
