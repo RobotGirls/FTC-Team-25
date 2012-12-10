@@ -86,10 +86,10 @@ task main()
 
 	initializeRobot();
 
-	// waitForStart(); // Wait for the beginning of autonomous phase.
+    // Wait for the beginning of autonomous phase.
+	// waitForStart();
 
 	// Move forward a predetermined amount.
-
     moveForward(52);
 
     pauseDebug("look for beacon", 3);

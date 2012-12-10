@@ -37,6 +37,10 @@
 #include "../library/sensors/drivers/lego-light.h"
 #include "Lib/Lib12-13.c"
 
+/*
+ * Semaphore for controlling servo movement.
+ */
+bool blockArm = false;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -54,6 +58,10 @@ void initializeRobot()
   	servo[gravityShelf] = SHELFDOWN;
   	servo[IRServo] = IRDOWN;
 	servo[Ramp] = RAMP_START;
+
+    nMotorPIDSpeedCtrl[driveLeft]  = mtrSpeedReg;
+    nMotorPIDSpeedCtrl[driveRight] = mtrSpeedReg;
+    nMotorPIDSpeedCtrl[driveSide]  = mtrSpeedReg;
 
     bFloatDuringInactiveMotorPWM = false;
 
@@ -88,40 +96,51 @@ void initializeRobot()
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+ * waitForSensorArm
+ *
+ * Use a task as a semaphore in order to prevent processing
+ * of a servo move until after a prior request to move the servo
+ * has finished.  1 second is probably overkill, but the driver
+ * should not be cycling this arm that fast anyway.
+ */
+task waitForSensorArm()
+{
+    blockArm = true;
+    wait1Msec(1000);
+    blockArm = false;
+}
+
 void forwarddrivetrain()
 {
-	if(abs(joystick.joy1_y1) > 50)//If the absolute value of the right joystick is greater than 50 then:
+	if(abs(joystick.joy1_y1) > 50)
  	{
-        nMotorPIDSpeedCtrl[driveLeft]   = mtrSpeedReg;
- 		motor[driveLeft] = joystick.joy1_y1;//run the right motor at the level of power that the input from the joystick indicates.
+ 		motor[driveLeft] = joystick.joy1_y1;
  	}
  	else
  	{
- 		motor[driveLeft] = 0;//If the absolute value of the right joystick is less than 50, then stop the right motor.
+ 		motor[driveLeft] = 0;
     }
 
-   if(abs(joystick.joy1_y2) > 50)//If the absolute value of the right joystick's x-axis is greater than 50 then:
+   if(abs(joystick.joy1_y2) > 50)
    {
-        nMotorPIDSpeedCtrl[driveRight]   = mtrSpeedReg;
- 		motor[driveRight] = joystick.joy1_y2;//run the left motor at the level of power that the input from the joystick indicates.
+ 		motor[driveRight] = joystick.joy1_y2;
    }
    else
    {
- 		motor[driveRight] = 0;//If the absolute value of the right joystick's x-axis is less than 50, then stop the left motor.
+ 		motor[driveRight] = 0;
    }
 }
 
 void sidewaysdrivetrain()
 {
-   if (joy1Btn(8))//If button 8 is pressed
+   if (joy1Btn(8))
    {
-        nMotorPIDSpeedCtrl[driveSide]   = mtrSpeedReg;
- 		motor[driveSide] = -100;// drive the right motor at 100
+ 		motor[driveSide] = -100;
    }
    else if (joy1Btn(7))
    {
-        nMotorPIDSpeedCtrl[driveSide]   = mtrSpeedReg;
- 		motor[driveSide] = 100;// drive the left motor at -100
+ 		motor[driveSide] = 100;
    }
    else
    {
@@ -162,19 +181,22 @@ void movegravityShelf()
 	}
 }
 
-void IRarm()
+void sensorStalk()
 {
     int val;
 
 	if(joy2Btn(6))
 	{
+        if (blockArm) {
+            return;
+        }
         val = ServoValue[IRServo];
         if (val < (IRUP + 20)) {
             servo[IRServo] = IRDOWN;
-            wait1Msec(500);
+            StartTask(waitForSensorArm, kDefaultTaskPriority);
         } else {
             servo[IRServo] = IRUP;
-            wait1Msec(500);
+            StartTask(waitForSensorArm, kDefaultTaskPriority);
         }
 	}
 	else if(joy2Btn(8))
@@ -183,22 +205,7 @@ void IRarm()
 	}
 }
 
-void arm ()
-{
-		if (joy2Btn(1))
-		{
-			motor[grabberArm] = 50;
-		}
-		else if(joy2Btn(3))
-		{
-			motor[grabberArm] = -50;
-		}
-		else
-		{
-			motor[grabberArm] = 0;
-		}
-}
-void ramp ()
+void moveRamp ()
 {
     if (joy1Btn(1))
     {
@@ -224,8 +231,7 @@ task main()
   	forwarddrivetrain();//call the forwarddrivetrain function
   	sidewaysdrivetrain();//call the sidewaysdrivetrain function
   	movegravityShelf();
-  	IRarm();
-  	arm();
-    ramp();
+  	sensorStalk();
+    moveRamp();
   }
 }
