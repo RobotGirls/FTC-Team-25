@@ -30,6 +30,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
+
 #include "../library/sensors/drivers/hitechnic-sensormux.h"
 #include "../library/sensors/drivers/hitechnic-irseeker-v2.h"
 #include "../library/sensors/drivers/hitechnic-compass.h"
@@ -83,16 +85,19 @@
 task main()
 {
 	direction_t dir;
+    char tmp[50];
 
 	initializeRobot();
 
     // Wait for the beginning of autonomous phase.
-	// waitForStart();
+	waitForStart();
 
 	// Move forward a predetermined amount.
-    moveForward(52);
+    moveForward(61);
 
-    pauseDebug("look for beacon", 3);
+   // moveForwardToIRBeacon(120);
+
+    pauseDebug(tmp, 1);
 
 	// Read IR sensor.
 	dir = lookForIRBeacon();
@@ -101,7 +106,7 @@ task main()
 	// dir direction of the white line.  Move to the line.
 	lookForWhiteLine(dir);
 
-    pauseDebug("I think i'm on the line", 5);
+    pauseDebug("I think i'm on the line", 1);
 
 	// If we were knocked off target, realign ourself.
     // FIXME: The compass does not appear to be accurate.

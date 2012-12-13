@@ -30,14 +30,18 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
+
 #include "../library/sensors/drivers/hitechnic-sensormux.h"
 #include "../library/sensors/drivers/hitechnic-irseeker-v2.h"
 #include "../library/sensors/drivers/hitechnic-compass.h"
 #include "../library/sensors/drivers/lego-light.h"
 #include "../library/sensors/drivers/lego-touch.h"
 
-#include "../Competition Code/Lib/Lib12-13.c"
-#include "../Competition Code/AutoCommon.c"
+#include "Lib/Lib12-13.c"
+#include "AutoCommon.c"
+
+#define FORWARDTOPEGS 2000
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -54,35 +58,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void initializeRobot()
-{
-  	// Place code here to sinitialize servos to starting positions.
-  	// Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
-  	servo[gravityShelf] = SHELFDOWN;
-  	servo[IRServo] = IRUP;
 
-	/*
-	 * Assume lined up perpendicular to the pegs.
-	 */
-	HTMCsetTarget(HTMC);
-
-	nMotorPIDSpeedCtrl[driveLeft] = mtrSpeedReg;
-	nMotorPIDSpeedCtrl[driveRight] = mtrSpeedReg;
-	nMotorPIDSpeedCtrl[driveSide] = mtrSpeedReg;
-
-    /*
-     * Do not let the motors coast
-     */
-    bFloatDuringInactiveMotorPWM = false;
-
-	// the default DSP mode is 1200 Hz.
-	tHTIRS2DSPMode mode = DSP_1200;
-
-	// set the DSP to the new mode
-	//HTIRS2setDSPMode(IRSeeker, mode);
-
-  	return;
-}
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,18 +82,44 @@ void initializeRobot()
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-task main() {
+task main()
+{
+	direction_t dir;
+    char tmp[50];
 
-    int val;
-    char str[24];
+	initializeRobot();
 
-    initializeRobot();
+    // Wait for the beginning of autonomous phase.
+	//waitForStart();
 
-    moveForwardToPushStop();
+	// Move forward a predetermined amount.
+    moveForwardToWhiteLine(32);
 
-	while (true) {
-    	val = SensorValue[touchSensor];
-        sprintf(str, "Touch: %d", val);
-        nxtDisplayBigTextLine(3, str);
-    }
+    pauseDebug("On white line", 1);
+
+    // Move until the robot is entirely on the platform
+    moveForward(4);
+
+    turn(-43, 5);
+
+    dir = lookForIRBeacon();
+
+    /*
+     * Center on the line.
+	 */
+	switch (dir) {
+		case RIGHT:
+			lookForWhiteLine(LEFT);
+			break;
+		case LEFT:
+			lookForWhiteLine(RIGHT);
+			break;
+		case NO_DIR:
+		default:
+	}
+
+	placeRing();
+
+	while (true)
+	{}
 }

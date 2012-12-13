@@ -5,6 +5,7 @@ void initializeRobot()
   	// Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
   	servo[gravityShelf] = SHELFDOWN;
   	servo[IRServo] = IRUP;
+    servo[Ramp] = RAMP_START;
 
 	/*
 	 * Assume lined up perpendicular to the pegs.
@@ -24,7 +25,7 @@ void initializeRobot()
 	tHTIRS2DSPMode mode = DSP_1200;
 
 	// set the DSP to the new mode
-	HTIRS2setDSPMode(IRSeeker, mode);
+	// HTIRS2setDSPMode(IRSeeker, mode);
 
   	return;
 }
@@ -73,13 +74,30 @@ direction_t lookForIRBeacon(void)
 
 	motor[driveSide] = 0;
 
-    pauseDebug("ir found", 5);
+    pauseDebug("ir found", 1);
 
     // moveSideways(7);
 
-    pauseDebug("IR Compensated", 5);
-
     return (moved_dir);
+}
+
+void moveForwardToIRBeacon(int strength)
+{
+    int val;
+    char tmp[50];
+
+    motor[driveLeft] = 70;
+    motor[driveRight] = 70;
+
+    val = getStrength();
+    while (val <= strength) {
+        val = getStrength();
+        sprintf(tmp, "strength %d", val);
+        nxtDisplayCenteredTextLine(2, tmp);
+   }
+
+    motor[driveLeft] = 0;
+    motor[driveRight] = 0;
 }
 
 /*
@@ -92,26 +110,61 @@ void lookForWhiteLine(direction_t dir)
 {
 	int val;
 
+	LSsetActive(lightSensor);
+
 	switch (dir) {
 		case LEFT:
 			motor[driveSide] = 15;
+	        // Look for the first right edge.
+		   	val = LSvalNorm(lightSensor);
+			while (val <= 22) {
+				val = LSvalNorm(lightSensor);
+			}
 			break;
 		case RIGHT:
+	        // Look for first the left edge and then the right
 			motor[driveSide] = -15;
+		   	val = LSvalNorm(lightSensor);
+			while (val <= 22) {
+				val = LSvalNorm(lightSensor);
+			}
+
+		    while (val >=20) {
+		        val = LSvalNorm(lightSensor);
+		    }
 			break;
+        case FORWARD:
+            motor[driveLeft] = 10;
+            motor[driveRight] = 10;
+		   	val = LSvalNorm(lightSensor);
+			while (val <= 28) {
+				val = LSvalNorm(lightSensor);
+			}
+            break;
 		case NO_DIR:
 		default:
 			return;
 	}
 
-	LSsetActive(lightSensor);
-	val = LSvalNorm(lightSensor);
-	while (val <= 22) {
-		val = LSvalNorm(lightSensor);
-	}
 	LSsetInactive(lightSensor);
 
 	motor[driveSide] = 0;
+    motor[driveLeft] = 0;
+    motor[driveRight] = 0;
+
+    pauseDebug("on white line", 1);
+}
+
+/*
+ * Move forward until we have detected a white line.
+ * dist is the distance to move full speed.  We then
+ * slow down so that we don't overshoot the line.  e.g.
+ * You know you won't find the line befor dist inches.
+ */
+void moveForwardToWhiteLine(int dist)
+{
+    moveForward(dist);
+    lookForWhiteLine(FORWARD);
 }
 
 /*
@@ -143,6 +196,29 @@ direction_t alignToPeg(void)
 	}
 }
 
+void moveForwardToPushStop()
+{
+    int val;
+
+    //servoChangeRate[IRServo] = 1;
+    servo[IRServo] = IR_DEPLOY_RING;
+    //wait1Msec(3000);
+    //servoChangeRate[IRServo] = 10;
+
+    wait1Msec(1000);
+
+    // We are aligned.  Move forward until the
+    // the touch sensor is depressed.
+    moveForwardOn(10);
+    val = SensorValue[touchSensor];
+
+	while (val != 1) {
+        val = SensorValue[touchSensor];
+        nxtDisplayCenteredBigTextLine(3, "Move: %d", val);
+    }
+    moveForwardOff();
+}
+
 /*
  * placeRing
  *
@@ -154,26 +230,21 @@ direction_t alignToPeg(void)
  */
 void placeRing(void)
 {
-	raiseShelfToPlacePosition();
+	raiseShelfToAutoPlacePosition();
 
-    pauseDebug("shelf raised, servo deployed", 5);
+    pauseDebug("shelf raised, servo deployed", 1);
 
-    servo[IRServo] = IR_DEPLOY_RING;
+    moveForwardToPushStop();
 
-    // We are aligned.  Move forward until the
-    // the touch sensor is depressed.
-    moveForwardOn(40);
-	while (TSreadState(touchSensor) == 0) { }
-    moveForwardOff();
-
-    pauseDebug("are we in place?", 5);
+    pauseDebug("are we in place?", 1);
 
 	// We are aligned, and on the white line so
 	// move forward until we hit the proper strength
 	// value from the beacon.
 	//moveToBeacon(BEACON_TARGET_STRENGTH);
 
-    moveSideways(7);
+    servo[gravityShelf] = 250;
+    moveSideways(20);
 
 	moveBackward(3);
 }

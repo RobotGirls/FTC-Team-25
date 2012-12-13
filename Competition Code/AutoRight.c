@@ -30,6 +30,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
+
 #include "../library/sensors/drivers/hitechnic-sensormux.h"
 #include "../library/sensors/drivers/hitechnic-irseeker-v2.h"
 #include "../library/sensors/drivers/hitechnic-compass.h"

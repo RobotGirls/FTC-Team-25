@@ -6,12 +6,15 @@
  */
 
 const tMUXSensor HTMC = msensor_S3_1;
-const tMUXSensor touchSensor = msensor_S3_2;
+const tMUXSensor IRSeeker = msensor_S3_2;
+//const tMUXSensor touchSensor = msensor_S3_2;
 
 #define ENCPERINCH 140
+#define ENC_TICKS_PER_DEGREE 25
 #define SHELFUP 5
 #define SHELFDOWN 240
 #define SHELFPLACE 86
+#define SHELF_AUTO_PLACE 100
 #define SHELFREMOVE 75
 #define SHELFDISCHARGE 0
 #define IRUP 130
@@ -27,7 +30,9 @@ const tMUXSensor touchSensor = msensor_S3_2;
 typedef enum {
 	NO_DIR,
 	LEFT,
-	RIGHT
+	RIGHT,
+    FORWARD,
+    BACKWARD
 } direction_t;
 
 /*
@@ -86,6 +91,14 @@ void moveForwardOn(int speed)
 	motor[driveLeft] = speed;
 }
 
+int getStrength(void)
+{
+    int strength1, strength2, strength3, strength4, strength5;
+
+    HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5);
+    return (strength3);
+}
+
 /*
  * moveForwardOff
  *
@@ -105,14 +118,15 @@ void moveForwardOff()
 void moveForward (int inches)
 {
 	int encoderCounts = inches * ENCPERINCH;
+    char tmp[50];
 
 	nMotorEncoder[driveRight] = 0;
 	nMotorEncoder[driveLeft] = 0;
 
-	motor[driveRight] = 75;
-	motor[driveLeft] = 75;
+	motor[driveRight] = 100;
+	motor[driveLeft] = 100;
 
-	while(abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
+	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
 	{
 	}
 
@@ -227,6 +241,28 @@ void turn(int deg, int speed)
 	motor[driveLeft] = 0;
 }
 
+void turnEncoder(int deg, int speed)
+{
+	int dest;
+    int encoderCounts;
+
+    encoderCounts = deg * ENC_TICKS_PER_DEGREE;
+
+	if (deg < 0) {
+		rotateCounterClockwise(speed);
+	} else {
+		rotateClockwise(speed);
+	}
+
+	nMotorEncoder[driveRight] = 0;
+
+    while (abs(nMotorEncoder[driveRight]) < encoderCounts) { }
+
+  	motor[driveRight] = 0;
+	motor[driveLeft] = 0;
+}
+
+
  /**********************************************************************************************
  * Functions that manipulate mechanisms
  **********************************************************************************************/
@@ -234,6 +270,11 @@ void turn(int deg, int speed)
 void raiseShelfToPlacePosition(void)
 {
 	servo[gravityShelf] = SHELFPLACE;
+}
+
+void raiseShelfToAutoPlacePosition(void)
+{
+	servo[gravityShelf] = SHELF_AUTO_PLACE;
 }
 
 void lowerShelfToDischargePosition(void)

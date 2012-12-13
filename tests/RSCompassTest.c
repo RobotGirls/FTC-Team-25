@@ -1,5 +1,5 @@
 #pragma config(Hubs,  S1, HTServo,  HTMotor,  HTMotor,  HTMotor)
-#pragma config(Sensor, S2,     touchSensor,    sensorTouch)
+#pragma config(Sensor, S2,     IRSeeker,       sensorI2CCustom)
 #pragma config(Sensor, S3,     HTSMUX,         sensorI2CCustom)
 #pragma config(Sensor, S4,     lightSensor,    sensorLightInactive)
 #pragma config(Motor,  motorA,           ,             tmotorNXT, openLoop)
@@ -37,7 +37,6 @@
 #include "../library/sensors/drivers/lego-touch.h"
 
 #include "../Competition Code/Lib/Lib12-13.c"
-#include "../Competition Code/AutoCommon.c"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -79,7 +78,7 @@ void initializeRobot()
 	tHTIRS2DSPMode mode = DSP_1200;
 
 	// set the DSP to the new mode
-	//HTIRS2setDSPMode(IRSeeker, mode);
+	HTIRS2setDSPMode(IRSeeker, mode);
 
   	return;
 }
@@ -113,11 +112,8 @@ task main() {
 
     initializeRobot();
 
-    moveForwardToPushStop();
-
-	while (true) {
-    	val = SensorValue[touchSensor];
-        sprintf(str, "Touch: %d", val);
-        nxtDisplayBigTextLine(3, str);
-    }
+    showHeading();
+    turn(45,5);
+    pauseDebug("foobar", 2);
+    turn(-45, 5);
 }

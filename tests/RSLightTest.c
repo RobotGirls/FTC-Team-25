@@ -46,8 +46,8 @@ task main()
 	nxtDisplayTextLine(2, "Press orange");
 	nxtDisplayTextLine(3, "button to switch");
 
-	motor[motorD] = -30;
-	motor[motorE] = -30;
+	//motor[motorD] = -30;
+	//motor[motorE] = -30;
 
     while (true) {
 		// The enter button has been pressed, switch
