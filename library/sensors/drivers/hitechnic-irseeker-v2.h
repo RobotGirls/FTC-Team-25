@@ -405,13 +405,13 @@ bool HTIRS2readEnhanced(tSensors  link, int &dir, int &strength)
   dcSigSum = HTIRS2_I2CReply[iMax] + HTIRS2_I2CReply[5];
 
   // Check signal strength of neighbouring sensor elements
-  if ((iMax > 0) && (HTIRS2_I2CReply[iMax - 1] > (HTIRS2_I2CReply[iMax] / 2)))
+  if ((iMax > 0) && (HTIRS2_I2CReply[iMax - 1] > (ubyte)(HTIRS2_I2CReply[iMax] / 2)))
   {
       dir--;
       dcSigSum += HTIRS2_I2CReply[iMax - 1];
   }
 
-  if ((iMax < 4) && (HTIRS2_I2CReply[iMax + 1] > HTIRS2_I2CReply[iMax] / 2))
+  if ((iMax < 4) && (HTIRS2_I2CReply[iMax + 1] > (ubyte)(HTIRS2_I2CReply[iMax] / 2)))
   {
       dir++;
       dcSigSum += HTIRS2_I2CReply[iMax + 1];

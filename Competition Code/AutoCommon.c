@@ -200,6 +200,8 @@ void moveForwardToPushStop()
 {
     int val;
 
+    raiseShelfToAutoPushStopPosition();
+
     //servoChangeRate[IRServo] = 1;
     servo[IRServo] = IR_DEPLOY_RING;
     //wait1Msec(3000);
@@ -211,7 +213,6 @@ void moveForwardToPushStop()
     // the touch sensor is depressed.
     moveForwardOn(10);
     val = SensorValue[touchSensor];
-
 	while (val != 1) {
         val = SensorValue[touchSensor];
         nxtDisplayCenteredBigTextLine(3, "Move: %d", val);
@@ -230,21 +231,27 @@ void moveForwardToPushStop()
  */
 void placeRing(void)
 {
-	raiseShelfToAutoPlacePosition();
-
-    pauseDebug("shelf raised, servo deployed", 1);
-
     moveForwardToPushStop();
 
-    pauseDebug("are we in place?", 1);
+    moveBackwardHalf(2,20);
 
-	// We are aligned, and on the white line so
-	// move forward until we hit the proper strength
-	// value from the beacon.
-	//moveToBeacon(BEACON_TARGET_STRENGTH);
+	raiseShelfToAutoPlacePosition();
 
-    servo[gravityShelf] = 250;
-    moveSideways(20);
+    //servo[IRServo] = IRUP;
+    pauseDebug("Prepping to move forward", 1);
+
+    moveForwardHalf(5,20);
+
+    //lowerShelfToDischargePosition();
+    pauseDebug("shelf raised, servo deployed", 1);
+    servo[IRServo] = IRRING;
+    turn(2,15);
+
+    moveSideways(10, 15);
+
+    servo[gravityShelf] = SHELFDOWN;
+
+    moveSideways(5, 15);
 
 	moveBackward(3);
 }

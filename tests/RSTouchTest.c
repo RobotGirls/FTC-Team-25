@@ -54,36 +54,6 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void initializeRobot()
-{
-  	// Place code here to sinitialize servos to starting positions.
-  	// Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
-  	servo[gravityShelf] = SHELFDOWN;
-  	servo[IRServo] = IRUP;
-
-	/*
-	 * Assume lined up perpendicular to the pegs.
-	 */
-	HTMCsetTarget(HTMC);
-
-	nMotorPIDSpeedCtrl[driveLeft] = mtrSpeedReg;
-	nMotorPIDSpeedCtrl[driveRight] = mtrSpeedReg;
-	nMotorPIDSpeedCtrl[driveSide] = mtrSpeedReg;
-
-    /*
-     * Do not let the motors coast
-     */
-    bFloatDuringInactiveMotorPWM = false;
-
-	// the default DSP mode is 1200 Hz.
-	tHTIRS2DSPMode mode = DSP_1200;
-
-	// set the DSP to the new mode
-	//HTIRS2setDSPMode(IRSeeker, mode);
-
-  	return;
-}
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -113,7 +83,9 @@ task main() {
 
     initializeRobot();
 
-    moveForwardToPushStop();
+    placeRing();
+
+//    moveForwardToPushStop();
 
 	while (true) {
     	val = SensorValue[touchSensor];

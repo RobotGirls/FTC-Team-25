@@ -85,7 +85,6 @@
 task main()
 {
 	direction_t dir;
-    char tmp[50];
 
 	initializeRobot();
 
@@ -93,14 +92,14 @@ task main()
 	//waitForStart();
 
 	// Move forward a predetermined amount.
-    moveForwardToWhiteLine(32);
+    moveForwardToWhiteLine(36);
 
     pauseDebug("On white line", 1);
 
     // Move until the robot is entirely on the platform
     moveForward(4);
 
-    turn(-43, 5);
+    turn(-41, 5);
 
     dir = lookForIRBeacon();
 
@@ -112,9 +111,9 @@ task main()
 			lookForWhiteLine(LEFT);
 			break;
 		case LEFT:
+        case NO_DIR:
 			lookForWhiteLine(RIGHT);
 			break;
-		case NO_DIR:
 		default:
 	}
 

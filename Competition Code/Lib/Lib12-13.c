@@ -14,9 +14,10 @@ const tMUXSensor IRSeeker = msensor_S3_2;
 #define SHELFUP 5
 #define SHELFDOWN 240
 #define SHELFPLACE 86
-#define SHELF_AUTO_PLACE 100
+#define SHELF_AUTO_PLACE 135
+#define SHELF_AUTO_PUSH_STOP 161
 #define SHELFREMOVE 75
-#define SHELFDISCHARGE 0
+#define SHELFDISCHARGE 144
 #define IRUP 130
 #define IRDOWN 234
 #define IR_DEPLOY_RING 116
@@ -118,13 +119,30 @@ void moveForwardOff()
 void moveForward (int inches)
 {
 	int encoderCounts = inches * ENCPERINCH;
-    char tmp[50];
 
 	nMotorEncoder[driveRight] = 0;
 	nMotorEncoder[driveLeft] = 0;
 
 	motor[driveRight] = 100;
 	motor[driveLeft] = 100;
+
+	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
+	{
+	}
+
+	motor[driveLeft] = 0;
+	motor[driveRight] = 0;
+}
+
+void moveForwardHalf(int inches, int speed)
+{
+	int encoderCounts = inches * (ENCPERINCH/2);
+
+	nMotorEncoder[driveRight] = 0;
+	nMotorEncoder[driveLeft] = 0;
+
+	motor[driveRight] = speed;
+	motor[driveLeft] = speed;
 
 	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
 	{
@@ -157,6 +175,25 @@ void moveBackward (int inches)
 	motor[driveRight] = 0;
 }
 
+void moveBackwardHalf(int inches, int speed)
+{
+	int encoderCounts = inches * (ENCPERINCH/2);
+
+	nMotorEncoder[driveRight] = 0;
+	nMotorEncoder[driveLeft] = 0;
+
+	motor[driveRight] = -speed;
+	motor[driveLeft] = -speed;
+
+	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
+	{
+	}
+
+	motor[driveLeft] = 0;
+	motor[driveRight] = 0;
+}
+
+
 /*
  * moveSideways
  *
@@ -164,12 +201,12 @@ void moveBackward (int inches)
  * FIXME: This only moves one way.  Fix such that you can
  *        move either right or left.
  */
-void moveSideways (int inches)
+void moveSideways (int inches, int speed)
 {
 	int encoderCounts = inches * ENCPERINCH;
 
 	nMotorEncoder[driveSide] = 0;
-	motor[driveSide] = -50;
+	motor[driveSide] = -speed;
 
 	while(abs(nMotorEncoder[driveSide]) < encoderCounts)
 	{
@@ -243,7 +280,6 @@ void turn(int deg, int speed)
 
 void turnEncoder(int deg, int speed)
 {
-	int dest;
     int encoderCounts;
 
     encoderCounts = deg * ENC_TICKS_PER_DEGREE;
@@ -275,6 +311,11 @@ void raiseShelfToPlacePosition(void)
 void raiseShelfToAutoPlacePosition(void)
 {
 	servo[gravityShelf] = SHELF_AUTO_PLACE;
+}
+
+void raiseShelfToAutoPushStopPosition(void)
+{
+	servo[gravityShelf] = SHELF_AUTO_PUSH_STOP;
 }
 
 void lowerShelfToDischargePosition(void)
