@@ -36,15 +36,6 @@ typedef enum {
     BACKWARD
 } direction_t;
 
-/*
- * Note that there's a problem if both motors do not turn
- * at the same rate.  #askjulie
- */
-#define WAIT_UNTIL_MOTOR_OFF \
-	while (nMotorRunState[driveRight] != runStateIdle) {} \
-	motor[driveLeft] = 0;
-
-
 /**********************************************************************************
  * Display and debugging functions
  **********************************************************************************/
@@ -65,154 +56,12 @@ void pauseDebug(char *str, int seconds)
     wait1Msec(seconds * 1000);
 }
 
-/**********************************************************************************
- * Movement functions
- **********************************************************************************/
-
-void rotateClockwise(int speed)
-{
-  	motor[driveRight] = -speed;
-	motor[driveLeft] = speed;
-}
-
-void rotateCounterClockwise(int speed)
-{
-	motor[driveRight] = speed;
-	motor[driveLeft] = -speed;
-}
-
-/*
- * moveForwardOn
- *
- * Turns the motors on, never turns them off.
- */
-void moveForwardOn(int speed)
-{
-	motor[driveRight] = speed;
-	motor[driveLeft] = speed;
-}
-
 int getStrength(void)
 {
     int strength1, strength2, strength3, strength4, strength5;
 
     HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5);
     return (strength3);
-}
-
-/*
- * moveForwardOff
- *
- * Turns the motors off.
- */
-void moveForwardOff()
-{
-	motor[driveRight] = 0;
-	motor[driveLeft] = 0;
-}
-
-/*
- * moveForward
- *
- * Move the robot forward a given number of inches.
- */
-void moveForward (int inches)
-{
-	int encoderCounts = inches * ENCPERINCH;
-
-	nMotorEncoder[driveRight] = 0;
-	nMotorEncoder[driveLeft] = 0;
-
-	motor[driveRight] = 100;
-	motor[driveLeft] = 100;
-
-	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
-	{
-	}
-
-	motor[driveLeft] = 0;
-	motor[driveRight] = 0;
-}
-
-void moveForwardHalf(int inches, int speed)
-{
-	int encoderCounts = inches * (ENCPERINCH/2);
-
-	nMotorEncoder[driveRight] = 0;
-	nMotorEncoder[driveLeft] = 0;
-
-	motor[driveRight] = speed;
-	motor[driveLeft] = speed;
-
-	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
-	{
-	}
-
-	motor[driveLeft] = 0;
-	motor[driveRight] = 0;
-}
-
-/*
- * moveBackward
- *
- * Move the robot backward a given number of inches
- */
-void moveBackward (int inches)
-{
-	int encoderCounts = inches * ENCPERINCH;
-
-	nMotorEncoder[driveRight] = 0;
-	nMotorEncoder[driveLeft] = 0;
-
-	motor[driveRight] = -50;
-	motor[driveLeft] = -50;
-
-	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
-	{
-	}
-
-	motor[driveLeft] = 0;
-	motor[driveRight] = 0;
-}
-
-void moveBackwardHalf(int inches, int speed)
-{
-	int encoderCounts = inches * (ENCPERINCH/2);
-
-	nMotorEncoder[driveRight] = 0;
-	nMotorEncoder[driveLeft] = 0;
-
-	motor[driveRight] = -speed;
-	motor[driveLeft] = -speed;
-
-	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
-	{
-	}
-
-	motor[driveLeft] = 0;
-	motor[driveRight] = 0;
-}
-
-
-/*
- * moveSideways
- *
- * Move the robot sideways a given number of inches.
- * FIXME: This only moves one way.  Fix such that you can
- *        move either right or left.
- */
-void moveSideways (int inches, int speed)
-{
-	int encoderCounts = inches * ENCPERINCH;
-
-	nMotorEncoder[driveSide] = 0;
-	motor[driveSide] = -speed;
-
-	while(abs(nMotorEncoder[driveSide]) < encoderCounts)
-	{
-	}
-
-	motor[driveSide] = 0;
 }
 
 /*
@@ -230,15 +79,15 @@ void moveToBeacon(int targetStrength)
 
 	HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5);
 
+    moveForwardOn(25);
+
 	motor[driveRight] = 25;
 	motor[driveLeft] = 25;
 
 	while (strength3 < targetStrength) {
 		HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5);
 	}
-	motor[driveRight] = 0;
-
-	motor[driveLeft] = 0;
+	moveForwardOff();
 }
 
 /*
@@ -274,8 +123,7 @@ void turn(int deg, int speed)
 		showHeading();
 	}
 
-  	motor[driveRight] = 0;
-	motor[driveLeft] = 0;
+  	moveForwardOff();
 }
 
 void turnEncoder(int deg, int speed)
@@ -294,8 +142,7 @@ void turnEncoder(int deg, int speed)
 
     while (abs(nMotorEncoder[driveRight]) < encoderCounts) { }
 
-  	motor[driveRight] = 0;
-	motor[driveLeft] = 0;
+    moveForwardOff(};
 }
 
 
