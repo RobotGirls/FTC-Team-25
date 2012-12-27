@@ -9,18 +9,16 @@ const tMUXSensor HTMC = msensor_S3_1;
 const tMUXSensor IRSeeker = msensor_S3_2;
 //const tMUXSensor touchSensor = msensor_S3_2;
 
-#define ENCPERINCH 140
-#define ENC_TICKS_PER_DEGREE 25
 #define SHELFUP 5
 #define SHELFDOWN 240
 #define SHELFPLACE 86
-#define SHELF_AUTO_PLACE 135
+#define SHELF_AUTO_PLACE 105
 #define SHELF_AUTO_PUSH_STOP 161
 #define SHELFREMOVE 75
 #define SHELFDISCHARGE 144
 #define IRUP 130
 #define IRDOWN 234
-#define IR_DEPLOY_RING 116
+#define IR_DEPLOY_RING 104
 #define IRRING 110
 #define BEACON_TARGET_STRENGTH 120
 #define RAMP_START 166
@@ -142,7 +140,7 @@ void turnEncoder(int deg, int speed)
 
     while (abs(nMotorEncoder[driveRight]) < encoderCounts) { }
 
-    moveForwardOff(};
+    moveForwardOff();
 }
 
 
