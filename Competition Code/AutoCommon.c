@@ -41,6 +41,9 @@ direction_t lookForIRBeacon(void)
 	int segment;
     direction_t moved_dir;
 	int strength1, strength2, strength3, strength4, strength5;
+    bool bypass;
+
+    bypass = false;
 
 	segment = HTIRS2readACDir(IRSeeker);
 
@@ -58,7 +61,12 @@ direction_t lookForIRBeacon(void)
 
     HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5);
 
+    nMotorEncoder[driveSide] = 0;
 	while (segment != BEACON_CENTER) {
+        if (nMotorEncoder[driveSide] >= (12 * ENCPERINCH)) {
+            bypass = true;
+            break;
+        }
     	segment = HTIRS2readACDir(IRSeeker);
 	}
 
@@ -66,17 +74,20 @@ direction_t lookForIRBeacon(void)
      * We are in the correct segment, so move until the strength
      * is balanced.
      */
-    HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5);
+    if (!bypass) {
+	    HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5);
 
-    while (strength3 > strength2) {
-        HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5);
+	    while (strength3 > strength2) {
+	        HTIRS2readAllACStrength(IRSeeker, strength1, strength2, strength3, strength4, strength5);
+	    }
     }
 
 	motor[driveSide] = 0;
 
+    if (bypass) {
+        moveForward(2);
+    }
     pauseDebug("ir found", 1);
-
-    // moveSideways(7);
 
     return (moved_dir);
 }
@@ -187,7 +198,7 @@ direction_t alignToPeg(void)
 	if (bearing == 0) {
 		return NO_DIR;
 	} else {
-		turn(bearing, 10);
+		turn(-bearing, 5);
 		if (bearing < 0) {
 			return LEFT;
 		} else {
@@ -240,12 +251,12 @@ void placeRing(void)
     //servo[IRServo] = IRUP;
     pauseDebug("Prepping to move forward", 1);
 
-    moveForwardHalf(5,20);
+    moveForwardHalf(7,20);
 
     //lowerShelfToDischargePosition();
     pauseDebug("shelf raised, servo deployed", 1);
     servo[IRServo] = IRRING;
-    turn(2,15);
+    turn(5,15);
 
     moveSideways(10, 15);
 

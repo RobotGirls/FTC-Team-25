@@ -38,6 +38,7 @@
 #include "../library/sensors/drivers/lego-light.h"
 #include "../library/sensors/drivers/lego-touch.h"
 
+#include "DrivetrainSquare.c"
 #include "Lib/Lib12-13.c"
 #include "AutoCommon.c"
 
@@ -101,21 +102,28 @@ task main()
 
     turn(-41, 5);
 
+	HTMCsetTarget(HTMC);
+
     dir = lookForIRBeacon();
 
     /*
      * Center on the line.
 	 */
-	switch (dir) {
+	/*
+    switch (dir) {
 		case RIGHT:
-			lookForWhiteLine(LEFT);
+			lookForWhiteLine(RIGHT);
 			break;
 		case LEFT:
         case NO_DIR:
-			lookForWhiteLine(RIGHT);
+			lookForWhiteLine(LEFT);
 			break;
 		default:
 	}
+    */
+    lookForWhiteLine(RIGHT);
+
+    // alignToPeg();
 
 	placeRing();
 
