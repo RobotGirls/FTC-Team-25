@@ -1,3 +1,15 @@
+
+#define ENCPERINCH 140
+#define ENC_TICKS_PER_DEGREE 25
+
+typedef enum {
+	NO_DIR,
+	LEFT,
+	RIGHT,
+    FORWARD,
+    BACKWARD
+} direction_t;
+
 /**********************************************************************************
  * Movement functions
  **********************************************************************************/
@@ -34,6 +46,18 @@ void moveForwardOff()
 {
 	motor[driveRight] = 0;
 	motor[driveLeft] = 0;
+}
+
+/*
+ * allMotorsOff
+ *
+ * Turns off all motors on the chassis.
+ */
+void allMotorsOff()
+{
+    motor[driveLeft] = 0;
+    motor[driveRight] = 0;
+    motor[driveSide] = 0;
 }
 
 /*
@@ -126,12 +150,16 @@ void moveBackwardHalf(int inches, int speed)
  * FIXME: This only moves one way.  Fix such that you can
  *        move either right or left.
  */
-void moveSideways (int inches, int speed)
+void moveSideways (direction_t dir, int inches, int speed)
 {
 	int encoderCounts = inches * ENCPERINCH;
 
 	nMotorEncoder[driveSide] = 0;
-	motor[driveSide] = -speed;
+    if (dir == LEFT) {
+	    motor[driveSide] = speed;
+    } else {
+        motor[driveSide] = -speed;
+    }
 
 	while(abs(nMotorEncoder[driveSide]) < encoderCounts)
 	{
