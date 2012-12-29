@@ -82,6 +82,15 @@ void moveForwardOff()
 }
 
 /*
+ * allMotorsOff
+ *
+ * Turns off all motors on the chassis.
+ */
+void allMotorsOff()
+{
+}
+
+/*
  * moveForward
  *
  * Move the robot forward a given number of inches

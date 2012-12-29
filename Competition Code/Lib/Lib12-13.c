@@ -24,15 +24,9 @@ const tMUXSensor IRSeeker = msensor_S3_2;
 #define RAMP_START 166
 #define RAMP_DEPLOY 48
 #define SHELFINCREMENT 1
-#define BEACON_CENTER 4
+#define BEACON_CENTER 5
 
-typedef enum {
-	NO_DIR,
-	LEFT,
-	RIGHT,
-    FORWARD,
-    BACKWARD
-} direction_t;
+int alignedHeading;
 
 /**********************************************************************************
  * Display and debugging functions
@@ -109,6 +103,8 @@ void turn(int deg, int speed)
 		dest = dest - 360;
 	}
 
+    eraseDisplay();
+
 	showTarget(dest);
 
 	if (deg < 0) {
@@ -122,6 +118,16 @@ void turn(int deg, int speed)
 	}
 
   	moveForwardOff();
+}
+
+void markHeading(void)
+{
+    alignedHeading = HTMCreadHeading(HTMC);
+}
+
+int getMarkedHeading(void)
+{
+    return alignedHeading;
 }
 
 void turnEncoder(int deg, int speed)
@@ -153,9 +159,19 @@ void raiseShelfToPlacePosition(void)
 	servo[gravityShelf] = SHELFPLACE;
 }
 
-void raiseShelfToAutoPlacePosition(void)
+void raiseShelfToAutoPlacePosition(direction_t dir)
 {
-	servo[gravityShelf] = SHELF_AUTO_PLACE;
+    switch (dir) {
+        case NO_DIR:
+	        servo[gravityShelf] = SHELF_AUTO_PLACE - 20;
+            break;
+        case RIGHT:
+        case LEFT:
+            servo[gravityShelf] = SHELF_AUTO_PLACE - 20;
+            break;
+        default:
+            break;
+    }
 }
 
 void raiseShelfToAutoPushStopPosition(void)
