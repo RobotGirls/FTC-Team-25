@@ -11,6 +11,10 @@
  */
 void rotateClockwise(int speed)
 {
+        motor[leftFront] = speed;
+ 		motor[rightFront] = speed;
+ 		motor[leftRear] = speed;
+ 		motor[rightRear] = speed;
 }
 
 /*
@@ -21,6 +25,10 @@ void rotateClockwise(int speed)
 
 void rotateCounterClockwise(int speed)
 {
+        motor[leftFront] = -speed;
+ 		motor[rightFront] = -speed;
+ 		motor[leftRear] = -speed;
+ 		motor[rightRear] = -speed;
 }
 
 /*
@@ -30,6 +38,34 @@ void rotateCounterClockwise(int speed)
  */
 void moveForwardOn(int speed)
 {
+	motor[leftFront] = speed;
+	motor[rightFront] = -speed;
+	motor[leftRear] = speed;
+	motor[rightRear] = -speed;
+}
+
+void moveBackwardOn(int speed)
+{
+    motor[leftFront] = -speed;
+ 	motor[rightFront] = speed;
+ 	motor[leftRear] = -speed;
+    motor[rightRear] = speed;
+}
+
+void moveSideRightOn(int speed)
+{
+     motor[leftFront] = speed;
+ 	 motor[rightFront] = speed;
+ 	 motor[leftRear] = -speed;
+     motor[rightRear] = -speed;
+}
+
+void moveSideLeftOn(int speed)
+{
+    motor[leftFront] = -speed;
+    motor[rightFront] = -speed;
+    motor[leftRear] = speed;
+    motor[rightRear] = speed;
 }
 
 /*
@@ -39,6 +75,10 @@ void moveForwardOn(int speed)
  */
 void moveForwardOff()
 {
+        motor[leftFront] = 0;
+ 		motor[rightFront] = 0;
+ 		motor[leftRear] = 0;
+ 		motor[rightRear] = 0;
 }
 
 /*
@@ -58,6 +98,10 @@ void allMotorsOff()
  */
 void moveForward (int inches, int speed)
 {
+        //motor[leftFront] = inches, speed;
+ 		//motor[rightFront] = inches, speed;
+ 		//motor[leftRear] = inches, speed;
+ 	    //motor[rightRear] = inches, speed;
 }
 
 /*
@@ -68,6 +112,10 @@ void moveForward (int inches, int speed)
  */
 void moveForwardHalf(int halfInches, int speed)
 {
+        //motor[leftFront] = (halfInches/2), speed;
+ 		//motor[rightFront] = (halfInches/2), speed;
+ 		//motor[leftRear] = (halfInches/2), speed;
+ 		//motor[rightRear] = (halfInches/2), speed;
 }
 
 /*
@@ -78,6 +126,10 @@ void moveForwardHalf(int halfInches, int speed)
  */
 void moveBackward (int inches, int speed)
 {
+        //motor[leftFront] = inches, speed;
+ 		//motor[rightFront] = inches, speed;
+ 		//motor[leftRear] = inches, speed;
+ 		//motor[rightRear] = inches,speed;
 }
 
 /*
@@ -88,6 +140,10 @@ void moveBackward (int inches, int speed)
  */
 void moveBackwardHalf(int inches, int speed)
 {
+        //motor[leftFront] = -(halfInches/2), speed;
+ 		//motor[rightFront] = -(halfInches/2), speed;
+ 		//motor[leftRear] = -(halfInches/2), speed;
+ 		//motor[rightRear] = -(halfInches/2), speed;
 }
 
 /*
@@ -97,6 +153,10 @@ void moveBackwardHalf(int inches, int speed)
  * FIXME: This only moves one way.  Fix such that you can
  *        move either right or left.
  */
-void moveSideways (int inches, int speed)
+void moveSideways (int inches, int speed)//fixed to go left right now. To go right put -speed.
 {
+        //motor[leftFront] = inches, -speed;
+ 		//motor[rightFront] = inches, -speed;
+ 		//motor[leftRear] = inches, speed;
+ 		//motor[rightRear] = inches, speed;
 }
