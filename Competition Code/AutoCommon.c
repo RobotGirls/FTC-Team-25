@@ -92,6 +92,24 @@ direction_t lookForIRBeacon(void)
     return (moved_dir);
 }
 
+direction_t whereIsTheBeacon(void)
+{
+    int segment;
+
+    segment = HTIRS2readACDir(IRSeeker);
+    nxtDisplayCenteredBigTextLine(4, "Dir: %d", segment);
+
+	if (segment != BEACON_CENTER) {
+        if ((segment > BEACON_CENTER) || (segment == 0)) {
+		    return RIGHT;
+        } else {
+            return LEFT;
+        }
+	} else {
+		return NO_DIR;
+	}
+}
+
 void moveForwardToIRBeacon(int strength)
 {
     int val;
@@ -162,8 +180,6 @@ void lookForWhiteLine(direction_t dir)
 	motor[driveSide] = 0;
     motor[driveLeft] = 0;
     motor[driveRight] = 0;
-
-    pauseDebug("on white line", 1);
 }
 
 /*
@@ -184,27 +200,34 @@ void moveForwardToWhiteLine(int dist)
  * We may have moved off perpendicular to the
  * peg during our travels.  If so, rotate back.
  */
-direction_t alignToPeg(void)
+void alignToPeg(direction_t dir)
 {
 	int bearing;
+    int marked;
     char str[48];
 
-	// Are we aligned?  If so we do nothing.
-	bearing = HTMCreadRelativeHeading(HTMC);
+    bearing = HTMCreadHeading(HTMC);
+    marked = getMarkedHeading();
 
-    sprintf(str, "Compass off %d", bearing);
+    sprintf(str, "Compass %d, Marked %d", bearing, marked);
     pauseDebug(str, 5);
 
-	if (bearing == 0) {
-		return NO_DIR;
-	} else {
-		turn(-bearing, 5);
-		if (bearing < 0) {
-			return LEFT;
-		} else {
-			return RIGHT;
-		}
+
+	if (bearing == getMarkedHeading()) {
+		return;
 	}
+
+	if (dir == LEFT) {
+		rotateCounterClockwise(20);
+	} else {
+		rotateClockwise(20);
+	}
+
+	while (HTMCreadHeading(HTMC) != marked) {
+		showHeading();
+	}
+
+  	moveForwardOff();
 }
 
 void moveForwardToPushStop()
@@ -231,6 +254,12 @@ void moveForwardToPushStop()
     moveForwardOff();
 }
 
+void findPeg(void)
+{
+    moveForwardToPushStop();
+    moveBackwardHalf(2,20);
+}
+
 /*
  * placeRing
  *
@@ -240,13 +269,9 @@ void moveForwardToPushStop()
  * Assumes we are on the platform and in front of the
  * peg we want to place the ring on.
  */
-void placeRing(void)
+void placeRing(direction_t dir)
 {
-    moveForwardToPushStop();
-
-    moveBackwardHalf(2,20);
-
-	raiseShelfToAutoPlacePosition();
+	raiseShelfToAutoPlacePosition(dir);
 
     //servo[IRServo] = IRUP;
     pauseDebug("Prepping to move forward", 1);
@@ -256,13 +281,13 @@ void placeRing(void)
     //lowerShelfToDischargePosition();
     pauseDebug("shelf raised, servo deployed", 1);
     servo[IRServo] = IRRING;
-    turn(5,15);
+    //turn(5,15);
 
-    moveSideways(10, 15);
+    //moveSideways(RIGHT, 10, 15);
 
     servo[gravityShelf] = SHELFDOWN;
 
-    moveSideways(5, 15);
+    //moveSideways(RIGHT, 5, 15);
 
 	moveBackward(3);
 }

@@ -36,6 +36,7 @@
 #include "../library/sensors/drivers/lego-light.h"
 #include "../library/sensors/drivers/lego-touch.h"
 
+#include "../Competition Code/DrivetrainSquare.c"
 #include "../Competition Code/Lib/Lib12-13.c"
 #include "../Competition Code/AutoCommon.c"
 
@@ -83,9 +84,9 @@ task main() {
 
     initializeRobot();
 
-    placeRing();
+//    placeRing();
 
-//    moveForwardToPushStop();
+    moveForwardToPushStop();
 
 	while (true) {
     	val = SensorValue[touchSensor];

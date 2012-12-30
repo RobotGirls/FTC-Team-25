@@ -95,16 +95,12 @@ task main()
 	// Move forward a predetermined amount.
     moveForwardToWhiteLine(36);
 
-    pauseDebug("On white line", 1);
-
     // Move until the robot is entirely on the platform
     moveForward(4);
 
     turn(-41, 5);
 
-	HTMCsetTarget(HTMC);
-
-    dir = lookForIRBeacon();
+    // dir = lookForIRBeacon();
 
     /*
      * Center on the line.
@@ -121,11 +117,48 @@ task main()
 		default:
 	}
     */
+
+    eraseDisplay();
+
+    dir = whereIsTheBeacon();
+
+    /*
+     * Take a reading of the compass so
+     * that we can rotate back to it's heading
+     * if we rotate off the platform
+     */
+    markHeading();
+
+    /*
+     * Find the middle peg
+     */
     lookForWhiteLine(RIGHT);
+    findPeg();
+
+    switch (dir) {
+        case NO_DIR:
+            // lookForWhiteLine(RIGHT);
+            break;
+        case RIGHT:
+            //lookForWhiteLine(RIGHT);
+            moveSideways(RIGHT, 50, 60);
+            //moveForwardHalf(2, 40);
+            lookForWhiteLine(RIGHT);
+            //alignToPeg(LEFT);
+            findPeg();
+            break;
+        case LEFT:
+            moveSideways(LEFT, 50, 60);
+            //moveForwardHalf(2, 40);
+            lookForWhiteLine(LEFT);
+            //alignToPeg(RIGHT);
+            findPeg();
+            break;
+    }
 
     // alignToPeg();
 
-	placeRing();
+	placeRing(dir);
 
 	while (true)
 	{}

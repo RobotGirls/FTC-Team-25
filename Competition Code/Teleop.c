@@ -35,12 +35,15 @@
 #include "../library/sensors/drivers/hitechnic-irseeker-v2.h"
 #include "../library/sensors/drivers/hitechnic-compass.h"
 #include "../library/sensors/drivers/lego-light.h"
+#include "DrivetrainSquare.c"
 #include "Lib/Lib12-13.c"
+#include "AutoCommon.c"
 
 /*
  * Semaphore for controlling servo movement.
  */
 bool blockArm = false;
+bool runningAutoPlace = false;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -53,6 +56,7 @@ bool blockArm = false;
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
 void initializeRobot()
 {
   	servo[gravityShelf] = SHELFDOWN;
@@ -67,7 +71,7 @@ void initializeRobot()
 
 	return;
 }
-
+*/
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -217,21 +221,55 @@ void moveRamp ()
     }
 }
 
+task placeRingTask()
+{
+    runningAutoPlace = true;
+    lookForWhiteLine(RIGHT);
+    placeRing();
+    runningAutoPlace = false;
+    allMotorsOff();
+}
+
+void autoPlace(void)
+{
+    if (joy1Btn(2))
+    {
+        StartTask(placeRingTask, kDefaultTaskPriority);
+    }
+}
+
+void stopAutoPlace(void)
+{
+	runningAutoPlace = false;
+    StopTask(placeRingTask);
+    allMotorsOff();
+}
 
 task main()
 {
-  initializeRobot();//call the initializeRobot function
+    initializeRobot();
 
-  waitForStart();   // wait for start of tele-op phase
+    waitForStart();
 
-  while (true)//infinite loop. Put all code in here to keep it running for the whole match
-  {
-    getJoystickSettings(joystick);//Get joystick input
+    while (true)
+    {
+        getJoystickSettings(joystick);
 
-  	forwarddrivetrain();//call the forwarddrivetrain function
-  	sidewaysdrivetrain();//call the sidewaysdrivetrain function
-  	movegravityShelf();
-  	sensorStalk();
-    moveRamp();
-  }
+        if (runningAutoPlace && (!joystick.joy1_Buttons))
+        {
+            continue;
+        }
+        else
+        {
+            if (runningAutoPlace) {
+                stopAutoPlace();
+            }
+	  	    forwarddrivetrain();
+	  	    sidewaysdrivetrain();
+	  	    movegravityShelf();
+	  	    sensorStalk();
+	        moveRamp();
+            autoPlace();
+        }
+    }
 }
