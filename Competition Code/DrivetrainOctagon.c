@@ -1,4 +1,4 @@
-
+#define ENCPERINCH 200
 
 /**********************************************************************************
  * Movement functions for the octagon drive train.
@@ -150,13 +150,29 @@ void moveBackwardHalf(int inches, int speed)
  * moveSideways
  *
  * Move the robot sideways a given number of inches.
- * FIXME: This only moves one way.  Fix such that you can
+ * FIXME: This only moves one way. z Fix such that you can
  *        move either right or left.
  */
 void moveSideways (int inches, int speed)//fixed to go left right now. To go right put -speed.
 {
-        //motor[leftFront] = inches, -speed;
- 		//motor[rightFront] = inches, -speed;
- 		//motor[leftRear] = inches, speed;
- 		//motor[rightRear] = inches, speed;
+    int encoderCounts = inches * ENCPERINCH;
+
+	nMotorEncoder[leftFront] = 0;
+    nMotorEncoder[rightFront] = 0;
+    nMotorEncoder[leftRear] = 0;
+    nMotorEncoder[rightRear] = 0;
+
+	motor[leftFront] = -speed;
+    motor[rightFront] = -speed;
+    motor[leftRear] = -speed;
+    motor[rightRear] = -speed;
+
+	while(abs(nMotorEncoder[leftFront]) < encoderCounts)
+	{
+	}
+
+	motor[leftFront] = 0;
+    motor[rightFront] = 0;
+    motor[leftRear] = 0;
+    motor[rightRear] = 0;
 }
