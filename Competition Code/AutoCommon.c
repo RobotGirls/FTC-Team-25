@@ -190,7 +190,8 @@ void lookForWhiteLine(direction_t dir)
  */
 void moveForwardToWhiteLine(int dist)
 {
-    moveForward(dist);
+    moveForward(dist-8);
+    moveForward(8, 40);
     lookForWhiteLine(FORWARD);
 }
 

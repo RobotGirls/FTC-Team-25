@@ -90,15 +90,17 @@ task main()
 	initializeRobot();
 
     // Wait for the beginning of autonomous phase.
-	//waitForStart();
+	waitForStart();
 
 	// Move forward a predetermined amount.
-    moveForwardToWhiteLine(36);
+    moveForwardToWhiteLine(38);
 
     // Move until the robot is entirely on the platform
-    moveForward(4);
+    moveForward(4, 50);
 
     turn(-41, 5);
+
+    moveSideways(LEFT, 5, 50);
 
     // dir = lookForIRBeacon();
 

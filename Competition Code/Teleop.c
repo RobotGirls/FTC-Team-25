@@ -117,39 +117,67 @@ task waitForSensorArm()
 
 void forwarddrivetrain()
 {
-	if(abs(joystick.joy1_y1) > 50)
- 	{
- 		motor[driveLeft] = joystick.joy1_y1;
- 	}
- 	else
- 	{
- 		motor[driveLeft] = 0;
-    }
+    if (joystick.joy1_TopHat == -1)
+    {
+		if(abs(joystick.joy1_y1) > 20)
+		{
+	    	motor[driveLeft] = joystick.joy1_y1;
+		}
+		else
+		{
+		    motor[driveLeft] = 0;
+		}
 
-   if(abs(joystick.joy1_y2) > 50)
-   {
- 		motor[driveRight] = joystick.joy1_y2;
-   }
-   else
-   {
- 		motor[driveRight] = 0;
-   }
+		if(abs(joystick.joy1_y2) > 20)
+		{
+	    	motor[driveRight] = joystick.joy1_y2;
+		}
+		else
+		{
+		    motor[driveRight] = 0;
+		}
+    }
+    else
+    {
+        if (joystick.joy1_TopHat == 0)
+        {
+            moveForwardOn(20);
+        }
+        else if (joystick.joy1_TopHat == 4)
+        {
+            moveBackwardOn(20);
+        }
+    }
 }
 
 void sidewaysdrivetrain()
 {
-   if (joy1Btn(8))
-   {
- 		motor[driveSide] = -100;
-   }
-   else if (joy1Btn(7))
-   {
- 		motor[driveSide] = 100;
-   }
-   else
-   {
-     motor[driveSide] = 0;
-   }
+    if (joystick.joy1_TopHat == -1)
+    {
+		if (joy1Btn(8))
+		{
+			motor[driveSide] = -100;
+		}
+		else if (joy1Btn(7))
+		{
+			motor[driveSide] = 100;
+		}
+		else
+		{
+			motor[driveSide] = 0;
+		}
+    }
+    else
+    {
+        if (joystick.joy1_TopHat == 2)
+        {
+            moveSidewaysOn(RIGHT, 20);
+        }
+        else if (joystick.joy1_TopHat == 6)
+        {
+            moveSidewaysOn(LEFT, 20);
+        }
+    }
 }
 
 void movegravityShelf()
@@ -165,6 +193,11 @@ void movegravityShelf()
 	{
 		servo[gravityShelf] = SHELFDOWN;
 	}
+
+    if (joy2Btn(1))
+    {
+        raiseShelfToAutoPlacePosition(NO_DIR);
+    }
 
 	if (joy2Btn(2))
 	{
@@ -221,27 +254,44 @@ void moveRamp ()
     }
 }
 
-task placeRingTask()
+void placeRingEx(direction_t dir)
 {
     runningAutoPlace = true;
-    lookForWhiteLine(RIGHT);
-    placeRing();
+    lookForWhiteLine(dir);
+    findPeg();
+    placeRing(dir);
     runningAutoPlace = false;
     allMotorsOff();
+}
+
+task placeRingRightTask()
+{
+    placeRingEx(RIGHT);
+}
+
+task placeRingLeftTask()
+{
+    placeRingEx(LEFT);
 }
 
 void autoPlace(void)
 {
     if (joy1Btn(2))
     {
-        StartTask(placeRingTask, kDefaultTaskPriority);
+        StartTask(placeRingRightTask, kDefaultTaskPriority);
+    }
+
+    if (joy1Btn(4))
+    {
+        StartTask(placeRingLeftTask, kDefaultTaskPriority);
     }
 }
 
 void stopAutoPlace(void)
 {
 	runningAutoPlace = false;
-    StopTask(placeRingTask);
+    StopTask(placeRingRightTask);
+    StopTask(placeRingLeftTask);
     allMotorsOff();
 }
 
