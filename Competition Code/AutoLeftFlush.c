@@ -92,6 +92,8 @@ task main()
     // Wait for the beginning of autonomous phase.
 	waitForStart();
 
+  	servo[IRServo] = IRUP;
+
 	// Move forward a predetermined amount.
     moveForwardToWhiteLine(38);
 
@@ -143,14 +145,15 @@ task main()
             break;
         case RIGHT:
             //lookForWhiteLine(RIGHT);
-            moveSideways(RIGHT, 50, 60);
-            //moveForwardHalf(2, 40);
+            moveForwardHalf(1, 40);
+            moveSideways(RIGHT, 30, 60);
             lookForWhiteLine(RIGHT);
             //alignToPeg(LEFT);
             findPeg();
             break;
         case LEFT:
-            moveSideways(LEFT, 50, 60);
+            moveForwardHalf(1, 40);
+            moveSideways(LEFT, 30, 60);
             //moveForwardHalf(2, 40);
             lookForWhiteLine(LEFT);
             //alignToPeg(RIGHT);

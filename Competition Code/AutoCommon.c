@@ -4,7 +4,7 @@ void initializeRobot()
   	// Place code here to sinitialize servos to starting positions.
   	// Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
   	servo[gravityShelf] = SHELFDOWN;
-  	servo[IRServo] = IRUP;
+  	servo[IRServo] = IRDOWN;
     servo[Ramp] = RAMP_START;
 
 	/*
@@ -272,16 +272,17 @@ void findPeg(void)
  */
 void placeRing(direction_t dir)
 {
+    servo[IRServo] = IRDOWN;
+
 	raiseShelfToAutoPlacePosition(dir);
 
     //servo[IRServo] = IRUP;
     pauseDebug("Prepping to move forward", 1);
-
+    servo[IRServo] = IRRING;
     moveForwardHalf(7,20);
 
     //lowerShelfToDischargePosition();
     pauseDebug("shelf raised, servo deployed", 1);
-    servo[IRServo] = IRRING;
     //turn(5,15);
 
     //moveSideways(RIGHT, 10, 15);
