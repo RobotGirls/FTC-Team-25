@@ -10,6 +10,13 @@ typedef enum {
     BACKWARD
 } direction_t;
 
+void initializeMotors(void)
+{
+	nMotorPIDSpeedCtrl[driveLeft] = mtrSpeedReg;
+	nMotorPIDSpeedCtrl[driveRight] = mtrSpeedReg;
+	nMotorPIDSpeedCtrl[driveSide] = mtrSpeedReg;
+}
+
 /**********************************************************************************
  * Movement functions
  **********************************************************************************/
@@ -166,4 +173,9 @@ void moveSideways (direction_t dir, int inches, int speed)
 	}
 
 	motor[driveSide] = 0;
+}
+//all sideway Movement
+void sidewaysMovement(int speed)
+{
+    motor[driveSide] = speed;
 }

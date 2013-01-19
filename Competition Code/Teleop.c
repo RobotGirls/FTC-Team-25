@@ -36,6 +36,7 @@
 #include "../library/sensors/drivers/hitechnic-compass.h"
 #include "../library/sensors/drivers/lego-light.h"
 #include "Lib/Lib12-13.c"
+#include "DrivetrainSquare.c"
 
 /*
  * Semaphore for controlling servo movement.

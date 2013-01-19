@@ -1,4 +1,5 @@
-#define ENCPERINCH 200
+#define ENCPERINCH 720
+
 
 /**********************************************************************************
  * Movement functions for the octagon drive train.
@@ -88,6 +89,10 @@ void moveForwardOff()
  */
 void allMotorsOff()
 {
+        motor[leftFront] = 0;
+ 		motor[rightFront] = 0;
+ 		motor[leftRear] = 0;
+ 		motor[rightRear] = 0;
 }
 
 /*
@@ -98,10 +103,26 @@ void allMotorsOff()
  */
 void moveForward (int inches, int speed)
 {
-        //motor[leftFront] = inches, speed;
- 		//motor[rightFront] = inches, speed;
- 		//motor[leftRear] = inches, speed;
- 	    //motor[rightRear] = inches, speed;
+    int encoderCounts = inches * ENCPERINCH;
+
+	nMotorEncoder[leftFront] = 0;
+    nMotorEncoder[rightFront] = 0;
+    nMotorEncoder[leftRear] = 0;
+    nMotorEncoder[rightRear] = 0;
+
+	motor[leftFront] = speed;
+    motor[rightFront] = -speed;
+    motor[leftRear] = speed;
+    motor[rightRear] = -speed;
+
+	while(abs(nMotorEncoder[leftFront]) < encoderCounts)
+	{
+	}
+
+	motor[leftFront] = 0;
+    motor[rightFront] = 0;
+    motor[leftRear] = 0;
+    motor[rightRear] = 0;
 }
 
 /*
@@ -110,13 +131,29 @@ void moveForward (int inches, int speed)
  * Move the robot forward a given number of half inches
  * at the given speed.
  */
-void moveForwardHalf(int halfInches, int speed)
-{
-        //motor[leftFront] = (halfInches/2), speed;
- 		//motor[rightFront] = (halfInches/2), speed;
- 		//motor[leftRear] = (halfInches/2), speed;
- 		//motor[rightRear] = (halfInches/2), speed;
-}
+//void moveForwardHalf(int halfInches, int speed)
+//{
+//    int encoderCounts = inches * ENCPERINCH/2;
+
+//	nMotorEncoder[leftFront] = 0;
+//    nMotorEncoder[rightFront] = 0;
+//    nMotorEncoder[leftRear] = 0;
+//    nMotorEncoder[rightRear] = 0;
+
+//	motor[leftFront] = speed;
+//    motor[rightFront] = -speed;
+//    motor[leftRear] = speed;
+//    motor[rightRear] = -speed;
+
+//	while(abs(nMotorEncoder[leftFront]) < encoderCounts)
+//	{
+//	}
+
+//	motor[leftFront] = 0;
+//    motor[rightFront] = 0;
+//    motor[leftRear] = 0;
+//    motor[rightRear] = 0;
+//}
 
 /*
  * moveBackward
@@ -126,10 +163,26 @@ void moveForwardHalf(int halfInches, int speed)
  */
 void moveBackward (int inches, int speed)
 {
-        //motor[leftFront] = inches, speed;
- 		//motor[rightFront] = inches, speed;
- 		//motor[leftRear] = inches, speed;
- 		//motor[rightRear] = inches,speed;
+    int encoderCounts = inches * ENCPERINCH;
+
+	nMotorEncoder[leftFront] = 0;
+    nMotorEncoder[rightFront] = 0;
+    nMotorEncoder[leftRear] = 0;
+    nMotorEncoder[rightRear] = 0;
+
+	motor[leftFront] = -speed;
+    motor[rightFront] = speed;
+    motor[leftRear] = -speed;
+    motor[rightRear] = speed;
+
+	while(abs(nMotorEncoder[leftFront]) < encoderCounts)
+	{
+	}
+
+	motor[leftFront] = 0;
+    motor[rightFront] = 0;
+    motor[leftRear] = 0;
+    motor[rightRear] = 0;
 }
 
 /*
@@ -140,10 +193,26 @@ void moveBackward (int inches, int speed)
  */
 void moveBackwardHalf(int inches, int speed)
 {
-        //motor[leftFront] = -(halfInches/2), speed;
- 		//motor[rightFront] = -(halfInches/2), speed;
- 		//motor[leftRear] = -(halfInches/2), speed;
- 		//motor[rightRear] = -(halfInches/2), speed;
+    int encoderCounts = inches * ENCPERINCH/2;
+
+	nMotorEncoder[leftFront] = 0;
+    nMotorEncoder[rightFront] = 0;
+    nMotorEncoder[leftRear] = 0;
+    nMotorEncoder[rightRear] = 0;
+
+	motor[leftFront] = -speed;
+    motor[rightFront] = speed;
+    motor[leftRear] = -speed;
+    motor[rightRear] = speed;
+
+	while(abs(nMotorEncoder[leftFront]) < encoderCounts)
+	{
+	}
+
+	motor[leftFront] = 0;
+    motor[rightFront] = 0;
+    motor[leftRear] = 0;
+    motor[rightRear] = 0;
 }
 
 /*
@@ -153,7 +222,7 @@ void moveBackwardHalf(int inches, int speed)
  * FIXME: This only moves one way. z Fix such that you can
  *        move either right or left.
  */
-void moveSideways (int inches, int speed)//fixed to go left right now. To go right put -speed.
+void moveSidewaysRight (int inches, int speed)
 {
     int encoderCounts = inches * ENCPERINCH;
 
@@ -162,8 +231,8 @@ void moveSideways (int inches, int speed)//fixed to go left right now. To go rig
     nMotorEncoder[leftRear] = 0;
     nMotorEncoder[rightRear] = 0;
 
-	motor[leftFront] = -speed;
-    motor[rightFront] = -speed;
+	motor[leftFront] = speed;
+    motor[rightFront] = speed;
     motor[leftRear] = -speed;
     motor[rightRear] = -speed;
 
@@ -176,3 +245,56 @@ void moveSideways (int inches, int speed)//fixed to go left right now. To go rig
     motor[leftRear] = 0;
     motor[rightRear] = 0;
 }
+
+void moveSidewaysLeft (int inches, int speed)
+{
+    int encoderCounts = inches * ENCPERINCH;
+
+	nMotorEncoder[leftFront] = 0;
+    nMotorEncoder[rightFront] = 0;
+    nMotorEncoder[leftRear] = 0;
+    nMotorEncoder[rightRear] = 0;
+
+	motor[leftFront] = -speed;
+    motor[rightFront] = -speed;
+    motor[leftRear] = speed;
+    motor[rightRear] = speed;
+
+	while(abs(nMotorEncoder[leftFront]) < encoderCounts)
+	{
+	}
+
+	motor[leftFront] = 0;
+    motor[rightFront] = 0;
+    motor[leftRear] = 0;
+    motor[rightRear] = 0;
+}
+
+//initializes all motors on the robot
+void initializeMotors(void)
+{
+	nMotorPIDSpeedCtrl[leftFront] = mtrSpeedReg;
+	nMotorPIDSpeedCtrl[rightFront] = mtrSpeedReg;
+	nMotorPIDSpeedCtrl[leftRear] = mtrSpeedReg;
+    nMotorPIDSpeedCtrl[rightRear] = mtrSpeedReg;
+}
+//sideways motions
+void sidewaysMovement(int speed)
+{
+    moveSideLeftOn(speed);
+    moveSideRightOn(speed);
+}
+//void linearEncoder (int inches, int speed)
+//{
+//    int encoderCounts = inches * ENCPERINCH;
+
+//	//nMotorEncoder[linearSlide] = 0;
+
+//	//motor[linearSlide] = speed;
+
+//	while(abs(nMotorEncoder[linearSlide]) < encoderCounts)
+//	{
+//	}
+
+//	motor[linearSlide] = 0;
+//}

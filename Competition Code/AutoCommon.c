@@ -12,9 +12,7 @@ void initializeRobot()
 	 */
 	HTMCsetTarget(HTMC);
 
-	nMotorPIDSpeedCtrl[driveLeft] = mtrSpeedReg;
-	nMotorPIDSpeedCtrl[driveRight] = mtrSpeedReg;
-	nMotorPIDSpeedCtrl[driveSide] = mtrSpeedReg;
+    initializeMotors();
 
     /*
      * Do not let the motors coast
@@ -49,11 +47,11 @@ direction_t lookForIRBeacon(void)
 
 	if (segment != BEACON_CENTER) {
         if (segment > BEACON_CENTER) {
-		    motor[driveSide] = -40;
+		    moveSideRightOn(-40);
             moved_dir = RIGHT;
         } else {
-            motor[driveSide] = 40;
             moved_dir = LEFT;
+            moveSideLeftOn(40)
         }
 	} else {
 		return NO_DIR;
@@ -82,10 +80,10 @@ direction_t lookForIRBeacon(void)
 	    }
     }
 
-	motor[driveSide] = 0;
+	sidewaysMovement(0);
 
     if (bypass) {
-        moveForward(2);
+        moveForwardOn(2);
     }
     pauseDebug("ir found", 1);
 
@@ -97,8 +95,7 @@ void moveForwardToIRBeacon(int strength)
     int val;
     char tmp[50];
 
-    motor[driveLeft] = 70;
-    motor[driveRight] = 70;
+    moveForwardOn(70);
 
     val = getStrength();
     while (val <= strength) {
@@ -107,8 +104,7 @@ void moveForwardToIRBeacon(int strength)
         nxtDisplayCenteredTextLine(2, tmp);
    }
 
-    motor[driveLeft] = 0;
-    motor[driveRight] = 0;
+    moveForwardOff;
 }
 
 /*
@@ -125,7 +121,7 @@ void lookForWhiteLine(direction_t dir)
 
 	switch (dir) {
 		case LEFT:
-			motor[driveSide] = 15;
+			sidewaysMovement(15);
 	        // Look for the first right edge.
 		   	val = LSvalNorm(lightSensor);
 			while (val <= 22) {
@@ -134,7 +130,7 @@ void lookForWhiteLine(direction_t dir)
 			break;
 		case RIGHT:
 	        // Look for first the left edge and then the right
-			motor[driveSide] = -15;
+			sidewaysMovement(-15);
 		   	val = LSvalNorm(lightSensor);
 			while (val <= 22) {
 				val = LSvalNorm(lightSensor);
@@ -145,8 +141,7 @@ void lookForWhiteLine(direction_t dir)
 		    }
 			break;
         case FORWARD:
-            motor[driveLeft] = 10;
-            motor[driveRight] = 10;
+            moveForwardOn(10);
 		   	val = LSvalNorm(lightSensor);
 			while (val <= 28) {
 				val = LSvalNorm(lightSensor);
@@ -159,9 +154,7 @@ void lookForWhiteLine(direction_t dir)
 
 	LSsetInactive(lightSensor);
 
-	motor[driveSide] = 0;
-    motor[driveLeft] = 0;
-    motor[driveRight] = 0;
+    moveForwardOff;
 
     pauseDebug("on white line", 1);
 }
