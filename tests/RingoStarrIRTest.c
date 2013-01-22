@@ -25,9 +25,6 @@
 #include "../library/sensors/drivers/lego-light.h"
 #include "../library/sensors/drivers/lego-touch.h"
 
-#include "../Competition Code/Lib/Lib12-13.c"
-
-
 task main()
 {
   	int dir;

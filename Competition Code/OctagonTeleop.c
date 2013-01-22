@@ -1,18 +1,19 @@
 #pragma config(Hubs,  S1, HTMotor,  HTServo,  HTMotor,  HTMotor)
-#pragma config(Sensor, S2,     compass,        sensorNone)
-#pragma config(Sensor, S3,     light,          sensorNone)
-#pragma config(Sensor, S4,     touch,          sensorNone)
+#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
+#pragma config(Sensor, S2,     compass,        sensorI2CHiTechnicCompass)
+#pragma config(Sensor, S3,     light,          sensorLightActive)
+#pragma config(Sensor, S4,     touch,          sensorTouch)
 #pragma config(Motor,  motorA,           ,             tmotorNXT, openLoop, encoder)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop, encoder)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop, encoder)
-#pragma config(Motor,  mtr_S1_C1_1,     rightFront,    tmotorTetrix, PIDControl, reversed)
-#pragma config(Motor,  mtr_S1_C1_2,     elevatorRight, tmotorTetrix, PIDControl, reversed)
-#pragma config(Motor,  mtr_S1_C3_1,     leftFront,     tmotorTetrix, PIDControl, encoder)
+#pragma config(Motor,  mtr_S1_C1_1,     rightFront,    tmotorTetrix, PIDControl, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C1_2,     elevatorRight, tmotorTetrix, PIDControl, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C3_1,     leftFront,     tmotorTetrix, PIDControl, reversed, encoder)
 #pragma config(Motor,  mtr_S1_C3_2,     elevatorLeft,  tmotorTetrix, PIDControl, reversed, encoder)
-#pragma config(Motor,  mtr_S1_C4_1,     leftRear,      tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C4_2,     rightRear,     tmotorTetrix, openLoop)
-#pragma config(Servo,  srvo_S1_C2_1,    Basket,               tServoNone)
-#pragma config(Servo,  srvo_S1_C2_2,    servo2,               tServoNone)
+#pragma config(Motor,  mtr_S1_C4_1,     leftRear,      tmotorTetrix, PIDControl, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C4_2,     rightRear,     tmotorTetrix, PIDControl, reversed, encoder)
+#pragma config(Servo,  srvo_S1_C2_1,    shelfServo,           tServoStandard)
+#pragma config(Servo,  srvo_S1_C2_2,    IRservo,              tServoStandard)
 #pragma config(Servo,  srvo_S1_C2_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C2_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S1_C2_5,    servo5,               tServoNone)
@@ -31,10 +32,17 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
+#include "../library/sensors/drivers/hitechnic-sensormux.h"
+#include "../library/sensors/drivers/hitechnic-irseeker-v2.h"
+#include "../library/sensors/drivers/hitechnic-compass.h"
+#include "../library/sensors/drivers/lego-light.h"
 #include "DrivetrainOctagon.c"
 
 #define TOPHAT_SPEED 30
-#define SHELFINCREMENT
+#define IRUP 0
+#define IRDOWN 12
+#define TILTDOWN 244
+#define TILTUP 184
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -49,10 +57,12 @@
 
 void initializeRobot()
 {
-  // Place code here to sinitialize servos to starting positions.
-  // Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
+    // Place code here to sinitialize servos to starting positions.
+    // Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
 
-  return;
+    allMotorsOff();
+
+    return;
 }
 
 
@@ -135,21 +145,45 @@ void gravitySlide()
 {
     if (joy2Btn(5))
 	{
-		motor[elevatorRight] = 50;
-        motor[elevatorLeft] = -50;
+		motor[elevatorRight] = 45;
+        motor[elevatorLeft] = -45;
     }
     else if (joy2Btn(7))
     {
         //while(SensorValue(touch) == 0)
         //{
-            motor[elevatorRight] = -50;
-            motor[elevatorLeft] = 50;
+            motor[elevatorRight] = -20;
+            motor[elevatorLeft] = 20;
         //}
     }
     else
     {
         motor[elevatorRight] = 0;
         motor[elevatorLeft] = 0;
+    }
+}
+
+void IRarm()
+{
+  if (joy2Btn(6))
+	{
+		servo[IRservo] = IRUP;
+    }
+    else if (joy2Btn(8))
+    {
+        servo[IRservo] = IRDOWN;
+    }
+}
+
+void gravityTilt()
+{
+     if (joy2Btn(4))
+	{
+		servo[shelfServo] = TILTDOWN;
+    }
+    else if (joy2Btn(2))
+    {
+        servo[shelfServo] = TILTUP;
     }
 }
 
@@ -164,5 +198,6 @@ task main()
 		getJoystickSettings(joystick);//Get joystick input
 		Octodrivetrain();//call the forwarddrivetrain function
         gravitySlide();
+        gravityTilt();
     }
 }

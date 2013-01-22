@@ -44,6 +44,12 @@ void moveForwardOn(int speed)
 	motor[driveLeft] = speed;
 }
 
+void moveBackwardOn(int speed)
+{
+	motor[driveRight] = -speed;
+	motor[driveLeft] = -speed;
+}
+
 /*
  * moveForwardOff
  *
@@ -72,15 +78,15 @@ void allMotorsOff()
  *
  * Move the robot forward a given number of inches.
  */
-void moveForward (int inches)
+void moveForward (int inches, int speed = 100)
 {
 	int encoderCounts = inches * ENCPERINCH;
 
 	nMotorEncoder[driveRight] = 0;
 	nMotorEncoder[driveLeft] = 0;
 
-	motor[driveRight] = 100;
-	motor[driveLeft] = 100;
+	motor[driveRight] = speed;
+	motor[driveLeft] = speed;
 
 	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
 	{
@@ -174,8 +180,12 @@ void moveSideways (direction_t dir, int inches, int speed)
 
 	motor[driveSide] = 0;
 }
-//all sideway Movement
-void sidewaysMovement(int speed)
+
+void moveSidewaysOn(direction_t dir, int speed)
 {
-    motor[driveSide] = speed;
+    if (dir == LEFT) {
+        motor[driveSide] = speed;
+    } else {
+        motor[driveSide] = -speed;
+    }
 }
