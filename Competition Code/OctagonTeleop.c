@@ -123,6 +123,10 @@ void Octodrivetrain()
  		motor[leftRear] = ((y-x)/2);
  		motor[rightRear] = ((-y-x)/2);
  	}
+    else if (joy1Btn(1))
+ 	{
+
+ 	}
     else if (joystick.joy1_TopHat != -1)
     {
         switch(joystick.joy1_TopHat)
