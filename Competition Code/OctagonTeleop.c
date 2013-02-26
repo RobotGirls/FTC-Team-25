@@ -3,7 +3,7 @@
 #pragma config(Sensor, S2,     lightSensor,    sensorI2CHiTechnicCompass)
 #pragma config(Sensor, S3,     IRsensor,       sensorHiTechnicIRSeeker1200)
 #pragma config(Sensor, S4,     compass,        sensorI2CHiTechnicCompass)
-#pragma config(Motor,  motorA,           ,             tmotorNXT, openLoop, encoder)
+#pragma config(Motor,  motorA,          motorDown,     tmotorNXT, openLoop, encoder)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop, encoder)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop, encoder)
 #pragma config(Motor,  mtr_S1_C1_1,     rightFront,    tmotorTetrix, PIDControl, reversed, encoder)
@@ -41,10 +41,10 @@
 #define TOPHAT_SPEED 30
 #define IRUP 104
 #define IRDOWN 19
-#define TILTDOWN 224
-#define TILTDOWN1 96
-#define TILTUP 184
-#define BUMPERDOWN 146
+#define TILTDOWN 119
+#define TILTHALF 96
+#define TILTUP 69
+#define BUMPERDOWN 148
 #define BUMPERUP 250
 #define ROTATE_SPEED 40
 
@@ -68,6 +68,7 @@ void initializeRobot()
     allMotorsOff();
     servo[IRservo] = IRDOWN;
     servo[Bumper] = BUMPERUP;
+    servo[shelfServo] = TILTUP;
 
     return;
 }
@@ -125,7 +126,7 @@ void Octodrivetrain()
  	}
     else if (joy1Btn(1))
  	{
-
+        reversed =! reversed;
  	}
     else if (joystick.joy1_TopHat != -1)
     {
@@ -164,17 +165,32 @@ void gravitySlide()
 {
     if (joy2Btn(5))
 	{
-		motor[elevatorRight] = 45;
-        motor[elevatorLeft] = -45;
+		motor[elevatorRight] = 90;
+        motor[elevatorLeft] = -90;
+        motor[motorDown] = 0;
     }
     else if (joy2Btn(7))
     {
-        //while(SensorValue(touch) == 0)
-        //{
-            motor[elevatorRight] = -20;
-            motor[elevatorLeft] = 20;
-        //}
+        motor[elevatorRight] = -15;
+        motor[elevatorLeft] = 15;
+        motor[motorDown] = -85;
     }
+    //else if (joystick.joy2_y1 >= 20)
+    //{
+    //        motor[elevatorLeft] = -10;
+    //}
+    //else if (joystick.joy2_y1 <= -20)
+    //{
+    //        motor[elevatorLeft] = 10;
+    //}
+    //else if (joystick.joy2_y2 >= 20)
+    //{
+    //        motor[elevatorRight] = 10;
+    //}
+    //else if (joystick.joy2_y2 <= -20)
+    //{
+    //        motor[elevatorRight] = -10;
+    //}
     else
     {
         motor[elevatorRight] = 0;
@@ -206,7 +222,7 @@ void gravityTilt()
     }
     else if (joy2Btn(3))
     {
-        servo[shelfServo] = TILTDOWN1;
+        servo[shelfServo] = TILTHALF;
     }
 }
 void sakshiBumper()
@@ -235,5 +251,6 @@ task main()
         gravitySlide();
         gravityTilt();
         sakshiBumper();
+        IRarm();
     }
 }
