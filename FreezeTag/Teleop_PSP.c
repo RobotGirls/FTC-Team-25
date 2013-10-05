@@ -96,10 +96,6 @@ task main()
 {
   initializeRobot();
 
-	psp currState;
-  //waitForStart();   // wait for start of tele-op phase
-	PSP_ReadButtonState(PSPSensorPort, PSPAddr, currState);
-
 	while(true)
 	{
 		if (Frozen){
@@ -116,22 +112,26 @@ task main()
 		}
 
 		if (!Frozen){
-			if (abs((int)currState.l_j_y)<10)
+		psp currState;
+	  	//waitForStart();   // wait for start of tele-op phase
+		PSP_ReadButtonState(PSPSensorPort, PSPAddr, currState);
+
+			if (abs((int)currState.r_j_y)<10)
 		   	{
-		     	motor[driveLeft]=0;
+		     	motor[driveRight]=0;
 		   	}
 		   	else
 		   	{
-		     	motor[driveLeft]=(int)currState.l_j_y;
+		     	motor[driveRight]=(int)currState.r_j_y;
 		   	}
 
-		   	if (abs((int)currState.l_j_x)<10)
+		   	if (abs((int)currState.l_j_y)<10)
 		  	{
-		  		motor[driveRight] = 0;
+		  		motor[driveLeft] = 0;
 		  	}
 		  	else
 		  	{
-		  		motor[driveRight] = (int)currState.l_j_x;
+		  		motor[driveLeft] = (int)currState.l_j_y;
 		  	}
 		}
 	}
