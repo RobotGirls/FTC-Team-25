@@ -6,8 +6,8 @@
 #pragma config(Motor,  mtr_S1_C2_2,     motorG,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C4_1,     rightElevator, tmotorTetrix, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C4_2,     driveRight,    tmotorTetrix, openLoop)
-#pragma config(Servo,  srvo_S1_C3_1,    servo1,               tServoNone)
-#pragma config(Servo,  srvo_S1_C3_2,    servo2,               tServoNone)
+#pragma config(Servo,  srvo_S1_C3_1,    right,                tServoNone)
+#pragma config(Servo,  srvo_S1_C3_2,    left,                 tServoNone)
 #pragma config(Servo,  srvo_S1_C3_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_5,    servo5,               tServoNone)
@@ -27,9 +27,13 @@
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
 
-#define CONVEYOR_SPEED 60
+#define CONVEYOR_SPEED 100
 #define ELEVATOR_SPEED 20
 #define OFF             0
+
+#define SERVO_FORWARD 0
+#define SERVO_REVERSE 256
+#define SERVO_STOPPED 127
 
 typedef enum {
     UP,
@@ -85,6 +89,9 @@ void initializeRobot()
     conveyor_state = STOPPED;
     debounce = false;
 
+    servo[left] = SERVO_STOPPED;
+    servo[right] = SERVO_STOPPED;
+
     all_stop();
 
   return;
@@ -117,12 +124,18 @@ void conv_enter_state(linear_state_t state)
     switch (conveyor_state) {
     case UP:
 	    motor[conveyor] = CONVEYOR_SPEED;
+        servo[left] = SERVO_REVERSE;
+        servo[right] = SERVO_FORWARD;
         break;
     case DOWN:
 	    motor[conveyor] = -CONVEYOR_SPEED;
+        servo[left] = SERVO_STOPPED;
+        servo[right] = SERVO_STOPPED;
         break;
     case STOPPED:
 	    motor[conveyor] = OFF;
+        servo[left] = SERVO_STOPPED;
+        servo[right] = SERVO_STOPPED;
         break;
     }
 }
@@ -255,22 +268,23 @@ task main()
 	            handle_event(LEFT_TRIGGER_DOWN);
 	        }
         }
+
         if(abs(joystick.joy1_y2) > 20)
 		{
-	    	motor[driveLeft] = joystick.joy1_y2;
-		}
-		else
-		{
-		    motor[driveLeft] = 0;
-		}
-
-        if(abs(joystick.joy1_y1) > 20)
-		{
-		    motor[driveRight] = joystick.joy1_y1;
+	    	motor[driveRight] = joystick.joy1_y2;
 		}
 		else
 		{
 		    motor[driveRight] = 0;
+		}
+
+        if(abs(joystick.joy1_y1) > 20)
+		{
+		    motor[driveLeft] = joystick.joy1_y1;
+		}
+		else
+		{
+		    motor[driveLeft] = 0;
 		}
     }
 }
