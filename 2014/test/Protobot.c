@@ -1,5 +1,5 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTServo,  HTMotor)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
+#pragma config(Sensor, S2,     elevTouch,      sensorTouch)
 #pragma config(Motor,  motorA,          waterWheel,    tmotorNXT, PIDControl, encoder)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
@@ -42,7 +42,7 @@
 #define CONVEYOR_SPEED_3 60
 #define CONVEYOR_SPEED_4 80
 #define CONVEYOR_SPEED_5 100
-#define ELEVATOR_SPEED   40
+#define ELEVATOR_SPEED   50
 #define OFF              0
 
 #define SERVO_FORWARD 0
@@ -101,6 +101,7 @@ bool debounce;
 
 void wheel_enter_state(wheel_state_t state);
 void drive_enter_state(drive_state_t state);
+void elev_enter_state(linear_state_t state);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -126,6 +127,28 @@ task moveWaterWheel()
     wait1Msec(400);
     motor[waterWheel] = 0;
     wheel_enter_state(WHEEL_OFF);
+}
+
+/*
+ * Automatically stops the elevator when the touch
+ * sensor is pressed.
+ */
+task waitForElevatorDown()
+{
+    while (!SensorValue[elevTouch])
+    {
+        /*
+         * If the operator manually stops prior to engaging
+         * the touch sensor, then break out of the loop so
+         * that we stop the task.
+         */
+        if (elevator_state == STOPPED) {
+            break;
+        }
+        wait1Msec(5);
+    }
+
+    elev_enter_state(STOPPED);
 }
 
 void wheel_enter_state(wheel_state_t state)
@@ -200,6 +223,7 @@ void elev_enter_state(linear_state_t state)
     case DOWN:
 	    motor[leftElevator] = -ELEVATOR_SPEED;
 	    motor[rightElevator] = ELEVATOR_SPEED;
+        StartTask(waitForElevatorDown);
         break;
     case STOPPED:
 	    motor[leftElevator] = OFF;
