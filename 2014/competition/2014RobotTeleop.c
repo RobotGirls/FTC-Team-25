@@ -11,11 +11,7 @@
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
 
-#define ROTATION         90
-#define LEFT_HOPPER_DOWN 110
 #define LEFT_HOPPER_UP LEFT_HOPPER_DOWN + ROTATION
-
-#define RIGHT_HOPPER_DOWN 129
 #define RIGHT_HOPPER_UP RIGHT_HOPPER_DOWN - ROTATION
 
 #define CONVEYOR_SPEED_1 10
@@ -23,7 +19,7 @@
 #define CONVEYOR_SPEED_3 60
 #define CONVEYOR_SPEED_4 80
 #define CONVEYOR_SPEED_5 100
-#define ELEVATOR_SPEED   50
+#define ELEVATOR_SPEED   70
 #define OFF              0
 
 #define SERVO_FORWARD 0
@@ -83,6 +79,7 @@ bool debounce;
 void wheel_enter_state(wheel_state_t state);
 void drive_enter_state(drive_state_t state);
 void elev_enter_state(linear_state_t state);
+void conv_enter_state(conveyor_state_t state);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -110,6 +107,18 @@ task moveWaterWheel()
     wheel_enter_state(WHEEL_OFF);
 }
 
+task elevatorSoftwareStop()
+{
+    long val;
+
+    val = nMotorEncoder[rightElevator];
+    while (val > ELEV_ENCODER_UP_VAL) {
+        val = nMotorEncoder[rightElevator];
+    }
+
+    elev_enter_state(STOPPED);
+}
+
 /*
  * Automatically stops the elevator when the touch
  * sensor is pressed.
@@ -127,6 +136,10 @@ task waitForElevatorDown()
             break;
         }
         wait1Msec(5);
+    }
+
+    if (SensorValue[elevTouch]) {
+        nMotorEncoder[rightElevator] = 0;
     }
 
     elev_enter_state(STOPPED);
@@ -171,6 +184,8 @@ void initializeRobot()
 
     motor[waterWheel] = 0;
 
+    nMotorEncoder[rightElevator] = 0;
+
     all_stop();
 
     return;
@@ -200,12 +215,28 @@ void elev_enter_state(linear_state_t state)
     case UP:
 	    motor[leftElevator] = ELEVATOR_SPEED;
 	    motor[rightElevator] = -ELEVATOR_SPEED;
+        conv_enter_state(CONVEYOR_STOPPED);
+        StartTask(elevatorSoftwareStop);
         break;
     case DOWN:
 	    motor[leftElevator] = -ELEVATOR_SPEED;
 	    motor[rightElevator] = ELEVATOR_SPEED;
         StartTask(waitForElevatorDown);
         break;
+/*
+    case RIGHT_UP:
+	    motor[rightElevator] = -ELEVATOR_SPEED;
+        break;
+    case RIGHT_DOWN:
+	    motor[rightElevator] = ELEVATOR_SPEED;
+        break;
+    case LEFT_UP:
+	    motor[leftElevator] = ELEVATOR_SPEED;
+        break;
+    case LEFT_DOWN:
+	    motor[leftElevator] = -ELEVATOR_SPEED;
+        break;
+*/
     case STOPPED:
 	    motor[leftElevator] = OFF;
 	    motor[rightElevator] = OFF;
@@ -334,6 +365,30 @@ void handle_event_btn1()
     wheel_enter_state(WHEEL_ON);
 }
 
+void handle_event_joy1_ltd()
+{
+    motor[rightElevator] = 0;
+    motor[leftElevator] = -ELEVATOR_SPEED;
+}
+
+void handle_event_joy1_rtd()
+{
+    motor[leftElevator] = 0;
+    motor[rightElevator] = ELEVATOR_SPEED;
+}
+
+void handle_event_joy1_ltu()
+{
+    motor[rightElevator] = 0;
+    motor[leftElevator] = ELEVATOR_SPEED;
+}
+
+void handle_event_joy1_rtu()
+{
+    motor[leftElevator] = 0;
+    motor[rightElevator] = -ELEVATOR_SPEED;
+}
+
 void handle_event_btn4()
 {
     switch (hopper_state) {
@@ -411,6 +466,24 @@ void handle_joy1_event(joystick_event_t event)
         handle_joy1_btn1();
         break;
     }
+/*
+    case LEFT_TRIGGER_DOWN:
+        handle_joy1_ltd();
+        break;
+    }
+    case RIGHT_TRIGGER_DOWN:
+        handle_joy1_rtd();
+        break;
+    }
+    case LEFT_TRIGGER_UP:
+        handle_joy1_ltu();
+        break;
+    }
+    case RIGHT_TRIGGER_UP:
+        handle_joy1_rtu();
+        break;
+    }
+*/
     StartTask(debounceTask);
 }
 
@@ -443,6 +516,9 @@ void handle_joy1_event(joystick_event_t event)
 
 task main()
 {
+    short right_y;
+    short left_y;
+
     initializeRobot();
 
     waitForStart();   // wait for start of tele-op phase
@@ -466,18 +542,34 @@ task main()
                 handle_event(BUTTON_FOUR);
             } else if (joy1Btn(BUTTON_ONE)) {
                 handle_joy1_event(BUTTON_ONE);
+	        } else if (joy1Btn(LEFT_TRIGGER_DOWN)) {
+	            handle_joy1_event(LEFT_TRIGGER_DOWN);
+	        } else if (joy1Btn(RIGHT_TRIGGER_DOWN)) {
+	            handle_joy1_event(RIGHT_TRIGGER_DOWN);
+	        } else if (joy1Btn(LEFT_TRIGGER_UP)) {
+	            handle_joy1_event(LEFT_TRIGGER_UP);
+	        } else if (joy1Btn(RIGHT_TRIGGER_UP)) {
+	            handle_joy1_event(RIGHT_TRIGGER_UP);
             }
         }
 
-        if (abs(joystick.joy1_y2) > 20) {
-	    	motor[driveRight] = drive_multiplier * joystick.joy1_y2;
+        if (drive_multiplier) {
+            right_y = joystick.joy1_y2;
+            left_y = joystick.joy1_y1;
+        } else {
+            right_y = joystick.joy1_y1;
+            left_y = joystick.joy1_y2;
+        }
+
+        if (abs(right_y) > 20) {
+	    	motor[driveRight] = drive_multiplier * right_y;
 		}
 		else {
 		    motor[driveRight] = 0;
 		}
 
-        if (abs(joystick.joy1_y1) > 20) {
-		    motor[driveLeft] = drive_multiplier * joystick.joy1_y1;
+        if (abs(left_y) > 20) {
+		    motor[driveLeft] = drive_multiplier * left_y;
 		}
 		else
 		{
