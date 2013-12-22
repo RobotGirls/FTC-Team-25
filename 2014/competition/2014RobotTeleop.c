@@ -34,6 +34,10 @@ typedef enum {
 typedef enum {
     UP,
     DOWN,
+    RIGHT_UP,
+    RIGHT_DOWN,
+    LEFT_UP,
+    LEFT_DOWN,
     STOPPED,
 } linear_state_t;
 
@@ -223,20 +227,22 @@ void elev_enter_state(linear_state_t state)
 	    motor[rightElevator] = ELEVATOR_SPEED;
         StartTask(waitForElevatorDown);
         break;
-/*
     case RIGHT_UP:
+	    motor[leftElevator] = 0;
 	    motor[rightElevator] = -ELEVATOR_SPEED;
         break;
     case RIGHT_DOWN:
+	    motor[leftElevator] = 0;
 	    motor[rightElevator] = ELEVATOR_SPEED;
         break;
     case LEFT_UP:
+	    motor[rightElevator] = 0;
 	    motor[leftElevator] = ELEVATOR_SPEED;
         break;
     case LEFT_DOWN:
+	    motor[rightElevator] = 0;
 	    motor[leftElevator] = -ELEVATOR_SPEED;
         break;
-*/
     case STOPPED:
 	    motor[leftElevator] = OFF;
 	    motor[rightElevator] = OFF;
@@ -367,26 +373,72 @@ void handle_event_btn1()
 
 void handle_event_joy1_ltd()
 {
-    motor[rightElevator] = 0;
-    motor[leftElevator] = -ELEVATOR_SPEED;
+    switch (elevator_state) {
+    case LEFT_DOWN:
+        elev_enter_state(STOPPED);
+        break;
+    case STOPPED:
+        elev_enter_state(LEFT_DOWN);
+        break;
+    case UP:
+    case DOWN:
+    case LEFT_UP:
+    case RIGHT_UP:
+    case RIGHT_DOWN:
+    default:
+    }
 }
 
 void handle_event_joy1_rtd()
 {
-    motor[leftElevator] = 0;
-    motor[rightElevator] = ELEVATOR_SPEED;
+    switch (elevator_state) {
+    case RIGHT_DOWN:
+        elev_enter_state(STOPPED);
+        break;
+    case STOPPED:
+        elev_enter_state(RIGHT_DOWN);
+        break;
+    case UP:
+    case DOWN:
+    case RIGHT_UP:
+    case LEFT_UP:
+    case LEFT_DOWN:
+    default:
+    }
 }
 
 void handle_event_joy1_ltu()
 {
-    motor[rightElevator] = 0;
-    motor[leftElevator] = ELEVATOR_SPEED;
+    switch (elevator_state) {
+    case LEFT_UP:
+        elev_enter_state(STOPPED);
+        break;
+    case STOPPED:
+        elev_enter_state(LEFT_UP);
+        break;
+    case UP:
+    case DOWN:
+    case RIGHT_UP:
+    case LEFT_DOWN:
+    default:
+    }
 }
 
 void handle_event_joy1_rtu()
 {
-    motor[leftElevator] = 0;
-    motor[rightElevator] = -ELEVATOR_SPEED;
+    switch (elevator_state) {
+    case RIGHT_UP:
+        elev_enter_state(STOPPED);
+        break;
+    case STOPPED:
+        elev_enter_state(RIGHT_UP);
+        break;
+    case UP:
+    case DOWN:
+    case LEFT_UP:
+    case LEFT_DOWN:
+    default:
+    }
 }
 
 void handle_event_btn4()
@@ -465,25 +517,20 @@ void handle_joy1_event(joystick_event_t event)
     case BUTTON_ONE:
         handle_joy1_btn1();
         break;
-    }
-/*
     case LEFT_TRIGGER_DOWN:
-        handle_joy1_ltd();
+        handle_event_joy1_ltd();
         break;
-    }
     case RIGHT_TRIGGER_DOWN:
-        handle_joy1_rtd();
+        handle_event_joy1_rtd();
         break;
-    }
     case LEFT_TRIGGER_UP:
-        handle_joy1_ltu();
+        handle_event_joy1_ltu();
         break;
-    }
     case RIGHT_TRIGGER_UP:
-        handle_joy1_rtu();
+        handle_event_joy1_rtu();
         break;
     }
-*/
+
     StartTask(debounceTask);
 }
 

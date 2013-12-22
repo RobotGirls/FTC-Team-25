@@ -22,4 +22,6 @@
 #define LEFT_HOPPER_DOWN  110
 #define ROTATION          90
 
+#define ELEV_ENCODER_UP_VAL -17000
+
 #include "2014RobotTeleop.c"
