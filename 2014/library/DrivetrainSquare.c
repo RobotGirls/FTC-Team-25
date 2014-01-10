@@ -1,5 +1,5 @@
 
-#define ENC_TICKS_PER_DEGREE 25
+#define ENC_TICKS_PER_DEGREE 50
 
 typedef enum {
 	NO_DIR,
@@ -18,6 +18,16 @@ void initializeMotors(void)
 /**********************************************************************************
  * Movement functions
  **********************************************************************************/
+
+void showTarget(int val)
+{
+	nxtDisplayTextLine(3, "Target:    %4d", val);
+}
+
+void showHeading(void)
+{
+	nxtDisplayTextLine(4, "Abs:   %4d", HTMCreadHeading(HTMC));
+}
 
 void rotateClockwise(int speed)
 {
@@ -150,4 +160,47 @@ void moveBackwardHalf(int inches, int speed)
 
 	motor[driveLeft] = 0;
 	motor[driveRight] = 0;
+}
+
+/*
+ * turn
+ *
+ * Turn the robot the specified number of degrees
+ *
+ * A positive value turns right, a negative value
+ * turns left.
+ */
+void turn(int deg, int speed)
+{
+	int dest,heading;
+    bool done = false;
+
+	dest = HTMCreadHeading(HTMC);
+
+	dest = dest + deg;
+	if (dest < 0) {
+		dest = 360 - abs(dest);
+	} else if (dest > 360) {
+		dest = dest - 360;
+	}
+
+    eraseDisplay();
+
+	showTarget(dest);
+
+	if (deg < 0) {
+		rotateCounterClockwise(speed);
+	} else {
+		rotateClockwise(speed);
+	}
+
+	while (!done) {
+        heading = HTMCreadHeading(HTMC);
+        if ((heading >= dest-1) && (heading <= dest+1)) {
+            done = true;
+        }
+		showHeading();
+	}
+
+  	moveForwardOff();
 }
