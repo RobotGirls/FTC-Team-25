@@ -52,7 +52,7 @@ void HT_MotorSetSpeed(unsigned int controller, unsigned int port, int speed)
  * Turn the motor on at the current set speed.  Note that the set speed
  * will persist across toggles of the motor's run state.
  */
-void HT_MotorOn(int controller, int port)
+void HT_MotorOn(unsigned int controller, unsigned int port)
 {
     motor_def_t *m;
 
@@ -73,7 +73,7 @@ void HT_MotorOn(int controller, int port)
  * Turn the motor off.  The motor may be turned back on without
  * resetting the speed and it will run at the last set speed.
  */
-void HT_MotorOff(int controller, int port)
+void HT_MotorOff(unsigned int controller, unsigned int port)
 {
     motor_def_t *m;
     int cache_speed;
@@ -94,6 +94,19 @@ void HT_MotorOff(int controller, int port)
     _motor_heartbeat(m);
 
     m->speed = cache_speed;
+}
+
+long HT_MotorEncoderValue(unsigned int controller, unsigned int port)
+{
+    motor_def_t *m;
+
+    m = _get_motor(controller, port);
+    if (m == NULL) {
+        nxtDisplayTextLine(4, "Invalid controller or port");
+        return 0;
+    }
+
+    return (_get_encoder_val(m));
 }
 
 /*

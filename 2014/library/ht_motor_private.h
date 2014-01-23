@@ -76,6 +76,30 @@ void _motor_heartbeat(motor_def_t *m)
     _unlock_semaphore();
 }
 
+long _get_encoder_val(motor_def_t *m)
+{
+    long val;
+    tByteArray I2Crequest;
+    tByteArray I2Creply;
+
+    I2Crequest[0] = 2;
+    I2Crequest[1] = m->i2c_addr;
+    if (m->port == 1) {
+	    I2Crequest[2] = 0x4C;
+    } else {
+	    I2Crequest[2] = 0x48;
+    }
+
+    val = 0;
+    for (int i = 0; i < 4; i++) {
+	    writeI2C(link, I2Crequest, I2Creply, 1);
+        val += (I2Creply[0] << (8 * (3 - i)));
+        I2Crequest += 1;
+    }
+
+    return val;
+}
+
 motor_def_t *_get_motor(unsigned int controller, unsigned int port)
 {
     if ((controller >= MAX_CONTROLLERS) || (port >= MAX_PORTS)) {

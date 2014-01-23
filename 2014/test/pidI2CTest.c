@@ -10,12 +10,14 @@ task main()
     HT_MotorSetPIDControl(0, 0, true);
     HT_MotorSetSpeed(0, 0, 10);
     HT_MotorOn(0, 0);
-    wait1Msec(2000);
+    /*wait1Msec(2000);
     HT_MotorOff(0, 0);
     wait1Msec(2000);
     HT_MotorOn(0, 0);
     wait1Msec(2000);
-    HT_MotorOff(0, 0);
+    HT_MotorOff(0, 0);*/
 
-    while (true) {}
+    while (true) {
+        nxtDisplayCenteredTextLine(3, "%d", HT_MotorEncoderValue(0, 0));
+    }
 }
