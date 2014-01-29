@@ -26,17 +26,25 @@ void showTarget(int val)
 
 void showHeading(void)
 {
-	nxtDisplayTextLine(4, "Abs:   %4d", HTMCreadHeading(HTMC));
+	nxtDisplayTextLine(4, "Heading:   %4d", HTMCreadHeading(HTMC));
 }
 
 void rotateClockwise(int speed)
 {
+    if (speed > 100) {
+        speed = 100;
+    }
+
   	motor[driveRight] = -speed;
 	motor[driveLeft] = speed;
 }
 
 void rotateCounterClockwise(int speed)
 {
+    if (speed > 100) {
+        speed = 100;
+    }
+
 	motor[driveRight] = speed;
 	motor[driveLeft] = -speed;
 }
@@ -103,6 +111,24 @@ void moveForward (int inches, int speed = 100)
 	motor[driveRight] = 0;
 }
 
+void moveForwardCentimeters(int cm, int speed = 100)
+{
+	int encoderCounts = cm * (ENCPERINCH / 2.54);
+
+	nMotorEncoder[driveRight] = 0;
+	nMotorEncoder[driveLeft] = 0;
+
+	motor[driveRight] = speed;
+	motor[driveLeft] = speed;
+
+	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
+	{
+	}
+
+	motor[driveLeft] = 0;
+	motor[driveRight] = 0;
+}
+
 void moveForwardHalf(int inches, int speed)
 {
 	int encoderCounts = inches * (ENCPERINCH/2);
@@ -126,15 +152,15 @@ void moveForwardHalf(int inches, int speed)
  *
  * Move the robot backward a given number of inches
  */
-void moveBackward (int inches)
+void moveBackward (int inches, int speed = 100)
 {
 	int encoderCounts = inches * ENCPERINCH;
 
 	nMotorEncoder[driveRight] = 0;
 	nMotorEncoder[driveLeft] = 0;
 
-	motor[driveRight] = -50;
-	motor[driveLeft] = -50;
+	motor[driveRight] = -speed;
+	motor[driveLeft] = -speed;
 
 	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
 	{
@@ -170,12 +196,14 @@ void moveBackwardHalf(int inches, int speed)
  * A positive value turns right, a negative value
  * turns left.
  */
-void turn(int deg, int speed)
+void turn(int deg)
 {
-	int dest,heading;
+	int dest, delta;
     bool done = false;
 
 	dest = HTMCreadHeading(HTMC);
+
+    nxtDisplayTextLine(2, "Start:   %4d", dest);
 
 	dest = dest + deg;
 	if (dest < 0) {
@@ -184,23 +212,20 @@ void turn(int deg, int speed)
 		dest = dest - 360;
 	}
 
-    eraseDisplay();
+	//showTarget(dest);
 
-	showTarget(dest);
-
-	if (deg < 0) {
-		rotateCounterClockwise(speed);
-	} else {
-		rotateClockwise(speed);
-	}
+    HTMCsetTarget(HTMC, dest);
 
 	while (!done) {
-        heading = HTMCreadHeading(HTMC);
-        if ((heading >= dest-1) && (heading <= dest+1)) {
+        delta = HTMCreadRelativeHeading(HTMC);
+        if (delta == 0) {
             done = true;
+        } else if (delta < 0) {
+            rotateClockwise(max2(abs(delta), 10));
+        } else {
+            rotateCounterClockwise(max2(delta, 10));
         }
-		showHeading();
 	}
-
+    //showHeading();
   	moveForwardOff();
 }
