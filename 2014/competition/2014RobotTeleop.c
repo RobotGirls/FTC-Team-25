@@ -57,6 +57,11 @@ typedef enum {
 } wheel_state_t;
 
 typedef enum {
+    FLAG_RAISE_ON,
+    FLAG_RAISE_OFF,
+} flag_raise_state_t;
+
+typedef enum {
     HOPPER_DOWN,
     HOPPER_UP,
 } hopper_state_t;
@@ -66,6 +71,7 @@ conveyor_state_t conveyor_state;
 wheel_state_t wheel_state;
 hopper_state_t hopper_state;
 drive_state_t drive_state;
+flag_raise_state_t flag_raise_state;
 
 int drive_multiplier;
 
@@ -84,6 +90,7 @@ void wheel_enter_state(wheel_state_t state);
 void drive_enter_state(drive_state_t state);
 void elev_enter_state(linear_state_t state);
 void conv_enter_state(conveyor_state_t state);
+void flag_raise_enter_state(flag_raise_state_t state);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -106,7 +113,7 @@ task debounceTask()
 task moveWaterWheel()
 {
     motor[waterWheel] = 20;
-    wait1Msec(400);
+    wait1Msec(2000);
     motor[waterWheel] = 0;
     wheel_enter_state(WHEEL_OFF);
 }
@@ -226,22 +233,6 @@ void elev_enter_state(linear_state_t state)
 	    motor[leftElevator] = -ELEVATOR_SPEED;
 	    motor[rightElevator] = ELEVATOR_SPEED;
         StartTask(waitForElevatorDown);
-        break;
-    case RIGHT_UP:
-	    motor[leftElevator] = 0;
-	    motor[rightElevator] = -ELEVATOR_SPEED;
-        break;
-    case RIGHT_DOWN:
-	    motor[leftElevator] = 0;
-	    motor[rightElevator] = ELEVATOR_SPEED;
-        break;
-    case LEFT_UP:
-	    motor[rightElevator] = 0;
-	    motor[leftElevator] = ELEVATOR_SPEED;
-        break;
-    case LEFT_DOWN:
-	    motor[rightElevator] = 0;
-	    motor[leftElevator] = -ELEVATOR_SPEED;
         break;
     case STOPPED:
 	    motor[leftElevator] = OFF;
@@ -511,23 +502,41 @@ void handle_joy1_btn1()
     }
 }
 
+void flag_raise_enter_state(flag_raise_state_t state)
+{
+    flag_raise_state = state;
+
+    switch (flag_raise_state) {
+    case FLAG_RAISE_ON:
+        motor[flag] = 100;
+        break;
+    case FLAG_RAISE_OFF:
+        motor[flag] = 0;
+        break;
+    }
+}
+
+void handle_joy1_btn2()
+{
+    switch (flag_raise_state) {
+    case FLAG_RAISE_ON:
+        flag_raise_enter_state(FLAG_RAISE_OFF);
+        break;
+    case FLAG_RAISE_OFF:
+        flag_raise_enter_state(FLAG_RAISE_ON);
+        break;
+    }
+}
+
+
 void handle_joy1_event(joystick_event_t event)
 {
     switch (event) {
     case BUTTON_ONE:
         handle_joy1_btn1();
         break;
-    case LEFT_TRIGGER_DOWN:
-        handle_event_joy1_ltd();
-        break;
-    case RIGHT_TRIGGER_DOWN:
-        handle_event_joy1_rtd();
-        break;
-    case LEFT_TRIGGER_UP:
-        handle_event_joy1_ltu();
-        break;
-    case RIGHT_TRIGGER_UP:
-        handle_event_joy1_rtu();
+    case BUTTON_FOUR:
+        handle_joy1_btn2();
         break;
     }
 
@@ -589,14 +598,8 @@ task main()
                 handle_event(BUTTON_FOUR);
             } else if (joy1Btn(BUTTON_ONE)) {
                 handle_joy1_event(BUTTON_ONE);
-	        } else if (joy1Btn(LEFT_TRIGGER_DOWN)) {
-	            handle_joy1_event(LEFT_TRIGGER_DOWN);
-	        } else if (joy1Btn(RIGHT_TRIGGER_DOWN)) {
-	            handle_joy1_event(RIGHT_TRIGGER_DOWN);
-	        } else if (joy1Btn(LEFT_TRIGGER_UP)) {
-	            handle_joy1_event(LEFT_TRIGGER_UP);
-	        } else if (joy1Btn(RIGHT_TRIGGER_UP)) {
-	            handle_joy1_event(RIGHT_TRIGGER_UP);
+            } else if (joy1Btn(BUTTON_FOUR)) {
+                handle_joy1_event(BUTTON_FOUR);
             }
         }
 
