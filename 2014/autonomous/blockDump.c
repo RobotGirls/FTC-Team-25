@@ -15,6 +15,7 @@
 #define ENCPERINCH 108
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
+#include "../library/sensors/drivers/hitechnic-irseeker-v2.h"
 #include "..\library\sensors\drivers\hitechnic-compass.h"
 #include "..\library\DrivetrainSquare.c"
 
@@ -54,15 +55,20 @@
 // At the end of the autonomous period, the FMS will autonmatically abort (stop) execution of the program.
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-#define RIGHT_HOPPER_DOWN 148
-#define LEFT_HOPPER_DOWN  96
+#define RIGHT_HOPPER_DOWN 143
+#define LEFT_HOPPER_DOWN  108
 #define ROTATION          100
 #define LEFT_HOPPER_UP LEFT_HOPPER_DOWN + ROTATION
 #define RIGHT_HOPPER_UP RIGHT_HOPPER_DOWN - ROTATION
 #define ELEV_ENCODER_UP_VAL -18000
 
+int travelDistance[] = {14, 10, 17, 10};
+
 void initializeRobot()
 {
+    tHTIRS2DSPMode mode = DSP_1200;
+    HTIRS2setDSPMode(IRSeeker, mode);
+
 	servo[leftHopper] = LEFT_HOPPER_DOWN;
     servo[rightHopper] = RIGHT_HOPPER_DOWN;
 }
@@ -97,26 +103,74 @@ void raiseHopper()
     servo[rightHopper] = RIGHT_HOPPER_UP;
 }
 
+void alignBasketEdge()
+{
+    int val;
+
+    // Use the ultrasound sensor to determine distance from the
+    // basket
+
+    // Assuming it gives us inches from the target.
+    //val = SensorValue[];
+    //delta = val - TARGET_DISTANCE;
+    //moveForwardCentimeters(delta, 20);
+}
+
 void dumpBlocks()
 {
-	moveWaterWheel();
+    turn(90);
+    //alignBasketEdge();
+	//moveWaterWheel();
+}
+
+int findIRBeacon()
+{
+    int dir;
+    int i;
+
+    for (i = 0; i < 4; i++) {
+	    moveBackward(travelDistance[i], 100);
+        wait1Msec(100);
+        dir = HTIRS2readACDir(IRSeeker);
+        nxtDisplayTextLine(2, "Reading %d", dir);
+
+	    if (dir == 5) {
+	        return i;
+	    }
+    }
+
+    return -1;
+}
+
+void driveToRamp(int basket)
+{
 }
 
 task main()
 {
+    int basketNumber;
+
     initializeRobot();
 
-  //waitForStart(); // Wait for the beginning of autonomous phase.
+    //waitForStart(); // Wait for the beginning of autonomous phase.
 
-	raiseElevator();
+	//raiseHopper();
 
-	raiseHopper();
+	//raiseElevator();
 
-	moveBackward(12, 75);
+    disableDiagnosticsDisplay();
+    eraseDisplay();
 
-	dumpBlocks();
+    basketNumber = findIRBeacon();
+    nxtDisplayTextLine(5, "Beacon #%d", basketNumber);
 
-	// movetoRamp();
+    if (basketNumber != -1) {
+		dumpBlocks();
+    } else {
+        basketNumber = 3;
+    }
+
+    driveToRamp(basketNumber);
 
     while (true)
     {}
