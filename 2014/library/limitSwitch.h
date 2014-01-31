@@ -30,3 +30,8 @@ bool isLimitSwitchClosed()
         return true;
     }
 }
+
+bool isLimitSwitchOpen()
+{
+    return (!isLimitSwitchClosed());
+}
