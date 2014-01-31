@@ -10,6 +10,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
+#include "../library/sensors/drivers/hitechnic-protoboard.h"
+#include "../library/limitSwitch.h"
 
 #define LEFT_HOPPER_UP LEFT_HOPPER_DOWN + ROTATION
 #define RIGHT_HOPPER_UP RIGHT_HOPPER_DOWN - ROTATION
@@ -136,7 +138,7 @@ task elevatorSoftwareStop()
  */
 task waitForElevatorDown()
 {
-    while (!SensorValue[elevTouch])
+    while (!isLimitSwitchClosed())
     {
         /*
          * If the operator manually stops prior to engaging
@@ -149,7 +151,7 @@ task waitForElevatorDown()
         wait1Msec(5);
     }
 
-    if (SensorValue[elevTouch]) {
+    if (isLimitSwitchClosed()) {
         nMotorEncoder[rightElevator] = 0;
     }
 
@@ -182,6 +184,8 @@ void initializeRobot()
     conveyor_state = CONVEYOR_STOPPED;
     wheel_state = WHEEL_OFF;
     hopper_state = HOPPER_DOWN;
+
+    limitSwitchInit();
 
     drive_enter_state(NORTH);
 
