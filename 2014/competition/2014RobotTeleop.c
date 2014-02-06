@@ -16,17 +16,16 @@
 #define LEFT_HOPPER_UP LEFT_HOPPER_DOWN + ROTATION
 #define RIGHT_HOPPER_UP RIGHT_HOPPER_DOWN - ROTATION
 
-#define CONVEYOR_SPEED_1 10
-#define CONVEYOR_SPEED_2 40
-#define CONVEYOR_SPEED_3 60
-#define CONVEYOR_SPEED_4 80
-#define CONVEYOR_SPEED_5 100
-#define ELEVATOR_SPEED   70
-#define OFF              0
-
 #define SERVO_FORWARD 0
 #define SERVO_REVERSE 256
 #define SERVO_STOPPED 127
+
+#define MIDDLE_ELEV_UP   SERVO_REVERSE
+#define MIDDLE_ELEV_DOWN SERVO_FORWARD
+#define MIDDLE_ELEV_STOP SERVO_STOPPED
+
+#define ELEVATOR_SPEED   70
+#define OFF              0
 
 typedef enum {
     NORTH,
@@ -54,9 +53,10 @@ typedef enum {
 } conveyor_state_t;
 
 typedef enum {
-    WHEEL_ON,
-    WHEEL_OFF,
-} wheel_state_t;
+    BLOCK_SCOOP_UP,
+    BLOCK_SCOOP_DOWN,
+    BLOCK_SCOOP_STOPPED,
+} block_scoop_state_t;
 
 typedef enum {
     FLAG_RAISE_ON,
@@ -70,7 +70,7 @@ typedef enum {
 
 linear_state_t elevator_state;
 conveyor_state_t conveyor_state;
-wheel_state_t wheel_state;
+block_scoop_state_t block_scoop_state;
 hopper_state_t hopper_state;
 drive_state_t drive_state;
 flag_raise_state_t flag_raise_state;
@@ -88,11 +88,10 @@ typedef enum {
 
 bool debounce;
 
-void wheel_enter_state(wheel_state_t state);
 void drive_enter_state(drive_state_t state);
 void elev_enter_state(linear_state_t state);
-void conv_enter_state(conveyor_state_t state);
 void flag_raise_enter_state(flag_raise_state_t state);
+void block_scoop_enter_state(block_scoop_state_t state);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -110,14 +109,6 @@ task debounceTask()
     debounce = true;
     wait1Msec(500);
     debounce = false;
-}
-
-task moveWaterWheel()
-{
-    motor[waterWheel] = 20;
-    wait1Msec(2000);
-    motor[waterWheel] = 0;
-    wheel_enter_state(WHEEL_OFF);
 }
 
 task elevatorSoftwareStop()
@@ -138,7 +129,7 @@ task elevatorSoftwareStop()
  */
 task waitForElevatorDown()
 {
-    while (!isLimitSwitchClosed())
+    while (isLimitSwitchOpen())
     {
         /*
          * If the operator manually stops prior to engaging
@@ -151,24 +142,8 @@ task waitForElevatorDown()
         wait1Msec(5);
     }
 
-    if (isLimitSwitchClosed()) {
-        nMotorEncoder[rightElevator] = 0;
-    }
-
+    nMotorEncoder[rightElevator] = 0;
     elev_enter_state(STOPPED);
-}
-
-void wheel_enter_state(wheel_state_t state)
-{
-    wheel_state = state;
-
-    switch (wheel_state) {
-    case WHEEL_ON:
-        StartTask(moveWaterWheel);
-        break;
-    case WHEEL_OFF:
-        break;
-    }
 }
 
 void all_stop()
@@ -182,8 +157,8 @@ void initializeRobot()
 {
     elevator_state = STOPPED;
     conveyor_state = CONVEYOR_STOPPED;
-    wheel_state = WHEEL_OFF;
     hopper_state = HOPPER_DOWN;
+    block_scoop_enter_state(BLOCK_SCOOP_STOPPED);
 
     limitSwitchInit();
 
@@ -191,19 +166,31 @@ void initializeRobot()
 
     debounce = false;
 
-    servo[left] = SERVO_STOPPED;
-    servo[right] = SERVO_STOPPED;
-
-    servo[leftHopper] = LEFT_HOPPER_DOWN;
-    servo[rightHopper] = RIGHT_HOPPER_DOWN;
-
-    motor[waterWheel] = 0;
+    motor[leftspod] = 100;
+    motor[rightspod] = 100;
 
     nMotorEncoder[rightElevator] = 0;
 
     all_stop();
 
     return;
+}
+
+void block_scoop_enter_state(block_scoop_state_t state)
+{
+    block_scoop_state = state;
+
+    switch (block_scoop_state) {
+    case BLOCK_SCOOP_UP:
+        servo[middleElev] = MIDDLE_ELEV_UP;
+        break;
+    case BLOCK_SCOOP_STOPPED:
+        servo[middleElev] = MIDDLE_ELEV_STOP;
+        break;
+    case BLOCK_SCOOP_DOWN:
+        servo[middleElev] = MIDDLE_ELEV_DOWN;
+        break;
+    }
 }
 
 void hopper_enter_state(hopper_state_t state)
@@ -230,7 +217,6 @@ void elev_enter_state(linear_state_t state)
     case UP:
 	    motor[leftElevator] = ELEVATOR_SPEED;
 	    motor[rightElevator] = -ELEVATOR_SPEED;
-        conv_enter_state(CONVEYOR_STOPPED);
         StartTask(elevatorSoftwareStop);
         break;
     case DOWN:
@@ -241,49 +227,6 @@ void elev_enter_state(linear_state_t state)
     case STOPPED:
 	    motor[leftElevator] = OFF;
 	    motor[rightElevator] = OFF;
-        break;
-    }
-}
-
-void conv_enter_state(conveyor_state_t state)
-{
-    conveyor_state = state;
-
-    switch (conveyor_state) {
-    case UP_SPEED_1:
-	    motor[conveyor] = CONVEYOR_SPEED_1;
-        servo[left] = SERVO_REVERSE;
-        servo[right] = SERVO_FORWARD;
-        break;
-    case UP_SPEED_2:
-	    motor[conveyor] = CONVEYOR_SPEED_2;
-        servo[left] = SERVO_REVERSE;
-        servo[right] = SERVO_FORWARD;
-        break;
-    case UP_SPEED_3:
-	    motor[conveyor] = CONVEYOR_SPEED_3;
-        servo[left] = SERVO_REVERSE;
-        servo[right] = SERVO_FORWARD;
-        break;
-    case UP_SPEED_4:
-	    motor[conveyor] = CONVEYOR_SPEED_4;
-        servo[left] = SERVO_REVERSE;
-        servo[right] = SERVO_FORWARD;
-        break;
-    case UP_SPEED_5:
-	    motor[conveyor] = CONVEYOR_SPEED_5;
-        servo[left] = SERVO_REVERSE;
-        servo[right] = SERVO_FORWARD;
-        break;
-    case CONVEYOR_DOWN:
-	    motor[conveyor] = -CONVEYOR_SPEED_1;
-        servo[left] = SERVO_STOPPED;
-        servo[right] = SERVO_STOPPED;
-        break;
-    case CONVEYOR_STOPPED:
-	    motor[conveyor] = OFF;
-        servo[left] = SERVO_STOPPED;
-        servo[right] = SERVO_STOPPED;
         break;
     }
 }
@@ -320,120 +263,36 @@ void handle_event_rtd()
 
 void handle_event_ltu()
 {
-    switch (conveyor_state) {
-    case CONVEYOR_STOPPED:
-        conv_enter_state(UP_SPEED_1);
+    switch (block_scoop_state) {
+    case BLOCK_SCOOP_UP:
+        block_scoop_enter_state(BLOCK_SCOOP_STOPPED);
         break;
-    case UP_SPEED_1:
-        conv_enter_state(UP_SPEED_2);
+    case BLOCK_SCOOP_DOWN:
+        block_scoop_enter_state(BLOCK_SCOOP_UP);
         break;
-    case UP_SPEED_2:
-        conv_enter_state(UP_SPEED_3);
-        break;
-    case UP_SPEED_4:
-        conv_enter_state(UP_SPEED_5);
-        break;
-    case UP_SPEED_5:
-        conv_enter_state(UP_SPEED_1);
-        break;
-    case CONVEYOR_DOWN:
-        conv_enter_state(CONVEYOR_STOPPED);
+    case BLOCK_SCOOP_STOPPED:
+        block_scoop_enter_state(BLOCK_SCOOP_UP);
         break;
     }
 }
 
 void handle_event_ltd()
 {
-    switch (conveyor_state) {
-    case CONVEYOR_STOPPED:
-        conv_enter_state(CONVEYOR_DOWN);
+    switch (block_scoop_state) {
+    case BLOCK_SCOOP_UP:
+        block_scoop_enter_state(BLOCK_SCOOP_DOWN);
         break;
-    case UP_SPEED_1:
-    case UP_SPEED_2:
-    case UP_SPEED_3:
-    case UP_SPEED_4:
-    case UP_SPEED_5:
-        conv_enter_state(CONVEYOR_STOPPED);
+    case BLOCK_SCOOP_DOWN:
+        block_scoop_enter_state(BLOCK_SCOOP_STOPPED);
         break;
-    case CONVEYOR_DOWN:
-        conv_enter_state(CONVEYOR_STOPPED);
+    case BLOCK_SCOOP_STOPPED:
+        block_scoop_enter_state(BLOCK_SCOOP_DOWN);
         break;
     }
 }
 
 void handle_event_btn1()
 {
-    wheel_enter_state(WHEEL_ON);
-}
-
-void handle_event_joy1_ltd()
-{
-    switch (elevator_state) {
-    case LEFT_DOWN:
-        elev_enter_state(STOPPED);
-        break;
-    case STOPPED:
-        elev_enter_state(LEFT_DOWN);
-        break;
-    case UP:
-    case DOWN:
-    case LEFT_UP:
-    case RIGHT_UP:
-    case RIGHT_DOWN:
-    default:
-    }
-}
-
-void handle_event_joy1_rtd()
-{
-    switch (elevator_state) {
-    case RIGHT_DOWN:
-        elev_enter_state(STOPPED);
-        break;
-    case STOPPED:
-        elev_enter_state(RIGHT_DOWN);
-        break;
-    case UP:
-    case DOWN:
-    case RIGHT_UP:
-    case LEFT_UP:
-    case LEFT_DOWN:
-    default:
-    }
-}
-
-void handle_event_joy1_ltu()
-{
-    switch (elevator_state) {
-    case LEFT_UP:
-        elev_enter_state(STOPPED);
-        break;
-    case STOPPED:
-        elev_enter_state(LEFT_UP);
-        break;
-    case UP:
-    case DOWN:
-    case RIGHT_UP:
-    case LEFT_DOWN:
-    default:
-    }
-}
-
-void handle_event_joy1_rtu()
-{
-    switch (elevator_state) {
-    case RIGHT_UP:
-        elev_enter_state(STOPPED);
-        break;
-    case STOPPED:
-        elev_enter_state(RIGHT_UP);
-        break;
-    case UP:
-    case DOWN:
-    case LEFT_UP:
-    case LEFT_DOWN:
-    default:
-    }
 }
 
 void handle_event_btn4()
@@ -582,6 +441,9 @@ task main()
     initializeRobot();
 
     waitForStart();   // wait for start of tele-op phase
+
+    motor[leftspod] = -100;
+    motor[rightspod] = 100;
 
     while (true)
     {
