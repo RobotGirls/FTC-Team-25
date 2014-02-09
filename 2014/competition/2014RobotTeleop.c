@@ -20,12 +20,15 @@
 #define SERVO_REVERSE 256
 #define SERVO_STOPPED 127
 
-#define MIDDLE_ELEV_UP   SERVO_REVERSE
-#define MIDDLE_ELEV_DOWN SERVO_FORWARD
+#define MIDDLE_ELEV_UP   SERVO_FORWARD
+#define MIDDLE_ELEV_DOWN SERVO_REVERSE
 #define MIDDLE_ELEV_STOP SERVO_STOPPED
 
-#define ELEVATOR_SPEED   70
+#define ELEVATOR_SPEED   50
 #define OFF              0
+
+#define BLOCK_SERVO_RETRACTED 6
+
 
 typedef enum {
     NORTH,
@@ -64,16 +67,17 @@ typedef enum {
 } flag_raise_state_t;
 
 typedef enum {
-    HOPPER_DOWN,
-    HOPPER_UP,
-} hopper_state_t;
+    SPOD_FORWARD,
+    SPOD_REVERSE,
+    SPOD_OFF,
+} spod_state_t;
 
 linear_state_t elevator_state;
 conveyor_state_t conveyor_state;
 block_scoop_state_t block_scoop_state;
-hopper_state_t hopper_state;
 drive_state_t drive_state;
 flag_raise_state_t flag_raise_state;
+spod_state_t spod_state;
 
 int drive_multiplier;
 
@@ -92,6 +96,7 @@ void drive_enter_state(drive_state_t state);
 void elev_enter_state(linear_state_t state);
 void flag_raise_enter_state(flag_raise_state_t state);
 void block_scoop_enter_state(block_scoop_state_t state);
+void spod_enter_state(spod_state_t state);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -157,8 +162,8 @@ void initializeRobot()
 {
     elevator_state = STOPPED;
     conveyor_state = CONVEYOR_STOPPED;
-    hopper_state = HOPPER_DOWN;
     block_scoop_enter_state(BLOCK_SCOOP_STOPPED);
+    spod_enter_state(SPOD_OFF);
 
     limitSwitchInit();
 
@@ -166,10 +171,8 @@ void initializeRobot()
 
     debounce = false;
 
-    motor[leftspod] = 100;
-    motor[rightspod] = 100;
-
     nMotorEncoder[rightElevator] = 0;
+	servo[blockDump] = BLOCK_SERVO_RETRACTED;
 
     all_stop();
 
@@ -189,22 +192,6 @@ void block_scoop_enter_state(block_scoop_state_t state)
         break;
     case BLOCK_SCOOP_DOWN:
         servo[middleElev] = MIDDLE_ELEV_DOWN;
-        break;
-    }
-}
-
-void hopper_enter_state(hopper_state_t state)
-{
-    hopper_state = state;
-
-    switch (hopper_state) {
-    case HOPPER_UP:
-        servo[leftHopper] = LEFT_HOPPER_UP;
-        servo[rightHopper] = RIGHT_HOPPER_UP;
-        break;
-    case HOPPER_DOWN:
-        servo[leftHopper] = LEFT_HOPPER_DOWN;
-        servo[rightHopper] = RIGHT_HOPPER_DOWN;
         break;
     }
 }
@@ -291,18 +278,52 @@ void handle_event_ltd()
     }
 }
 
+void spod_enter_state(spod_state_t state)
+{
+    spod_state = state;
+
+    switch (spod_state) {
+    case SPOD_FORWARD:
+	    motor[leftspod] = -100;
+	    motor[rightspod] = 100;
+        break;
+    case SPOD_REVERSE:
+	    motor[leftspod] = 100;
+	    motor[rightspod] = -100;
+        break;
+    case SPOD_OFF:
+        motor[leftspod] = 0;
+        motor[rightspod] = 0;
+        break;
+    }
+}
+
 void handle_event_btn1()
 {
+    switch (spod_state) {
+    case SPOD_FORWARD:
+        spod_enter_state(SPOD_REVERSE);
+        break;
+    case SPOD_REVERSE:
+        spod_enter_state(SPOD_OFF);
+        break;
+    case SPOD_OFF:
+        spod_enter_state(SPOD_REVERSE);
+        break;
+    }
 }
 
 void handle_event_btn4()
 {
-    switch (hopper_state) {
-    case HOPPER_DOWN:
-        hopper_enter_state(HOPPER_UP);
+    switch (spod_state) {
+    case SPOD_FORWARD:
+        spod_enter_state(SPOD_OFF);
         break;
-    case HOPPER_UP:
-        hopper_enter_state(HOPPER_DOWN);
+    case SPOD_REVERSE:
+        spod_enter_state(SPOD_FORWARD);
+        break;
+    case SPOD_OFF:
+        spod_enter_state(SPOD_FORWARD);
         break;
     }
 }
@@ -441,9 +462,6 @@ task main()
     initializeRobot();
 
     waitForStart();   // wait for start of tele-op phase
-
-    motor[leftspod] = -100;
-    motor[rightspod] = 100;
 
     while (true)
     {
