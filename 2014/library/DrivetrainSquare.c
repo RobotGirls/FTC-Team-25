@@ -1,10 +1,7 @@
 
-#define ENC_TICKS_PER_DEGREE 50
+#define ENC_TICKS_PER_DEGREE 25
 
 typedef enum {
-	NO_DIR,
-	LEFT,
-	RIGHT,
     FORWARD,
     BACKWARD
 } direction_t;
@@ -50,34 +47,6 @@ void rotateCounterClockwise(int speed)
 }
 
 /*
- * moveForwardOn
- *
- * Turns the motors on, never turns them off.
- */
-void moveForwardOn(int speed)
-{
-	motor[driveRight] = speed;
-	motor[driveLeft] = speed;
-}
-
-void moveBackwardOn(int speed)
-{
-	motor[driveRight] = -speed;
-	motor[driveLeft] = -speed;
-}
-
-/*
- * moveForwardOff
- *
- * Turns the motors off.
- */
-void moveForwardOff()
-{
-	motor[driveRight] = 0;
-	motor[driveLeft] = 0;
-}
-
-/*
  * allMotorsOff
  *
  * Turns off all motors on the chassis.
@@ -91,101 +60,99 @@ void allMotorsOff()
 /*
  * moveForward
  *
- * Move the robot forward a given number of inches.
+ * Move the robot the given direction a given number of
+ * inches.  If inches is 0 and speed is non-zero, turn on
+ * motors and do not turn off.  0,0 turns off motors.
  */
-void moveForward (int inches, int speed = 100)
+void move(float inches, direction_t dir, int speed = 100)
 {
 	int encoderCounts = inches * ENCPERINCH;
+    int direction_multiplier;
 
 	nMotorEncoder[driveRight] = 0;
 	nMotorEncoder[driveLeft] = 0;
 
-	motor[driveRight] = speed;
-	motor[driveLeft] = speed;
+    switch (dir) {
+    case FORWARD:
+	    direction_multiplier = 1;
+        break;
+    case BACKWARD:
+	    direction_multiplier = -1;
+        break;
+    }
 
-	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
-	{
-	}
+    if ((inches == 0) && (speed == 0)) {
+        motor[driveRight] = 0;
+        motor[driveLeft] = 0;
+    } else if ((inches == 0) && (speed != 0)) {
+	    motor[driveRight] = direction_multiplier * speed;
+		motor[driveLeft] = direction_multiplier * speed;
+    } else {
+	    nMotorEncoderTarget[driveRight] = direction_multiplier * encoderCounts;
+	    nMotorEncoderTarget[driveLeft] = direction_multiplier * encoderCounts;
+	    motor[driveRight] = direction_multiplier * speed;
+		motor[driveLeft] = direction_multiplier * speed;
 
-	motor[driveLeft] = 0;
-	motor[driveRight] = 0;
+	    while ((nMotorRunState[driveRight] != runStateIdle) && (nMotorRunState[driveLeft] != runStateIdle)) {
+	    }
+    }
 }
 
-void moveForwardCentimeters(int cm, int speed = 100)
+int calcTarget(int deg)
 {
-	int encoderCounts = cm * (ENCPERINCH / 2.54);
+    int target;
 
-	nMotorEncoder[driveRight] = 0;
-	nMotorEncoder[driveLeft] = 0;
+	target = HTMCreadHeading(HTMC);
 
-	motor[driveRight] = speed;
-	motor[driveLeft] = speed;
+    nxtDisplayTextLine(2, "Start:   %4d", target);
 
-	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
-	{
+	target = target + deg;
+	if (target < 0) {
+		target = 360 - abs(target);
+	} else if (target > 360) {
+		target = target - 360;
 	}
 
-	motor[driveLeft] = 0;
-	motor[driveRight] = 0;
+    return target;
 }
 
-void moveForwardHalf(int inches, int speed)
+void turnEncoder(int deg, int speed)
 {
-	int encoderCounts = inches * (ENCPERINCH/2);
+    int encoderCounts = deg * ENC_TICKS_PER_DEGREE;
+    int dest, delta;
 
-	nMotorEncoder[driveRight] = 0;
-	nMotorEncoder[driveLeft] = 0;
+    if (deg == 0) {
+        return;
+    }
 
-	motor[driveRight] = speed;
-	motor[driveLeft] = speed;
+    dest = calcTarget(deg);
 
-	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
-	{
-	}
+    HTMCsetTarget(HTMC, dest);
 
-	motor[driveLeft] = 0;
-	motor[driveRight] = 0;
-}
+    nMotorEncoder[driveLeft] = 0;
+    nMotorEncoder[driveRight] = 0;
 
-/*
- * moveBackward
- *
- * Move the robot backward a given number of inches
- */
-void moveBackward (int inches, int speed = 100)
-{
-	int encoderCounts = inches * ENCPERINCH;
+    nMotorEncoderTarget[driveLeft] = encoderCounts;
+    nMotorEncoderTarget[driveRight] = encoderCounts;
 
-	nMotorEncoder[driveRight] = 0;
-	nMotorEncoder[driveLeft] = 0;
+    if (deg > 0) {
+	    rotateClockwise(speed);
+    } else {
+	    rotateCounterClockwise(speed);
+    }
 
-	motor[driveRight] = -speed;
-	motor[driveLeft] = -speed;
+    while ((nMotorRunState[driveLeft] != runStateIdle) && (nMotorRunState[driveRight] != runStateIdle)) {
+    }
 
-	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
-	{
-	}
-
-	motor[driveLeft] = 0;
-	motor[driveRight] = 0;
-}
-
-void moveBackwardHalf(int inches, int speed)
-{
-	int encoderCounts = inches * (ENCPERINCH/2);
-
-	nMotorEncoder[driveRight] = 0;
-	nMotorEncoder[driveLeft] = 0;
-
-	motor[driveRight] = -speed;
-	motor[driveLeft] = -speed;
-
-	while (abs(nMotorEncoder[driveLeft]) < encoderCounts && abs(nMotorEncoder[driveRight]) < encoderCounts)
-	{
-	}
-
-	motor[driveLeft] = 0;
-	motor[driveRight] = 0;
+    /*
+     * How close did we get to the target?
+     */
+    delta = HTMCreadRelativeHeading(HTMC);
+    if ((delta <= 3) && (delta >= -3)) {
+        return;
+    } else {
+        turnEncoder(delta, speed);
+    }
 }
 
 /*
@@ -201,16 +168,7 @@ void turn(int deg)
 	int dest, delta;
     bool done = false;
 
-	dest = HTMCreadHeading(HTMC);
-
-    nxtDisplayTextLine(2, "Start:   %4d", dest);
-
-	dest = dest + deg;
-	if (dest < 0) {
-		dest = 360 - abs(dest);
-	} else if (dest > 360) {
-		dest = dest - 360;
-	}
+	dest = calcTarget(deg);
 
 	//showTarget(dest);
 
@@ -218,7 +176,7 @@ void turn(int deg)
 
 	while (!done) {
         delta = HTMCreadRelativeHeading(HTMC);
-        if (delta == 0) {
+        if ((delta <= 3) && (delta >= -3)) {
             done = true;
         } else if (delta < 0) {
             rotateClockwise(max2(abs(delta), 10));
@@ -227,5 +185,5 @@ void turn(int deg)
         }
 	}
     //showHeading();
-  	moveForwardOff();
+  	move(0, FORWARD, 0);
 }
