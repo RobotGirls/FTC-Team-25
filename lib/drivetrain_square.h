@@ -153,7 +153,7 @@ void move(float inches, direction_t dir, int speed = 100)
 
 void turnEncoder(int deg, int speed)
 {
-    int encoderCounts = deg * ENC_TICKS_PER_DEGREE;
+    int encoderCounts = abs(deg * ENC_TICKS_PER_DEGREE);
 
     if (deg == 0) {
         return;
