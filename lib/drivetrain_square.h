@@ -1,5 +1,4 @@
 
-#include "drivetrain_defs.h"
 
 typedef enum  dir_ {
     DIR_FORWARD,
@@ -106,10 +105,9 @@ void waitForIdle(int t)
            (abs(nMotorEncoder[driveFrontRight]) < t) &&
            (abs(nMotorEncoder[driveFrontLeft]) < t) &&
 #endif
-           (abs(nMotorEncoder[driveRearLeft]) < t) &&
-           (abs(nMotorEncoder[driveRearRight]) < t))
-	{
-    }
+           (abs(nMotorEncoder[driveRearLeft]) < t)) //&&
+           //(abs(nMotorEncoder[driveRearRight]) < t))
+	{ /* Do nothing but wait */ }
 
 #ifdef FOUR_WHEEL_DRIVE
     motor[driveFrontLeft] = 0;
@@ -162,14 +160,11 @@ void turnEncoder(int deg, int speed)
     }
 
     resetAllMotorsEncoder();
-    setAllMotorsEncoderTarget(encoderCounts);
 
     if (deg > 0) {
 	    rotateClockwise(speed);
     } else {
 	    rotateCounterClockwise(speed);
     }
-
-	while ((nMotorRunState[driveRearLeft] != runStateIdle) && (nMotorRunState[driveRearRight] != runStateIdle)) {
-	}
+    waitForIdle(encoderCounts);
 }

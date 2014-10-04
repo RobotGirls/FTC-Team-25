@@ -14,5 +14,5 @@
  */
 // #define USING_SENSOR_MUX
 
-#define ENCPERINCH              120
-#define ENC_TICKS_PER_DEGREE    26
+#define ENCPERINCH              36
+#define ENC_TICKS_PER_DEGREE    5

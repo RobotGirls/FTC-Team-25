@@ -59,7 +59,7 @@ void dead_reckon()
         }
 
         if (path[idx].turn != 0) {
-            turnEncoder(path[idx].turn, 100);
+            turnEncoder(path[idx].turn, path[idx].speed);
         }
         wait1Msec(300);
         if (path[idx].inches != 0) {
