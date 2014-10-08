@@ -17,4 +17,4 @@
 #define ENCPERINCH              36
 #define ENC_TICKS_PER_DEGREE    6.5
 
-#define FOOBAR 120
+#define IAMANAWESOMEPERSONJUSTJOKING 120
