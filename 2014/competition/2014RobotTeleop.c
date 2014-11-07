@@ -12,6 +12,7 @@
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
 #include "../library/sensors/drivers/hitechnic-protoboard.h"
 #include "../library/limitSwitch.h"
+#include "../library/light_strip.h"
 
 #define LEFT_HOPPER_UP LEFT_HOPPER_DOWN + ROTATION
 #define RIGHT_HOPPER_UP RIGHT_HOPPER_DOWN - ROTATION
@@ -24,7 +25,7 @@
 #define MIDDLE_ELEV_DOWN SERVO_REVERSE
 #define MIDDLE_ELEV_STOP SERVO_STOPPED
 
-#define ELEVATOR_SPEED   50
+#define ELEVATOR_SPEED   90
 #define OFF              0
 
 #define BLOCK_SERVO_RETRACTED 6
@@ -116,6 +117,26 @@ task debounceTask()
     debounce = false;
 }
 
+task endGameTimer()
+{
+    int cnt;
+
+    for (int i = 0; i < 90; i++) {
+        wait1Msec(1000);
+    }
+    displayEndgame();
+
+    for (int i = 0; i < 20; i++) {
+        wait1Msec(1000);
+    }
+    displayCaution();
+
+    for (int i = 0; i < 8; i++) {
+        wait1Msec(1000);
+    }
+    displayRestingPulse();
+}
+
 task elevatorSoftwareStop()
 {
     long val;
@@ -153,8 +174,10 @@ task waitForElevatorDown()
 
 void all_stop()
 {
-    motor[driveLeft] = 0;
-    motor[driveRight] = 0;
+    motor[driveFrontLeft] = 0;
+    motor[driveRearLeft] = 0;
+    motor[driveFrontRight] = 0;
+    motor[driveRearRight] = 0;
     motor[conveyor] = 0;
 }
 
@@ -165,9 +188,12 @@ void initializeRobot()
     block_scoop_enter_state(BLOCK_SCOOP_STOPPED);
     spod_enter_state(SPOD_OFF);
 
-    limitSwitchInit();
+    limitSwitchInit(5);
+    lightStripInit(0x1F);
 
     drive_enter_state(NORTH);
+
+    displayRestingPulse();
 
     debounce = false;
 
@@ -364,12 +390,14 @@ void drive_enter_state(drive_state_t state)
         /*
          * TODO: Set north leds.
          */
+        displayForward();
         break;
     case SOUTH:
         drive_multiplier = -1;
         /*
          * TODO: Set south leds.
          */
+        displayBackward();
         break;
     }
 }
@@ -463,6 +491,10 @@ task main()
 
     waitForStart();   // wait for start of tele-op phase
 
+    StartTask(endGameTimer);
+
+    displayForward();
+
     while (true)
     {
         getJoystickSettings(joystick);
@@ -487,27 +519,31 @@ task main()
             }
         }
 
-        if (drive_multiplier) {
-            right_y = joystick.joy1_y2;
-            left_y = joystick.joy1_y1;
-        } else {
+        //if (drive_multiplier) {
+            //right_y = joystick.joy1_y2;
+            //left_y = joystick.joy1_y1;
+        //} else {
             right_y = joystick.joy1_y1;
             left_y = joystick.joy1_y2;
-        }
+        //}
 
         if (abs(right_y) > 20) {
-	    	motor[driveRight] = drive_multiplier * right_y;
+	    	motor[driveFrontRight] = drive_multiplier * right_y;
+	    	motor[driveRearRight] = drive_multiplier * right_y;
 		}
 		else {
-		    motor[driveRight] = 0;
+		    motor[driveFrontRight] = 0;
+		    motor[driveRearRight] = 0;
 		}
 
         if (abs(left_y) > 20) {
-		    motor[driveLeft] = drive_multiplier * left_y;
+		    motor[driveFrontLeft] = drive_multiplier * left_y;
+		    motor[driveRearLeft] = drive_multiplier * left_y;
 		}
 		else
 		{
-		    motor[driveLeft] = 0;
+		    motor[driveFrontLeft] = 0;
+		    motor[driveRearLeft] = 0;
 		}
     }
 }
