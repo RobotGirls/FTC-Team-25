@@ -3,17 +3,29 @@
 
 #include "../library/nxt_buttons.h"
 
+#define ELEV_ENCODER_UP_VAL -24000
+
+task elevatorSoftwareStop()
+{
+    long val;
+
+    val = nMotorEncoder[rightElevator];
+    while (val > ELEV_ENCODER_UP_VAL) {
+        val = nMotorEncoder[rightElevator];
+    }
+    motor[leftElevator] = 0;
+    motor[rightElevator] = 0;
+}
+
 task main()
 {
     nMotorEncoder[leftElevator] = 0;
     nMotorEncoder[rightElevator] = 0;
 
-    wait1Msec(1000);
-
     motor[leftElevator] = 20;
     motor[rightElevator] = -20;
 
-    // StartTask(syncController);
+    StartTask(elevatorSoftwareStop);
 
     while (1) {
         if (isMainButtonPressed()) {
