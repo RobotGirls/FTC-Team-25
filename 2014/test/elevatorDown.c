@@ -6,7 +6,7 @@
 
 task main()
 {
-    limitSwitchInit();
+    limitSwitchInit(5);
 
     motor[leftElevator] = -20;
     motor[rightElevator] = 20;

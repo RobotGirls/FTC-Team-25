@@ -105,9 +105,10 @@ void waitForIdle(int t)
            (abs(nMotorEncoder[driveFrontRight]) < t) &&
            (abs(nMotorEncoder[driveFrontLeft]) < t) &&
 #endif
-           (abs(nMotorEncoder[driveRearLeft]) < t)) //&&
-           //(abs(nMotorEncoder[driveRearRight]) < t))
-	{ /* Do nothing but wait */ }
+           (abs(nMotorEncoder[driveRearLeft]) < t) &&
+           (abs(nMotorEncoder[driveRearRight]) < t))
+	{
+    }
 
 #ifdef FOUR_WHEEL_DRIVE
     motor[driveFrontLeft] = 0;
@@ -115,6 +116,102 @@ void waitForIdle(int t)
 #endif
     motor[driveRearLeft] = 0;
     motor[driveRearRight] = 0;
+}
+
+void move_with_software_pid(int t, int power)
+{
+    /*
+     * The idea is to pick one motor as the master and then
+     * continually adjust the slave to match the master.
+     */
+	int master_power = power;
+	int slave_power = power;
+
+    /*
+     * Resetting the encoder each time, so we need to track total ticks
+     * to know when to stop.
+     */
+    int total_ticks = 0;
+
+	/*
+     * The difference between the master encoder and the slave encoder
+     * If they aren't the same, then one is moving faster and we must
+     * correct for that.
+     */
+	int error = 0;
+
+	/*
+     * The P in PID.  The proportional amount that we want to change the
+     * motor's power by.  This seems large, but it appears to work pretty well,
+     * with a very small delay in between reading the error factor.
+     */
+	float kp = 1.0;
+
+	nMotorEncoder[driveRearLeft] = 0;
+	nMotorEncoder[driveRearRight] = 0;
+
+    while (abs(total_ticks) < t)
+	{
+	    motor[driveRearLeft] = master_power;
+	    motor[driveRearRight] = slave_power;
+
+	    /*
+         * If the left motor (the master) is moving faster than the right (the slave), then this will be
+	     * a positive number, meaning the master is moving faster so the slave has to speed up.
+         */
+	    error = nMotorEncoder[driveRearLeft] - nMotorEncoder[driveRearRight];
+
+	    /*
+         * Multiple error by the scaling, or proportional factor, and adjust the slave.
+         */
+	    slave_power += error * kp;
+	    motor[driveRearRight] = slave_power;
+
+        /*
+         * Debugging.  The NXT display comes in handy.
+         */
+        displayString(1, "Ticks %d", total_ticks);
+        displayString(2, "Error: %d", error);
+        displayString(4, "R: %d, L: %d", slave_power, master_power);
+
+	    /*
+         * Need a fresh error factor each iteration.
+         */
+	    nMotorEncoder[driveRearLeft] = 0;
+	    nMotorEncoder[driveRearRight] = 0;
+
+	    /*
+         * Pretty fast interval.  I think the Hitechnic controller by default uses a 25ms
+         * refresh interval, but that turned out to be too slow.
+         */
+	    wait1Msec(5);
+
+        /*
+         * Update the master tick count so we know when to stop.
+         */
+        total_ticks += nMotorEncoder[driveRearLeft];  // The left is the master...
+    }
+
+    motor[driveRearLeft] = 0;
+    motor[driveRearRight] = 0;
+}
+
+void turnEncoder(float deg, int speed)
+{
+    float encoderCounts = abs(deg * ENC_TICKS_PER_DEGREE);
+
+    if (deg == 0) {
+        return;
+    }
+
+    resetAllMotorsEncoder();
+
+    if (deg > 0) {
+	    rotateClockwise(speed);
+    } else {
+	    rotateCounterClockwise(speed);
+    }
+    waitForIdle(encoderCounts);
 }
 
 /*
@@ -131,6 +228,11 @@ void move(float inches, direction_t dir, int speed = 100)
 
 	resetAllMotorsEncoder();
 
+#ifdef USE_COMPASS_CORRECTION
+    int target_pos, target_rel, actual;
+    target_pos = HTMCsetTarget(compass, 0);
+#endif
+
     switch (dir) {
     case DIR_FORWARD:
 	    direction_multiplier = 1;
@@ -145,26 +247,25 @@ void move(float inches, direction_t dir, int speed = 100)
     } else if ((inches == 0) && (speed != 0)) {
 	    allMotorsOn(direction_multiplier * speed);
     } else {
-	    setAllMotorsEncoderTarget(encoderCounts);
-        allMotorsOn(direction_multiplier * speed);
-        waitForIdle(encoderCounts);
-    }
-}
-
-void turnEncoder(int deg, int speed)
-{
-    int encoderCounts = abs(deg * ENC_TICKS_PER_DEGREE);
-
-    if (deg == 0) {
-        return;
+        move_with_software_pid(encoderCounts, direction_multiplier * speed);
     }
 
-    resetAllMotorsEncoder();
+#ifdef USE_COMPASS_CORRECTION
+	    target_rel = HTMCreadRelativeHeading(compass);
+	    actual = HTMCreadHeading(compass);
+		displayString(1, "Start t: %d", target_pos);
+	    while (abs(target_rel) > 0) {
+			displayString(2, "Target: %d", target_pos);
+			displayString(3, "Actual: %d", actual);
+			displayString(4, "Relative: %d", target_rel);
+	        if (target > 0) {
+	            turnEncoder(.25, 20);
+	        } else {
+	            turnEncoder(-.25, 20);
+	        }
+	        target_rel = HTMCreadRelativeHeading(compass);
+	        actual = HTMCreadHeading(compass);
+	    }
+#endif
 
-    if (deg > 0) {
-	    rotateClockwise(speed);
-    } else {
-	    rotateCounterClockwise(speed);
-    }
-    waitForIdle(encoderCounts);
 }
