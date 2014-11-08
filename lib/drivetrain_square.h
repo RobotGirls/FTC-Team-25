@@ -145,7 +145,7 @@ void move_with_software_pid(int t, int power)
      * motor's power by.  This seems large, but it appears to work pretty well,
      * with a very small delay in between reading the error factor.
      */
-	float kp = 1.0;
+	float kp = .3;
 
 	nMotorEncoder[driveRearLeft] = 0;
 	nMotorEncoder[driveRearRight] = 0;
@@ -247,7 +247,13 @@ void move(float inches, direction_t dir, int speed = 100)
     } else if ((inches == 0) && (speed != 0)) {
 	    allMotorsOn(direction_multiplier * speed);
     } else {
+#ifdef USE_SOFTWARE_PID
         move_with_software_pid(encoderCounts, direction_multiplier * speed);
+#else
+		setAllMotorsEncoderTarget(encoderCounts);
+		allMotorsOn(direction_multiplier * speed);
+		waitForIdle(encoderCounts);
+#endif
     }
 
 #ifdef USE_COMPASS_CORRECTION
