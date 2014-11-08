@@ -3,11 +3,12 @@
 
 #define ENCPERINCH 108
 
-#include "../library/sensors/drivers/hitechnic-irseeker-v2.h"
 #include "..\library\sensors\drivers\hitechnic-compass.h"
 #include "..\library\DrivetrainSquare.c"
 
 task main()
 {
-    moveForward(24, 100);
+	turn(90);
+
+    while (true) {}
 }

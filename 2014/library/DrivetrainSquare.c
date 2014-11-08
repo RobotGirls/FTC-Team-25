@@ -1,15 +1,20 @@
 
-#define ENC_TICKS_PER_DEGREE 25
+
+const tMUXSensor HTMC = msensor_S2_1;
 
 typedef enum {
-    FORWARD,
-    BACKWARD
+    DIR_FORWARD,
+    DIR_BACKWARD
 } direction_t;
 
 void initializeMotors(void)
 {
-	nMotorPIDSpeedCtrl[driveLeft] = mtrSpeedReg;
-	nMotorPIDSpeedCtrl[driveRight] = mtrSpeedReg;
+#ifdef FOUR_WHEEL_DRIVE
+	nMotorPIDSpeedCtrl[driveFrontLeft] = mtrSpeedReg;
+	nMotorPIDSpeedCtrl[driveFrontRight] = mtrSpeedReg;
+#endif
+	nMotorPIDSpeedCtrl[driveRearLeft] = mtrSpeedReg;
+	nMotorPIDSpeedCtrl[driveRearRight] = mtrSpeedReg;
 }
 
 /**********************************************************************************
@@ -31,9 +36,10 @@ void rotateClockwise(int speed)
     if (speed > 100) {
         speed = 100;
     }
-
-  	motor[driveRight] = -speed;
-	motor[driveLeft] = speed;
+  	motor[driveFrontRight] = -speed;
+  	motor[driveRearRight] = -speed;
+	motor[driveFrontLeft] = speed;
+	motor[driveRearLeft] = speed;
 }
 
 void rotateCounterClockwise(int speed)
@@ -41,9 +47,10 @@ void rotateCounterClockwise(int speed)
     if (speed > 100) {
         speed = 100;
     }
-
-	motor[driveRight] = speed;
-	motor[driveLeft] = -speed;
+	motor[driveFrontRight] = speed;
+	motor[driveRearRight] = speed;
+	motor[driveFrontLeft] = -speed;
+	motor[driveRearLeft] = -speed;
 }
 
 /*
@@ -53,8 +60,62 @@ void rotateCounterClockwise(int speed)
  */
 void allMotorsOff()
 {
-    motor[driveLeft] = 0;
-    motor[driveRight] = 0;
+#ifdef FOUR_WHEEL_DRIVE
+    motor[driveFrontLeft] = 0;
+    motor[driveFrontRight] = 0;
+#endif
+    motor[driveRearLeft] = 0;
+    motor[driveRearRight] = 0;
+}
+
+void allMotorsOn(int speed)
+{
+#ifdef FOUR_WHEEL_DRIVE
+    motor[driveFrontLeft] = speed;
+    motor[driveFrontRight] = speed;
+#endif
+    motor[driveRearLeft] = speed;
+    motor[driveRearRight] = speed;
+}
+
+void setAllMotorsEncoderTarget(int t)
+{
+#ifdef FOUR_WHEEL_DRIVE
+    nMotorEncoderTarget[driveFrontRight] = t;
+    nMotorEncoderTarget[driveFrontLeft] = t;
+#endif
+    nMotorEncoderTarget[driveRearRight] = t;
+    nMotorEncoderTarget[driveRearLeft] = t;
+
+            nxtDisplayTextLine(2, "FrontRight %d", nMotorEncoderTarget[driveFrontRight]);
+            nxtDisplayTextLine(3, "FrontLeft  %d", nMotorEncoderTarget[driveFrontLeft]);
+            nxtDisplayTextLine(4, "RearRight  %d", nMotorEncoderTarget[driveRearRight]);
+            nxtDisplayTextLine(5, "RearLeft   %d", nMotorEncoderTarget[driveRearLeft]);
+}
+
+void resetAllMotorsEncoder(void)
+{
+#ifdef FOUR_WHEEL_DRIVE
+    nMotorEncoder[driveFrontRight] = 0;
+    nMotorEncoder[driveFrontLeft] = 0;
+#endif
+    nMotorEncoder[driveRearRight] = 0;
+    nMotorEncoder[driveRearLeft] = 0;
+}
+
+
+void waitForIdle(int t)
+{
+    while ((abs(nMotorEncoder[driveFrontRight]) < t) &&
+           (abs(nMotorEncoder[driveFrontLeft]) < t) &&
+           (abs(nMotorEncoder[driveRearLeft]) < t) &&
+           (abs(nMotorEncoder[driveRearRight]) < t))
+	{
+    }
+    motor[driveRearLeft] = 0;
+    motor[driveRearRight] = 0;
+    motor[driveFrontLeft] = 0;
+    motor[driveFrontRight] = 0;
 }
 
 /*
@@ -69,32 +130,25 @@ void move(float inches, direction_t dir, int speed = 100)
 	int encoderCounts = inches * ENCPERINCH;
     int direction_multiplier;
 
-	nMotorEncoder[driveRight] = 0;
-	nMotorEncoder[driveLeft] = 0;
+	resetAllMotorsEncoder();
 
     switch (dir) {
-    case FORWARD:
+    case DIR_FORWARD:
 	    direction_multiplier = 1;
         break;
-    case BACKWARD:
+    case DIR_BACKWARD:
 	    direction_multiplier = -1;
         break;
     }
 
     if ((inches == 0) && (speed == 0)) {
-        motor[driveRight] = 0;
-        motor[driveLeft] = 0;
+        allMotorsOff();
     } else if ((inches == 0) && (speed != 0)) {
-	    motor[driveRight] = direction_multiplier * speed;
-		motor[driveLeft] = direction_multiplier * speed;
+	    allMotorsOn(direction_multiplier * speed);
     } else {
-	    nMotorEncoderTarget[driveRight] = direction_multiplier * encoderCounts;
-	    nMotorEncoderTarget[driveLeft] = direction_multiplier * encoderCounts;
-	    motor[driveRight] = direction_multiplier * speed;
-		motor[driveLeft] = direction_multiplier * speed;
-
-	    while ((nMotorRunState[driveRight] != runStateIdle) && (nMotorRunState[driveLeft] != runStateIdle)) {
-	    }
+	    setAllMotorsEncoderTarget(encoderCounts);
+        allMotorsOn(direction_multiplier * speed);
+        waitForIdle(encoderCounts);
     }
 }
 
@@ -119,21 +173,24 @@ int calcTarget(int deg)
 void turnEncoder(int deg, int speed)
 {
     int encoderCounts = deg * ENC_TICKS_PER_DEGREE;
-    int dest, delta;
+    int dest, delta, curr, initial, idx;
 
     if (deg == 0) {
         return;
     }
 
+    idx = 0;
+
     dest = calcTarget(deg);
 
     HTMCsetTarget(HTMC, dest);
 
-    nMotorEncoder[driveLeft] = 0;
-    nMotorEncoder[driveRight] = 0;
+    eraseDisplay();
+    initial = HTMCreadHeading(HTMC);
+    nxtDisplayTextLine(3, "Target: %d", dest);
+    nxtDisplayTextLine(4, "Dest: %d", curr);
 
-    nMotorEncoderTarget[driveLeft] = encoderCounts;
-    nMotorEncoderTarget[driveRight] = encoderCounts;
+    resetAllMotorsEncoder();
 
     if (deg > 0) {
 	    rotateClockwise(speed);
@@ -141,18 +198,55 @@ void turnEncoder(int deg, int speed)
 	    rotateCounterClockwise(speed);
     }
 
-    while ((nMotorRunState[driveLeft] != runStateIdle) && (nMotorRunState[driveRight] != runStateIdle)) {
-    }
+    waitForIdle(abs(encoderCounts));
 
     /*
      * How close did we get to the target?
      */
+    /*
     delta = HTMCreadRelativeHeading(HTMC);
-    if ((delta <= 3) && (delta >= -3)) {
-        return;
-    } else {
-        turnEncoder(delta, speed);
-    }
+    while ((delta > 2) || (delta < -2)) {
+        idx++;
+	    resetAllMotorsEncoder();
+        encoderCounts = ENC_TICKS_PER_DEGREE;
+	    setAllMotorsEncoderTarget(encoderCounts);
+        if (delta > 0) {
+#ifdef FOUR_WHEEL_DRIVE
+		    nMotorEncoderTarget[driveFrontRight] = encoderCounts;
+		    nMotorEncoderTarget[driveFrontLeft] = encoderCounts;
+#endif
+		    nMotorEncoderTarget[driveRearRight] = -encoderCounts;
+		    nMotorEncoderTarget[driveRearLeft] = -encoderCounts;
+            rotateCounterClockwise(speed/2);
+        } else {
+#ifdef FOUR_WHEEL_DRIVE
+		    nMotorEncoderTarget[driveFrontRight] = -encoderCounts;
+		    nMotorEncoderTarget[driveFrontLeft] = -encoderCounts;
+#endif
+		    nMotorEncoderTarget[driveRearRight] = encoderCounts;
+		    nMotorEncoderTarget[driveRearLeft] = encoderCounts;
+            rotateClockwise(speed/2);
+        }
+        delta = HTMCreadRelativeHeading(HTMC);
+		eraseDisplay();
+		curr = HTMCreadHeading(HTMC);
+		nxtDisplayTextLine(1, "Delta: %d", delta);
+		nxtDisplayTextLine(2, "Initial: %d", initial);
+		nxtDisplayTextLine(3, "Target: %d", dest);
+		nxtDisplayTextLine(4, "Current: %d", curr);
+		nxtDisplayTextLine(5, "Adjust: %d", idx);
+        if (nNxtButtonPressed == 3) {
+            break;
+        }
+    } */
+
+    eraseDisplay();
+    curr = HTMCreadHeading(HTMC);
+ 	nxtDisplayTextLine(1, "Delta: %d", delta);
+    nxtDisplayTextLine(2, "Initial: %d", initial);
+    nxtDisplayTextLine(3, "Target: %d", dest);
+    nxtDisplayTextLine(4, "Current: %d", curr);
+    nxtDisplayTextLine(5, "Adjust: %d", idx);
 }
 
 /*
@@ -185,5 +279,5 @@ void turn(int deg)
         }
 	}
     //showHeading();
-  	move(0, FORWARD, 0);
+  	move(0, DIR_FORWARD, 0);
 }
