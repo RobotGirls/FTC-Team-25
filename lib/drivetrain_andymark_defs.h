@@ -14,11 +14,5 @@
  */
 // #define USING_SENSOR_MUX
 
-#define ENCPERINCH              36
-#define ENC_TICKS_PER_DEGREE    6.5
-
-<<<<<<< HEAD
-#define IAMANAWESOMEPERSONJUSTJOKING 120
-=======
-#define FOOBAR 120
->>>>>>> upstream/master
+#define ENCPERINCH              118.75
+#define ENC_TICKS_PER_DEGREE    11.25
