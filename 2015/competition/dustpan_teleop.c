@@ -2,13 +2,12 @@
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Motor,  mtr_S1_C2_1,     driveRearRight, tmotorTetrix, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C2_2,     driveFrontRight, tmotorTetrix, PIDControl, encoder)
-#pragma config(Motor,  mtr_S1_C3_1,     elbow,         tmotorTetrix, PIDControl, encoder)
+#pragma config(Motor,  mtr_S1_C3_1,     shoulder,      tmotorTetrix, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C3_2,     motorG,        tmotorTetrix, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C4_1,     driveFrontLeft, tmotorTetrix, PIDControl, reversed, encoder)
 #pragma config(Motor,  mtr_S1_C4_2,     driveRearLeft, tmotorTetrix, PIDControl, reversed, encoder)
 #pragma config(Servo,  srvo_S1_C1_1,    finger,               tServoStandard)
 #pragma config(Servo,  srvo_S1_C1_2,    brush,                tServoContinuousRotation)
-#pragma config(Servo,  srvo_S1_C1_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C1_3,    arm,                  tServoStandard)
 #pragma config(Servo,  srvo_S1_C1_4,    dockarm,              tServoContinuousRotation)
 #pragma config(Servo,  srvo_S1_C1_5,    servo5,               tServoNone)
@@ -18,7 +17,7 @@
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
 
 #define SERVO_ARM_EXTENDED          90
-#define SERVO_ARM_RETRACTED         137
+#define SERVO_ARM_RETRACTED         150
 #define SERVO_ARM_EXTENDED_HALF     120
 
 static int drive_multiplier = 1;
@@ -32,6 +31,7 @@ typedef enum brush_state_ {
 typedef enum shoulder_state_ {
     SHOULDER_UP,
     SHOULDER_DOWN,
+    SHOULDER_STOP,
 } shoulder_state_t;
 
 typedef enum arm_state_ {
@@ -112,28 +112,22 @@ void shoulder_enter_state(shoulder_state_t state)
 
     switch (state) {
     case SHOULDER_DOWN:
-        if (nMotorEncoder[elbow] > 0) {
-            motor[elbow] = -20;
-            while (nMotorEncoder[elbow] > 0) { }
-            motor[elbow] = 0;
-        }
+        motor[shoulder] = -20;
         break;
     case SHOULDER_UP:
-        if (nMotorEncoder[elbow] > 0) {
-            motor[elbow] = 20;
-            while (nMotorEncoder[elbow] < 500) { }
-            motor[elbow] = 0;
-        }
-
+        motor[shoulder] = 20;
+        break;
+    case SHOULDER_STOP:
+        motor[shoulder] = 0;
         break;
     }
 }
 
 void initializeRobot()
 {
-    nMotorEncoder[elbow] = 0;
+    nMotorEncoder[shoulder] = 0;
 
-    shoulder_enter_state(SHOULDER_DOWN);
+    shoulder_enter_state(SHOULDER_STOP);
     brush_enter_state(BRUSH_OFF);
     arm_enter_state(ARM_RETRACTED);
 
@@ -179,6 +173,10 @@ void handle_joy2_ltu()
         shoulder_enter_state(SHOULDER_UP);
         break;
     case SHOULDER_UP:
+        shoulder_enter_state(SHOULDER_STOP);
+        break;
+    case SHOULDER_STOP:
+        shoulder_enter_state(SHOULDER_UP);
         break;
     }
 }
@@ -187,8 +185,12 @@ void handle_joy2_ltd()
 {
     switch (shoulder_state) {
     case SHOULDER_DOWN:
+        shoulder_enter_state(SHOULDER_STOP);
         break;
     case SHOULDER_UP:
+        shoulder_enter_state(SHOULDER_DOWN);
+        break;
+    case SHOULDER_STOP:
         shoulder_enter_state(SHOULDER_DOWN);
         break;
     }
@@ -309,8 +311,8 @@ task main()
         //}
 
         if (abs(right_y) > 20) {
-	    	motor[driveFrontRight] = drive_multiplier * right_y;
-	    	motor[driveRearRight] = drive_multiplier * right_y;
+	    	motor[driveFrontRight] = drive_multiplier * left_y;
+	    	motor[driveRearRight] = drive_multiplier * left_y;
 		}
 		else {
 		    motor[driveFrontRight] = 0;
@@ -318,8 +320,8 @@ task main()
 		}
 
         if (abs(left_y) > 20) {
-		    motor[driveFrontLeft] = drive_multiplier * left_y;
-		    motor[driveRearLeft] = drive_multiplier * left_y;
+		    motor[driveFrontLeft] = drive_multiplier * right_y;
+		    motor[driveRearLeft] = drive_multiplier * right_y;
 		}
 		else
 		{
