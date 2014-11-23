@@ -19,6 +19,7 @@
 #define SERVO_ARM_EXTENDED          90
 #define SERVO_ARM_RETRACTED         150
 #define SERVO_ARM_EXTENDED_HALF     120
+#define SERVO_ARM_PICKUP            140
 
 static int drive_multiplier = 1;
 
@@ -35,6 +36,7 @@ typedef enum shoulder_state_ {
 } shoulder_state_t;
 
 typedef enum arm_state_ {
+    ARM_PICKUP,
     ARM_EXTENDED,
     ARM_RETRACTED,
     ARM_EXTENDED_HALF,
@@ -94,6 +96,9 @@ void arm_enter_state(arm_state_t state)
     arm_state = state;
 
     switch (state) {
+    case ARM_PICKUP:
+        servo[arm] = SERVO_ARM_PICKUP;
+        break;
     case ARM_EXTENDED:
         servo[arm] = SERVO_ARM_EXTENDED;
         break;
@@ -199,27 +204,16 @@ void handle_joy2_ltd()
 void handle_joy2_btn2()
 {
     switch (arm_state) {
-    case ARM_EXTENDED:
+    case ARM_PICKUP:
         arm_enter_state(ARM_RETRACTED);
         break;
-    case ARM_RETRACTED:
-        break;
-    case ARM_EXTENDED_HALF:
-        arm_enter_state(ARM_RETRACTED);
-        break;
-    }
-}
-
-void handle_joy2_btn3()
-{
-    switch (arm_state) {
     case ARM_EXTENDED:
         arm_enter_state(ARM_EXTENDED_HALF);
         break;
     case ARM_RETRACTED:
-        arm_enter_state(ARM_EXTENDED_HALF);
         break;
     case ARM_EXTENDED_HALF:
+        arm_enter_state(ARM_PICKUP);
         break;
     }
 }
@@ -227,10 +221,13 @@ void handle_joy2_btn3()
 void handle_joy2_btn4()
 {
     switch (arm_state) {
+    case ARM_PICKUP:
+        arm_enter_state(ARM_EXTENDED_HALF);
+        break;
     case ARM_EXTENDED:
         break;
     case ARM_RETRACTED:
-        arm_enter_state(ARM_EXTENDED);
+        arm_enter_state(ARM_PICKUP);
         break;
     case ARM_EXTENDED_HALF:
         arm_enter_state(ARM_EXTENDED);
@@ -243,9 +240,6 @@ void handle_joy2_event(joystick_event_t event)
     switch (event) {
     case BUTTON_TWO:
         handle_joy2_btn2();
-        break;
-    case BUTTON_THREE:
-        handle_joy2_btn3();
         break;
     case BUTTON_FOUR:
         handle_joy2_btn4();
