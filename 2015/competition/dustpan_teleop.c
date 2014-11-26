@@ -21,6 +21,12 @@
 #define SERVO_ARM_EXTENDED_HALF     120
 #define SERVO_ARM_PICKUP            140
 
+#define SERVO_DOCK_ARM_FORWARD      80
+#define SERVO_DOCK_ARM_BACKWARD     147
+#define SERVO_DOCK_ARM_STOPPED      127
+#define SERVO_FINGER_UP             160
+#define SERVO_FINGER_DOWN           146
+
 static int drive_multiplier = 1;
 
 typedef enum brush_state_ {
@@ -42,6 +48,11 @@ typedef enum arm_state_ {
     ARM_EXTENDED_HALF,
 } arm_state_t;
 
+typedef enum dock_state_ {
+    DOCK_FINGER_UP,
+    DOCK_FINGER_DOWN,
+} dock_state_t;
+
 typedef enum joystick_event_ {
     RIGHT_TRIGGER_UP = 6,
     RIGHT_TRIGGER_DOWN = 8,
@@ -56,6 +67,7 @@ typedef enum joystick_event_ {
 brush_state_t brush_state;
 arm_state_t arm_state;
 shoulder_state_t shoulder_state;
+dock_state_t dock_state;
 
 bool debounce;
 
@@ -72,6 +84,20 @@ void all_stop()
     motor[driveRearLeft] = 0;
     motor[driveFrontRight] = 0;
     motor[driveRearRight] = 0;
+}
+
+void dock_enter_state(dock_state_t state)
+{
+    dock_state = state;
+
+    switch (state) {
+    case DOCK_FINGER_UP:
+        servo[finger] = SERVO_FINGER_UP;
+        break;
+    case DOCK_FINGER_DOWN:
+        servo[finger] = SERVO_FINGER_DOWN;
+        break;
+    }
 }
 
 void brush_enter_state(brush_state_t state)
@@ -135,6 +161,9 @@ void initializeRobot()
     shoulder_enter_state(SHOULDER_STOP);
     brush_enter_state(BRUSH_OFF);
     arm_enter_state(ARM_RETRACTED);
+    dock_enter_state(DOCK_FINGER_UP);
+
+    servo[dockarm] = SERVO_DOCK_ARM_STOPPED;
 
     all_stop();
 
@@ -235,9 +264,37 @@ void handle_joy2_btn4()
     }
 }
 
+void handle_joy2_btn1()
+{
+    switch (dock_state) {
+    case DOCK_FINGER_UP:
+        break;
+    case DOCK_FINGER_DOWN:
+        dock_enter_state(DOCK_FINGER_UP);
+        break;
+    }
+}
+
+void handle_joy2_btn3()
+{
+    switch (dock_state) {
+    case DOCK_FINGER_UP:
+        dock_enter_state(DOCK_FINGER_DOWN);
+        break;
+    case DOCK_FINGER_DOWN:
+        break;
+    }
+}
+
 void handle_joy2_event(joystick_event_t event)
 {
     switch (event) {
+    case BUTTON_ONE:
+        handle_joy2_btn1();
+        break;
+    case BUTTON_THREE:
+        handle_joy2_btn3();
+        break;
     case BUTTON_TWO:
         handle_joy2_btn2();
         break;
@@ -265,6 +322,7 @@ task main()
 {
     short right_y;
     short left_y;
+    short left_dock_y;
 
     debounce = false;
 
@@ -279,7 +337,9 @@ task main()
         getJoystickSettings(joystick);
 
         if (!debounce) {
- 	        if (joy2Btn(Btn2)) {
+ 	        if (joy2Btn(Btn1)) {
+	            handle_joy2_event(BUTTON_ONE);
+	        } else if (joy2Btn(Btn2)) {
 	            handle_joy2_event(BUTTON_TWO);
 	        } else if (joy2Btn(Btn3)) {
 	            handle_joy2_event(BUTTON_THREE);
@@ -300,6 +360,7 @@ task main()
             //right_y = joystick.joy1_y2;
             //left_y = joystick.joy1_y1;
         //} else {
+            left_dock_y = joystick.joy2_y1;
             right_y = joystick.joy1_y1;
             left_y = joystick.joy1_y2;
         //}
@@ -322,5 +383,15 @@ task main()
 		    motor[driveFrontLeft] = 0;
 		    motor[driveRearLeft] = 0;
 		}
+
+        if (abs(left_dock_y) > 20) {
+            if (left_dock_y > 0) {
+                servo[dockarm] = SERVO_DOCK_ARM_FORWARD;
+            } else {
+                servo[dockarm] = SERVO_DOCK_ARM_BACKWARD;
+            }
+        } else {
+            servo[dockarm] = SERVO_DOCK_ARM_STOPPED;
+        }
     }
 }
