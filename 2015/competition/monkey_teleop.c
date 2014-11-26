@@ -18,6 +18,7 @@
 
 #define SERVO_ROLLER_UP    48
 #define SERVO_ROLLER_DOWN  137
+#define CONVEYOR_POWER     80
 
 static int drive_multiplier = 1;
 
@@ -26,8 +27,6 @@ typedef enum conveyor_state_ {
     CONVEYOR_FORWARD,
     CONVEYOR_BACKWARD,
 } conveyor_state_t;
-
-
 
 typedef enum joystick_event_ {
     RIGHT_TRIGGER_UP = 6,
@@ -67,10 +66,10 @@ void conveyor_enter_state(conveyor_state_t state)
         motor[conveyor] = 0;
         break;
     case CONVEYOR_FORWARD:
-        motor[conveyor] = 100;
+        motor[conveyor] = CONVEYOR_POWER;
         break;
     case CONVEYOR_BACKWARD:
-        motor[conveyor] = -100;
+        motor[conveyor] = -CONVEYOR_POWER;
         break;
     }
 }
@@ -80,7 +79,8 @@ void conveyor_enter_state(conveyor_state_t state)
 void initializeRobot()
 {
     conveyor_enter_state(CONVEYOR_OFF);
-    servo[roller]=SERVO_ROLLER_DOWN;
+
+    servo[roller] = SERVO_ROLLER_DOWN;
 
     all_stop();
 
@@ -119,10 +119,7 @@ void handle_joy1_btn4()
 
 void handle_joy1_btn10()
 {
-
-			servo[roller] = SERVO_ROLLER_UP;
-
-
+    servo[roller] = SERVO_ROLLER_UP;
 }
 
 
@@ -136,8 +133,8 @@ void handle_joy1_event(joystick_event_t event)
         handle_joy1_btn4();
         break;
     case BUTTON_TEN:
-    		handle_joy1_btn10();
-    		break;
+		handle_joy1_btn10();
+		break;
     }
 
     startTask(debounceTask);
@@ -168,10 +165,8 @@ task main()
 	        } else if (joy1Btn(Btn4)) {
 	            handle_joy1_event(BUTTON_FOUR);
 	        } else if (joy1Btn(Btn10)) {
-	        		handle_joy1_event(BUTTON_TEN);
-	        }
-
-	        if (joy1Btn(Btn6)) {
+        		handle_joy1_event(BUTTON_TEN);
+	        } else if (joy1Btn(Btn6)) {
 	        	motor[elbow]=100;
 	        } else if (joy1Btn(Btn8)) {
 	        	motor[elbow]=-100;
