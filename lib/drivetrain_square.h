@@ -1,5 +1,4 @@
 
-
 typedef enum  dir_ {
     DIR_FORWARD,
     DIR_BACKWARD
