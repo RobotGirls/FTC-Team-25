@@ -1,4 +1,7 @@
 
+#define RAMP_DELTA        2
+#define RAMP_PERIOD       50
+#define RAMP_START_SPEED  10
 
 typedef enum  dir_ {
     DIR_FORWARD,
@@ -97,9 +100,18 @@ void resetAllMotorsEncoder(void)
     nMotorEncoder[driveRearLeft] = 0;
 }
 
-
-void waitForIdle(int t)
+void waitForIdle(int t, int speed = 0)
 {
+    int curr_speed;
+    int ramp_delta;
+
+    curr_speed = motor[driveRearLeft];
+    if (curr_speed < 0) {
+        ramp_delta = -RAMP_DELTA;
+    } else {
+        ramp_delta = RAMP_DELTA;
+    }
+
     while (
 #ifdef FOUR_WHEEL_DRIVE
            (abs(nMotorEncoder[driveFrontRight]) < t) &&
@@ -108,6 +120,19 @@ void waitForIdle(int t)
            (abs(nMotorEncoder[driveRearLeft]) < t) &&
            (abs(nMotorEncoder[driveRearRight]) < t))
 	{
+        /*
+         * Ramp up to speed if speed does not equal zero otherwise, we are
+         * already at full speed in which case bypass.
+         */
+        if ((speed != 0) && (curr_speed != speed)) {
+            curr_speed += ramp_delta;
+            if (curr_speed > speed) {
+                curr_speed = speed;
+            }
+            motor[driveRearLeft] = curr_speed;
+            motor[driveRearRight] = curr_speed;
+            wait1Msec(RAMP_PERIOD);
+        }
     }
 
 #ifdef FOUR_WHEEL_DRIVE
@@ -145,7 +170,7 @@ void move_with_software_pid(int t, int power)
      * motor's power by.  This seems large, but it appears to work pretty well,
      * with a very small delay in between reading the error factor.
      */
-	float kp = 1.0;
+	float kp = .3;
 
 	nMotorEncoder[driveRearLeft] = 0;
 	nMotorEncoder[driveRearRight] = 0;
@@ -162,9 +187,9 @@ void move_with_software_pid(int t, int power)
 	    error = nMotorEncoder[driveRearLeft] - nMotorEncoder[driveRearRight];
 
 	    /*
-         * Multiple error by the scaling, or proportional factor, and adjust the slave.
+         * Multiply error by the scaling, or proportional factor, and adjust the slave.
          */
-	    slave_power += error * kp;
+	    slave_power = slave_power + (error * kp);
 	    motor[driveRearRight] = slave_power;
 
         /*
@@ -221,7 +246,7 @@ void turnEncoder(float deg, int speed)
  * inches.  If inches is 0 and speed is non-zero, turn on
  * motors and do not turn off.  0,0 turns off motors.
  */
-void move(float inches, direction_t dir, int speed = 100)
+void move(float inches, direction_t dir, int speed = 100, bool ramp_start = false)
 {
 	int encoderCounts = inches * ENCPERINCH;
     int direction_multiplier;
@@ -247,7 +272,18 @@ void move(float inches, direction_t dir, int speed = 100)
     } else if ((inches == 0) && (speed != 0)) {
 	    allMotorsOn(direction_multiplier * speed);
     } else {
+#ifdef USE_SOFTWARE_PID
         move_with_software_pid(encoderCounts, direction_multiplier * speed);
+#else
+		setAllMotorsEncoderTarget(encoderCounts);
+        if (ramp_start == true) {
+            allMotorsOn(direction_multiplier * RAMP_START_SPEED);
+            waitForIdle(encoderCounts, direction_multiplier * speed);
+        } else {
+			allMotorsOn(direction_multiplier * speed);
+			waitForIdle(encoderCounts);
+        }
+#endif
     }
 
 #ifdef USE_COMPASS_CORRECTION
