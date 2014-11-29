@@ -187,9 +187,9 @@ void move_with_software_pid(int t, int power)
 	    error = nMotorEncoder[driveRearLeft] - nMotorEncoder[driveRearRight];
 
 	    /*
-         * Multiple error by the scaling, or proportional factor, and adjust the slave.
+         * Multiply error by the scaling, or proportional factor, and adjust the slave.
          */
-	    slave_power += error * kp;
+	    slave_power = slave_power + (error * kp);
 	    motor[driveRearRight] = slave_power;
 
         /*
