@@ -7,8 +7,8 @@
 #pragma config(Motor,  mtr_S1_C3_1,     driveRearLeft, tmotorTetrix, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C3_2,     driveFrontLeft, tmotorTetrix, PIDControl, encoder)
 #pragma config(Servo,  srvo_S1_C4_1,    roller,               tServoStandard)
-#pragma config(Servo,  srvo_S1_C4_2,    servo2,               tServoNone)
-#pragma config(Servo,  srvo_S1_C4_3,    servo3,               tServoNone)
+#pragma config(Servo,  srvo_S1_C4_2,    leftFinger,           tServoStandard)
+#pragma config(Servo,  srvo_S1_C4_3,    rightFinger,          tServoStandard)
 #pragma config(Servo,  srvo_S1_C4_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_5,    servo5,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_6,    servo6,               tServoNone)
@@ -16,9 +16,15 @@
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
 
-#define SERVO_ROLLER_UP    48
-#define SERVO_ROLLER_DOWN  137
-#define CONVEYOR_POWER     80
+#define SERVO_ROLLER_UP             48
+#define SERVO_ROLLER_DOWN           137
+#define CONVEYOR_POWER              80
+#define LSERVO_DOCK_FINGER_STOWED   82
+#define LSERVO_DOCK_FINGER_UP       205
+#define LSERVO_DOCK_FINGER_DOWN     161
+#define RSERVO_DOCK_FINGER_STOWED   144
+#define RSERVO_DOCK_FINGER_UP       0
+#define RSERVO_DOCK_FINGER_DOWN     64
 
 static int drive_multiplier = 1;
 
@@ -27,6 +33,12 @@ typedef enum conveyor_state_ {
     CONVEYOR_FORWARD,
     CONVEYOR_BACKWARD,
 } conveyor_state_t;
+
+typedef enum dock_state_ {
+    DOCK_FINGER_UP,
+    DOCK_FINGER_DOWN,
+    DOCK_FINGER_STOWED,
+} dock_state_t;
 
 typedef enum joystick_event_ {
     RIGHT_TRIGGER_UP = 6,
@@ -39,6 +51,7 @@ typedef enum joystick_event_ {
 } joystick_event_t;
 
 conveyor_state_t conveyor_state;
+dock_state_t dock_state;
 
 bool debounce;
 
@@ -55,6 +68,26 @@ void all_stop()
     motor[driveRearLeft] = 0;
     motor[driveFrontRight] = 0;
     motor[driveRearRight] = 0;
+}
+
+void dock_enter_state(dock_state_t state)
+{
+    dock_state = state;
+
+    switch (state) {
+    case DOCK_FINGER_STOWED:
+        servo[rightFinger] = RSERVO_DOCK_FINGER_STOWED;
+        servo[leftFinger]  = LSERVO_DOCK_FINGER_STOWED;
+        break;
+    case DOCK_FINGER_UP:
+        servo[rightFinger] = RSERVO_DOCK_FINGER_UP;
+        servo[leftFinger]  = LSERVO_DOCK_FINGER_UP;
+       break;
+    case DOCK_FINGER_DOWN:
+        servo[rightFinger] = RSERVO_DOCK_FINGER_DOWN;
+        servo[leftFinger]  = LSERVO_DOCK_FINGER_DOWN;
+        break;
+    }
 }
 
 void conveyor_enter_state(conveyor_state_t state)
@@ -74,11 +107,10 @@ void conveyor_enter_state(conveyor_state_t state)
     }
 }
 
-
-
 void initializeRobot()
 {
     conveyor_enter_state(CONVEYOR_OFF);
+    dock_enter_state(DOCK_FINGER_STOWED);
 
     servo[roller] = SERVO_ROLLER_DOWN;
 
@@ -117,6 +149,30 @@ void handle_joy1_btn4()
     }
 }
 
+void handle_joy1_ltu()
+{
+    switch (dock_state) {
+    case DOCK_FINGER_STOWED:
+    case DOCK_FINGER_DOWN:
+        dock_enter_state(DOCK_FINGER_UP);
+        break;
+    case DOCK_FINGER_UP:
+         break;
+    }
+}
+
+void handle_joy1_ltd()
+{
+    switch (dock_state) {
+    case DOCK_FINGER_STOWED:
+    case DOCK_FINGER_UP:
+        dock_enter_state(DOCK_FINGER_DOWN);
+        break;
+    case DOCK_FINGER_DOWN:
+        break;
+    }
+}
+
 void handle_joy1_btn10()
 {
     servo[roller] = SERVO_ROLLER_UP;
@@ -135,6 +191,12 @@ void handle_joy1_event(joystick_event_t event)
     case BUTTON_TEN:
 		handle_joy1_btn10();
 		break;
+    case LEFT_TRIGGER_UP:
+        handle_joy1_ltu();
+        break;
+    case LEFT_TRIGGER_DOWN:
+        handle_joy1_ltd();
+        break;
     }
 
     startTask(debounceTask);
@@ -166,6 +228,10 @@ task main()
 	            handle_joy1_event(BUTTON_FOUR);
 	        } else if (joy1Btn(Btn10)) {
         		handle_joy1_event(BUTTON_TEN);
+	        } else if (joy1Btn(Btn5)) {
+	            handle_joy1_event(LEFT_TRIGGER_UP);
+	        } else if (joy1Btn(Btn7)) {
+	            handle_joy1_event(LEFT_TRIGGER_DOWN);
 	        } else if (joy1Btn(Btn6)) {
 	        	motor[elbow]=100;
 	        } else if (joy1Btn(Btn8)) {
