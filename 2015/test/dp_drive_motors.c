@@ -24,10 +24,20 @@
 
 task main()
 {
-	motor[driveFrontRight] = 100;
-	motor[driveRearRight] = 100;
-	motor[driveFrontLeft] = 100;
-	motor[driveRearLeft] = 100;
+	motor[driveFrontRight] = 60;
+	motor[driveRearRight] = 60;
+	motor[driveFrontLeft] = 60;
+	motor[driveRearLeft] = 60;
 
-    while (true) {}
+    nMotorEncoder[driveFrontRight] = 0;
+    nMotorEncoder[driveFrontLeft] = 0;
+    nMotorEncoder[driveRearRight] = 0;
+    nMotorEncoder[driveRearLeft] = 0;
+
+    while (true) {
+	    displayString(0, "FR: %d", nMotorEncoder[driveFrontRight]);
+	    displayString(1, "FL: %d", nMotorEncoder[driveFrontLeft]);
+	    displayString(2, "RR: %d", nMotorEncoder[driveRearRight]);
+	    displayString(3, "RL: %d", nMotorEncoder[driveRearLeft]);
+    }
 }
