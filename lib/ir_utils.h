@@ -7,15 +7,15 @@ typedef enum direction_ {
 } ir_direction_t;
 
 typedef enum ir_segment_ {
-    IR_SEGMENT_1 = 0,
-    IR_SEGMENT_2,
-    IR_SEGMENT_3,
-    IR_SEGMENT_4,
-    IR_SEGMENT_5,
-    IR_SEGMENT_6,
-    IR_SEGMENT_7,
-    IR_SEGMENT_8,
-    IR_SEGMENT_9,
+    IR_SEGMENT_1 = 1,
+    IR_SEGMENT_2 = 2,
+    IR_SEGMENT_3 = 3,
+    IR_SEGMENT_4 = 4,
+    IR_SEGMENT_5 = 5,
+    IR_SEGMENT_6 = 6,
+    IR_SEGMENT_7 = 7,
+    IR_SEGMENT_8 = 8,
+    IR_SEGMENT_9 = 9,
 } ir_segment_t;
 
 /*
@@ -68,6 +68,8 @@ bool is_beacon_in_segment(tSensors link, ir_segment_t target_segment)
     int segment;
 
     segment = HTIRS2readACDir(link);
+
+    nxtDisplayTextLine(5, "Segment: %d, %d", segment, target_segment);
 
     if (segment == target_segment) {
         return true;
