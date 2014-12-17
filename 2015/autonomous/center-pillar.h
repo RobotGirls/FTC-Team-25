@@ -62,5 +62,4 @@ task main()
     if (r_dir == 0 && l_dir == 5) {
         move_to_position(3);
     }
-
 }
