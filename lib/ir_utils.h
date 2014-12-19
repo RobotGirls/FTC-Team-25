@@ -1,18 +1,10 @@
 
 typedef enum direction_ {
-<<<<<<< HEAD
-	DIR_NONE,
-	DIR_RIGHT,
-	DIR_LEFT,
-	DIR_CENTER,
-} direction_t;
-=======
     DIR_NONE,
     DIR_RIGHT,
     DIR_LEFT,
     DIR_CENTER,
 } ir_direction_t;
->>>>>>> upstream/master
 
 /*
 * The IR Receiver can return the strength
@@ -30,35 +22,6 @@ typedef enum ir_segment_strength_ {
 
 ir_direction_t get_dir_to_beacon(tSensors link)
 {
-<<<<<<< HEAD
-	int segment;
-	direction_t dir;
-
-	segment = HTIRS2readACDir(link);
-
-	switch (segment) {
-	case 0:
-		dir = DIR_NONE;
-		break;
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-		dir = DIR_LEFT;
-		break;
-	case 5:
-		dir = DIR_CENTER;
-		break;
-	case 6:
-	case 7:
-	case 8:
-	case 9:
-		dir = DIR_RIGHT;
-		break;
-	}
-
-	return dir;
-=======
     int segment;
     ir_direction_t dir;
 
@@ -86,7 +49,6 @@ ir_direction_t get_dir_to_beacon(tSensors link)
     }
 
     return dir;
->>>>>>> upstream/master
 }
 
 /*
@@ -144,9 +106,6 @@ void initialize_receiver(tSensors link, tSensors link2)
 	// the default DSP mode is 1200 Hz.
 	tHTIRS2DSPMode m = DSP_1200;
 
-<<<<<<< HEAD
-	HTIRS2setDSPMode(link, m);
-=======
     HTIRS2setDSPMode(link, m);
     HTIRS2setDSPMode(link2, m);
 }
@@ -173,8 +132,6 @@ void find_center(tSensors link)
     case DIR_NONE:
         break;
     }
-
->>>>>>> upstream/master
 }
 
 void find_absolute_center(tSensors left, tSensors right)
@@ -203,12 +160,6 @@ void move_to_beacon(tSensors link, tSensors link2, int power, bool log_data)
 {
 	int _dirAC = 0;
 	int s1, s2, s3, s4, s5 = 0;
-<<<<<<< HEAD
-	int error;
-	int master_power, slave_power;
-	float kp;
-	bool done;
-=======
 	int s21, s22, s23, s24, s25 = 0;
     int error;
     int master_power, slave_power;
@@ -223,41 +174,12 @@ void move_to_beacon(tSensors link, tSensors link2, int power, bool log_data)
     if (log_data == true) {
         dl_init("ir_log.txt", true);
     }
->>>>>>> upstream/master
 
 	master_power = power;
 	slave_power = power;
 
 	_dirAC = HTIRS2readACDir(link);
 
-<<<<<<< HEAD
-	// Read the individual signal strengths of the internal sensors
-	// Do this for both unmodulated (DC) and modulated signals (AC)
-	HTIRS2readAllACStrength(link, s1, s2, s3, s4, s5);
-
-	kp = 1.0;
-	error = s2 - s3;
-	slave_power += error * kp;
-	done = false;
-
-	while (!done) {
-		motor[driveRearLeft] = master_power;
-		motor[driveRearRight] = slave_power;
-		if (!HTIRS2readAllACStrength(link, s1, s2, s3, s4, s5)) {
-			wait1Msec(10);
-			continue;
-		}
-		error = s2 - s3;
-		slave_power += error * kp;
-
-		displayString(2, "E: %d", error);
-		displayString(3, "slave: %d", slave_power);
-
-		if ((s2 >= 200) || (s3 >= 200)) {
-			done = true;
-		}
-	}
-=======
     kp = 0.3;
     // error = s3 - s23;
     // slave_power += error * kp;
@@ -342,5 +264,4 @@ void move_to_beacon(tSensors link, tSensors link2, int power, bool log_data)
     allMotorsOff();
 
     dl_close();
->>>>>>> upstream/master
 }
