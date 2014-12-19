@@ -1,11 +1,8 @@
 
-<<<<<<< HEAD
-=======
 #define RAMP_DELTA        2
 #define RAMP_PERIOD       50
 #define RAMP_START_SPEED  10
 
->>>>>>> upstream/master
 typedef enum  dir_ {
     DIR_FORWARD,
     DIR_BACKWARD
