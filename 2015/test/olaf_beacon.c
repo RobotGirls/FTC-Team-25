@@ -41,7 +41,7 @@ void move_to_position(int position)
         break;
     case 2:
         add_segment(40, -90, 40);
-        add_segment(0, 145, 40);
+        add_segment(0, 145pl, 40);
         break;
     case 3:
         add_segment(3, 0, 40);
