@@ -22,6 +22,7 @@
 #include "../../lib/drivetrain_square.h"
 #include "../../lib/data_log.h"
 #include "../../lib/ir_utils.h"
+#include "../../lib/us_utils.h"
 
 task main()
 {
@@ -32,4 +33,5 @@ task main()
         nxtDisplayTextLine(4, "Left dir %d", HTIRS2readACDir(irr_left));
         nxtDisplayTextLine(5, "Right dir %d", HTIRS2readACDir(irr_right));
     }
+    move_to_object(carrot, 25);
 }

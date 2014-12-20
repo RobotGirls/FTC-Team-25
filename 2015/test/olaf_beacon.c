@@ -23,28 +23,28 @@
 #include "../../lib/dead_reckon.h"
 #include "../../lib/data_log.h"
 #include "../../lib/ir_utils.h"
+#include "../../lib/us_utils.h"
 
 ir_direction_t dir;
 
 int count;
 int beep;
 
-void move_to_pole(int count)
+void move_to_position(int position)
 {
-    init_path();
+	init_path();
 
-    switch (count) {
-    case 1:
-        add_segment(26, 15, 45);
-        add_segment(-7.5, 105, 80);
+	switch (position) {
+	case 1:
+        add_segment(53.5, -30, 50);
+        add_segment(0, 120, 50);
         break;
     case 2:
-        add_segment(22, 0, 45);
-        add_segment(-7.5, -135, 50);
+        add_segment(26, -37.5, 50);
+        add_segment(0, 80, 50);
         break;
     case 3:
-        add_segment(27, 27.5, 45);
-        add_segment(-13.5, -202, 50);
+        add_segment(3, 0, 50);
         break;
     }
     stop_path();
@@ -65,15 +65,17 @@ task main()
 
     if (SensorValue[carrot] < 60) {
         beep = 3;
-        move_to_pole(3);
+        move_to_beacon(irr_left, irr_right, 20, true);
     }
     else if (SensorValue[carrot] > 200) {
         beep = 2;
-        move_to_pole(2);
+        move_to_position(2);
+        move_to_beacon(irr_left, irr_right, 20, true);
     }
     else if (SensorValue[carrot] < 80) {
         beep = 1;
-        move_to_pole(1);
+        move_to_position(1);
+        move_to_beacon(irr_left, irr_right, 20, true);
     }
 
     for (i = 0; i < beep; i++) {
