@@ -66,6 +66,8 @@ task main()
 {
     int i;
 
+    initialize_receiver(irr_left, irr_right);
+
     servo[leftEye] = LSERVO_CENTER;
     servo[rightEye] = RSERVO_CENTER;
 
