@@ -33,5 +33,4 @@ task main()
         nxtDisplayTextLine(4, "Left dir %d", HTIRS2readACDir(irr_left));
         nxtDisplayTextLine(5, "Right dir %d", HTIRS2readACDir(irr_right));
     }
-    move_to_object(carrot, 25);
 }
