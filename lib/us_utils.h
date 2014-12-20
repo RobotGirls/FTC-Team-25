@@ -1,8 +1,14 @@
 
-void move_to_object(tSensors link, int cm)
+void move_to_object(tSensors link, int speed, int cm)
 {
-    while(SensorValue[link] > cm) {
-        motor[driveRearRight] = 35;
-        motor[driveRearLeft] = 35;
+    motor[driveRearRight] = speed;
+    motor[driveRearLeft] = speed;
+
+    while (SensorValue[link] > cm) {
+        /* Noop, or a wait for that condition to be true */
     }
+
+    motor[driveRearLeft] = 0;
+    motor[driveRearRight] = 0;
+
 }

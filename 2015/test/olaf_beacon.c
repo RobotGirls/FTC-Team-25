@@ -36,15 +36,15 @@ void move_to_position(int position)
 
 	switch (position) {
 	case 1:
-        add_segment(53.5, -30, 50);
-        add_segment(0, 120, 50);
+        add_segment(53.5, -30, 40);
+        add_segment(0, 120, 40);
         break;
     case 2:
-        add_segment(26, -37.5, 50);
-        add_segment(0, 80, 50);
+        add_segment(40, -90, 40);
+        add_segment(0, 145, 40);
         break;
     case 3:
-        add_segment(3, 0, 50);
+        add_segment(3, 0, 40);
         break;
     }
     stop_path();
@@ -65,21 +65,23 @@ task main()
 
     if (SensorValue[carrot] < 60) {
         beep = 3;
-        move_to_beacon(irr_left, irr_right, 20, true);
-    }
-    else if (SensorValue[carrot] > 200) {
-        beep = 2;
-        move_to_position(2);
-        move_to_beacon(irr_left, irr_right, 20, true);
-    }
-    else if (SensorValue[carrot] < 80) {
+    } else if (SensorValue[carrot] < 80) {
         beep = 1;
         move_to_position(1);
-        move_to_beacon(irr_left, irr_right, 20, true);
+    } else {
+        beep = 2;
+        move_to_position(2);
     }
+
+    move_to_beacon(irr_left, irr_right, 20, true);
+    move_to_object(carrot, 5, 16);
 
     for (i = 0; i < beep; i++) {
         playImmediateTone(251, 50);
         wait1Msec(1000);
+    }
+
+    nxtDisplayTextLine(3, "Sensor sees %d", SensorValue[carrot]);
+    while(true) {
     }
 }
