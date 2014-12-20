@@ -69,7 +69,7 @@ void move_to_pole(int count)
 
     switch (count) {
     case 1:
-        add_segment(60, -45, 50);   //move to pole position 1
+        add_segment(60, -35, 50);   //move to pole position 1
       	add_segment(28, 135, 50);
         add_segment(0, -90, 50);    // hit pole
         break;
