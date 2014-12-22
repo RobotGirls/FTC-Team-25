@@ -1,9 +1,12 @@
 
+<<<<<<< HEAD
+=======
 #define LSERVO_LEFT_SLANT 110
 #define LSERVO_CENTER 145
 #define RSERVO_CENTER 113
 #define RSERVO_PERP   235
 
+>>>>>>> upstream/master
 #include "../../lib/sensors/drivers/hitechnic-irseeker-v2.h"
 #include "../../lib/drivetrain_andymark_defs.h"
 #include "../../lib/drivetrain_square.h"
@@ -11,12 +14,23 @@
 #include "../../lib/data_log.h"
 #include "../../lib/ir_utils.h"
 
+<<<<<<< HEAD
+#define LSERVO_CENTER 134
+#define RSERVO_CENTER 113
+#define RSERVO_PERP   235
+
+=======
+>>>>>>> upstream/master
 ir_direction_t dir;
 
 int count;
 
 void move_to_position(int position)
 {
+<<<<<<< HEAD
+	init_path();
+
+=======
     int i;
 
 	init_path();
@@ -26,6 +40,7 @@ void move_to_position(int position)
         wait1Msec(2000);
     }
 
+>>>>>>> upstream/master
 	switch (position) {
 	case 1:
         // add_segment(52.5, 0, 50);    // move to position 1
@@ -33,6 +48,15 @@ void move_to_position(int position)
         break;
     case 2:
         // add_segment(30, -33, 40);       //move to position 2
+<<<<<<< HEAD
+        servo[rightEye] = RSERVO_PERP;
+        add_segment(12, 0, 40);
+        add_segment(22, 45, 40);
+        break;
+    case 3:
+        add_segment(22, 0, 40);          //move to position 3
+        add_segment(9, 45, 40);
+=======
         add_segment(6, 0, 40);
         add_segment(22, -45, 40);
         add_segment(0, 90, 30);
@@ -41,12 +65,15 @@ void move_to_position(int position)
         add_segment(6, 0, 40);          //move to position 3
         add_segment(78, -45, 40);
         add_segment(0, 135, 30);
+>>>>>>> upstream/master
         break;
     }
     stop_path();
   	dead_reckon();
 }
 
+<<<<<<< HEAD
+=======
 /*
  * The idea here is that we will use the left side narrow segment
  * of the left receiver to do a rotational sweep and attempt to
@@ -100,6 +127,7 @@ int where_is_beacon()
     return position;
 }
 
+>>>>>>> upstream/master
 task main()
 {
     int r_val;
@@ -108,6 +136,24 @@ task main()
     ir_direction_t r_dir;
     ir_direction_t l_dir;
 
+<<<<<<< HEAD
+    r_val = get_ir_strength(irr_left, IR_STRENGTH_3);
+    l_val = get_ir_strength(irr_right, IR_STRENGTH_3);
+
+    r_dir = get_dir_to_beacon(irr_right);
+    l_dir = get_dir_to_beacon(irr_right);
+
+    if (r_dir == 5 && l_dir == 5) {
+        move_to_position(1);
+    }
+
+    if (r_dir == 5 && l_dir == 0) {
+        move_to_position(2);
+    }
+    if (r_dir == 0 && l_dir == 5) {
+        move_to_position(3);
+    }
+=======
     initialize_receiver(irr_left, irr_right);
 
     wait1Msec(500);
@@ -125,4 +171,5 @@ task main()
     add_segment(12, 0, 40);
     stop_path();
     dead_reckon();
+>>>>>>> upstream/master
 }
