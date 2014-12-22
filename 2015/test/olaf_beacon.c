@@ -41,7 +41,7 @@ void move_to_position(int position)
         break;
     case 2:
         add_segment(40, -90, 40);
-        add_segment(0, 145pl, 40);
+        add_segment(0, 145, 40);
         break;
     case 3:
         add_segment(3, 0, 40);
@@ -59,29 +59,29 @@ task main()
     servo[rightEye] = RSERVO_CENTER;
 
     init_path();
-    add_segment(24, 0, 50);
+    add_segment(24, 0, 50);                     // Move to beacon sensing position.
     stop_path();
     dead_reckon();
 
-    if (SensorValue[carrot] < 60) {
-        beep = 3;
-    } else if (SensorValue[carrot] < 80) {
-        beep = 1;
+    if (SensorValue[carrot] < 60) {             // If ultrasonic sensor sees position 3,
+        beep = 3;                               // don't move.
+    } else if (SensorValue[carrot] < 80) {      // If ultrasonic sensor sees position 1,
+        beep = 1;                               // move to position 1.
         move_to_position(1);
-    } else {
-        beep = 2;
+    } else {                                    // If ultrasonic sensor sees position 2,
+        beep = 2;                               // move to position 2.
         move_to_position(2);
     }
 
-    move_to_beacon(irr_left, irr_right, 20, true);
-    move_to_object(carrot, 5, 16);
+    move_to_beacon(irr_left, irr_right, 20, true);      // Move relatively in front of the beacon.
+    move_to_object(carrot, 5, 16);                      // Go forward until ultrasonic sensor sees certain distance.
 
-    for (i = 0; i < beep; i++) {
-        playImmediateTone(251, 50);
+    for (i = 0; i < beep; i++) {                // Beep for the position number that the
+        playImmediateTone(251, 50);             // ultrasonic sensor sees.
         wait1Msec(1000);
     }
 
-    nxtDisplayTextLine(3, "Sensor sees %d", SensorValue[carrot]);
+    nxtDisplayTextLine(3, "Sensor sees %d", SensorValue[carrot]);       // Display ultrasonic sensor value.
     while(true) {
     }
 }

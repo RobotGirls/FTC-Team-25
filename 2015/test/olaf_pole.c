@@ -59,25 +59,25 @@ task main()
     servo[rightEye] = RSERVO_CENTER;
 
     init_path();
-    add_segment(24, 0, 50);
+    add_segment(24, 0, 50);                     // Move to beacon sensing position.
     stop_path();
     dead_reckon();
 
-    if (SensorValue[carrot] < 60) {
-        beep = 3;
+    if (SensorValue[carrot] < 60) {             // If ultrasonic sensor sees position 3,
+        beep = 3;                               // dead reckon to the pole.
         move_to_pole(3);
     }
-    else if (SensorValue[carrot] > 200) {
-        beep = 2;
+    else if (SensorValue[carrot] > 200) {       // If ultrasonic sensor sees position 2,
+        beep = 2;                               // dead reckon to the pole.
         move_to_pole(2);
     }
-    else if (SensorValue[carrot] < 80) {
-        beep = 1;
+    else if (SensorValue[carrot] < 80) {        // If ultrasonic sensor sees position 1,
+        beep = 1;                               // dead reckon to the pole.
         move_to_pole(1);
     }
 
-    for (i = 0; i < beep; i++) {
-        playImmediateTone(251, 50);
+    for (i = 0; i < beep; i++) {                // Beep for the position number that the
+        playImmediateTone(251, 50);             // ultrasonic sensor sees.
         wait1Msec(1000);
     }
 }
