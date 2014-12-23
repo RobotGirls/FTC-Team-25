@@ -44,7 +44,7 @@ void move_to_position(int position)
         add_segment(0, 145, 40);
         break;
     case 3:
-        add_segment(3, 0, 40);
+        add_segment(3, 0, 20);
         break;
     }
     stop_path();
@@ -63,16 +63,15 @@ task main()
     stop_path();
     dead_reckon();
 
-    if (SensorValue[carrot] < 60) {             // If ultrasonic sensor sees position 3,
-        beep = 3;                               // don't move.
-    } else if (SensorValue[carrot] < 80) {      // If ultrasonic sensor sees position 1,
-        beep = 1;                               // move to position 1.
-        move_to_position(1);
-    } else {                                    // If ultrasonic sensor sees position 2,
-        beep = 2;                               // move to position 2.
-        move_to_position(2);
+    if (SensorValue[carrot] < 60) {
+        beep = 3;
+    } else if (SensorValue[carrot] < 80) {      // If ultrasonic sensor sees a position,
+        beep = 1;                               // set variable "beep" to position number.
+    } else {
+        beep = 2;
     }
 
+    move_to_position(beep);                             // Move to center goal using position number.
     move_to_beacon(irr_left, irr_right, 20, true);      // Move relatively in front of the beacon.
     move_to_object(carrot, 5, 16);                      // Go forward until ultrasonic sensor sees certain distance.
 
