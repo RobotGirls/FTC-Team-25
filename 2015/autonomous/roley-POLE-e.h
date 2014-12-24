@@ -15,8 +15,9 @@
 #define RSERVO_PERP   235
 
 #define FOUR_WHEEL_DRIVE
+
 #include "../../lib/sensors/drivers/hitechnic-irseeker-v2.h"
-#include "../../lib/drivetrain_andymark_defs.h"
+#include "../../lib/baemax_drivetrain_defs.h"
 #include "../../lib/drivetrain_square.h"
 #include "../../lib/dead_reckon.h"
 #include "../../lib/data_log.h"
