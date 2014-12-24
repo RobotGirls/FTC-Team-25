@@ -6,6 +6,18 @@ typedef enum direction_ {
     DIR_CENTER,
 } ir_direction_t;
 
+typedef enum ir_segment_ {
+    IR_SEGMENT_1 = 1,
+    IR_SEGMENT_2 = 2,
+    IR_SEGMENT_3 = 3,
+    IR_SEGMENT_4 = 4,
+    IR_SEGMENT_5 = 5,
+    IR_SEGMENT_6 = 6,
+    IR_SEGMENT_7 = 7,
+    IR_SEGMENT_8 = 8,
+    IR_SEGMENT_9 = 9,
+} ir_segment_t;
+
 /*
  * The IR Receiver can return the strength
  * from 5 different segments (unlike position
@@ -49,6 +61,21 @@ ir_direction_t get_dir_to_beacon(tSensors link)
     }
 
     return dir;
+}
+
+bool is_beacon_in_segment(tSensors link, ir_segment_t target_segment)
+{
+    int segment;
+
+    segment = HTIRS2readACDir(link);
+
+    nxtDisplayTextLine(5, "Segment: %d, %d", segment, target_segment);
+
+    if (segment == target_segment) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /*
@@ -137,6 +164,13 @@ void find_center(tSensors link)
 
 void find_absolute_center(tSensors left, tSensors right)
 {
+    /*
+     * Our IR beacons are not calibrated equally.  One gives
+     * a much higher reading than the other when far away
+     * from the goal.
+     */
+    //int error_offset = 20;
+
 	int ls1, ls2, ls3, ls4, ls5 = 0;
 	int rs1, rs2, rs3, rs4, rs5 = 0;
 
@@ -146,20 +180,19 @@ void find_absolute_center(tSensors left, tSensors right)
     HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
     HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
 
-    while (abs(ls3 - rs3) > 1) {
+    while (abs(ls3 - rs3) > 5) {
         if (ls3 > rs3) {
-            rotateCounterClockwise(10);
+            rotateCounterClockwise(5);
         } else {
-            rotateClockwise(10);
+            rotateClockwise(5);
         }
 	    HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
 	    HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
     }
 }
 
-void move_to_beacon(tSensors link, tSensors link2, int power, bool log_data)
+void move_to_beacon(tSensors left, tSensors right, int power, bool log_data)
 {
-	int _dirAC = 0;
 	int s1, s2, s3, s4, s5 = 0;
 	int s21, s22, s23, s24, s25 = 0;
     int error;
@@ -167,7 +200,7 @@ void move_to_beacon(tSensors link, tSensors link2, int power, bool log_data)
     float kp;
     bool left_done, right_done;
 
-    find_absolute_center(link, link2);
+    // find_absolute_center(left, right);
 
     left_done = false;
     right_done = false;
@@ -179,16 +212,14 @@ void move_to_beacon(tSensors link, tSensors link2, int power, bool log_data)
     master_power = power;
     slave_power = power;
 
-	_dirAC = HTIRS2readACDir(link);
-
     kp = 0.3;
     // error = s3 - s23;
     // slave_power += error * kp;
 
     while (true) {
 
-	    HTIRS2readAllACStrength(link, s1, s2, s3, s4, s5);
-	    HTIRS2readAllACStrength(link2, s21, s22, s23, s24, s25);
+	    HTIRS2readAllACStrength(left, s1, s2, s3, s4, s5);
+	    HTIRS2readAllACStrength(right, s21, s22, s23, s24, s25);
 
         /*
          * Assumptions master is left, slave is right
@@ -231,6 +262,15 @@ void move_to_beacon(tSensors link, tSensors link2, int power, bool log_data)
             dl_append_int(s23);
             dl_append_int(error);
             dl_append_int(error * kp);
+        }
+
+        /*
+         * Compensating for inaccurate receivers.  If we see a zero from the
+         * left one then rotate it straight, and read again.
+         */
+        if (s3 == 0) {
+            servo[leftEye] = LSERVO_CENTER;
+            HTIRS2readAllACStrength(left, s1, s2, s3, s4, s5);
         }
 
         /*
