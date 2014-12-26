@@ -27,7 +27,7 @@
 ir_direction_t dir;
 
 int count;
-int beep;
+int position;
 
 void move_to_pole(int count)
 {
@@ -63,20 +63,17 @@ task main()
     stop_path();
     dead_reckon();
 
-    if (SensorValue[carrot] < 60) {             // If ultrasonic sensor sees position 3,
-        beep = 3;                               // dead reckon to the pole.
-        move_to_pole(3);
-    }
-    else if (SensorValue[carrot] > 200) {       // If ultrasonic sensor sees position 2,
-        beep = 2;                               // dead reckon to the pole.
-        move_to_pole(2);
-    }
-    else if (SensorValue[carrot] < 80) {        // If ultrasonic sensor sees position 1,
-        beep = 1;                               // dead reckon to the pole.
-        move_to_pole(1);
+    if (SensorValue[carrot] < 60) {
+        position = 3;
+    } else if (SensorValue[carrot] < 80) {        // If ultrasonic sensor sees a position,
+        position = 1;                             // set variable "position" to position number.
+    } else {
+        position = 2;
     }
 
-    for (i = 0; i < beep; i++) {                // Beep for the position number that the
+    move_to_pole(position);                     // Move to pole using position number.
+
+    for (i = 0; i < position; i++) {            // Beep for the position number that the
         playImmediateTone(251, 50);             // ultrasonic sensor sees.
         wait1Msec(1000);
     }
