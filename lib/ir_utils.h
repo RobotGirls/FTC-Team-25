@@ -19,17 +19,17 @@ typedef enum ir_segment_ {
 } ir_segment_t;
 
 /*
- * The IR Receiver can return the strength
- * from 5 different segments (unlike position
- * which has 9 segments.
- */
+* The IR Receiver can return the strength
+* from 5 different segments (unlike position
+* which has 9 segments.
+*/
 
 typedef enum ir_segment_strength_ {
-    IR_STRENGTH_1,
-    IR_STRENGTH_2,
-    IR_STRENGTH_3,
-    IR_STRENGTH_4,
-    IR_STRENGTH_5,
+	IR_STRENGTH_1,
+	IR_STRENGTH_2,
+	IR_STRENGTH_3,
+	IR_STRENGTH_4,
+	IR_STRENGTH_5,
 } ir_segment_strength_t;
 
 ir_direction_t get_dir_to_beacon(tSensors link)
@@ -79,54 +79,54 @@ bool is_beacon_in_segment(tSensors link, ir_segment_t target_segment)
 }
 
 /*
- * Simplifies getting the strength for any one segment
- *
- * Returns -1 on error.
- */
+* Simplifies getting the strength for any one segment
+*
+* Returns -1 on error.
+*/
 int get_ir_strength(tSensors link, ir_segment_strength_t seg)
 {
 	int strength1, strength2, strength3, strength4, strength5;
 
-    if (!HTIRS2readAllACStrength(link, strength1, strength2, strength3, strength4, strength5)) {
-        return -1;
-    }
+	if (!HTIRS2readAllACStrength(link, strength1, strength2, strength3, strength4, strength5)) {
+		return -1;
+	}
 
-    switch (seg) {
-    case IR_STRENGTH_1:
-        return strength1;
-        break;
-    case IR_STRENGTH_2:
-        return strength2;
-        break;
-    case IR_STRENGTH_3:
-        return strength3;
-        break;
-    case IR_STRENGTH_4:
-        return strength4;
-        break;
-    case IR_STRENGTH_5:
-        return strength5;
-        break;
-    default:
-        return -1;
-    }
+	switch (seg) {
+	case IR_STRENGTH_1:
+		return strength1;
+		break;
+	case IR_STRENGTH_2:
+		return strength2;
+		break;
+	case IR_STRENGTH_3:
+		return strength3;
+		break;
+	case IR_STRENGTH_4:
+		return strength4;
+		break;
+	case IR_STRENGTH_5:
+		return strength5;
+		break;
+	default:
+		return -1;
+	}
 }
 
 
 /*
- * Beacon finding.
- *
- * IR receiver must be predefined and called 'irr'
- *
- * Can we use the PID principle to drive motors toward a beacon?
- *
- * Using the narrow band segment, 4, take the error of relative
- * strengths to drive a slave motor into a turn to either direction.
- *
- * The strength will oscillate between strength readings 2 and 3.
- * If 2 > 3 then right (slave) must speed up, if the reverse then
- * right (slave) must slow down to induce a right hand turn.
- */
+* Beacon finding.
+*
+* IR receiver must be predefined and called 'irr'
+*
+* Can we use the PID principle to drive motors toward a beacon?
+*
+* Using the narrow band segment, 4, take the error of relative
+* strengths to drive a slave motor into a turn to either direction.
+*
+* The strength will oscillate between strength readings 2 and 3.
+* If 2 > 3 then right (slave) must speed up, if the reverse then
+* right (slave) must slow down to induce a right hand turn.
+*/
 
 void initialize_receiver(tSensors link, tSensors link2)
 {
@@ -159,7 +159,6 @@ void find_center(tSensors link)
     case DIR_NONE:
         break;
     }
-
 }
 
 void find_absolute_center(tSensors left, tSensors right)
@@ -209,8 +208,8 @@ void move_to_beacon(tSensors left, tSensors right, int power, bool log_data)
         dl_init("ir_log.txt", true);
     }
 
-    master_power = power;
-    slave_power = power;
+	master_power = power;
+	slave_power = power;
 
     kp = 0.3;
     // error = s3 - s23;
