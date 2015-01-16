@@ -19,6 +19,10 @@
 
 #define SERVO_ROLLER_UP             48
 #define SERVO_ROLLER_DOWN           137
+
+#define SERVO_ROLLER_OSC_UP         25
+#define SERVO_ROLLER_OSC_DOWN       100
+
 #define CONVEYOR_POWER              80
 #define LSERVO_DOCK_FINGER_STOWED   82
 #define LSERVO_DOCK_FINGER_UP       205
@@ -28,6 +32,26 @@
 #define RSERVO_DOCK_FINGER_DOWN     64
 
 static int drive_multiplier = 1;
+
+task oscillateRoller()
+{
+    int i;
+
+    servo[roller] = SERVO_ROLLER_OSC_UP;
+    wait1Msec(500);
+
+    while (true) {
+        for (i = SERVO_ROLLER_OSC_UP; i <= SERVO_ROLLER_OSC_DOWN; i++) {
+            servo[roller] = i;
+            wait1Msec(10);
+        }
+
+        for (i = SERVO_ROLLER_OSC_DOWN; i >= SERVO_ROLLER_OSC_UP; i--) {
+            servo[roller] = i;
+            wait1Msec(10);
+        }
+    }
+}
 
 typedef enum conveyor_state_ {
     CONVEYOR_OFF,
@@ -158,7 +182,7 @@ task main()
 
     waitForStart();   // wait for start of tele-op phase
 
-    servo[roller] = SERVO_ROLLER_UP;
+    startTask(oscillateRoller);
 
     // StartTask(endGameTimer);
 
@@ -190,15 +214,14 @@ task main()
             //right_y = joystick.joy1_y2;
             //left_y = joystick.joy1_y1;
         //} else {
-            left_y = joystick.joy1_y1;
-            right_y = joystick.joy1_y2;
+            left_y = joystick.joy2_y1;
+            right_y = joystick.joy2_y2;
         //}
 
         if (abs(right_y) > 20) {
 	    	motor[driveFrontRight] = drive_multiplier * right_y;
 	    	motor[driveRearRight] = drive_multiplier * right_y;
-		}
-		else {
+		} else {
 		    motor[driveFrontRight] = 0;
 		    motor[driveRearRight] = 0;
 		}
@@ -206,9 +229,7 @@ task main()
         if (abs(left_y) > 20) {
 		    motor[driveFrontLeft] = drive_multiplier * left_y;
 		    motor[driveRearLeft] = drive_multiplier * left_y;
-		}
-		else
-		{
+		} else {
 		    motor[driveFrontLeft] = 0;
 		    motor[driveRearLeft] = 0;
 		}
