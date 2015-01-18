@@ -30,8 +30,10 @@
 #define RSERVO_CENTER 113
 #define RSERVO_PERP   235
 
-#define US_DIST_POS_1 80
-#define US_DIST_POS_3 55
+#define SERVO_ARM_EXTENDED          85
+#define SERVO_ARM_RETRACTED         160
+#define SERVO_ARM_EXTENDED_HALF     120
+#define SERVO_ARM_PICKUP            140
 
 #include "../../lib/sensors/drivers/hitechnic-sensormux.h"
 #include "../../lib/sensors/drivers/hitechnic-irseeker-v2.h"
@@ -42,54 +44,9 @@
 #include "../../lib/ir_utils.h"
 #include "../../lib/us_cascade_utils.c"
 
-const tMUXSensor irr_left = msensor_S4_1;
-const tMUXSensor irr_right = msensor_S4_2;
-
-ir_direction_t dir;
-
-void move_to_pole(int count)
-{
-    init_path();
-
-    switch (count) {
-    case 1:
-        add_segment(-22, 0, 50);
-        add_segment(-20, 180, 100);
-        break;
-    case 2:
-        add_segment(-10, 0, 50);
-        add_segment(0, 30, 50);
-        add_segment(-50, 0, 100);
-        break;
-    case 3:
-        add_segment(-10, 90, 50);
-        add_segment(-45, -90, 50);
-        break;
-    }
-    stop_path();
-  	dead_reckon();
-}
-
-task main()
-{
-    int i;
-    int center_position;
-
-    initialize_receiver(irr_left, irr_right);
-
-    servo[leftEye] = LSERVO_CENTER;
-    servo[rightEye] = RSERVO_CENTER;
-
-    center_position = ultrasound(carrot, -24, US_DIST_POS_1, US_DIST_POS_3);
-
-    for (i = 0; i < center_position; i++) {
-        playImmediateTone(251, 50);
-        wait1Msec(1000);
-    }
-
-    move_to_pole(center_position);
-
-    while(true) {
-        nxtDisplayTextLine(1, "Sensor value: %d", SensorValue[carrot]);
-    }
+task main() {
+    while(true){
+	    servo[arm] = SERVO_ARM_RETRACTED;
+	    wait1Msec(1000);
+	}
 }
