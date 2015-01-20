@@ -96,7 +96,7 @@
 
 
 /*!< Sensor types as detected by SMUX */
-typedef enum {
+typedef enum htsmux_sensor_type_ {
   HTSMUXAnalogue = 0x00,
   HTSMUXLegoUS = 0x01,
   HTSMUXCompass = 0x02,
@@ -112,7 +112,7 @@ typedef enum {
 } HTSMUXSensorType;
 
 /*!< Sensor and SMUX port combinations */
-typedef enum {
+typedef enum mux_sensor_ {
   msensor_S1_1 = 0,
   msensor_S1_2 = 1,
   msensor_S1_3 = 2,
