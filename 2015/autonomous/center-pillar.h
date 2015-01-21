@@ -40,8 +40,8 @@ task main()
     wait1Msec(1000);
 
     move_to_position(center_position);
-    // move_to_beacon_mux(irr_left, irr_right, 20, true);
-    // move_to_object(carrot, 5, 16);
+    move_to_beacon_mux(irr_left, irr_right, 20, true);
+    move_to_object(carrot, 5, 16);
 
     nxtDisplayTextLine(3, "Sensor sees %d", SensorValue[carrot]);
     while(true) {

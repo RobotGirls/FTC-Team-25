@@ -2,7 +2,7 @@
 #pragma config(Hubs,  S2, HTServo,  none,     none,     none)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S3,     HTSMUX,         sensorLowSpeed)
+#pragma config(Sensor, S3,     HTSMUX,         sensorI2CCustom)
 #pragma config(Motor,  motorA,          rampRight,     tmotorNXT, PIDControl, reversed)
 #pragma config(Motor,  motorB,          rampLeft,      tmotorNXT, PIDControl, encoder)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
@@ -46,6 +46,9 @@ const tMUXSensor LEGOUS = msensor_S3_1;
 #define SERVO_ROLLER_UP             48
 #define SERVO_ROLLER_DOWN           137
 
+#define SERVO_AUTOELBOW_UP          37
+#define SERVO_AUTOELBOW_DOWN        233
+
 #define SERVO_ROLLER_OSC_UP         60
 #define SERVO_ROLLER_OSC_DOWN       105
 
@@ -63,6 +66,7 @@ bool deadman_ltu_running;
 bool deadman_ltd_running;
 bool deadman_rtu_running;
 bool deadman_rtd_running;
+
 
 task oscillateRoller()
 {
@@ -108,6 +112,8 @@ typedef enum joystick_event_ {
     LEFT_TRIGGER_UP = 5,
     LEFT_TRIGGER_DOWN = 7,
     BUTTON_ONE = 1,
+    BUTTON_TWO = 2,
+    BUTTON_THREE = 3,
     BUTTON_FOUR = 4,
     BUTTON_TEN	= 10,
 } joystick_event_t;
@@ -265,6 +271,14 @@ void conveyor_enter_state(conveyor_state_t state)
     }
 }
 
+task validate_conveyor()
+{
+    while (true) {
+        conveyor_enter_state(CONVEYOR_FORWARD);
+        wait1Msec(2000);
+    }
+}
+
 void initializeRobot()
 {
     deadman_ltu_running = false;
@@ -276,6 +290,8 @@ void initializeRobot()
     ramp_enter_state(RAMP_STOP);
 
     servo[roller] = SERVO_ROLLER_DOWN;
+
+    servo[autoElbow] = 233;
 
     all_stop();
 
@@ -317,6 +333,11 @@ void handle_joy1_btn10()
     servo[roller] = SERVO_ROLLER_UP;
 }
 
+void handle_joy1_btn3()
+{
+    servo[autoElbow] = SERVO_AUTOELBOW_UP;
+}
+
 void handle_joy1_rtu()
 {
     if (!deadman_rtu_running) {
@@ -350,6 +371,9 @@ void handle_joy1_event(joystick_event_t event)
     switch (event) {
     case BUTTON_ONE:
         handle_joy1_btn1();
+        break;
+    case BUTTON_THREE:
+        handle_joy1_btn3();
         break;
     case BUTTON_FOUR:
         handle_joy1_btn4();
@@ -385,7 +409,12 @@ task main()
 
     waitForStart();   // wait for start of tele-op phase
 
-    startTask(ball_watch);
+    startTask(validate_conveyor);
+
+    servo[roller] = SERVO_ROLLER_UP;
+    // servo[autoElbow] = 37;
+
+    //startTask(ball_watch);
 
     // StartTask(endGameTimer);
 
@@ -400,6 +429,8 @@ task main()
 	            handle_joy1_event(BUTTON_FOUR);
 	        } else if (joy1Btn(Btn10)) {
         		handle_joy1_event(BUTTON_TEN);
+	        } else if (joy1Btn(Btn3)) {
+        		handle_joy1_event(BUTTON_THREE);
 	        } else if (joy1Btn(Btn5)) {
 	            handle_joy1_event(LEFT_TRIGGER_UP);
 	        } else if (joy1Btn(Btn7)) {
@@ -425,17 +456,17 @@ task main()
             right_y = joystick.joy2_y2;
         //}
 
-        if (abs(right_y) > 20) {
-	    	motor[driveFrontRight] = drive_multiplier * right_y;
-	    	motor[driveRearRight] = drive_multiplier * right_y;
+        if (abs(right_y) > 10) {
+	    	motor[driveFrontRight] = drive_multiplier * right_y * 0.80;
+	    	motor[driveRearRight] = drive_multiplier * right_y * 0.80;
 		} else {
 		    motor[driveFrontRight] = 0;
 		    motor[driveRearRight] = 0;
 		}
 
-        if (abs(left_y) > 20) {
-		    motor[driveFrontLeft] = drive_multiplier * left_y;
-		    motor[driveRearLeft] = drive_multiplier * left_y;
+        if (abs(left_y) > 10) {
+		    motor[driveFrontLeft] = drive_multiplier * left_y * 0.80;
+		    motor[driveRearLeft] = drive_multiplier * left_y * 0.80;
 		} else {
 		    motor[driveFrontLeft] = 0;
 		    motor[driveRearLeft] = 0;

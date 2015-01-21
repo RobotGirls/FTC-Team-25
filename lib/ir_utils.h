@@ -143,7 +143,7 @@ void initialize_receiver(tSensors link, tSensors link2)
 
 void find_center(tSensors link)
 {
-    direction_t dir;
+    ir_direction_t dir;
 
     dir = get_dir_to_beacon(link);
     switch (dir) {
