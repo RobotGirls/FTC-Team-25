@@ -1,5 +1,8 @@
-
+#ifdef __HTSMUX_SUPPORT__
+int ultrasound(tMUXSensor us_sensor, int distance, int ultrasound_dist1, int ultrasound_dist3)
+#else
 int ultrasound(tSensors us_sensor, int distance, int ultrasound_dist1, int ultrasound_dist3)
+#endif
 {
     int s_val;
 
@@ -10,7 +13,11 @@ int ultrasound(tSensors us_sensor, int distance, int ultrasound_dist1, int ultra
 
     wait1Msec(1000);
 
+#ifdef __HTSMUX_SUPPORT__
+    s_val = USreadDist(us_sensor);
+#else
     s_val = SensorValue[us_sensor];
+#endif
 
     if (s_val < ultrasound_dist3) {
         return 3;

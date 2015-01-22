@@ -221,7 +221,7 @@ bool writeI2C(tSensors link, tByteArray &request) {
     case sensorI2CCustomFastSkipStates:   break;
     default:
 	    hogCPU();
-	    PlaySound(soundException);
+	    playSound(soundException);
 	    eraseDisplay();
 	    nxtDisplayCenteredTextLine(0, "3rd Party Driver");
 	    nxtDisplayCenteredTextLine(1, "ERROR");
@@ -232,7 +232,7 @@ bool writeI2C(tSensors link, tByteArray &request) {
 	    nxtDisplayCenteredTextLine(6, "one of the");
 	    nxtDisplayCenteredTextLine(7, "examples.");
 	    wait1Msec(10000);
-	    StopAllTasks();
+	    stopAllTasks();
   }
 #endif
 
@@ -282,7 +282,7 @@ bool writeI2C(tSensors link, tByteArray &request, tByteArray &reply, int replyle
     case sensorI2CCustomFastSkipStates:   break;
     default:
 	    hogCPU();
-	    PlaySound(soundException);
+	    playSound(soundException);
 	    eraseDisplay();
 	    nxtDisplayCenteredTextLine(0, "3rd Party Driver");
 	    nxtDisplayCenteredTextLine(1, "ERROR");
@@ -293,7 +293,7 @@ bool writeI2C(tSensors link, tByteArray &request, tByteArray &reply, int replyle
 	    nxtDisplayCenteredTextLine(6, "one of the");
 	    nxtDisplayCenteredTextLine(7, "examples.");
 	    wait1Msec(10000);
-	    StopAllTasks();
+	    stopAllTasks();
   }
 #endif
 
