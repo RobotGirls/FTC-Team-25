@@ -38,8 +38,9 @@
 #define SERVO_AUTOELBOW_UP          37
 #define SERVO_AUTOELBOW_DOWN        233
 
-#define US_DIST_POS_1 80
-#define US_DIST_POS_3 55
+#define US_DIST_POS_1 51
+#define US_DIST_POS_2 255
+#define US_DIST_POS_3 44
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
 
@@ -63,17 +64,20 @@ void move_to_pole(int count)
 
     switch (count) {
     case 1:
-        add_segment(22, 180, 50);
-        add_segment(20, 90, 100);
+        add_segment(22, 180, 30);
+        add_segment(0, 90, 30);
+        add_segment(20, 0, 100);
         break;
     case 2:
-        add_segment(-10, 0, 50);
-        add_segment(0, -150, 50);
-        add_segment(-50, 0, 100);
+        add_segment(-7, 0, 50);
+        add_segment(0, -160, 30);
+        add_segment(50, 0, 100);
         break;
     case 3:
-        add_segment(15, -90, 50);
-        add_segment(45, -90, 50);
+        add_segment(0, -90, 30);
+        add_segment(15, 0, 60);
+        add_segment(0, -90, 30);
+        add_segment(45, 0, 80);
         break;
     }
     stop_path();
@@ -84,19 +88,6 @@ task raise_hand()
 {
     wait1Msec(5000);
     servo[autoElbow] = SERVO_AUTOELBOW_UP;
-}
-
-task raise_elbow()
-{
-    wait1Msec(2000);
-
-    nMotorEncoder[elbow] = 0;
-
-    motor[elbow] = 10;
-    while (nMotorEncoder[elbow] <= 4000) {
-        nxtDisplayCenteredBigTextLine(3, "%d", nMotorEncoder[elbow]);
-    }
-    motor[elbow] = 0;
 }
 
 task lower_ramp()
@@ -136,9 +127,9 @@ task main()
 
     initialize_robot();
 
-    waitForStart();
+    //waitForStart();
 
-    startTask(raise_elbow);
+    // startTask(raise_elbow);
     startTask(raise_hand);
     startTask(lower_ramp);
 
@@ -147,18 +138,30 @@ task main()
     servo[leftEye] = LSERVO_CENTER;
     servo[rightEye] = RSERVO_CENTER;
 
-    center_position = ultrasound(carrot, -24, US_DIST_POS_1, US_DIST_POS_3);
+    center_position = ultrasound_mk(carrot, -24, US_DIST_POS_1, US_DIST_POS_2, US_DIST_POS_3);
 
-    startTask(raise_ramp);
+    //startTask(raise_ramp);
+
+    if (center_position == -1) {
+        playImmediateTone(251, 150);
+    }
 
     for (i = 0; i < center_position; i++) {
         playImmediateTone(251, 50);
         wait1Msec(1000);
     }
 
-    move_to_pole(center_position);
+    nMotorEncoder[elbow] = 0;
+
+    motor[elbow] = 20;
+    while (nMotorEncoder[elbow] <= 3600) {
+        nxtDisplayCenteredBigTextLine(3, "%d", nMotorEncoder[elbow]);
+    }
+    motor[elbow] = 0;
+
+    // move_to_pole(center_position);
 
     while(true) {
-        nxtDisplayTextLine(1, "Sensor value: %d", SensorValue[carrot]);
+        nxtDisplayCenteredBigTextLine(3, "%d", USreadDist(carrot));
     }
 }

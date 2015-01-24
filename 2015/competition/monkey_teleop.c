@@ -274,8 +274,10 @@ void conveyor_enter_state(conveyor_state_t state)
 task validate_conveyor()
 {
     while (true) {
+        conveyor_enter_state(CONVEYOR_OFF);
+        wait1Msec(250);
         conveyor_enter_state(CONVEYOR_FORWARD);
-        wait1Msec(2000);
+        wait1Msec(10000);
     }
 }
 
