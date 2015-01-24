@@ -1,5 +1,6 @@
 #pragma config(Hubs,  S1, HTServo,  HTMotor,  HTMotor,  HTMotor)
 #pragma config(Hubs,  S2, HTServo,  none,     none,     none)
+#pragma config(Sensor, S2,     carrot,         sensorNone)
 #pragma config(Sensor, S3,     irr_left,       sensorI2CCustom)
 #pragma config(Sensor, S4,     irr_right,      sensorI2CCustom)
 #pragma config(Motor,  mtr_S1_C2_1,     driveRearRight, tmotorTetrix, PIDControl, encoder)
@@ -47,13 +48,6 @@
 #define SERVO_FINGER_UP             160
 #define SERVO_FINGER_DOWN           146
 
-
-#include "../../lib/sensors/drivers/hitechnic-irseeker-v2.h"
-#include "../../lib/baemax_drivetrain_defs.h"
-#include "../../lib/drivetrain_square.h"
-#include "../../lib/dead_reckon.h"
-#include "../../lib/data_log.h"
-#include "../../lib/ir_utils.h"
 
 task ext_dock_arm()
 {
