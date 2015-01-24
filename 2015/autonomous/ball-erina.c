@@ -57,9 +57,13 @@
 
 task ext_dock_arm()
 {
+    wait1Msec(6000);
     servo[dockarm] = SERVO_DOCK_ARM_FORWARD;
-    wait1Msec(2000);
-    servo[finger] = SERVO_FINGER_UP;
+    wait1Msec(1500);
+    servo[dockarm] = SERVO_DOCK_ARM_STOPPED;
+    servo[finger] = SERVO_FINGER_DOWN;
+    wait1Msec(1500);
+    servo[dockarm] = SERVO_DOCK_ARM_BACKWARD;
     wait1Msec(1500);
     servo[dockarm] = SERVO_DOCK_ARM_STOPPED;
 }
@@ -67,7 +71,7 @@ task ext_dock_arm()
 void initializeRobot()
 {
     servo[arm] = SERVO_ARM_RETRACTED;
-    servo[finger] = SERVO_FINGER_DOWN;
+    servo[finger] = SERVO_FINGER_UP;
     nMotorEncoder(shoulder) = 0;
     servo[brush] = 127;
     servo[door] = SERVO_DOOR_CLOSED;
@@ -79,6 +83,8 @@ task main()
 
     waitForStart(); // Wait for the beginning of autonomous phase.
 
+    startTask(ext_dock_arm);
+
     init_path();
     add_segment(-83, 0, 30);  //gets off the ramp to medium goal
     stop_path();
@@ -88,9 +94,12 @@ task main()
         motor[shoulder] = 15;
     }
     motor[shoulder] = 0;
+    servo[brush] = 255;
+    wait1Msec(2000);
+    servo[brush] = 127;
     servo[door] = SERVO_DOOR_OPEN;
     servo[brush] = 255;
-    wait1Msec(4000);
+    wait1Msec(2000);
     servo[brush] = 127;
 
     while (true){
