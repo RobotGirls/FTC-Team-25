@@ -83,10 +83,8 @@ task main()
 
     waitForStart(); // Wait for the beginning of autonomous phase.
 
-    startTask(ext_dock_arm);
-
     init_path();
-    add_segment(-83, 0, 30);  //gets off the ramp to medium goal
+    add_segment(-86, 0, 40);  //gets off the ramp to medium goal
     stop_path();
     dead_reckon();
 
@@ -94,13 +92,10 @@ task main()
         motor[shoulder] = 15;
     }
     motor[shoulder] = 0;
-    servo[brush] = 255;
-    wait1Msec(2000);
-    servo[brush] = 127;
+
     servo[door] = SERVO_DOOR_OPEN;
-    servo[brush] = 255;
-    wait1Msec(2000);
-    servo[brush] = 127;
+
+    //startTask(ext_dock_arm);
 
     while (true){
     }
