@@ -2,7 +2,7 @@
 #pragma config(Hubs,  S2, HTServo,  none,     none,     none)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S3,     HTSMUX,         sensorLowSpeed)
+#pragma config(Sensor, S3,     HTSMUX,         sensorI2CCustom)
 #pragma config(Motor,  motorA,          rampRight,     tmotorNXT, PIDControl, reversed)
 #pragma config(Motor,  motorB,          rampLeft,      tmotorNXT, PIDControl, encoder)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
@@ -36,18 +36,20 @@
 // were connected to 3rd port of the SMUX connected to the NXT port S4,
 // we would use msensor_S4_3
 
-const tMUXSensor LEGOUS = msensor_S3_1;
+const tMUXSensor LEGOUS = msensor_S3_2;
 
 #define RAMP_SPEED_UP              -30
 #define RAMP_SPEED_DOWN             30
 #define SHOULDER_SPEED_UP           10
 #define SHOULDER_SPEED_DOWN        -10
 
-#define SERVO_ROLLER_UP             48
+#define SERVO_ROLLER_UP             25
+#define SERVO_ROLLER_OSC_DOWN       80
 #define SERVO_ROLLER_DOWN           137
 
-#define SERVO_ROLLER_OSC_UP         60
-#define SERVO_ROLLER_OSC_DOWN       105
+#define SERVO_AUTOELBOW_UP          37
+#define SERVO_AUTOELBOW_DOWN        233
+
 
 #define CONVEYOR_POWER              80
 #define LSERVO_DOCK_FINGER_STOWED   82
@@ -63,26 +65,6 @@ bool deadman_ltu_running;
 bool deadman_ltd_running;
 bool deadman_rtu_running;
 bool deadman_rtd_running;
-
-task oscillateRoller()
-{
-    int i;
-
-    servo[roller] = SERVO_ROLLER_OSC_UP;
-    wait1Msec(500);
-
-    while (true) {
-        for (i = SERVO_ROLLER_OSC_UP; i <= SERVO_ROLLER_OSC_DOWN; i++) {
-            servo[roller] = i;
-            wait1Msec(10);
-        }
-
-        for (i = SERVO_ROLLER_OSC_DOWN; i >= SERVO_ROLLER_OSC_UP; i--) {
-            servo[roller] = i;
-            wait1Msec(10);
-        }
-    }
-}
 
 typedef enum conveyor_state_ {
     CONVEYOR_OFF,
@@ -108,6 +90,8 @@ typedef enum joystick_event_ {
     LEFT_TRIGGER_UP = 5,
     LEFT_TRIGGER_DOWN = 7,
     BUTTON_ONE = 1,
+    BUTTON_TWO = 2,
+    BUTTON_THREE = 3,
     BUTTON_FOUR = 4,
     BUTTON_TEN	= 10,
 } joystick_event_t;
@@ -125,20 +109,33 @@ task debounceTask()
     debounce = false;
 }
 
+
 task ball_watch()
 {
     int dist;
     int i;
+    int ball_count;
+
+    ball_count = 0;
+    nxtDisplayCenteredBigTextLine(2, "%d", ball_count);
 
     while (true) {
         dist = USreadDist(LEGOUS);
         if (dist <= 7) {
-            wait1Msec(500);
-	        for (i = SERVO_ROLLER_OSC_UP; i <= SERVO_ROLLER_OSC_DOWN; i++) {
+            // eraseDisplay();
+            nxtDisplayCenteredBigTextLine(2, "%d", ++ball_count);
+
+            wait1Msec(2000);
+
+            playImmediateTone(60, 100);
+
+	        for (i = SERVO_ROLLER_UP; i <= SERVO_ROLLER_OSC_DOWN; i++) {
 	            servo[roller] = i;
 	            wait1Msec(10);
 	        }
+            servo[roller] = SERVO_ROLLER_UP;
 
+            wait1Msec(1000);
         }
     }
 }
@@ -265,6 +262,16 @@ void conveyor_enter_state(conveyor_state_t state)
     }
 }
 
+task validate_conveyor()
+{
+    while (true) {
+        conveyor_enter_state(CONVEYOR_OFF);
+        wait1Msec(100);
+        conveyor_enter_state(CONVEYOR_FORWARD);
+        wait1Msec(10000);
+    }
+}
+
 void initializeRobot()
 {
     deadman_ltu_running = false;
@@ -276,6 +283,8 @@ void initializeRobot()
     ramp_enter_state(RAMP_STOP);
 
     servo[roller] = SERVO_ROLLER_DOWN;
+
+    servo[autoElbow] = 233;
 
     all_stop();
 
@@ -317,6 +326,11 @@ void handle_joy1_btn10()
     servo[roller] = SERVO_ROLLER_UP;
 }
 
+void handle_joy1_btn3()
+{
+    servo[autoElbow] = SERVO_AUTOELBOW_UP;
+}
+
 void handle_joy1_rtu()
 {
     if (!deadman_rtu_running) {
@@ -351,6 +365,9 @@ void handle_joy1_event(joystick_event_t event)
     case BUTTON_ONE:
         handle_joy1_btn1();
         break;
+    case BUTTON_THREE:
+        handle_joy1_btn3();
+        break;
     case BUTTON_FOUR:
         handle_joy1_btn4();
         break;
@@ -374,6 +391,41 @@ void handle_joy1_event(joystick_event_t event)
     startTask(debounceTask);
 }
 
+#define RAMP_SPEED 30
+#define RAMP_SCORE_DELTA 932
+#define RAMP_PICKUP_DELTA 932
+
+void handle_tophat_up()
+{
+    nMotorEncoder[rampLeft] = 0;
+    nSyncedMotors = synchAB;
+
+    motor[rampLeft] = RAMP_SPEED;
+    motor[rampRight] = RAMP_SPEED;
+
+    while (abs(nMotorEncoder[rampLeft]) < RAMP_SCORE_DELTA) {
+    }
+
+    motor[rampLeft] = 0;
+    motor[rampRight] = 0;
+}
+
+void handle_tophat_down()
+{
+    nMotorEncoder[rampLeft] = 0;
+    nSyncedMotors = synchAB;
+
+    motor[rampLeft] = -RAMP_SPEED;
+    motor[rampRight] = -RAMP_SPEED;
+
+    while (abs(nMotorEncoder[rampLeft]) < RAMP_PICKUP_DELTA) {
+    }
+
+    motor[rampLeft] = 0;
+    motor[rampRight] = 0;
+
+}
+
 task main()
 {
     short right_y;
@@ -385,7 +437,13 @@ task main()
 
     waitForStart();   // wait for start of tele-op phase
 
+    startTask(validate_conveyor);
     startTask(ball_watch);
+
+    servo[roller] = SERVO_ROLLER_UP;
+    // servo[autoElbow] = 37;
+
+    //startTask(ball_watch);
 
     // StartTask(endGameTimer);
 
@@ -400,6 +458,8 @@ task main()
 	            handle_joy1_event(BUTTON_FOUR);
 	        } else if (joy1Btn(Btn10)) {
         		handle_joy1_event(BUTTON_TEN);
+	        } else if (joy1Btn(Btn3)) {
+        		handle_joy1_event(BUTTON_THREE);
 	        } else if (joy1Btn(Btn5)) {
 	            handle_joy1_event(LEFT_TRIGGER_UP);
 	        } else if (joy1Btn(Btn7)) {
@@ -408,6 +468,10 @@ task main()
 	            handle_joy1_event(RIGHT_TRIGGER_UP);
 	        } else if (joy1Btn(Btn8)) {
 	            handle_joy1_event(RIGHT_TRIGGER_DOWN);
+            } else if (joystick.joy2_TopHat == 0) { // Up d-pad
+                handle_tophat_up();
+            } else if (joystick.joy2_TopHat == 4) { // Down d-pad
+                handle_tophat_down();
 	        } else if (joy1Btn(Btn6)) {
 	        	motor[elbow]=100;
 	        } else if (joy1Btn(Btn8)) {
@@ -425,17 +489,17 @@ task main()
             right_y = joystick.joy2_y2;
         //}
 
-        if (abs(right_y) > 20) {
-	    	motor[driveFrontRight] = drive_multiplier * right_y;
-	    	motor[driveRearRight] = drive_multiplier * right_y;
+        if (abs(right_y) > 10) {
+	    	motor[driveFrontRight] = drive_multiplier * right_y * 0.80;
+	    	motor[driveRearRight] = drive_multiplier * right_y * 0.80;
 		} else {
 		    motor[driveFrontRight] = 0;
 		    motor[driveRearRight] = 0;
 		}
 
-        if (abs(left_y) > 20) {
-		    motor[driveFrontLeft] = drive_multiplier * left_y;
-		    motor[driveRearLeft] = drive_multiplier * left_y;
+        if (abs(left_y) > 10) {
+		    motor[driveFrontLeft] = drive_multiplier * left_y * 0.80;
+		    motor[driveRearLeft] = drive_multiplier * left_y * 0.80;
 		} else {
 		    motor[driveFrontLeft] = 0;
 		    motor[driveRearLeft] = 0;
