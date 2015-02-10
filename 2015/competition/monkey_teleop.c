@@ -38,6 +38,9 @@
 
 const tMUXSensor LEGOUS = msensor_S3_2;
 
+#define RAMP_TILT       50
+#define RAMP_PICKUP     875
+
 #define RAMP_SPEED_UP              -30
 #define RAMP_SPEED_DOWN             30
 #define SHOULDER_SPEED_UP           10
@@ -208,34 +211,6 @@ task deadman_ltd()
     }
 }
 
-task deadman_rtu()
-{
-    if (!deadman_rtd_running) {
-	    deadman_rtu_running = true;
-	    ramp_enter_state(RAMP_UP);
-
-	    while ((joy1Btn(Btn6)) && (deadman_rtd_running == false)) {
-	    }
-
-	    ramp_enter_state(RAMP_STOP);
-	    deadman_rtu_running = false;
-    }
-}
-
-task deadman_rtd()
-{
-    if (!deadman_rtu_running) {
-	    deadman_rtd_running = true;
-	    ramp_enter_state(RAMP_DOWN);
-
-	    while ((joy1Btn(Btn8)) && (deadman_rtu_running == false)) {
-	    }
-
-	    ramp_enter_state(RAMP_STOP);
-	    deadman_rtd_running = false;
-    }
-}
-
 void all_stop()
 {
     motor[driveFrontLeft] = 0;
@@ -274,6 +249,10 @@ task validate_conveyor()
 
 void initializeRobot()
 {
+    bFloatDuringInactiveMotorPWM = false;
+    motor[rampLeft] = 0;
+    motor[rampRight] = 0;
+
     deadman_ltu_running = false;
     deadman_ltd_running = false;
     deadman_rtu_running = false;
@@ -333,16 +312,30 @@ void handle_joy1_btn3()
 
 void handle_joy1_rtu()
 {
-    if (!deadman_rtu_running) {
-        startTask(deadman_rtu);
+    nMotorEncoder[rampRight] = 0;
+    nMotorEncoder[rampLeft] = 0;
+
+    motor[rampRight] = -30;
+    motor[rampLeft] = -30;
+    while (abs(nMotorEncoder[rampRight]) < RAMP_TILT) {
     }
+
+    motor[rampRight] = 0;
+    motor[rampLeft] = 0;
 }
 
 void handle_joy1_rtd()
 {
-    if (!deadman_rtd_running) {
-        startTask(deadman_rtd);
+    nMotorEncoder[rampRight] = 0;
+    nMotorEncoder[rampLeft] = 0;
+
+    motor[rampRight] = 30;
+    motor[rampLeft] = 30;
+    while (abs(nMotorEncoder[rampRight]) < RAMP_PICKUP) {
     }
+
+    motor[rampRight] = 0;
+    motor[rampLeft] = 0;
 }
 
 void handle_joy1_ltu()
@@ -398,7 +391,6 @@ void handle_joy1_event(joystick_event_t event)
 void handle_tophat_up()
 {
     nMotorEncoder[rampLeft] = 0;
-    nSyncedMotors = synchAB;
 
     motor[rampLeft] = RAMP_SPEED;
     motor[rampRight] = RAMP_SPEED;
@@ -413,7 +405,6 @@ void handle_tophat_up()
 void handle_tophat_down()
 {
     nMotorEncoder[rampLeft] = 0;
-    nSyncedMotors = synchAB;
 
     motor[rampLeft] = -RAMP_SPEED;
     motor[rampRight] = -RAMP_SPEED;
@@ -436,6 +427,8 @@ task main()
     initializeRobot();
 
     waitForStart();   // wait for start of tele-op phase
+
+    bFloatDuringInactiveMotorPWM = false;
 
     startTask(validate_conveyor);
     startTask(ball_watch);
@@ -472,12 +465,6 @@ task main()
                 handle_tophat_up();
             } else if (joystick.joy2_TopHat == 4) { // Down d-pad
                 handle_tophat_down();
-	        } else if (joy1Btn(Btn6)) {
-	        	motor[elbow]=100;
-	        } else if (joy1Btn(Btn8)) {
-	        	motor[elbow]=-100;
-	        } else {
-	        	motor[elbow]=0;
 	        }
         }
 
