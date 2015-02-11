@@ -128,13 +128,21 @@ int get_ir_strength(tSensors link, ir_segment_strength_t seg)
 * right (slave) must slow down to induce a right hand turn.
 */
 #ifdef __HTSMUX_SUPPORT__
-void initialize_receiver(tMUXSensor link, tMUXSensor link2)
+int initialize_receiver(tMUXSensor link, tMUXSensor link2)
 #else
-void initialize_receiver(tSensors link, tSensors link2)
+int initialize_receiver(tSensors link, tSensors link2)
 #endif
 {
+	int ls1, ls2, ls3, ls4, ls5 = 0;
+	int rs1, rs2, rs3, rs4, rs5 = 0;
+
 	// the default DSP mode is 1200 Hz.
 	tHTIRS2DSPMode m = DSP_1200;
+
+    HTIRS2readAllACStrength(link, ls1, ls2, ls3, ls4, ls5);
+    HTIRS2readAllACStrength(link2, rs1, rs2, rs3, rs4, rs5);
+
+    return (ls2 - rs3);
 
     //HTIRS2setDSPMode(link, m);
     //HTIRS2setDSPMode(link2, m);
@@ -197,6 +205,8 @@ void move_to_beacon(tSensors left, tSensors right, int power, bool log_data)
 {
 	int s1, s2, s3, s4, s5 = 0;
 	int s21, s22, s23, s24, s25 = 0;
+    int left_strength, right_strength;
+    int left_dir, right_dir;
     int error;
     int master_power, slave_power;
     float kp;
@@ -222,6 +232,8 @@ void move_to_beacon(tSensors left, tSensors right, int power, bool log_data)
 
 	    HTIRS2readAllACStrength(left, s1, s2, s3, s4, s5);
 	    HTIRS2readAllACStrength(right, s21, s22, s23, s24, s25);
+        //HTIRS2readEnhanced(left, left_dir, left_strength);
+        //HTIRS2readEnhanced(right, right_dir, right_strength);
 
         /*
          * Assumptions master is left, slave is right
@@ -271,7 +283,7 @@ void move_to_beacon(tSensors left, tSensors right, int power, bool log_data)
          * left one then rotate it straight, and read again.
          */
         if (s3 == 0) {
-            servo[leftEye] = LSERVO_CENTER;
+            //servo[leftEye] = LSERVO_CENTER;
             HTIRS2readAllACStrength(left, s1, s2, s3, s4, s5);
         }
 
@@ -317,11 +329,19 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
     int master_power, slave_power;
     float kp;
     bool left_done, right_done;
+    bool reversed;
+    int offset;
 
     // find_absolute_center(left, right);
 
+    HTIRS2readAllACStrength(left, s1, s2, s3, s4, s5);
+    HTIRS2readAllACStrength(right, s21, s22, s23, s24, s25);
+
+    offset = s3 - s23;
+
     left_done = false;
     right_done = false;
+    reversed = false;
 
     if (log_data == true) {
         dl_init("ir_log.txt", true);
@@ -329,6 +349,10 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
 
 	master_power = power;
 	slave_power = power;
+
+    if (power < 0) {
+        reversed = true;
+    }
 
     kp = 0.3;
     // error = s3 - s23;
@@ -338,6 +362,8 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
 
 	    HTIRS2readAllACStrength(left, s1, s2, s3, s4, s5);
 	    HTIRS2readAllACStrength(right, s21, s22, s23, s24, s25);
+
+        // s3 -= offset;
 
         /*
          * Assumptions master is left, slave is right
@@ -362,15 +388,27 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
         /*
          * We want a floor on the slave of stopped
          */
-        if (slave_power < 0) {
-            slave_power = 0;
+        if (reversed) {
+	        if (slave_power > 0) {
+	            slave_power = 0;
+	        }
+        } else {
+	        if (slave_power < 0) {
+	            slave_power = 0;
+	        }
         }
 
         /*
          * To keep the from overshooting implement a ceiling of 1.5 of the master
          */
-        if (slave_power > (master_power * 1.5)) {
-            slave_power = (master_power * 1.5);
+        if (reversed) {
+	        if (slave_power < (master_power * 1.5)) {
+	            slave_power = (master_power * 1.5);
+	        }
+        } else {
+	        if (slave_power > (master_power * 1.5)) {
+	            slave_power = (master_power * 1.5);
+	        }
         }
 
         if (log_data == true) {
@@ -387,7 +425,7 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
          * left one then rotate it straight, and read again.
          */
         if (s3 == 0) {
-            servo[leftEye] = LSERVO_CENTER;
+            //servo[leftEye] = LSERVO_CENTER;
             HTIRS2readAllACStrength(left, s1, s2, s3, s4, s5);
         }
 
@@ -395,7 +433,7 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
          * If we saw a zero from either receiver, then force abort
          * as we are either on top of the beacon or we are off track.
          */
-        if ((s3 == 0) || (s23 == 0)) {
+        if ((s3 <= 15) || (s23 <= 15)) {
             s3 = 180;
             s23 = 180;
         }
@@ -403,15 +441,19 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
         if ((!left_done) && (s3 >= 175)) {
             left_done = true;
             motor[driveRearLeft] = 0;
+            motor[driveFrontLeft] = 0;
         } else {
             motor[driveRearLeft] = master_power;
+            motor[driveFrontLeft] = master_power;
         }
 
         if ((!right_done) && (s23 >= 175)) {
             right_done = true;
             motor[driveRearRight] = 0;
+            motor[driveFrontRight] = 0;
         } else {
             motor[driveRearRight] = slave_power;
+            motor[driveFrontRight] = slave_power;
         }
 
         if (left_done && right_done) {

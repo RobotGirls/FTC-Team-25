@@ -71,7 +71,7 @@ float HTGYRO_offsets[][] = {{620.0, 620.0, 620.0, 620.0}, /*!< Array for offset 
 float HTGYROreadRot(tSensors link) {
   // Make sure the sensor is configured as type sensorRawValue
   if (SensorType[link] != sensorAnalogInactive) {
-    SetSensorType(link, sensorAnalogInactive);
+    setSensorType(link, sensorAnalogInactive);
     wait1Msec(100);
   }
 
@@ -101,7 +101,7 @@ float HTGYROstartCal(tSensors link) {
 
   // Make sure the sensor is configured as type sensorRawValue
   if (SensorType[link] != sensorAnalogInactive) {
-    SetSensorType(link, sensorAnalogInactive);
+    setSensorType(link, sensorAnalogInactive);
     wait1Msec(100);
   }
 

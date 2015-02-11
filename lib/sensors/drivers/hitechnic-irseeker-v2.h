@@ -64,7 +64,7 @@
 
 
 /*!< AC DSP modes */
-typedef enum {
+typedef enum _htirs2 {
   DSP_1200 = 0,
   DSP_600 = 1
 } tHTIRS2DSPMode;

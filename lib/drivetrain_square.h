@@ -239,6 +239,71 @@ void turnEncoder(float deg, int speed)
     waitForIdle(encoderCounts);
 }
 
+#define GO_SLOW_SPEED 10
+
+void turn_gyro(float deg, int speed)
+{
+    int error;
+    bool go_slow;
+	bool gyro_done;
+	int gyro_target;
+    float heading;
+    float rot_speed;
+
+    heading = 0;
+    rot_speed = 0;
+    go_slow = false;
+    gyro_done = false;
+    gyro_target = abs(deg);
+
+    if (deg > 0) {
+	    rotateClockwise(speed);
+    } else {
+	    rotateCounterClockwise(speed);
+    }
+
+    time1[T1]=0;
+
+    while (!gyro_done) {
+	    // Wait until 10ms has passed
+	    while (time1[T1] < 10)
+	        wait1Msec(1);
+
+	    // Reset the timer
+	    time1[T1]=0;
+
+	    // Read the current rotation speed
+	    rot_speed = HTGYROreadRot(HTGYRO);
+	    //rot_speed -= gyro_bias;
+
+	    // Calculate the new heading by adding the amount of degrees
+	    // we've turned in the last 10ms
+	    // If our current rate of rotation is 100 degrees/second,
+	    // then we will have turned 100 * (10/1000) = 1 degrees since
+	    // the last time we measured.
+	    heading += abs(rot_speed) * 0.01;
+
+	    // Display our current heading on the screen
+	    nxtDisplayCenteredBigTextLine(5, "%d", heading);
+
+        error = heading - gyro_target;
+        if ((!go_slow) && (abs(error) < 20)) {
+		    if (deg > 0) {
+			    rotateClockwise(GO_SLOW_SPEED);
+		    } else {
+			    rotateCounterClockwise(GO_SLOW_SPEED);
+		    }
+            go_slow = true;
+        }
+
+        if (abs(heading) >= gyro_target) {
+            gyro_done = true;
+        }
+    }
+
+    allMotorsOff();
+}
+
 /*
  * moveForward
  *

@@ -16,7 +16,3 @@
 
 #define ENCPERINCH              118.75
 #define ENC_TICKS_PER_DEGREE    18.5
-
-#define SERVO_DOOR_OPEN             103
-#define SERVO_DOOR_CENTERGOAL_RAMP  21
-#define SERVO_DOOR_CLOSED           45
