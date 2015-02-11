@@ -1,0 +1,30 @@
+
+#define LSERVO_CENTER 134
+#define RSERVO_CENTER 113
+#define RSERVO_PERP   235
+#define CROSSEYED     40
+
+#define US_DIST_POS_1 80
+#define US_DIST_POS_3 55
+
+#define UPCOUNTS      4200
+
+#define SERVO_DOOR_OPEN             103
+#define SERVO_DOOR_CENTERGOAL_RAMP  1
+#define SERVO_DOOR_CLOSED           45
+
+//#define SERVO_ARM_EXTENDED          165
+#define SERVO_ARM_EXTENDED          210
+#define SERVO_ARM_RETRACTED         60
+#define SERVO_ARM_EXTENDED_HALF     105
+#define SERVO_ARM_PICKUP            73
+
+#define SERVO_DOCK_ARM_FORWARD      80
+#define SERVO_DOCK_ARM_BACKWARD     147
+#define SERVO_DOCK_ARM_STOPPED      127
+#define SERVO_FINGER_UP             15
+#define SERVO_FINGER_DOWN           127
+#define SERVO_CENTER_DISPENSER_STOWED   0
+#define SERVO_CENTER_DISPENSER_DEPLOYED 127
+
+#define SHOULDER_POWER 80
