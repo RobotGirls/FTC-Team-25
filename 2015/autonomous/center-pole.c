@@ -33,6 +33,8 @@
 #include "../../lib/sensors/drivers/hitechnic-gyro.h"
 
 const tMUXSensor HTGYRO  = msensor_S4_3;
+bool beacon_done;
+int distance_monitor_distance;
 
 #include "../library/baemax_defs.h"
 #include "../../lib/baemax_drivetrain_defs.h"
@@ -91,6 +93,19 @@ void raise_arm()
     wait1Msec(12000);
 }
 
+task distance_monitor()
+{
+    if (SensorValue[carrot] < distance_monitor_distance) {
+	    while (SensorValue[carrot] <= distance_monitor_distance) {
+	    }
+    } else {
+	    while (SensorValue[carrot] >= distance_monitor_distance) {
+	        /* Noop, or a wait for that condition to be true */
+	    }
+    }
+    beacon_done = true;
+}
+
 task main()
 {
     int i;
@@ -122,7 +137,11 @@ task main()
         servo[leftEye] = LSERVO_CENTER + CROSSEYED;
         servo[rightEye] = RSERVO_CENTER - CROSSEYED;
 
+        beacon_done = false;
+        distance_monitor_distance = 29;
+        startTask(distance_monitor);
         move_to_beacon_mux(irr_left, irr_right, -10, true);
+        stopTask(distance_monitor);
         score_center_goal(35, 29);
     } else {
         move_to_pole(center_position);

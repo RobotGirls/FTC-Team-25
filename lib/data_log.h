@@ -1,7 +1,7 @@
 
 TFileIOResult nIoResult;
 TFileHandle hFileHandle;
-short nFileSize = 16767;
+short nFileSize = 32767;
 bool _timestamp = false;
 
 void dl_init(char* sFileName, bool timestamp)

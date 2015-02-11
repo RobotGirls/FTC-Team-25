@@ -358,7 +358,7 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
     // error = s3 - s23;
     // slave_power += error * kp;
 
-    while (true) {
+    while (!beacon_done) {
 
 	    HTIRS2readAllACStrength(left, s1, s2, s3, s4, s5);
 	    HTIRS2readAllACStrength(right, s21, s22, s23, s24, s25);
@@ -378,7 +378,7 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
         if (abs(error) < 8) {
             slave_power = master_power;
         } else {
-            slave_power = slave_power + (error * kp);
+            slave_power = slave_power + ((-error) * kp);
         }
 
         // displayString(2, "E: %d", error);
@@ -463,6 +463,12 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
     }
 
     allMotorsOff();
+
+    if (beacon_done) {
+        dl_insert_int(25);
+    } else {
+        dl_insert_int(251);
+    }
 
     dl_close();
 }
