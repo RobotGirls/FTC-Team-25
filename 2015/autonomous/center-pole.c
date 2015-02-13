@@ -128,10 +128,7 @@ task main()
 
         beacon_done = false;
         distance_monitor_distance = 29;
-        //startTask(distance_monitor);
-        // move_to_beacon_mux(irr_left, irr_right, -10, true);
         find_absolute_center(irr_left, irr_right, true);
-        //stopTask(distance_monitor);
         score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
     } else {
         move_to_pole(center_position);
