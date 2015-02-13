@@ -80,19 +80,6 @@ void move_to_pole(int count)                 // Function that moves the robot to
   	dead_reckon();
 }
 
-void raise_arm()
-{
-    motor[shoulder] = 30;
-    while (nMotorEncoder[shoulder] < UPCOUNTS) {        // While encoder counts is less than UPCOUNTS, move shoulder at 15
-    }                                                   // power. When encoder counts surpasses UPCOUNTs, stop shoulder.
-    motor[shoulder] = 0;
-
-    servoChangeRate[arm] = 0;
-    servo[arm] = SERVO_ARM_EXTENDED;                    // Move the arm to the extended position.
-
-    wait1Msec(12000);
-}
-
 task distance_monitor()
 {
     if (SensorValue[carrot] < distance_monitor_distance) {
@@ -112,6 +99,8 @@ task main()
     int center_position;
     int offset;
     int bias;
+
+    disableDiagnosticsDisplay();
 
     bias = HTGYROstartCal(HTGYRO);
     offset = initialize_receiver(irr_left, irr_right);
@@ -139,10 +128,11 @@ task main()
 
         beacon_done = false;
         distance_monitor_distance = 29;
-        startTask(distance_monitor);
-        move_to_beacon_mux(irr_left, irr_right, -10, true);
-        stopTask(distance_monitor);
-        score_center_goal(35, 29);
+        //startTask(distance_monitor);
+        // move_to_beacon_mux(irr_left, irr_right, -10, true);
+        find_absolute_center(irr_left, irr_right, true);
+        //stopTask(distance_monitor);
+        score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
     } else {
         move_to_pole(center_position);
     }

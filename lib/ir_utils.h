@@ -1,9 +1,9 @@
 
 typedef enum direction_ {
-    DIR_NONE,
-    DIR_RIGHT,
-    DIR_LEFT,
-    DIR_CENTER,
+    DIR_NONE = 0,
+    DIR_RIGHT = 1,
+    DIR_LEFT = 2,
+    DIR_CENTER = 3,
 } ir_direction_t;
 
 typedef enum ir_segment_ {
@@ -172,7 +172,11 @@ void find_center(tSensors link)
     }
 }
 
-void find_absolute_center(tSensors left, tSensors right)
+#ifdef  __HTSMUX_SUPPORT__
+void find_absolute_center(tMUXSensor left, tMUXSensor right, bool reversed)
+#else
+void find_absolute_center(tSensors left, tSensors right, bool reversed)
+#endif
 {
     /*
      * Our IR beacons are not calibrated equally.  One gives
@@ -183,28 +187,45 @@ void find_absolute_center(tSensors left, tSensors right)
 
 	int ls1, ls2, ls3, ls4, ls5 = 0;
 	int rs1, rs2, rs3, rs4, rs5 = 0;
+    int ldir, rdir;
 
-    find_center(left);
-    find_center(right);
+    eraseDisplay();
+
+    // find_center(left);
+    // find_center(right);
 
     HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
     HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
 
-    while (abs(ls3 - rs3) > 5) {
-        if (ls3 > rs3) {
-            rotateCounterClockwise(5);
+    while (abs(ls3 - rs3) > 3) {
+        if (reversed) {
+	        if (ls3 > rs3) {
+	            rotateClockwise(10);
+	        } else {
+	            rotateCounterClockwise(10);
+	        }
         } else {
-            rotateClockwise(5);
+	        if (ls3 > rs3) {
+	            rotateCounterClockwise(10);
+	        } else {
+	            rotateClockwise(10);
+	        }
         }
 	    HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
 	    HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
+
+	    ldir = HTIRS2readACDir(left);
+        rdir = HTIRS2readACDir(right);
+	    nxtDisplayCenteredBigTextLine(2, "L: %d: %d", ls3, ldir);
+	    nxtDisplayCenteredBigTextLine(4, "R: %d: %d", rs3, rdir);
     }
 }
 
 void move_to_beacon(tSensors left, tSensors right, int power, bool log_data)
 {
-	int s1, s2, s3, s4, s5 = 0;
-	int s21, s22, s23, s24, s25 = 0;
+	int ls1, ls2, ls3, ls4, ls5 = 0;
+	int rs1, rs2, rs3, rs4, rs5 = 0;
+
     int left_strength, right_strength;
     int left_dir, right_dir;
     int error;
@@ -230,8 +251,8 @@ void move_to_beacon(tSensors left, tSensors right, int power, bool log_data)
 
     while (true) {
 
-	    HTIRS2readAllACStrength(left, s1, s2, s3, s4, s5);
-	    HTIRS2readAllACStrength(right, s21, s22, s23, s24, s25);
+	    HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
+	    HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
         //HTIRS2readEnhanced(left, left_dir, left_strength);
         //HTIRS2readEnhanced(right, right_dir, right_strength);
 
@@ -239,7 +260,7 @@ void move_to_beacon(tSensors left, tSensors right, int power, bool log_data)
          * Assumptions master is left, slave is right
          * s3 is left receiver, s23 is right receiver.
          */
-        error = s3 - s23;
+        error = ls3 - rs3;
 
         /*
          * If the error is within a "tolerance zone" then
@@ -272,38 +293,29 @@ void move_to_beacon(tSensors left, tSensors right, int power, bool log_data)
         if (log_data == true) {
             dl_insert_int(master_power);
             dl_append_int(slave_power);
-            dl_append_int(s3);
-            dl_append_int(s23);
+            dl_append_int(ls3);
+            dl_append_int(rs3);
             dl_append_int(error);
             dl_append_int(error * kp);
-        }
-
-        /*
-         * Compensating for inaccurate receivers.  If we see a zero from the
-         * left one then rotate it straight, and read again.
-         */
-        if (s3 == 0) {
-            //servo[leftEye] = LSERVO_CENTER;
-            HTIRS2readAllACStrength(left, s1, s2, s3, s4, s5);
         }
 
         /*
          * If we saw a zero from either receiver, then force abort
          * as we are either on top of the beacon or we are off track.
          */
-        if ((s3 == 0) || (s23 == 0)) {
-            s3 = 180;
-            s23 = 180;
+        if ((ls3 == 0) || (rs3 == 0)) {
+            ls3 = 180;
+            rs3 = 180;
         }
 
-        if ((!left_done) && (s3 >= 175)) {
+        if ((!left_done) && (ls3 >= 175)) {
             left_done = true;
             motor[driveRearLeft] = 0;
         } else {
             motor[driveRearLeft] = master_power;
         }
 
-        if ((!right_done) && (s23 >= 175)) {
+        if ((!right_done) && (rs3 >= 175)) {
             right_done = true;
             motor[driveRearRight] = 0;
         } else {
@@ -323,8 +335,9 @@ void move_to_beacon(tSensors left, tSensors right, int power, bool log_data)
 
 void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_data)
 {
-	int s1, s2, s3, s4, s5 = 0;
-	int s21, s22, s23, s24, s25 = 0;
+	int ls1, ls2, ls3, ls4, ls5 = 0;
+	int rs1, rs2, rs3, rs4, rs5 = 0;
+    int ldir, rdir;
     int error;
     int master_power, slave_power;
     float kp;
@@ -334,10 +347,10 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
 
     // find_absolute_center(left, right);
 
-    HTIRS2readAllACStrength(left, s1, s2, s3, s4, s5);
-    HTIRS2readAllACStrength(right, s21, s22, s23, s24, s25);
+    HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
+    HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
 
-    offset = s3 - s23;
+    offset = ls3 - rs3;
 
     left_done = false;
     right_done = false;
@@ -360,8 +373,8 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
 
     while (!beacon_done) {
 
-	    HTIRS2readAllACStrength(left, s1, s2, s3, s4, s5);
-	    HTIRS2readAllACStrength(right, s21, s22, s23, s24, s25);
+	    HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
+	    HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
 
         // s3 -= offset;
 
@@ -369,7 +382,7 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
          * Assumptions master is left, slave is right
          * s3 is left receiver, s23 is right receiver.
          */
-        error = s3 - s23;
+        error = ls3 - rs3;
 
         /*
          * If the error is within a "tolerance zone" then
@@ -411,34 +424,30 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
 	        }
         }
 
+	    ldir = HTIRS2readACDir(left);
+        rdir = HTIRS2readACDir(right);
+	    nxtDisplayCenteredBigTextLine(2, "L: %d: %d", ls3, ldir);
+	    nxtDisplayCenteredBigTextLine(4, "R: %d: %d", rs3, rdir);
+
         if (log_data == true) {
             dl_insert_int(master_power);
             dl_append_int(slave_power);
-            dl_append_int(s3);
-            dl_append_int(s23);
+            dl_append_int(ls3);
+            dl_append_int(rs3);
             dl_append_int(error);
             dl_append_int(error * kp);
-        }
-
-        /*
-         * Compensating for inaccurate receivers.  If we see a zero from the
-         * left one then rotate it straight, and read again.
-         */
-        if (s3 == 0) {
-            //servo[leftEye] = LSERVO_CENTER;
-            HTIRS2readAllACStrength(left, s1, s2, s3, s4, s5);
         }
 
         /*
          * If we saw a zero from either receiver, then force abort
          * as we are either on top of the beacon or we are off track.
          */
-        if ((s3 <= 15) || (s23 <= 15)) {
-            s3 = 180;
-            s23 = 180;
+        if ((ls3 <= 15) || (rs3 <= 15)) {
+            ls3 = 180;
+            rs3 = 180;
         }
 
-        if ((!left_done) && (s3 >= 175)) {
+        if ((!left_done) && (ls3 >= 175)) {
             left_done = true;
             motor[driveRearLeft] = 0;
             motor[driveFrontLeft] = 0;
@@ -447,7 +456,7 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
             motor[driveFrontLeft] = master_power;
         }
 
-        if ((!right_done) && (s23 >= 175)) {
+        if ((!right_done) && (rs3 >= 175)) {
             right_done = true;
             motor[driveRearRight] = 0;
             motor[driveFrontRight] = 0;
@@ -469,6 +478,35 @@ void move_to_beacon_mux(tMUXSensor left, tMUXSensor right, int power, bool log_d
     } else {
         dl_insert_int(251);
     }
+/*
+    ldir = HTIRS2readACDir(left);
+    rdir = HTIRS2readACDir(right);
 
+    eraseDisplay();
+    nxtDisplayCenteredBigTextLine(2, "L: %d: %d", ls3, ldir);
+    nxtDisplayCenteredBigTextLine(4, "R: %d: %d", rs3, rdir);
+
+    if (rdir > 4) {
+        rotateCounterClockwise(20);
+        while (rdir > 4) {
+		    nxtDisplayCenteredBigTextLine(2, "L: %d: %d", ls3, ldir);
+		    nxtDisplayCenteredBigTextLine(4, "R: %d: %d", rs3, rdir);
+            rdir = HTIRS2readACDir(right);
+        }
+        allMotorsOff();
+    }
+
+    if (ldir < 6) {
+        rotateClockwise(20);
+        while (ldir < 6) {
+		    nxtDisplayCenteredBigTextLine(2, "L: %d: %d", ls3, ldir);
+		    nxtDisplayCenteredBigTextLine(4, "R: %d: %d", rs3, rdir);
+            ldir = HTIRS2readACDir(left);
+        }
+        allMotorsOff();
+    }
+    nxtDisplayCenteredBigTextLine(2, "L: %d: %d", ls3, ldir);
+    nxtDisplayCenteredBigTextLine(4, "R: %d: %d", rs3, rdir);
+*/
     dl_close();
 }

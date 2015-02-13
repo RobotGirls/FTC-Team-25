@@ -35,6 +35,8 @@
 #include "../../lib/sensors/drivers/hitechnic-gyro.h"
 
 const tMUXSensor HTGYRO  = msensor_S4_3;
+bool beacon_done;
+int distance_monitor_distance;
 
 #include "../library/baemax_defs.h"
 #include "../../lib/baemax_drivetrain_defs.h"
@@ -394,10 +396,20 @@ void handle_joy2_btn3()
     }
 }
 
+bool center_goal_task_running = false;
+
 task center_goal()
 {
-    move_to_beacon_mux(irr_left, irr_right, -10, true);
-    score_center_goal(35, 29);
+	center_goal_task_running = true;
+    disableDiagnosticsDisplay();
+    eraseDisplay();
+    playImmediateTone(60, 100);
+    servo[leftEye] = LSERVO_CENTER + CROSSEYED;
+    servo[rightEye] = RSERVO_CENTER - CROSSEYED;
+    // raise_arm();
+    find_absolute_center(irr_left, irr_right, true);
+    score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
+    center_goal_task_running = false;
 }
 
 void handle_joy1_event(joystick_event_t event)
@@ -408,9 +420,13 @@ void handle_joy1_event(joystick_event_t event)
         break;
     case BUTTON_TWO:
         stopTask(center_goal);
+        allMotorsOff();
+        center_goal_task_running = false;
         break;
     default:
     }
+
+    startTask(debounceTask);
 }
 
 void handle_joy2_event(joystick_event_t event)
@@ -491,35 +507,35 @@ task main()
             } else if (joystick.joy2_TopHat == 4) { // Down d-pad
                 door_enter_state(DOOR_OPEN);
             }
-       }
+        }
 
-        //if (drive_multiplier) {
-            //right_y = joystick.joy1_y2;
-            //left_y = joystick.joy1_y1;
-        //} else {
-            left_dock_y = joystick.joy2_y1;
-            right_y = joystick.joy1_y1;
-            left_y = joystick.joy1_y2;
-        //}
+        /*
+         * Lock out the drivetrain if we are doing autonomous center goal dispense
+         */
+        if (!center_goal_task_running) {
+	        left_dock_y = joystick.joy2_y1;
+	        right_y = joystick.joy1_y1;
+	        left_y = joystick.joy1_y2;
 
-        if (abs(right_y) > 20) {
-	    	motor[driveFrontRight] = drive_multiplier * left_y;
-	    	motor[driveRearRight] = drive_multiplier * left_y;
-		}
-		else {
-		    motor[driveFrontRight] = 0;
-		    motor[driveRearRight] = 0;
-		}
+	        if (abs(right_y) > 20) {
+		    	motor[driveFrontRight] = drive_multiplier * left_y;
+		    	motor[driveRearRight] = drive_multiplier * left_y;
+			}
+			else {
+			    motor[driveFrontRight] = 0;
+			    motor[driveRearRight] = 0;
+			}
 
-        if (abs(left_y) > 20) {
-		    motor[driveFrontLeft] = drive_multiplier * right_y;
-		    motor[driveRearLeft] = drive_multiplier * right_y;
-		}
-		else
-		{
-		    motor[driveFrontLeft] = 0;
-		    motor[driveRearLeft] = 0;
-		}
+	        if (abs(left_y) > 20) {
+			    motor[driveFrontLeft] = drive_multiplier * right_y;
+			    motor[driveRearLeft] = drive_multiplier * right_y;
+			}
+			else
+			{
+			    motor[driveFrontLeft] = 0;
+			    motor[driveRearLeft] = 0;
+			}
+        }
 
         if (abs(left_dock_y) > 20) {
             if (left_dock_y > 0) {
