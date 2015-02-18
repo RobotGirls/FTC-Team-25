@@ -19,16 +19,19 @@
 
 task main()
 {
-    nMotorEncoder[motorA] = 0;
-    motor[motorA] = -30;
-    motor[motorB] = -30;
+    bFloatDuringInactiveMotorPWM = false;
+
+    nMotorEncoder[rampRight] = 0;
+    nMotorEncoder[rampLeft] = 0;
+    motor[rampRight] = -15;
+    motor[rampLeft] = -15;
 
     while (nNxtButtonPressed != 3) {
-        nxtDisplayCenteredBigTextLine(3, "%d", nMotorEncoder[motorA]);
+        nxtDisplayCenteredBigTextLine(3, "%d", nMotorEncoder[rampRight]);
     }
 
-    motor[motorA] = 0;
-    motor[motorB] = 0;
+    motor[rampRight] = 0;
+    motor[rampLeft] = 0;
 
     while (true) {}
 }

@@ -14,7 +14,6 @@
 #define SERVO_DOOR_CENTERGOAL_RAMP  1
 #define SERVO_DOOR_CLOSED           45
 
-//#define SERVO_ARM_EXTENDED          165
 //#define SERVO_ARM_EXTENDED          210
 //#define SERVO_ARM_RETRACTED         60
 //#define SERVO_ARM_EXTENDED_HALF     105
