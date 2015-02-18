@@ -172,6 +172,23 @@ void find_center(tSensors link)
     }
 }
 
+void do_center_rotation(int ls3, int rs3, int reversed)
+{
+    if (reversed) {
+        if (ls3 > rs3) {
+            rotateClockwise(5);
+        } else {
+            rotateCounterClockwise(5);
+        }
+    } else {
+        if (ls3 > rs3) {
+            rotateCounterClockwise(5);
+        } else {
+            rotateClockwise(5);
+        }
+    }
+}
+
 #ifdef  __HTSMUX_SUPPORT__
 void find_absolute_center(tMUXSensor left, tMUXSensor right, bool reversed)
 #else
@@ -188,6 +205,9 @@ void find_absolute_center(tSensors left, tSensors right, bool reversed)
 	int ls1, ls2, ls3, ls4, ls5 = 0;
 	int rs1, rs2, rs3, rs4, rs5 = 0;
     int ldir, rdir;
+    int count;
+
+    count = 0;
 
     eraseDisplay();
 
@@ -197,20 +217,30 @@ void find_absolute_center(tSensors left, tSensors right, bool reversed)
     HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
     HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
 
+    /*
+     * Attempt to compensate for crappy ir receivers.
+     */
+    if ((abs(ls3 - rs3)) >= 20) {
+        init_path();
+        add_segment(3, 0, 10);
+        stop_path();
+        dead_reckon();
+    }
+
+    HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
+    HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
+
+    /*
+     * Give up
+     */
+    if ((abs(ls3 - rs3)) >= 20) {
+        ls3 = 0;
+        rs3 = 0;
+    }
+
     while (abs(ls3 - rs3) > 3) {
-        if (reversed) {
-	        if (ls3 > rs3) {
-	            rotateClockwise(10);
-	        } else {
-	            rotateCounterClockwise(10);
-	        }
-        } else {
-	        if (ls3 > rs3) {
-	            rotateCounterClockwise(10);
-	        } else {
-	            rotateClockwise(10);
-	        }
-        }
+        do_center_rotation(ls3, rs3, reversed);
+
 	    HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
 	    HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
 
@@ -218,6 +248,16 @@ void find_absolute_center(tSensors left, tSensors right, bool reversed)
         rdir = HTIRS2readACDir(right);
 	    nxtDisplayCenteredBigTextLine(2, "L: %d: %d", ls3, ldir);
 	    nxtDisplayCenteredBigTextLine(4, "R: %d: %d", rs3, rdir);
+
+        if ((ls3 == 0) || (rs3 == 0)) {
+            count++;
+            reversed = !reversed;
+            do_center_rotation(ls3, rs3, reversed);
+            if (count >= 5) {
+                // ABORT !!
+                break;
+            }
+        }
     }
 }
 

@@ -1,13 +1,13 @@
 
-#define LSERVO_CENTER 134
-#define RSERVO_CENTER 113
+#define LSERVO_CENTER 140
+#define RSERVO_CENTER 120
 #define RSERVO_PERP   235
-#define CROSSEYED     40
+#define CROSSEYED     30
 
 #define US_DIST_POS_1 80
 #define US_DIST_POS_3 55
 
-#define CENTER_GOAL_DUMP_DISTANCE   29
+#define CENTER_GOAL_DUMP_DISTANCE   27
 #define UPCOUNTS                    4200
 
 #define SERVO_DOOR_OPEN             103
@@ -15,10 +15,19 @@
 #define SERVO_DOOR_CLOSED           45
 
 //#define SERVO_ARM_EXTENDED          165
-#define SERVO_ARM_EXTENDED          210
-#define SERVO_ARM_RETRACTED         60
-#define SERVO_ARM_EXTENDED_HALF     105
-#define SERVO_ARM_PICKUP            73
+//#define SERVO_ARM_EXTENDED          210
+//#define SERVO_ARM_RETRACTED         60
+//#define SERVO_ARM_EXTENDED_HALF     105
+//#define SERVO_ARM_PICKUP            73
+
+#define PICKUP_OFFSET               15
+#define GOAL_OFFSET                 36
+#define EXTENDED_OFFSET             105
+
+#define SERVO_ARM_RETRACTED         80
+#define SERVO_ARM_PICKUP            SERVO_ARM_RETRACTED + PICKUP_OFFSET
+#define SERVO_ARM_EXTENDED_HALF     SERVO_ARM_RETRACTED + GOAL_OFFSET
+#define SERVO_ARM_EXTENDED          SERVO_ARM_RETRACTED + EXTENDED_OFFSET
 
 #define SERVO_DOCK_ARM_FORWARD      80
 #define SERVO_DOCK_ARM_BACKWARD     147

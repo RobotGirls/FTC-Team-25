@@ -57,19 +57,24 @@ void move_to_pole(int count)                 // Function that moves the robot to
 
     switch (count) {
     case 1:
-        add_segment(-25, 0, 50);
+        add_segment(-15, 45, 50);
+        add_segment(-20, -90, 100);
+        add_segment(-10, -45, 100);
         add_segment(0, 45, 100);
-        add_segment(-5, -45, 100);
+        add_segment(-10, -45, 100);
         add_segment(0, 45, 100);
-        add_segment(-5, -45, 100);
-        add_segment(0, 45, 100);
-        add_segment(-5, -45, 100);
+        add_segment(-10, -45, 100);
         add_segment(0, 45, 100);
         break;
     case 2:
-        add_segment(-13, 0, 50);
-        add_segment(-50, 30, 100);
-        add_segment(4, 20, 100);
+        add_segment(-12, 0, 50);
+        add_segment(-40, 30, 100);
+        add_segment(12, 0, 100);
+        add_segment(-12, 0, 100);
+        add_segment(12, 0, 100);
+        add_segment(-12, 0, 100);
+        add_segment(12, 0, 100);
+        add_segment(-12, 0, 100);
         break;
     case 3:
         add_segment(-10, 90, 50);
@@ -111,7 +116,7 @@ task main()
     servo[door] = SERVO_DOOR_CLOSED;
     servo[brush] = 127;
 
-    //waitForStart();
+    waitForStart();
 
     center_position = ultrasound(carrot, -24, US_DIST_POS_1, US_DIST_POS_3);    // Sets the value integer center_position to 1, 2, or 3
                                                                                 // based on ultrasound sensor readings.
@@ -120,15 +125,20 @@ task main()
     //    wait1Msec(750);
     //}
 
-    if (center_position == 3) {
-        raise_arm();
+    eraseDisplay();
 
+    nxtDisplayCenteredBigTextLine(3, "%d", center_position);
+
+    if (center_position == 3) {
         servo[leftEye] = LSERVO_CENTER + CROSSEYED;
         servo[rightEye] = RSERVO_CENTER - CROSSEYED;
 
-        beacon_done = false;
-        distance_monitor_distance = 29;
-        find_absolute_center(irr_left, irr_right, true);
+        raise_arm(UPCOUNTS);
+
+        //servo[leftEye] = LSERVO_CENTER + CROSSEYED;
+        //servo[rightEye] = RSERVO_CENTER - CROSSEYED;
+
+        find_absolute_center(irr_left, irr_right, false);
         score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
     } else {
         move_to_pole(center_position);

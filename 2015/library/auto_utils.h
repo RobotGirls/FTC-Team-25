@@ -1,8 +1,9 @@
 
-void raise_arm()
+
+void raise_arm(int ticks)
 {
     motor[shoulder] = 30;
-    while (nMotorEncoder[shoulder] < UPCOUNTS) {        // While encoder counts is less than UPCOUNTS, move shoulder at 15
+    while (nMotorEncoder[shoulder] < ticks) {        // While encoder counts is less than UPCOUNTS, move shoulder at 15
     }                                                   // power. When encoder counts surpasses UPCOUNTs, stop shoulder.
     motor[shoulder] = 0;
 
@@ -23,7 +24,7 @@ void score_center_goal(int dump_dist)          // Function that moves the robot 
     //servo[brush] = 127;
     //while (true) {
 	    servo[brush] = 255;
-	    wait1Msec(500);
+	    wait1Msec(1000);
         servo[brush] = 127;
 	    //servo[brush] = 255;
         //wait1Msec(200);
