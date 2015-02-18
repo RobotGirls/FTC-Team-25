@@ -36,21 +36,20 @@
 // were connected to 3rd port of the SMUX connected to the NXT port S4,
 // we would use msensor_S4_3
 
-const tMUXSensor LEGOUS = msensor_S3_1;
+const tMUXSensor LEGOUS = msensor_S3_2;
 
 #define RAMP_SPEED_UP              -30
 #define RAMP_SPEED_DOWN             30
 #define SHOULDER_SPEED_UP           10
 #define SHOULDER_SPEED_DOWN        -10
 
-#define SERVO_ROLLER_UP             48
+#define SERVO_ROLLER_UP             25
+#define SERVO_ROLLER_OSC_DOWN       80
 #define SERVO_ROLLER_DOWN           137
 
 #define SERVO_AUTOELBOW_UP          37
 #define SERVO_AUTOELBOW_DOWN        233
 
-#define SERVO_ROLLER_OSC_UP         60
-#define SERVO_ROLLER_OSC_DOWN       105
 
 #define CONVEYOR_POWER              80
 #define LSERVO_DOCK_FINGER_STOWED   82
@@ -66,27 +65,6 @@ bool deadman_ltu_running;
 bool deadman_ltd_running;
 bool deadman_rtu_running;
 bool deadman_rtd_running;
-
-
-task oscillateRoller()
-{
-    int i;
-
-    servo[roller] = SERVO_ROLLER_OSC_UP;
-    wait1Msec(500);
-
-    while (true) {
-        for (i = SERVO_ROLLER_OSC_UP; i <= SERVO_ROLLER_OSC_DOWN; i++) {
-            servo[roller] = i;
-            wait1Msec(10);
-        }
-
-        for (i = SERVO_ROLLER_OSC_DOWN; i >= SERVO_ROLLER_OSC_UP; i--) {
-            servo[roller] = i;
-            wait1Msec(10);
-        }
-    }
-}
 
 typedef enum conveyor_state_ {
     CONVEYOR_OFF,
@@ -131,20 +109,33 @@ task debounceTask()
     debounce = false;
 }
 
+
 task ball_watch()
 {
     int dist;
     int i;
+    int ball_count;
+
+    ball_count = 0;
+    nxtDisplayCenteredBigTextLine(2, "%d", ball_count);
 
     while (true) {
         dist = USreadDist(LEGOUS);
         if (dist <= 7) {
-            wait1Msec(500);
-	        for (i = SERVO_ROLLER_OSC_UP; i <= SERVO_ROLLER_OSC_DOWN; i++) {
+            // eraseDisplay();
+            nxtDisplayCenteredBigTextLine(2, "%d", ++ball_count);
+
+            wait1Msec(2000);
+
+            playImmediateTone(60, 100);
+
+	        for (i = SERVO_ROLLER_UP; i <= SERVO_ROLLER_OSC_DOWN; i++) {
 	            servo[roller] = i;
 	            wait1Msec(10);
 	        }
+            servo[roller] = SERVO_ROLLER_UP;
 
+            wait1Msec(1000);
         }
     }
 }
@@ -275,7 +266,7 @@ task validate_conveyor()
 {
     while (true) {
         conveyor_enter_state(CONVEYOR_OFF);
-        wait1Msec(250);
+        wait1Msec(100);
         conveyor_enter_state(CONVEYOR_FORWARD);
         wait1Msec(10000);
     }
@@ -400,6 +391,41 @@ void handle_joy1_event(joystick_event_t event)
     startTask(debounceTask);
 }
 
+#define RAMP_SPEED 30
+#define RAMP_SCORE_DELTA 932
+#define RAMP_PICKUP_DELTA 932
+
+void handle_tophat_up()
+{
+    nMotorEncoder[rampLeft] = 0;
+    nSyncedMotors = synchAB;
+
+    motor[rampLeft] = RAMP_SPEED;
+    motor[rampRight] = RAMP_SPEED;
+
+    while (abs(nMotorEncoder[rampLeft]) < RAMP_SCORE_DELTA) {
+    }
+
+    motor[rampLeft] = 0;
+    motor[rampRight] = 0;
+}
+
+void handle_tophat_down()
+{
+    nMotorEncoder[rampLeft] = 0;
+    nSyncedMotors = synchAB;
+
+    motor[rampLeft] = -RAMP_SPEED;
+    motor[rampRight] = -RAMP_SPEED;
+
+    while (abs(nMotorEncoder[rampLeft]) < RAMP_PICKUP_DELTA) {
+    }
+
+    motor[rampLeft] = 0;
+    motor[rampRight] = 0;
+
+}
+
 task main()
 {
     short right_y;
@@ -412,6 +438,7 @@ task main()
     waitForStart();   // wait for start of tele-op phase
 
     startTask(validate_conveyor);
+    startTask(ball_watch);
 
     servo[roller] = SERVO_ROLLER_UP;
     // servo[autoElbow] = 37;
@@ -441,6 +468,10 @@ task main()
 	            handle_joy1_event(RIGHT_TRIGGER_UP);
 	        } else if (joy1Btn(Btn8)) {
 	            handle_joy1_event(RIGHT_TRIGGER_DOWN);
+            } else if (joystick.joy2_TopHat == 0) { // Up d-pad
+                handle_tophat_up();
+            } else if (joystick.joy2_TopHat == 4) { // Down d-pad
+                handle_tophat_down();
 	        } else if (joy1Btn(Btn6)) {
 	        	motor[elbow]=100;
 	        } else if (joy1Btn(Btn8)) {
