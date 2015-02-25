@@ -58,7 +58,7 @@ typedef enum arm_state_ {
     ARM_PICKUP,
     ARM_EXTENDED,
     ARM_RETRACTED,
-    ARM_EXTENDED_HALF,
+    ARM_GOAL,
 } arm_state_t;
 
 typedef enum dock_state_ {
@@ -213,26 +213,66 @@ void brush_enter_state(brush_state_t state)
 
 void arm_enter_state(arm_state_t state)
 {
-    arm_state = state;
+	nMotorEncoder[arm_motor] = 0;
 
     switch (state) {
     case ARM_PICKUP:
-        nxtDisplayCenteredBigTextLine(3, "Pickup");
-        servo[arm] = SERVO_ARM_PICKUP;
+        nxtDisplayCenteredBigTextLine(3, "PICKUP");
+        if (arm_state == ARM_GOAL) {
+            motor[arm_motor] = ARM_MOTOR_SPEED;
+            while (abs(nMotorEncoder[arm_motor]) < ENC_ARM_Y) {
+            }
+            motor[arm_motor] = 0;
+        } else if (arm_state == ARM_RETRACTED) {
+            motor[arm_motor] = -ARM_MOTOR_SPEED;
+            while (abs(nMotorEncoder[arm_motor]) < ENC_ARM_X) {
+            }
+            motor[arm_motor] = 0;
+        } else {
+			motor[arm_motor] = 0;
+    	}
         break;
     case ARM_EXTENDED:
-        nxtDisplayCenteredBigTextLine(3, "Extended");
-        servo[arm] = SERVO_ARM_EXTENDED;
+        nxtDisplayCenteredBigTextLine(3, "EXTENDED");
+        if (arm_state == ARM_GOAL) {
+        	motor[arm_motor] = -ARM_MOTOR_SPEED;
+        	while (abs(nMotorEncoder[arm_motor]) < ENC_ARM_Z) {
+        	}
+        	motor[arm_motor] = 0;
+        } else {
+        	motor[arm_motor] = 0;
+    	}
         break;
-    case ARM_EXTENDED_HALF:
-        nxtDisplayCenteredBigTextLine(3, "Goal");
-        servo[arm] = SERVO_ARM_EXTENDED_HALF;
+    case ARM_GOAL:
+        nxtDisplayCenteredBigTextLine(3, "GOAL");
+        if (arm_state == ARM_EXTENDED) {
+	        motor[arm_motor] = ARM_MOTOR_SPEED;
+	        while (abs(nMotorEncoder[arm_motor]) < ENC_ARM_Z) {
+	        }
+	        motor[arm_motor] = 0;
+	    } else if (arm_state == ARM_PICKUP) {
+			motor[arm_motor] = -ARM_MOTOR_SPEED;
+			while (abs(nMotorEncoder[arm_motor]) < ENC_ARM_Y) {
+			}
+			motor[arm_motor] = 0;
+	    } else {
+			motor[arm_motor] = 0;
+	    }
         break;
     case ARM_RETRACTED:
-        nxtDisplayCenteredBigTextLine(3, "Retracted");
-        servo[arm] = SERVO_ARM_RETRACTED;
+        nxtDisplayCenteredBigTextLine(3, "RETACTED");
+        if (arm_state == ARM_PICKUP) {
+        	motor[arm_motor] = ARM_MOTOR_SPEED;
+        	while (abs(nMotorEncoder[arm_motor]) < ENC_ARM_X) {
+        	}
+        	motor[arm_motor] = 0;
+        } else {
+    		motor[arm_motor] = 0;
+        }
         break;
     }
+
+    arm_state = state;
 }
 
 void shoulder_enter_state(shoulder_state_t state)
@@ -259,9 +299,10 @@ void initializeRobot()
 
     nMotorEncoder[shoulder] = 0;
 
+    arm_state = ARM_RETRACTED;
+    nxtDisplayCenteredBigTextLine(3, "RETRACTED");
     shoulder_enter_state(SHOULDER_STOP);
     brush_enter_state(BRUSH_OFF);
-    arm_enter_state(ARM_RETRACTED);
     dock_enter_state(DOCK_FINGER_UP);
     door_enter_state(DOOR_CLOSED);
 
@@ -332,11 +373,11 @@ void handle_joy2_btn2()
         arm_enter_state(ARM_RETRACTED);
         break;
     case ARM_EXTENDED:
-        arm_enter_state(ARM_EXTENDED_HALF);
+        arm_enter_state(ARM_GOAL);
         break;
     case ARM_RETRACTED:
         break;
-    case ARM_EXTENDED_HALF:
+    case ARM_GOAL:
         arm_enter_state(ARM_PICKUP);
         break;
     }
@@ -346,14 +387,14 @@ void handle_joy2_btn4()
 {
     switch (arm_state) {
     case ARM_PICKUP:
-        arm_enter_state(ARM_EXTENDED_HALF);
+        arm_enter_state(ARM_GOAL);
         break;
     case ARM_EXTENDED:
         break;
     case ARM_RETRACTED:
         arm_enter_state(ARM_PICKUP);
         break;
-    case ARM_EXTENDED_HALF:
+    case ARM_GOAL:
         arm_enter_state(ARM_EXTENDED);
         break;
     }
