@@ -1,3 +1,37 @@
+typedef enum motor_state_ {
+	MOTOR_OK,
+	MOTOR_STALL,
+} motor_state_t;
+
+#define STALL_TIMEOUT 500
+
+motor_state_t move_to(tMotor m, int speed, int count)
+{
+	motor_state_t rtn;
+	int last;
+
+	rtn = MOTOR_OK;
+	nMotorEncoder[m] = 0;
+	last = nMotorEncoder[m];
+	clearTimer(T1);
+
+	motor[m] = speed;
+
+	while (abs(nMotorEncoder[m]) < count) {
+		if (nMotorEncoder[m] != last) {
+			clearTimer(T1);
+			last = nMotorEncoder[m];
+		}
+		if (time1[T1] >= STALL_TIMEOUT) {
+			rtn = MOTOR_STALL;
+			break;
+		}
+	}
+
+	motor[m] = 0;
+
+	return rtn;
+}
 
 
 void raise_arm(int ticks)
