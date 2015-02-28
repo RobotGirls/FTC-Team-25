@@ -21,7 +21,7 @@ const tMUXSensor LEGOUS = msensor_S3_2;
 #define RIGHT_GUIDE_STOW    30
 #define RIGHT_GUIDE_DEPLOY  142
 #define LEFT_GUIDE_STOW     0
-#define LEFT_GUIDE_DEPLOY   240
+#define LEFT_GUIDE_DEPLOY   185
 
 #define RAMP_TILT       50
 #define RAMP_PICKUP     875
@@ -39,7 +39,7 @@ const tMUXSensor LEGOUS = msensor_S3_2;
 #define SERVO_AUTOELBOW_DOWN        233
 
 
-#define CONVEYOR_POWER              80
+#define CONVEYOR_POWER              100
 #define LSERVO_DOCK_FINGER_STOWED   82
 #define LSERVO_DOCK_FINGER_UP       205
 #define LSERVO_DOCK_FINGER_DOWN     161
@@ -97,6 +97,16 @@ task debounceTask()
     debounce = false;
 }
 
+void push_ball()
+{
+	int i;
+
+    for (i = SERVO_ROLLER_UP; i <= SERVO_ROLLER_OSC_DOWN; i++) {
+        servo[roller] = i;
+        wait1Msec(10);
+    }
+    servo[roller] = SERVO_ROLLER_UP;
+}
 
 task ball_watch()
 {
@@ -117,11 +127,7 @@ task ball_watch()
 
             playImmediateTone(60, 100);
 
-	        for (i = SERVO_ROLLER_UP; i <= SERVO_ROLLER_OSC_DOWN; i++) {
-	            servo[roller] = i;
-	            wait1Msec(10);
-	        }
-            servo[roller] = SERVO_ROLLER_UP;
+			push_ball();
 
             wait1Msec(1000);
         }
@@ -251,8 +257,6 @@ void initializeRobot()
 	servo[rightFang] = RIGHT_FANG_STOW;
 
     servo[autoElbow] = 233;
-
-    servo[ramp] = RAMP_INIT;
 
     all_stop();
 
@@ -464,7 +468,7 @@ task main()
 	        } else if (joy1Btn(Btn8)) {
 	            handle_joy1_event(RIGHT_TRIGGER_DOWN);
 	        } else if (joy2Btn(Btn6)) {
-	            handle_joy2_event(RIGHT_TRIGGER_DOWN);
+	            handle_joy2_event(RIGHT_TRIGGER_UP);
             } else if (joystick.joy2_TopHat == 0) { // Up d-pad
                 handle_tophat_up();
             } else if (joystick.joy2_TopHat == 4) { // Down d-pad
