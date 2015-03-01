@@ -10,9 +10,9 @@
 #define CENTER_GOAL_DUMP_DISTANCE   27
 #define UPCOUNTS                    4200
 
-#define SERVO_DOOR_OPEN             103
-#define SERVO_DOOR_CENTERGOAL_RAMP  1
-#define SERVO_DOOR_CLOSED           45
+#define SERVO_DOOR_OPEN             0
+#define SERVO_DOOR_CENTERGOAL_RAMP  90
+#define SERVO_DOOR_CLOSED           128
 
 //#define SERVO_ARM_EXTENDED          210
 //#define SERVO_ARM_RETRACTED         60
