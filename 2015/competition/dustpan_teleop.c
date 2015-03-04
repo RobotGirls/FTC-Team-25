@@ -88,7 +88,6 @@ center_dispenser_state_t center_dispenser_state;
 door_state_t door_state;
 
 bool debounce;
-bool deadman_ltu_running;
 bool deadman_ltd_running;
 
 void shoulder_enter_state(shoulder_state_t state);
@@ -100,27 +99,13 @@ task debounceTask()
     debounce = false;
 }
 
-task deadman_ltu()
-{
-    if (!deadman_ltd_running) {
-	    deadman_ltu_running = true;
-	    shoulder_enter_state(SHOULDER_UP);
-
-	    while ((joy2Btn(Btn5)) && (deadman_ltd_running == false)) {
-	    }
-
-	    shoulder_enter_state(SHOULDER_STOP);
-	    deadman_ltu_running = false;
-    }
-}
-
 task deadman_ltd()
 {
-    if (!deadman_ltu_running) {
+    if (!deadman_ltd_running) {
 	    deadman_ltd_running = true;
 	    shoulder_enter_state(SHOULDER_DOWN);
 
-	    while ((joy2Btn(Btn7)) && (deadman_ltu_running == false)) {
+	    while (joy2Btn(Btn7)) {
 	    }
 
 	    shoulder_enter_state(SHOULDER_STOP);
@@ -128,19 +113,7 @@ task deadman_ltd()
     }
 }
 
-int shoulder_ticks;
-bool raise_shoulder_running;
-
-/*
-task raise_shoulder_task()
-{
-	if (!raise_shoulder_running) {
-		raise_shoulder_running = true;
-		raise_shoulder(shoulder_ticks);
-	}
-	raise_shoulder_running = false;
-}
-*/
+bool limit_shoulder_running;
 
 task limit_shoulder()
 {
@@ -148,12 +121,13 @@ task limit_shoulder()
 		nMotorEncoder[shoulder] = 0;
 		shoulder_enter_state(SHOULDER_UP);
 		while (is_limit_switch_open()) {
-			if (nMotorEncoder[shoulder] > 3000) {
+			if (nMotorEncoder[shoulder] > 2700) {
 				motor[shoulder] = 10;
 			}
 		}
     }
 	shoulder_enter_state(SHOULDER_STOP);
+    limit_shoulder_running = false;
 }
 
 void all_stop()
@@ -307,37 +281,6 @@ void shoulder_enter_state(shoulder_state_t state)
     }
 }
 
-void initializeRobot()
-{
-	if (!limit_switch_init(HTPB, 0x05)) {
-		nxtDisplayCenteredBigTextLine(3, "ERROR");
-		nxtDisplayTextLine(6, "CF251, LP: IZZIE");
-	}
-
-    disableDiagnosticsDisplay();
-    eraseDisplay();
-
-    nMotorEncoder[shoulder] = 0;
-
-    arm_state = ARM_RETRACTED;
-    nxtDisplayCenteredBigTextLine(3, "RETRACTED");
-    shoulder_enter_state(SHOULDER_STOP);
-    brush_enter_state(BRUSH_OFF);
-    dock_enter_state(DOCK_FINGER_UP);
-    door_enter_state(DOOR_CLOSED);
-
-    deadman_ltu_running = false;
-    deadman_ltd_running = false;
-
-    servo[dockarm] = SERVO_DOCK_ARM_STOPPED;
-    servo[rightEye] = 128;
-    servo[leftEye] = 128;
-
-    all_stop();
-
-    return;
-}
-
 void handle_joy2_rtu()
 {
     switch (brush_state) {
@@ -370,11 +313,6 @@ void handle_joy2_rtd()
 
 void handle_joy2_ltu()
 {
-    //center_dispenser_enter_state(CENTER_DISPENSER_DEPLOYED);
-
-    //if (!deadman_ltu_running) {
-    //    startTask(deadman_ltu);
-    //}
 }
 
 void handle_joy2_ltd()
@@ -462,7 +400,10 @@ void handle_joy1_event(joystick_event_t event)
 {
     switch (event) {
     case BUTTON_ONE:
-    	startTask(limit_shoulder);
+        if (!limit_shoulder_running) {
+            limit_shoulder_running = true;
+    	    startTask(limit_shoulder);
+        }
         break;
     case BUTTON_TWO:
         stopTask(center_goal);
@@ -515,6 +456,46 @@ void handle_joy2_event(joystick_event_t event)
     startTask(debounceTask);
 }
 
+void initialize_robot()
+{
+	if (!limit_switch_init(HTPB, 0x05)) {
+		nxtDisplayCenteredBigTextLine(3, "ERROR");
+		nxtDisplayTextLine(6, "CF251, LP: IZZIE");
+	}
+
+    disableDiagnosticsDisplay();
+    eraseDisplay();
+
+    nMotorEncoder[shoulder] = 0;
+
+    limit_shoulder_running = false;
+
+    /*
+     * Ensure that the arm will go to the origin from whereever
+     * it may be.  Set the state to retracted, and then call
+     * arm_enter_state() and it will ensure that the motor retracts
+     * to the stall point.
+     */
+    arm_state = ARM_RETRACTED;
+    arm_enter_state(ARM_RETRACTED);
+    nxtDisplayCenteredBigTextLine(3, "RETRACTED");
+
+    shoulder_enter_state(SHOULDER_STOP);
+    brush_enter_state(BRUSH_OFF);
+    dock_enter_state(DOCK_FINGER_UP);
+    door_enter_state(DOOR_CLOSED);
+
+    deadman_ltd_running = false;
+
+    servo[dockarm] = SERVO_DOCK_ARM_STOPPED;
+    servo[rightEye] = 128;
+    servo[leftEye] = 128;
+
+    all_stop();
+
+    return;
+}
+
 task main()
 {
     short right_y;
@@ -523,7 +504,7 @@ task main()
 
     debounce = false;
 
-    initializeRobot();
+    initialize_robot();
 
     waitForStart();   // wait for start of tele-op phase
 
@@ -567,21 +548,12 @@ task main()
             } else if (joystick.joy2_TopHat == 4) { // Down d-pad
                 door_enter_state(DOOR_OPEN);
             }
-/*
-            if (joy2Btn(Btn5)) {
-                shoulder_enter_state(SHOULDER_UP);
-            } else if (joy2Btn(Btn7)) {
-                shoulder_enter_state(SHOULDER_DOWN);
-            } else {
-                shoulder_enter_state(SHOULDER_STOP);
-            }
-*/
         }
 
         /*
          * Lock out the drivetrain if we are doing autonomous center goal dispense
          */
-        if (!center_goal_task_running) {
+        if ((!center_goal_task_running) && (!limit_shoulder_running)) {
 	        left_dock_y = joystick.joy2_y1;
 	        right_y = joystick.joy1_y1;
 	        left_y = joystick.joy1_y2;
