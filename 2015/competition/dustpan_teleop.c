@@ -145,8 +145,12 @@ task raise_shoulder_task()
 task limit_shoulder()
 {
 	if (is_limit_switch_open()) {
+		nMotorEncoder[shoulder] = 0;
 		shoulder_enter_state(SHOULDER_UP);
 		while (is_limit_switch_open()) {
+			if (nMotorEncoder[shoulder] > 3000) {
+				motor[shoulder] = 10;
+			}
 		}
     }
 	shoulder_enter_state(SHOULDER_STOP);
