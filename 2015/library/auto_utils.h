@@ -34,17 +34,34 @@ motor_state_t move_to(tMotor m, int speed, int count)
 }
 
 
+void raise_shoulder(int ticks)
+{
+	nMotorEncoder[shoulder] = 0;
+
+    motor[shoulder] = 60;
+    while (nMotorEncoder[shoulder] < ticks) {           // While encoder counts is less than TICKS, move shoulder at 60
+    }                                                   // power. When encoder counts surpasses TICKS, stop shoulder.
+    motor[shoulder] = 0;
+}
+
+
 void raise_arm(int ticks)
 {
-    motor[shoulder] = 30;
-    while (nMotorEncoder[shoulder] < ticks) {        // While encoder counts is less than UPCOUNTS, move shoulder at 15
-    }                                                   // power. When encoder counts surpasses UPCOUNTs, stop shoulder.
-    motor[shoulder] = 0;
-
     servoChangeRate[arm] = 0;
     servo[arm] = SERVO_ARM_EXTENDED;                    // Move the arm to the extended position.
 
     wait1Msec(12000);
+}
+
+void shoulder_auto(tMotor m_shoulder, int speed_half_up, int speed_all_up, int half_up, int all_up)
+{
+	eraseDisplay();
+
+	nxtDisplayCenteredBigTextLine(3, "HALFWAY.");
+	move_to(m_shoulder, speed_half_up, half_up);
+
+	nxtDisplayCenteredBigTextLine(3, "ALL THE WAY.");
+	move_to(m_shoulder, speed_all_up, all_up);
 }
 
 void score_center_goal(int dump_dist)          // Function that moves the robot to the correct distance, raises
