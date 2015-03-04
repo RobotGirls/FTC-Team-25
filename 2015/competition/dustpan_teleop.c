@@ -9,6 +9,7 @@
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
 #include "../../lib/sensors/drivers/hitechnic-sensormux.h"
+#include "../../lib/sensors/drivers/hitechnic-protoboard.h"
 #include "../../lib/sensors/drivers/hitechnic-irseeker-v2.h"
 #include "../../lib/sensors/drivers/hitechnic-gyro.h"
 
@@ -19,6 +20,7 @@ int distance_monitor_distance;
 #include "../library/baemax_defs.h"
 #include "../../lib/baemax_drivetrain_defs.h"
 #include "../../lib/drivetrain_square.h"
+#include "../../lib/limit_switch.h"
 #include "../../lib/dead_reckon.h"
 #include "../../lib/data_log.h"
 #include "../../lib/ir_utils.h"
@@ -28,6 +30,7 @@ int distance_monitor_distance;
 
 const tMUXSensor irr_left = msensor_S4_1;
 const tMUXSensor irr_right = msensor_S4_2;
+const tMUXSensor HTPB = msensor_S4_4;
 
 static int drive_multiplier = 1;
 
@@ -128,6 +131,7 @@ task deadman_ltd()
 int shoulder_ticks;
 bool raise_shoulder_running;
 
+/*
 task raise_shoulder_task()
 {
 	if (!raise_shoulder_running) {
@@ -135,6 +139,17 @@ task raise_shoulder_task()
 		raise_shoulder(shoulder_ticks);
 	}
 	raise_shoulder_running = false;
+}
+*/
+
+task limit_shoulder()
+{
+	if (is_limit_switch_open()) {
+		shoulder_enter_state(SHOULDER_UP);
+		while (is_limit_switch_open()) {
+		}
+    }
+	shoulder_enter_state(SHOULDER_STOP);
 }
 
 void all_stop()
@@ -290,6 +305,11 @@ void shoulder_enter_state(shoulder_state_t state)
 
 void initializeRobot()
 {
+	if (!limit_switch_init(HTPB, 0x05)) {
+		nxtDisplayCenteredBigTextLine(3, "ERROR");
+		nxtDisplayTextLine(6, "CF251, LP: IZZIE");
+	}
+
     disableDiagnosticsDisplay();
     eraseDisplay();
 
@@ -438,8 +458,7 @@ void handle_joy1_event(joystick_event_t event)
 {
     switch (event) {
     case BUTTON_ONE:
-        shoulder_ticks = 3300;
-        startTask(raise_shoulder_task);
+    	startTask(limit_shoulder);
         break;
     case BUTTON_TWO:
         stopTask(center_goal);
@@ -447,8 +466,7 @@ void handle_joy1_event(joystick_event_t event)
         center_goal_task_running = false;
         break;
     case BUTTON_THREE:
-        shoulder_ticks = 150;
-        startTask(raise_shoulder_task);
+   		//useable
         break;
     case BUTTON_FOUR:
         startTask(center_goal);
