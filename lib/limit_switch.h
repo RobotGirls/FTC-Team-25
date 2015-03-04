@@ -1,9 +1,30 @@
 
-#include "../../lib/sensors/drivers/hitechnic-protoboard.h"
 
 ubyte switch_pin_mask;
+#ifdef __HTSMUX_H__
+tMUXSensor board;
+#else
 tSensors board;
+#endif
 
+#ifdef __HTSMUX_H__
+bool limit_switch_init(tMUXSensor link, ubyte pin)
+{
+    int err;
+    int val;
+
+	board = link;
+
+    if (pin > 5) {
+        nxtDisplayTextLine(4, "Pin %d is invalid", pin);
+		return false;
+    }
+
+    switch_pin_mask = (0x1 << pin);
+
+	return true;
+}
+#else
 bool limit_switch_init(tSensors link, ubyte pin)
 {
     int err;
@@ -32,6 +53,7 @@ bool limit_switch_init(tSensors link, ubyte pin)
 
 	return true;
 }
+#endif
 
 bool is_limit_switch_closed()
 {
