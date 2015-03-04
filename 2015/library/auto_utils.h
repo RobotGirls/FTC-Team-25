@@ -45,23 +45,27 @@ void raise_shoulder(int ticks)
 }
 
 
-void raise_arm(int ticks)
+void raise_arm(tMotor m_arm)
 {
-    servoChangeRate[arm] = 0;
-    servo[arm] = SERVO_ARM_EXTENDED;                    // Move the arm to the extended position.
-
-    wait1Msec(12000);
+	move_to(m_arm, -ARM_MOTOR_SPEED, ENC_ARM_X);
+	move_to(m_arm, -ARM_MOTOR_SPEED, ENC_ARM_Y);
+	move_to(m_arm, -ARM_MOTOR_SPEED, ENC_ARM_Z);
 }
 
-void shoulder_auto(tMotor m_shoulder, int speed_half_up, int speed_all_up, int half_up, int all_up)
+void raise_shoulder(tMotor m_shoulder, int speed_half_up, int speed_all_up, int half_up)
 {
 	eraseDisplay();
 
-	nxtDisplayCenteredBigTextLine(3, "HALFWAY.");
-	move_to(m_shoulder, speed_half_up, half_up);
-
-	nxtDisplayCenteredBigTextLine(3, "ALL THE WAY.");
-	move_to(m_shoulder, speed_all_up, all_up);
+	if (is_limit_switch_open()) {
+		nMotorEncoder[m_shoulder] = 0;
+		motor[m_shoulder] = speed_half_up;
+		while (is_limit_switch_open()) {
+			if (nMotorEncoder[m_shoulder] > half_up) {
+				motor[m_shoulder] = speed_all_up;
+			}
+		}
+    }
+	motor[m_shoulder] = 0;
 }
 
 void score_center_goal(int dump_dist)          // Function that moves the robot to the correct distance, raises
