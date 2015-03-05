@@ -313,6 +313,10 @@ void handle_joy2_rtd()
 
 void handle_joy2_ltu()
 {
+    if (!limit_shoulder_running) {
+        limit_shoulder_running = true;
+	    startTask(limit_shoulder);
+    }
 }
 
 void handle_joy2_ltd()
@@ -400,10 +404,7 @@ void handle_joy1_event(joystick_event_t event)
 {
     switch (event) {
     case BUTTON_ONE:
-        if (!limit_shoulder_running) {
-            limit_shoulder_running = true;
-    	    startTask(limit_shoulder);
-        }
+		// useable
         break;
     case BUTTON_TWO:
         stopTask(center_goal);
@@ -411,7 +412,7 @@ void handle_joy1_event(joystick_event_t event)
         center_goal_task_running = false;
         break;
     case BUTTON_THREE:
-   		//useable
+   		// useable
         break;
     case BUTTON_FOUR:
         startTask(center_goal);
