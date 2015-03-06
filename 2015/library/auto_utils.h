@@ -47,9 +47,7 @@ void raise_shoulder(int ticks)
 
 void raise_arm(tMotor m_arm)
 {
-	move_to(m_arm, -ARM_MOTOR_SPEED, ENC_ARM_X);
-	move_to(m_arm, -ARM_MOTOR_SPEED, ENC_ARM_Y);
-	move_to(m_arm, -ARM_MOTOR_SPEED, ENC_ARM_Z);
+	move_to(m_arm, -ARM_MOTOR_SPEED, 251000);
 }
 
 void raise_shoulder(tMotor m_shoulder, int speed_half_up, int speed_all_up, int half_up)

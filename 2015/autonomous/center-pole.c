@@ -30,6 +30,19 @@ const tMUXSensor irr_right = msensor_S4_2;
 const tMUXSensor HTPB = msensor_S4_4;
 
 ir_direction_t dir;
+bool raised_arm;
+
+task auto_timer()
+{
+    for (int i = 0; i < 27; i++) {
+        wait1Msec(1000);
+    }
+
+	if (raised_arm) {
+		move_to(shoulder, -20, 40);
+		move_to(arm_motor, 25, 25100);
+	}
+}
 
 void move_to_pole(int count)                 // Function that moves the robot to the pole
 {                                            // based on the position of the center goal.
@@ -85,7 +98,7 @@ task main()
     int offset;
     int bias;
 
-    disableDiagnosticsDisplay();
+    //disableDiagnosticsDisplay();
 
     bias = HTGYROstartCal(HTGYRO);
     offset = initialize_receiver(irr_left, irr_right);
@@ -100,12 +113,15 @@ task main()
 	 */
 	move_to(arm_motor, ARM_MOTOR_SPEED, 25100);
 
+	raised_arm = false;
     servo[leftEye] = LSERVO_CENTER;
     servo[rightEye] = RSERVO_CENTER;
     servo[door] = SERVO_DOOR_CLOSED;
     servo[brush] = 127;
 
-    waitForStart();
+    //waitForStart();
+
+	startTask(auto_timer);
 
     center_position = ultrasound(carrot, -24, US_DIST_POS_1, US_DIST_POS_3);    // Sets the value integer center_position to 1, 2, or 3
                                                                                 // based on ultrasound sensor readings.
@@ -124,11 +140,13 @@ task main()
 
 		raise_shoulder(shoulder, 40, 10, 2700);
         raise_arm(arm_motor);
+		raised_arm = true;
 
         //servo[leftEye] = LSERVO_CENTER + CROSSEYED;
         //servo[rightEye] = RSERVO_CENTER - CROSSEYED;
 
-        find_absolute_center(irr_left, irr_right, false);
+        //find_absolute_center(irr_left, irr_right, false);
+
         score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
     } else {
         move_to_pole(center_position);
