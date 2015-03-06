@@ -121,7 +121,7 @@ task limit_shoulder()
 		nMotorEncoder[shoulder] = 0;
 		shoulder_enter_state(SHOULDER_UP);
 		while (is_limit_switch_open()) {
-			if (nMotorEncoder[shoulder] > 2700) {
+			if (nMotorEncoder[shoulder] > 2500) {
 				motor[shoulder] = 10;
 			}
 		}
@@ -250,11 +250,12 @@ void arm_enter_state(arm_state_t state)
 	    }
         break;
     case ARM_RETRACTED:
-        nxtDisplayCenteredBigTextLine(3, "RETRACTED");
         if (arm_state == ARM_PICKUP) {
+			nxtDisplayCenteredBigTextLine(3, "RET Pick");
         	move_to(arm_motor, ARM_MOTOR_SPEED, ENC_ARM_X);
         } else if (arm_state == ARM_RETRACTED) {
-        	move_to(arm_motor, -ARM_MOTOR_SPEED, 25100);
+			nxtDisplayCenteredBigTextLine(3, "RET RET");
+        	move_to(arm_motor, ARM_MOTOR_SPEED, 25100);
     	} else {
     		motor[arm_motor] = 0;
         }
@@ -313,6 +314,8 @@ void handle_joy2_rtd()
 
 void handle_joy2_ltu()
 {
+	nxtDisplayCenteredBigTextLine(4, "Joy1 LTU");
+
     if (!limit_shoulder_running) {
         limit_shoulder_running = true;
 	    startTask(limit_shoulder);
@@ -338,6 +341,7 @@ void handle_joy2_btn2()
         arm_enter_state(ARM_GOAL);
         break;
     case ARM_RETRACTED:
+		arm_enter_state(ARM_RETRACTED);
         break;
     case ARM_GOAL:
         arm_enter_state(ARM_PICKUP);
@@ -412,7 +416,9 @@ void handle_joy1_event(joystick_event_t event)
         center_goal_task_running = false;
         break;
     case BUTTON_THREE:
-   		// useable
+   		stopTask(limit_shoulder);
+		shoulder_enter_state(SHOULDER_STOP);
+		limit_shoulder_running = false;
         break;
     case BUTTON_FOUR:
         startTask(center_goal);
