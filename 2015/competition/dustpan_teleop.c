@@ -318,6 +318,15 @@ void handle_joy2_ltu()
 
     if (!limit_shoulder_running) {
         limit_shoulder_running = true;
+        /*
+         * If the driver is moving when LTU is pressed
+         * then the motors get locked 'on'.  Ensure that
+         * they are off here.
+         */
+        motor[driveFrontLeft]  = 0;
+        motor[driveRearLeft]   = 0;
+        motor[driveFrontRight] = 0;
+        motor[driveRearRight]  = 0;
 	    startTask(limit_shoulder);
     }
 }
