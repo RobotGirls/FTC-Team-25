@@ -14,6 +14,7 @@ const tMUXSensor HTGYRO  = msensor_S4_3;
 bool beacon_done;
 int distance_monitor_distance;
 
+#include "../../lib/rnrr_start.h"
 #include "../library/baemax_defs.h"
 #include "../../lib/baemax_drivetrain_defs.h"
 #include "../../lib/drivetrain_square.h"
@@ -39,7 +40,7 @@ task auto_timer()
     }
 
 	if (raised_arm) {
-		move_to(shoulder, -20, 40);
+		move_to(shoulder, -20, 300);
 		move_to(arm_motor, 25, 25100);
 	}
 }
@@ -119,7 +120,7 @@ task main()
     servo[door] = SERVO_DOOR_CLOSED;
     servo[brush] = 127;
 
-    //waitForStart();
+    RNRR_waitForStart();
 
 	startTask(auto_timer);
 
@@ -138,7 +139,7 @@ task main()
         servo[leftEye] = LSERVO_CENTER + CROSSEYED;
         servo[rightEye] = RSERVO_CENTER - CROSSEYED;
 
-		raise_shoulder(shoulder, 40, 10, 2700);
+		raise_shoulder(shoulder, 35, 10, 2500);
         raise_arm(arm_motor);
 		raised_arm = true;
 
