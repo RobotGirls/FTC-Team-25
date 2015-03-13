@@ -31,17 +31,25 @@ const tMUXSensor irr_right = msensor_S4_2;
 const tMUXSensor HTPB = msensor_S4_4;
 
 ir_direction_t dir;
-bool raised_arm;
+bool in_front_of_center;
 
 task auto_timer()
 {
-    for (int i = 0; i < 27; i++) {
+    for (int i = 0; i < 20; i++) {
         wait1Msec(1000);
     }
 
-	if (raised_arm) {
+	if (in_front_of_center) {
 		move_to(shoulder, -20, 300);
 		move_to(arm_motor, 25, 25100);
+
+		move_to(shoulder, -20, 1251);
+
+		init_path();
+		add_segment(-10, 90, 45);
+		add_segment(-45, -90, 100);
+		stop_path();
+		dead_reckon();
 	}
 }
 
@@ -114,7 +122,7 @@ task main()
 	 */
 	move_to(arm_motor, ARM_MOTOR_SPEED, 25100);
 
-	raised_arm = false;
+	in_front_of_center = false;
     servo[leftEye] = LSERVO_CENTER;
     servo[rightEye] = RSERVO_CENTER;
     servo[door] = SERVO_DOOR_CLOSED;
@@ -141,7 +149,7 @@ task main()
 
 		raise_shoulder(shoulder, 35, 10, 2500);
         raise_arm(arm_motor);
-		raised_arm = true;
+		in_front_of_center = true;
 
         //servo[leftEye] = LSERVO_CENTER + CROSSEYED;
         //servo[rightEye] = RSERVO_CENTER - CROSSEYED;
