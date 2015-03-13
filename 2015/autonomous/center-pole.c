@@ -32,24 +32,32 @@ const tMUXSensor HTPB = msensor_S4_4;
 
 ir_direction_t dir;
 bool in_front_of_center;
+bool done_scoring;
 
 task auto_timer()
 {
-    for (int i = 0; i < 20; i++) {
+    int i;
+
+    for (i = 0; i < 27; i++) {
         wait1Msec(1000);
+        if (done_scoring == true) {
+            break;
+        }
     }
 
 	if (in_front_of_center) {
 		move_to(shoulder, -20, 300);
-		move_to(arm_motor, 25, 25100);
+		move_to(arm_motor, 45, 25100);
 
-		move_to(shoulder, -20, 1251);
+        if (i < 20) {
+			move_to(shoulder, -40, 4500);
 
-		init_path();
-		add_segment(-10, 90, 45);
-		add_segment(-45, -90, 100);
-		stop_path();
-		dead_reckon();
+			init_path();
+			add_segment(-15, 90, 65);
+			add_segment(-45, -90, 100);
+			stop_path();
+			dead_reckon();
+        }
 	}
 }
 
@@ -123,6 +131,7 @@ task main()
 	move_to(arm_motor, ARM_MOTOR_SPEED, 25100);
 
 	in_front_of_center = false;
+    done_scoring = false;
     servo[leftEye] = LSERVO_CENTER;
     servo[rightEye] = RSERVO_CENTER;
     servo[door] = SERVO_DOOR_CLOSED;
@@ -156,7 +165,13 @@ task main()
 
         //find_absolute_center(irr_left, irr_right, false);
 
+        /*
+         * Ensure the shoulder is all the way up
+         */
+        raise_shoulder(shoulder, 10, 10, 500);
+
         score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
+        done_scoring = true;
     } else {
         move_to_pole(center_position);
     }
