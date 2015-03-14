@@ -50,11 +50,14 @@ task auto_timer()
 		move_to(arm_motor, 45, 25100);
 
         if (i < 20) {
-			move_to(shoulder, -40, 4500);
+			move_to(shoulder, -40, 4700);
 
-			init_path();
+            servo[polearm] = 0;
+
+            init_path();
 			add_segment(-15, 90, 65);
-			add_segment(-45, -90, 100);
+			add_segment(-25, -95, 100);
+            add_segment(0, 25, 100);
 			stop_path();
 			dead_reckon();
         }
@@ -63,36 +66,50 @@ task auto_timer()
 
 void move_to_pole(int count)                 // Function that moves the robot to the pole
 {                                            // based on the position of the center goal.
-    init_path();
 
     switch (count) {
     case 1:
-        add_segment(-15, 45, 50);
-        add_segment(-20, -90, 100);
-        add_segment(-10, -45, 100);
+        servo[polearm] = 0;
+
+        init_path();
+        add_segment(-18, -45, 50);
+        add_segment(-10, 90, 100);
+        add_segment(0, 45, 100);
+        stop_path();
+        dead_reckon();
+
+        /*
         add_segment(0, 45, 100);
         add_segment(-10, -45, 100);
         add_segment(0, 45, 100);
         add_segment(-10, -45, 100);
         add_segment(0, 45, 100);
+        */
         break;
     case 2:
-        add_segment(-12, 0, 50);
-        add_segment(-40, 30, 100);
-        add_segment(12, 0, 100);
-        add_segment(-12, 0, 100);
-        add_segment(12, 0, 100);
-        add_segment(-12, 0, 100);
-        add_segment(12, 0, 100);
-        add_segment(-12, 0, 100);
+        init_path();
+        add_segment(-13, 0, 50);
+        add_segment(0, 25, 100);
+        stop_path();
+        dead_reckon();
+
+        servo[polearm] = 0;
+        wait1Msec(500);
+
+        init_path();
+        add_segment(-25, 0, 100);
+        add_segment(0, 25, 100);
+        stop_path();
+        dead_reckon();
         break;
     case 3:
+        init_path();
         add_segment(-10, 90, 50);
-        add_segment(-45, -90, 100);
+        add_segment(-25, -90, 100);
+        stop_path();
+        dead_reckon();
         break;
     }
-    stop_path();
-  	dead_reckon();
 }
 
 task distance_monitor()
@@ -136,6 +153,7 @@ task main()
     servo[rightEye] = RSERVO_CENTER;
     servo[door] = SERVO_DOOR_CLOSED;
     servo[brush] = 127;
+    servo[polearm] = (251 - 25);
 
     RNRR_waitForStart();
 

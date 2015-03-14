@@ -81,13 +81,6 @@ void setAllMotorsEncoderTarget(int t)
 #endif
     nMotorEncoderTarget[driveRearRight] = t;
     nMotorEncoderTarget[driveRearLeft] = t;
-
-#ifdef FOUR_WHEEL_DRIVE
-	nxtDisplayTextLine(2, "FrontRight %d", nMotorEncoderTarget[driveFrontRight]);
-	nxtDisplayTextLine(3, "FrontLeft  %d", nMotorEncoderTarget[driveFrontLeft]);
-#endif
-	nxtDisplayTextLine(4, "RearRight  %d", nMotorEncoderTarget[driveRearRight]);
-	nxtDisplayTextLine(5, "RearLeft   %d", nMotorEncoderTarget[driveRearLeft]);
 }
 
 void resetAllMotorsEncoder(void)

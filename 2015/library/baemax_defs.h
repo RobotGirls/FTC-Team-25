@@ -4,7 +4,7 @@
 #define RSERVO_PERP   235
 #define CROSSEYED     30
 
-#define US_DIST_POS_1 80
+#define US_DIST_POS_1 82
 #define US_DIST_POS_3 55
 
 #define CENTER_GOAL_DUMP_DISTANCE   27
@@ -44,4 +44,5 @@
 
 #define SHOULDER_POWER 40
 
-#define SECONDS_BEFORE_POLE   20
+//#define UPPER_SWITCH_PIN    0
+//#define LOWER_SWITCH_PIN    0

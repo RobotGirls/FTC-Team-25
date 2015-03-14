@@ -68,7 +68,7 @@ void raise_shoulder(tMotor m_shoulder, int speed_half_up, int speed_all_up, int 
 
 void score_center_goal(int dump_dist)          // Function that moves the robot to the correct distance, raises
 {                                                       // the arm, and spins the balls into the tube.
-    move_to_object(carrot, -5, dump_dist);              // Move robot to position where it can dump balls in tube.
+    move_to_object(carrot, -10, dump_dist);             // Move robot to position where it can dump balls in tube.
 
     servo[door] = SERVO_DOOR_CENTERGOAL_RAMP;           // Open the servo door (releases balls).
 
