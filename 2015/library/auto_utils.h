@@ -54,16 +54,32 @@ void raise_shoulder(tMotor m_shoulder, int speed_half_up, int speed_all_up, int 
 {
 	eraseDisplay();
 
-	if (is_limit_switch_open()) {
+	if (is_limit_switch_open(0x05)) {
 		nMotorEncoder[m_shoulder] = 0;
 		motor[m_shoulder] = speed_half_up;
-		while (is_limit_switch_open()) {
+		while (is_limit_switch_open(0x05)) {
 			if (nMotorEncoder[m_shoulder] > half_up) {
 				motor[m_shoulder] = speed_all_up;
 			}
 		}
     }
 	motor[m_shoulder] = 0;
+}
+
+void down_shoulder(tMotor m_shoulder, int speed_half_down, int speed_all_down, int half_down)
+{
+    eraseDisplay();
+
+    if (is_limit_switch_open(0x04)) {
+        nMotorEncoder[m_shoulder] = 0;
+        motor[m_shoulder] = -speed_half_down;
+        while (is_limit_switch_open(0x04)) {
+            if (nMotorEncoder[m_shoulder] < half_down) {
+                motor[m_shoulder] = -speed_all_down;
+            }
+        }
+    }
+    motor[m_shoulder] = 0;
 }
 
 void score_center_goal(int dump_dist)          // Function that moves the robot to the correct distance, raises

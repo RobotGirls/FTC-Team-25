@@ -34,6 +34,10 @@ ir_direction_t dir;
 bool in_front_of_center;
 bool done_scoring;
 
+task drop_shoulder() {
+    down_shoulder(shoulder, 35, 10, 2051);
+}
+
 task auto_timer()
 {
     int i;
@@ -46,13 +50,15 @@ task auto_timer()
     }
 
 	if (in_front_of_center) {
-		move_to(shoulder, -20, 300);
+		move_to(shoulder, -20, 1000);
 		move_to(arm_motor, 45, 25100);
 
         if (i < 20) {
-			move_to(shoulder, -40, 4700);
+            startTask(drop_shoulder);
+            wait1Msec(2000);
+			// move_to(shoulder, -40, 4700);
 
-            servo[polearm] = 0;
+            servo[fist] = 127;
 
             init_path();
 			add_segment(-15, 90, 65);
@@ -69,7 +75,7 @@ void move_to_pole(int count)                 // Function that moves the robot to
 
     switch (count) {
     case 1:
-        servo[polearm] = 0;
+        servo[fist] = 127;
 
         init_path();
         add_segment(-18, -45, 50);
@@ -93,7 +99,7 @@ void move_to_pole(int count)                 // Function that moves the robot to
         stop_path();
         dead_reckon();
 
-        servo[polearm] = 0;
+        servo[fist] = 127;
         wait1Msec(500);
 
         init_path();
@@ -153,7 +159,7 @@ task main()
     servo[rightEye] = RSERVO_CENTER;
     servo[door] = SERVO_DOOR_CLOSED;
     servo[brush] = 127;
-    servo[polearm] = (251 - 25);
+    servo[fist] = 0;
 
     RNRR_waitForStart();
 
@@ -180,6 +186,28 @@ task main()
 
         //servo[leftEye] = LSERVO_CENTER + CROSSEYED;
         //servo[rightEye] = RSERVO_CENTER - CROSSEYED;
+
+        //find_absolute_center(irr_left, irr_right, false);
+
+        /*
+         * Ensure the shoulder is all the way up
+         */
+        raise_shoulder(shoulder, 10, 10, 500);
+
+        score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
+        done_scoring = true;
+    } if (center_position == 2) {
+
+        init_path();
+        add_segment(30, 90, 50);
+        add_segment(0, -45, 40);
+
+		raise_shoulder(shoulder, 35, 10, 2500);
+        raise_arm(arm_motor);
+		in_front_of_center = true;
+
+        servo[leftEye] = LSERVO_CENTER + CROSSEYED;
+        servo[rightEye] = RSERVO_CENTER - CROSSEYED;
 
         //find_absolute_center(irr_left, irr_right, false);
 

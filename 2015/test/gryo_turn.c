@@ -43,7 +43,7 @@ task main()
     nxtDisplayCenteredBigTextLine(2, "%d", bias);
 
     init_path();
-    add_segment(0, -90, 70);
+    add_segment(0, 90, 70);
     stop_path();
     dead_reckon();
 

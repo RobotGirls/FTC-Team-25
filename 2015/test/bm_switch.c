@@ -17,16 +17,7 @@ const tMUXSensor HTGYRO  = msensor_S4_3;
 bool beacon_done;
 int distance_monitor_distance;
 
-#include "../library/baemax_defs.h"
-#include "../../lib/baemax_drivetrain_defs.h"
-#include "../../lib/drivetrain_square.h"
 #include "../../lib/limit_switch.h"
-#include "../../lib/dead_reckon.h"
-#include "../../lib/data_log.h"
-#include "../../lib/ir_utils.h"
-#include "../../lib/us_utils.h"
-#include "../../lib/us_cascade_utils.c"
-#include "../library/auto_utils.h"
 
 const tMUXSensor irr_left = msensor_S4_1;
 const tMUXSensor irr_right = msensor_S4_2;
@@ -39,11 +30,16 @@ task main()
 	}
 
 	while (true) {
-		if (is_limit_switch_closed()) {
-			nxtDisplayCenteredBigTextLine(4, "Closed");
+		if (is_limit_switch_closed(0x05)) {
+			nxtDisplayCenteredBigTextLine(2, "Closed");
 		} else {
-			nxtDisplayCenteredBigTextLine(4, "Open");
+			nxtDisplayCenteredBigTextLine(2, "Open");
 		}
+        if (is_limit_switch_closed(0x04)) {
+            nxtDisplayCenteredBigTextLine(5, "Closed");
+        } else {
+            nxtDisplayCenteredBigTextLine(5, "Open");
+        }
 	}
 
 _err:

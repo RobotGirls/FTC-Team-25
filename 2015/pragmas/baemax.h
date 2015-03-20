@@ -19,6 +19,6 @@
 #pragma config(Servo,  srvo_S2_C1_1,    rightEye,             tServoStandard)
 #pragma config(Servo,  srvo_S2_C1_2,    leftEye,              tServoStandard)
 #pragma config(Servo,  srvo_S2_C1_3,    finger,               tServoStandard)
-#pragma config(Servo,  srvo_S2_C1_4,    polearm,              tServoStandard)
+#pragma config(Servo,  srvo_S2_C1_4,    fist,              tServoStandard)
 #pragma config(Servo,  srvo_S2_C1_5,    servo11,              tServoNone)
 #pragma config(Servo,  srvo_S2_C1_6,    door,                 tServoStandard)

@@ -25,6 +25,7 @@ int distance_monitor_distance;
 #include "../../lib/data_log.h"
 #include "../../lib/ir_utils.h"
 #include "../../lib/us_utils.h"
+#include "../../lib/button_utils.h"
 #include "../../lib/us_cascade_utils.c"
 #include "../library/auto_utils.h"
 
@@ -117,16 +118,17 @@ bool limit_shoulder_running;
 
 task limit_shoulder()
 {
-	if (is_limit_switch_open()) {
-		nMotorEncoder[shoulder] = 0;
-		shoulder_enter_state(SHOULDER_UP);
-		while (is_limit_switch_open()) {
+    if (is_limit_switch_open(0x05)) {
+        nMotorEncoder[shoulder] = 0;
+        shoulder_enter_state(SHOULDER_UP);
+
+		while (is_limit_switch_open(0x05) && !any_trigger_pressed()) {
 			if (nMotorEncoder[shoulder] > 2500) {
 				motor[shoulder] = 10;
-			}
-		}
+            }
+        }
     }
-	shoulder_enter_state(SHOULDER_STOP);
+    shoulder_enter_state(SHOULDER_STOP);
     limit_shoulder_running = false;
 }
 
@@ -506,6 +508,7 @@ void initialize_robot()
     servo[dockarm] = SERVO_DOCK_ARM_STOPPED;
     servo[rightEye] = 128;
     servo[leftEye] = 128;
+    servo[fist] = 15;
 
     all_stop();
 

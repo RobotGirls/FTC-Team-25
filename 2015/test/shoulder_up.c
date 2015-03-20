@@ -23,8 +23,8 @@ int distance_monitor_distance;
 #include "../../lib/ir_utils.h"
 #include "../../lib/us_utils.h"
 #include "../../lib/us_cascade_utils.c"
-#include "../library/auto_utils.h"
 #include "../../lib/limit_switch.h"
+#include "../library/auto_utils.h"
 
 const tMUXSensor irr_left = msensor_S4_1;
 const tMUXSensor irr_right = msensor_S4_2;
@@ -43,7 +43,7 @@ task main()
 
 	nMotorEncoder[shoulder] = 0;
 	motor[shoulder] = 40;
-	while (is_limit_switch_open()) {
+	while (is_limit_switch_open(0x05)) {
 		if (nMotorEncoder[shoulder] > 2600) {
 			motor[shoulder] = 10;
 		}

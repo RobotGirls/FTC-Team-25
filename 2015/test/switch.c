@@ -5,16 +5,23 @@
 
 task main()
 {
+    // pin 5 = behind shoulder
+
 	if (!limit_switch_init(HTPB, 0x05)) {
 		goto _err;
 	}
 
 	while (true) {
-		if (is_limit_switch_closed()) {
-			nxtDisplayCenteredBigTextLine(4, "Closed");
+		if (is_limit_switch_closed(0x05)) {
+			nxtDisplayCenteredBigTextLine(2, "Closed");
 		} else {
-			nxtDisplayCenteredBigTextLine(4, "Open");
+			nxtDisplayCenteredBigTextLine(2, "Open");
 		}
+        if (is_limit_switch_closed(0x04)) {
+            nxtDisplayCenteredBigTextLine(5, "Closed");
+        } else {
+            nxtDisplayCenteredBigTextLine(5, "Open");
+        }
 	}
 
 _err:
