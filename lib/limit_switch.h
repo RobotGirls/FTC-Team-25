@@ -1,6 +1,5 @@
 
 
-ubyte switch_pin_mask;
 #ifdef __HTSMUX_H__
 tMUXSensor board;
 #else
@@ -15,29 +14,15 @@ bool limit_switch_init(tMUXSensor link, ubyte pin)
 
 	board = link;
 
-    if (pin > 5) {
-        nxtDisplayTextLine(4, "Pin %d is invalid", pin);
-		return false;
-    }
-
-    switch_pin_mask = (0x1 << pin);
-
 	return true;
 }
 #else
-bool limit_switch_init(tSensors link, ubyte pin)
+bool limit_switch_init(tSensors link, ubyte pin_mask)
 {
     int err;
     int val;
 
 	board = link;
-
-    if (pin > 5) {
-        nxtDisplayTextLine(4, "Pin %d is invalid", pin);
-		return false;
-    }
-
-    switch_pin_mask = (0x1 << pin);
 
     val = HTPBgetIOCfg(board);
     if (val == -1) {
@@ -45,7 +30,7 @@ bool limit_switch_init(tSensors link, ubyte pin)
 		return false;
 	}
 
-    err = HTPBsetupIO(board, ~(switch_pin_mask) & (0xff & val));
+    err = HTPBsetupIO(board, ~(pin_mask) & (0xff & val));
     if (!err) {
 		nxtDisplayTextLine(4, "Error setting up digital outputs, %d", err);
 		return false;
@@ -55,9 +40,12 @@ bool limit_switch_init(tSensors link, ubyte pin)
 }
 #endif
 
-bool is_limit_switch_closed()
+bool is_limit_switch_closed(ubyte pin)
 {
     ubyte val;
+	ubyte switch_pin_mask;
+
+	switch_pin_mask = (0x1 << pin);
 
     val = HTPBreadIO(board, switch_pin_mask);
     /*
@@ -71,7 +59,7 @@ bool is_limit_switch_closed()
     }
 }
 
-bool is_limit_switch_open()
+bool is_limit_switch_open(ubyte pin)
 {
-    return (!is_limit_switch_closed());
+    return (!is_limit_switch_closed(pin));
 }
