@@ -33,7 +33,7 @@ motor_state_t move_to(tMotor m, int speed, int count)
 	return rtn;
 }
 
-
+/*
 void raise_shoulder(int ticks)
 {
 	nMotorEncoder[shoulder] = 0;
@@ -43,6 +43,7 @@ void raise_shoulder(int ticks)
     }                                                   // power. When encoder counts surpasses TICKS, stop shoulder.
     motor[shoulder] = 0;
 }
+*/
 
 
 void raise_arm(tMotor m_arm)
@@ -68,13 +69,11 @@ void raise_shoulder(tMotor m_shoulder, int speed_half_up, int speed_all_up, int 
 
 void down_shoulder(tMotor m_shoulder, int speed_half_down, int speed_all_down, int half_down)
 {
-    eraseDisplay();
-
     if (is_limit_switch_open(0x04)) {
         nMotorEncoder[m_shoulder] = 0;
         motor[m_shoulder] = -speed_half_down;
         while (is_limit_switch_open(0x04)) {
-            if (nMotorEncoder[m_shoulder] < half_down) {
+            if (abs(nMotorEncoder[m_shoulder]) > half_down) {
                 motor[m_shoulder] = -speed_all_down;
             }
         }
@@ -82,7 +81,7 @@ void down_shoulder(tMotor m_shoulder, int speed_half_down, int speed_all_down, i
     motor[m_shoulder] = 0;
 }
 
-void score_center_goal(int dump_dist)          // Function that moves the robot to the correct distance, raises
+void score_center_goal(int dump_dist)                   // Function that moves the robot to the correct distance, raises
 {                                                       // the arm, and spins the balls into the tube.
     move_to_object(carrot, -10, dump_dist);             // Move robot to position where it can dump balls in tube.
 

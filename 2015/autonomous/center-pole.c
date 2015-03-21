@@ -50,19 +50,24 @@ task auto_timer()
     }
 
 	if (in_front_of_center) {
-		move_to(shoulder, -20, 1000);
+		move_to(shoulder, -20, 400);
 		move_to(arm_motor, 45, 25100);
 
         if (i < 20) {
-            startTask(drop_shoulder);
-            wait1Msec(2000);
-			// move_to(shoulder, -40, 4700);
+            //startTask(drop_shoulder);
+            //wait1Msec(2000);
+			down_shoulder(shoulder, 75, 20, 4000);
+
+            init_path();
+			add_segment(-18, 90, 65);
+			add_segment(0, -90, 100);
+            stop_path();
+            dead_reckon();
 
             servo[fist] = 127;
 
             init_path();
-			add_segment(-15, 90, 65);
-			add_segment(-25, -95, 100);
+            add_segment(-23, 0, 100);
             add_segment(0, 25, 100);
 			stop_path();
 			dead_reckon();
@@ -75,8 +80,6 @@ void move_to_pole(int count)                 // Function that moves the robot to
 
     switch (count) {
     case 1:
-        servo[fist] = 127;
-
         init_path();
         add_segment(-18, -45, 50);
         add_segment(-10, 90, 100);
@@ -196,11 +199,12 @@ task main()
 
         score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
         done_scoring = true;
-    } if (center_position == 2) {
-
+    } else if (center_position == 2) {
         init_path();
         add_segment(30, 90, 50);
         add_segment(0, -45, 40);
+        stop_path();
+        dead_reckon();
 
 		raise_shoulder(shoulder, 35, 10, 2500);
         raise_arm(arm_motor);

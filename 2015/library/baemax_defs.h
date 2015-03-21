@@ -7,7 +7,7 @@
 #define US_DIST_POS_1 82
 #define US_DIST_POS_3 55
 
-#define CENTER_GOAL_DUMP_DISTANCE   27
+#define CENTER_GOAL_DUMP_DISTANCE   25
 #define UPCOUNTS                    4200
 
 #define SERVO_DOOR_OPEN             0
