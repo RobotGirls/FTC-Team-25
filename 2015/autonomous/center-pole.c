@@ -60,14 +60,14 @@ task auto_timer()
 
             init_path();
 			add_segment(-18, 90, 65);
-			add_segment(0, -90, 100);
+			add_segment(-20, -90, 85);
             stop_path();
             dead_reckon();
 
             servo[fist] = 127;
 
             init_path();
-            add_segment(-23, 0, 100);
+            add_segment(-5, 0, 100);
             add_segment(0, 25, 100);
 			stop_path();
 			dead_reckon();
@@ -97,8 +97,8 @@ void move_to_pole(int count)                 // Function that moves the robot to
         break;
     case 2:
         init_path();
-        add_segment(-13, 0, 50);
-        add_segment(0, 25, 100);
+        add_segment(-13, 45, 50);
+        add_segment(-20, 45, 100);
         stop_path();
         dead_reckon();
 
@@ -106,7 +106,7 @@ void move_to_pole(int count)                 // Function that moves the robot to
         wait1Msec(500);
 
         init_path();
-        add_segment(-25, 0, 100);
+        add_segment(-5, 0, 100);
         add_segment(0, 25, 100);
         stop_path();
         dead_reckon();
@@ -208,7 +208,7 @@ task main()
 
 		raise_shoulder(shoulder, 35, 10, 2500);
         raise_arm(arm_motor);
-		in_front_of_center = true;
+		in_front_of_center = false;
 
         servo[leftEye] = LSERVO_CENTER + CROSSEYED;
         servo[rightEye] = RSERVO_CENTER - CROSSEYED;
@@ -222,6 +222,11 @@ task main()
 
         score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
         done_scoring = true;
+
+        move_to(shoulder, -20, 400);
+		move_to(arm_motor, 45, 25100);
+        down_shoulder(shoulder, 75, 20, 4000);
+        move_to_pole(center_position);
     } else {
         move_to_pole(center_position);
     }
