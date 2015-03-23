@@ -67,8 +67,8 @@ task auto_timer()
             servo[fist] = 127;
 
             init_path();
-            add_segment(-5, 0, 100);
-            add_segment(0, 25, 100);
+            add_segment(-15, 0, 100);  // For the sake of time, I think the robot should
+            add_segment(0, 25, 100);   // only move 15 inches forward (it's already @ pole).
 			stop_path();
 			dead_reckon();
         }
@@ -208,7 +208,7 @@ task main()
 
 		raise_shoulder(shoulder, 35, 10, 2500);
         raise_arm(arm_motor);
-		in_front_of_center = false;
+		in_front_of_center = true;
 
         servo[leftEye] = LSERVO_CENTER + CROSSEYED;
         servo[rightEye] = RSERVO_CENTER - CROSSEYED;
@@ -222,11 +222,6 @@ task main()
 
         score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
         done_scoring = true;
-
-        move_to(shoulder, -20, 400);
-		move_to(arm_motor, 45, 25100);
-        down_shoulder(shoulder, 75, 20, 4000);
-        move_to_pole(center_position);
     } else {
         move_to_pole(center_position);
     }
