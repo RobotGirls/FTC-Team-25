@@ -44,5 +44,7 @@
 
 #define SHOULDER_POWER 40
 
+#define STOP_VALUE     13
+
 //#define UPPER_SWITCH_PIN    0
 //#define LOWER_SWITCH_PIN    0

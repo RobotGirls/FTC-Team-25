@@ -217,48 +217,34 @@ void find_absolute_center(tSensors left, tSensors right, bool reversed)
     HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
     HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
 
-    /*
-     * Attempt to compensate for crappy ir receivers.
-     */
-    if ((abs(ls3 - rs3)) >= 20) {
-        init_path();
-        add_segment(3, 0, 10);
-        stop_path();
-        dead_reckon();
-    }
+    do_center_rotation(ls3, rs3, reversed);
 
     HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
     HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
 
-    /*
-     * Give up
+    ldir = HTIRS2readACDir(left);
+    rdir = HTIRS2readACDir(right);
+    nxtDisplayCenteredBigTextLine(2, "L: %d: %d", ls3, ldir);
+    nxtDisplayCenteredBigTextLine(4, "R: %d: %d", rs3, rdir);
+
+    if ((ls3 == 0) || (rs3 == 0)) {
+        ls3 = 180;
+        rs3 = 180;
+    }
+
+    if (rs3 < ls3) {
+        rotateCounterClockwise(3);
+    } else if (ls3 < rs3) {
+        rotateClockwise(3);
+    }
+
+    while (abs(rs3 - ls3) > STOP_VALUE) {
+    }
+    allMotorsOff();
+
+    /*while (abs(ls3 - rs3) > 3) {
+     *}
      */
-    if ((abs(ls3 - rs3)) >= 20) {
-        ls3 = 0;
-        rs3 = 0;
-    }
-
-    while (abs(ls3 - rs3) > 3) {
-        do_center_rotation(ls3, rs3, reversed);
-
-	    HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
-	    HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
-
-	    ldir = HTIRS2readACDir(left);
-        rdir = HTIRS2readACDir(right);
-	    nxtDisplayCenteredBigTextLine(2, "L: %d: %d", ls3, ldir);
-	    nxtDisplayCenteredBigTextLine(4, "R: %d: %d", rs3, rdir);
-
-        if ((ls3 == 0) || (rs3 == 0)) {
-            count++;
-            reversed = !reversed;
-            do_center_rotation(ls3, rs3, reversed);
-            if (count >= 5) {
-                // ABORT !!
-                break;
-            }
-        }
-    }
 }
 
 void move_to_beacon(tSensors left, tSensors right, int power, bool log_data)
@@ -343,10 +329,6 @@ void move_to_beacon(tSensors left, tSensors right, int power, bool log_data)
          * If we saw a zero from either receiver, then force abort
          * as we are either on top of the beacon or we are off track.
          */
-        if ((ls3 == 0) || (rs3 == 0)) {
-            ls3 = 180;
-            rs3 = 180;
-        }
 
         if ((!left_done) && (ls3 >= 175)) {
             left_done = true;

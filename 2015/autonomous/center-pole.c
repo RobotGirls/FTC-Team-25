@@ -60,15 +60,14 @@ task auto_timer()
 
             init_path();
 			add_segment(-18, 90, 65);
-			add_segment(-20, -90, 85);
+			add_segment(-25, -90, 85);
             stop_path();
             dead_reckon();
 
             servo[fist] = 127;
 
             init_path();
-            add_segment(-15, 0, 100);  // For the sake of time, I think the robot should
-            add_segment(0, 25, 100);   // only move 15 inches forward (it's already @ pole).
+            add_segment(0, 25, 100);
 			stop_path();
 			dead_reckon();
         }
@@ -162,7 +161,7 @@ task main()
     servo[rightEye] = RSERVO_CENTER;
     servo[door] = SERVO_DOOR_CLOSED;
     servo[brush] = 127;
-    servo[fist] = 0;
+    servo[fist] = 25;
 
     RNRR_waitForStart();
 
@@ -183,7 +182,7 @@ task main()
         servo[leftEye] = LSERVO_CENTER + CROSSEYED;
         servo[rightEye] = RSERVO_CENTER - CROSSEYED;
 
-		raise_shoulder(shoulder, 35, 10, 2500);
+		raise_shoulder(shoulder, 35, 15, 2500);
         raise_arm(arm_motor);
 		in_front_of_center = true;
 
@@ -206,7 +205,7 @@ task main()
         stop_path();
         dead_reckon();
 
-		raise_shoulder(shoulder, 35, 10, 2500);
+		raise_shoulder(shoulder, 35, 15, 2500);
         raise_arm(arm_motor);
 		in_front_of_center = true;
 

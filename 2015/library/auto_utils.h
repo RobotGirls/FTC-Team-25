@@ -92,7 +92,7 @@ void score_center_goal(int dump_dist)                   // Function that moves t
     //servo[brush] = 127;
     //while (true) {
 	    servo[brush] = 255;
-	    wait1Msec(1000);
+	    wait1Msec(500);
         servo[brush] = 127;
 	    //servo[brush] = 255;
         //wait1Msec(200);

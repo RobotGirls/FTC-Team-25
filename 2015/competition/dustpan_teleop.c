@@ -122,6 +122,8 @@ task limit_shoulder()
         nMotorEncoder[shoulder] = 0;
         shoulder_enter_state(SHOULDER_UP);
 
+        wait1Msec(500);
+
 		while (is_limit_switch_open(0x05) && !any_trigger_pressed()) {
 			if (nMotorEncoder[shoulder] > 2500) {
 				motor[shoulder] = 10;
@@ -129,6 +131,7 @@ task limit_shoulder()
         }
     }
     shoulder_enter_state(SHOULDER_STOP);
+    wait1Msec(500);
     limit_shoulder_running = false;
 }
 
@@ -508,7 +511,7 @@ void initialize_robot()
     servo[dockarm] = SERVO_DOCK_ARM_STOPPED;
     servo[rightEye] = 128;
     servo[leftEye] = 128;
-    servo[fist] = 15;
+    servo[fist] = 25;
 
     all_stop();
 
