@@ -133,6 +133,47 @@ task distance_monitor()
     beacon_done = true;
 }
 
+void raise_the_monster()
+{
+	raise_shoulder(shoulder, 35, 15, 2500);
+
+	/*
+	 * Mark the shoulder motor's encoder position before raising the
+	 * arm.
+	 */
+	nMotorEncoder[shoulder] = 0;
+    raise_arm(arm_motor);
+
+    servo[leftEye] = LSERVO_CENTER + CROSSEYED;
+    servo[rightEye] = RSERVO_CENTER - CROSSEYED;
+
+	/*
+	 * Did the shoulder move backward?  If so, fix it.
+	 * Start a timer as a failsafe.  e.g. We should be at
+	 * the top of rotation, if it takes more than 3 seconds
+	 * something is wrong anyway.  Abort to prevent damage
+	 * to the robot.
+	 */
+	if (nMotorEncoder[shoulder] < 0) {
+		clearTimer(T1);
+		motor[shoulder] = 10;
+		while (nMotorEncoder[shoulder] < 0) {
+			if (time1[T1] >= 3000) {
+				break;
+			}
+		}
+		motor[shoulder] = 0;
+	}
+
+    /*
+     * Ensure the shoulder is all the way up.
+	 * We shouldn't really need this given the software
+	 * that looks for the shoulder rotating backward, but
+	 * it can't hurt cause it's a noop if the switch is closed.
+     */
+    raise_shoulder(shoulder, 10, 10, 500);
+}
+
 task main()
 {
     int i;
@@ -179,17 +220,11 @@ task main()
     nxtDisplayCenteredBigTextLine(3, "%d", center_position);
 
     if (center_position == 3) {
-        servo[leftEye] = LSERVO_CENTER + CROSSEYED;
-        servo[rightEye] = RSERVO_CENTER - CROSSEYED;
-
-		raise_shoulder(shoulder, 35, 15, 2500);
-        raise_arm(arm_motor);
+		/*
+	 	 * Raise the shoulder, move to goal, dump the ball.
+		 */
+		raise_the_monster();
 		in_front_of_center = true;
-
-        /*
-         * Ensure the shoulder is all the way up
-         */
-        raise_shoulder(shoulder, 10, 10, 500);
 
         score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
         done_scoring = true;
@@ -227,44 +262,8 @@ task main()
 			/*
 		 	 * Raise the shoulder, move to goal, dump the ball.
 			 */
-			raise_shoulder(shoulder, 35, 15, 2500);
-
-			/*
-			 * Mark the shoulder motor's encoder position before raising the
-			 * arm.
-			 */
-			nMotorEncoder[shoulder] = 0;
-	        raise_arm(arm_motor);
+			raise_the_monster();
 			in_front_of_center = true;
-
-	        servo[leftEye] = LSERVO_CENTER + CROSSEYED;
-	        servo[rightEye] = RSERVO_CENTER - CROSSEYED;
-
-			/*
-			 * Did the shoulder move backward?  If so, fix it.
-			 * Start a timer as a failsafe.  e.g. We should be at
-			 * the top of rotation, if it takes more than 3 seconds
-			 * something is wrong anyway.  Abort to prevent damage
-			 * to the robot.
-			 */
-			if (nMotorEncoder[shoulder] < 0) {
-				clearTimer(T1);
-				motor[shoulder] = 10;
-				while (nMotorEncoder[shoulder] < 0) {
-					if (time1[T1] >= 3000) {
-						break;
-					}
-				}
-				motor[shoulder] = 0;
-			}
-
-	        /*
-	         * Ensure the shoulder is all the way up.
-			 * We shouldn't really need this given the software
-			 * that looks for the shoulder rotating backward, but
-			 * it can't hurt cause it's a noop if the switch is closed.
-	         */
-	        raise_shoulder(shoulder, 10, 10, 500);
 
 	        score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
 	        done_scoring = true;
