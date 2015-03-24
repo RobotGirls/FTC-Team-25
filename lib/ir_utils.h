@@ -1,4 +1,6 @@
 
+#define SOME_ARBITRARY_VALUE_FOR_CLOSE_ENOUGH 25
+
 typedef enum direction_ {
     DIR_NONE = 0,
     DIR_RIGHT = 1,
@@ -211,40 +213,22 @@ void find_absolute_center(tSensors left, tSensors right, bool reversed)
 
     eraseDisplay();
 
-    // find_center(left);
-    // find_center(right);
-
     HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
     HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
 
-    do_center_rotation(ls3, rs3, reversed);
+	if (ls3 < rs3) {
+		rotateClockwise(55);
+	} else if (rs3 < ls3) {
+		rotateCounterClockwise(5);
+	}
 
-    HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
-    HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
-
-    ldir = HTIRS2readACDir(left);
-    rdir = HTIRS2readACDir(right);
-    nxtDisplayCenteredBigTextLine(2, "L: %d: %d", ls3, ldir);
-    nxtDisplayCenteredBigTextLine(4, "R: %d: %d", rs3, rdir);
-
-    if ((ls3 == 0) || (rs3 == 0)) {
-        ls3 = 180;
-        rs3 = 180;
+    while (abs(ls3 - rs3) > SOME_ARBITRARY_VALUE_FOR_CLOSE_ENOUGH) {
+	    ldir = HTIRS2readACDir(left);
+        rdir = HTIRS2readACDir(right);
+	    nxtDisplayCenteredBigTextLine(2, "L: %d: %d", ls3, ldir);
+	    nxtDisplayCenteredBigTextLine(4, "R: %d: %d", rs3, rdir);
     }
-
-    if (rs3 < ls3) {
-        rotateCounterClockwise(3);
-    } else if (ls3 < rs3) {
-        rotateClockwise(3);
-    }
-
-    while (abs(rs3 - ls3) > STOP_VALUE) {
-    }
-    allMotorsOff();
-
-    /*while (abs(ls3 - rs3) > 3) {
-     *}
-     */
+	allMotorsOff();
 }
 
 void move_to_beacon(tSensors left, tSensors right, int power, bool log_data)

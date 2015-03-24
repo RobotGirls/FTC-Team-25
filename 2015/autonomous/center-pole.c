@@ -186,11 +186,6 @@ task main()
         raise_arm(arm_motor);
 		in_front_of_center = true;
 
-        //servo[leftEye] = LSERVO_CENTER + CROSSEYED;
-        //servo[rightEye] = RSERVO_CENTER - CROSSEYED;
-
-        //find_absolute_center(irr_left, irr_right, false);
-
         /*
          * Ensure the shoulder is all the way up
          */
@@ -199,28 +194,81 @@ task main()
         score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
         done_scoring = true;
     } else if (center_position == 2) {
+
+		/*
+		 * Move to approximate location in front of goal.
+		 */
         init_path();
         add_segment(30, 90, 50);
         add_segment(0, -45, 40);
         stop_path();
         dead_reckon();
 
-		raise_shoulder(shoulder, 35, 15, 2500);
-        raise_arm(arm_motor);
-		in_front_of_center = true;
+		/*
+		 * If we have an ultrasound signal bouncing off the structure
+		 * consider ourselves close enough.
+		 */
+		if (SensorValue[carrot] > 200) {
+			/*
+			 * No ultrasound, so do some rotation.
+			 */
+        	find_absolute_center(irr_left, irr_right, false);
+		}
 
-        servo[leftEye] = LSERVO_CENTER + CROSSEYED;
-        servo[rightEye] = RSERVO_CENTER - CROSSEYED;
+		/*
+		 * Can we see the ultrasound signal now?
+		 */
+		if (SensorValue[carrot] > 200) {
+        	/*
+			 * What do we do?  Abort and attempt
+			 * to find the pole?
+			 */
+		} else {
+			/*
+		 	 * Raise the shoulder, move to goal, dump the ball.
+			 */
+			raise_shoulder(shoulder, 35, 15, 2500);
 
-        //find_absolute_center(irr_left, irr_right, false);
+			/*
+			 * Mark the shoulder motor's encoder position before raising the
+			 * arm.
+			 */
+			nMotorEncoder[shoulder] = 0;
+	        raise_arm(arm_motor);
+			in_front_of_center = true;
 
-        /*
-         * Ensure the shoulder is all the way up
-         */
-        raise_shoulder(shoulder, 10, 10, 500);
+	        servo[leftEye] = LSERVO_CENTER + CROSSEYED;
+	        servo[rightEye] = RSERVO_CENTER - CROSSEYED;
 
-        score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
-        done_scoring = true;
+			/*
+			 * Did the shoulder move backward?  If so, fix it.
+			 * Start a timer as a failsafe.  e.g. We should be at
+			 * the top of rotation, if it takes more than 3 seconds
+			 * something is wrong anyway.  Abort to prevent damage
+			 * to the robot.
+			 */
+			if (nMotorEncoder[shoulder] < 0) {
+				clearTimer(T1);
+				motor[shoulder] = 10;
+				while (nMotorEncoder[shoulder] < 0) {
+					if (time1[T1] >= 3000) {
+						break;
+					}
+				}
+				motor[shoulder] = 0;
+			}
+
+	        /*
+	         * Ensure the shoulder is all the way up.
+			 * We shouldn't really need this given the software
+			 * that looks for the shoulder rotating backward, but
+			 * it can't hurt cause it's a noop if the switch is closed.
+	         */
+	        raise_shoulder(shoulder, 10, 10, 500);
+
+	        score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
+	        done_scoring = true;
+		}
     } else {
         move_to_pole(center_position);
     }
