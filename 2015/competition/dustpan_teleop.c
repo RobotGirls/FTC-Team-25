@@ -90,8 +90,11 @@ door_state_t door_state;
 
 bool debounce;
 bool deadman_ltd_running;
+bool deadman_rtd_running;
+bool deadman_rtu_running;
 
 void shoulder_enter_state(shoulder_state_t state);
+void brush_enter_state(brush_state_t state);
 
 task debounceTask()
 {
@@ -111,6 +114,36 @@ task deadman_ltd()
 
 	    shoulder_enter_state(SHOULDER_STOP);
 	    deadman_ltd_running = false;
+    }
+}
+
+task deadman_rtu()
+{
+    if (!deadman_rtu_running) {
+        deadman_rtu_running = true;
+        brush_enter_state(BRUSH_BACKWARD);
+
+        while (joy2Btn(Btn6)) {
+            // Assigns brush button.
+        }
+
+        brush_enter_state(BRUSH_OFF);
+        deadman_rtu_running = false;
+    }
+}
+
+task deadman_rtd()
+{
+    if (!deadman_rtd_running) {
+        deadman_rtd_running = true;
+        brush_enter_state(BRUSH_FORWARD);
+
+        while (joy2Btn(Btn8)) {
+            // Assigns brush button.
+        }
+
+        brush_enter_state(BRUSH_OFF);
+        deadman_rtd_running = false;
     }
 }
 
@@ -287,36 +320,6 @@ void shoulder_enter_state(shoulder_state_t state)
     }
 }
 
-void handle_joy2_rtu()
-{
-    switch (brush_state) {
-    case BRUSH_FORWARD:
-        brush_enter_state(BRUSH_OFF);
-        break;
-    case BRUSH_BACKWARD:
-        brush_enter_state(BRUSH_FORWARD);
-        break;
-    case BRUSH_OFF:
-        brush_enter_state(BRUSH_FORWARD);
-        break;
-    }
-}
-
-void handle_joy2_rtd()
-{
-    switch (brush_state) {
-    case BRUSH_FORWARD:
-        brush_enter_state(BRUSH_BACKWARD);
-        break;
-    case BRUSH_BACKWARD:
-        brush_enter_state(BRUSH_OFF);
-        break;
-    case BRUSH_OFF:
-        brush_enter_state(BRUSH_BACKWARD);
-        break;
-    }
-}
-
 void handle_joy2_ltu()
 {
 	nxtDisplayCenteredBigTextLine(4, "Joy1 LTU");
@@ -342,6 +345,20 @@ void handle_joy2_ltd()
 
     if (!deadman_ltd_running) {
         startTask(deadman_ltd);
+    }
+}
+
+void handle_joy2_rtd()
+{
+    if (!deadman_rtd_running) {
+        startTask(deadman_rtd);
+    }
+}
+
+void handle_joy2_rtu()
+{
+    if (!deadman_rtu_running) {
+        startTask(deadman_rtu);
     }
 }
 
@@ -412,8 +429,7 @@ task center_goal()
     playImmediateTone(60, 100);
     servo[leftEye] = LSERVO_CENTER + CROSSEYED;
     servo[rightEye] = RSERVO_CENTER - CROSSEYED;
-    // raise_arm();
-    find_absolute_center(irr_left, irr_right, false);
+    raise_the_monster();
     score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
     center_goal_task_running = false;
 }
@@ -507,6 +523,8 @@ void initialize_robot()
     door_enter_state(DOOR_CLOSED);
 
     deadman_ltd_running = false;
+    deadman_rtd_running = false;
+    deadman_rtu_running = false;
 
     servo[dockarm] = SERVO_DOCK_ARM_STOPPED;
     servo[rightEye] = 128;

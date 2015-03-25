@@ -91,10 +91,51 @@ void score_center_goal(int dump_dist)                   // Function that moves t
     //wait1Msec(2000);
     //servo[brush] = 127;
     //while (true) {
-	    servo[brush] = 255;
-	    wait1Msec(500);
+        servo[brush] = 255;
+        wait1Msec(500);
         servo[brush] = 127;
-	    //servo[brush] = 255;
+        //servo[brush] = 255;
         //wait1Msec(200);
     //}
+}
+
+void raise_the_monster()
+{
+	raise_shoulder(shoulder, 35, 15, 2500);
+
+	/*
+	 * Mark the shoulder motor's encoder position before raising the
+	 * arm.
+	 */
+	nMotorEncoder[shoulder] = 0;
+    raise_arm(arm_motor);
+
+    servo[leftEye] = LSERVO_CENTER + CROSSEYED;
+    servo[rightEye] = RSERVO_CENTER - CROSSEYED;
+
+	/*
+	 * Did the shoulder move backward?  If so, fix it.
+	 * Start a timer as a failsafe.  e.g. We should be at
+	 * the top of rotation, if it takes more than 3 seconds
+	 * something is wrong anyway.  Abort to prevent damage
+	 * to the robot.
+	 */
+	if (nMotorEncoder[shoulder] < 0) {
+		clearTimer(T1);
+		motor[shoulder] = 10;
+		while (nMotorEncoder[shoulder] < 0) {
+			if (time1[T1] >= 3000) {
+				break;
+			}
+		}
+		motor[shoulder] = 0;
+	}
+
+    /*
+     * Ensure the shoulder is all the way up.
+	 * We shouldn't really need this given the software
+	 * that looks for the shoulder rotating backward, but
+	 * it can't hurt cause it's a noop if the switch is closed.
+     */
+    raise_shoulder(shoulder, 10, 10, 500);
 }
