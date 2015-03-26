@@ -87,16 +87,9 @@ void score_center_goal(int dump_dist)                   // Function that moves t
 
     servo[door] = SERVO_DOOR_CENTERGOAL_RAMP;           // Open the servo door (releases balls).
 
-    //servo[brush] = 255;                                 // Rotate brush (spins balls into center goal).
-    //wait1Msec(2000);
-    //servo[brush] = 127;
-    //while (true) {
-        servo[brush] = 255;
-        wait1Msec(500);
-        servo[brush] = 127;
-        //servo[brush] = 255;
-        //wait1Msec(200);
-    //}
+    servo[brush] = 10;
+    wait1Msec(1000);
+    servo[brush] = 127;
 }
 
 void raise_the_monster()

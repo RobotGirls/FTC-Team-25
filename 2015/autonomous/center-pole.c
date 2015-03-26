@@ -135,7 +135,7 @@ task distance_monitor()
 
 task main()
 {
-    int i;
+    int i,j ;
     int center_position;
     int offset;
     int bias;
@@ -206,7 +206,7 @@ task main()
 			/*
 			 * No ultrasound, so do some rotation.
 			 */
-        	find_absolute_center(irr_left, irr_right, false);
+        	//find_absolute_center(irr_left, irr_right, false);
 		}
 
 		/*
@@ -217,10 +217,18 @@ task main()
 			 * What do we do?  Abort and attempt
 			 * to find the pole?
 			 */
+			for (j = 0; j < 6; j++) {
+				rotateClockwise(30);
+				wait1Msec(500);
+				rotateCounterClockwise(30);
+				wait1Msec(500);
+			}
+			allMotorsOff();
 		} else {
 			/*
 		 	 * Raise the shoulder, move to goal, dump the ball.
 			 */
+			find_absolute_center(irr_left, irr_right, carrot, false);
 			raise_the_monster();
 			in_front_of_center = true;
 

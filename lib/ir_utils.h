@@ -1,5 +1,5 @@
 
-#define SOME_ARBITRARY_VALUE_FOR_CLOSE_ENOUGH 25
+#define SOME_ARBITRARY_VALUE_FOR_CLOSE_ENOUGH 10
 
 typedef enum direction_ {
     DIR_NONE = 0,
@@ -192,7 +192,7 @@ void do_center_rotation(int ls3, int rs3, int reversed)
 }
 
 #ifdef  __HTSMUX_SUPPORT__
-void find_absolute_center(tMUXSensor left, tMUXSensor right, bool reversed)
+void find_absolute_center(tMUXSensor left, tMUXSensor right,  tSensors uss, bool reversed)
 #else
 void find_absolute_center(tSensors left, tSensors right, bool reversed)
 #endif
@@ -202,7 +202,7 @@ void find_absolute_center(tSensors left, tSensors right, bool reversed)
      * a much higher reading than the other when far away
      * from the goal.
      */
-    //int error_offset = 20;
+    int error_offset = 0;
 
 	int ls1, ls2, ls3, ls4, ls5 = 0;
 	int rs1, rs2, rs3, rs4, rs5 = 0;
@@ -216,8 +216,9 @@ void find_absolute_center(tSensors left, tSensors right, bool reversed)
     HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
     HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
 
+	ls3 -= error_offset;
 	if (ls3 < rs3) {
-		rotateClockwise(55);
+		rotateClockwise(5);
 	} else if (rs3 < ls3) {
 		rotateCounterClockwise(5);
 	}
@@ -225,6 +226,9 @@ void find_absolute_center(tSensors left, tSensors right, bool reversed)
     while (abs(ls3 - rs3) > SOME_ARBITRARY_VALUE_FOR_CLOSE_ENOUGH) {
 	    ldir = HTIRS2readACDir(left);
         rdir = HTIRS2readACDir(right);
+	    HTIRS2readAllACStrength(left, ls1, ls2, ls3, ls4, ls5);
+	    HTIRS2readAllACStrength(right, rs1, rs2, rs3, rs4, rs5);
+		ls3 -= error_offset;
 	    nxtDisplayCenteredBigTextLine(2, "L: %d: %d", ls3, ldir);
 	    nxtDisplayCenteredBigTextLine(4, "R: %d: %d", rs3, rdir);
     }
