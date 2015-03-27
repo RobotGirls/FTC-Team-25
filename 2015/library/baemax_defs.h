@@ -1,6 +1,8 @@
 
-#define LSERVO_CENTER 140
-#define RSERVO_CENTER 120
+#define LSERVO_CENTER 136
+#define RSERVO_CENTER 118
+//#define LSERVO_CENTER 140
+//#define RSERVO_CENTER 120
 #define RSERVO_PERP   235
 #define CROSSEYED     30
 
