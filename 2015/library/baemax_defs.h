@@ -50,3 +50,7 @@
 
 //#define UPPER_SWITCH_PIN    0
 //#define LOWER_SWITCH_PIN    0
+
+#define RIGHT_EYE_STOP 176
+#define LEFT_EYE_STOP  80
+#define EYE_OFFSET     30

@@ -14,6 +14,9 @@
 #include "../../lib/sensors/drivers/hitechnic-gyro.h"
 
 const tMUXSensor HTGYRO  = msensor_S4_3;
+const tMUXSensor irr_left = msensor_S4_1;
+const tMUXSensor irr_right = msensor_S4_2;
+
 bool beacon_done;
 int distance_monitor_distance;
 
@@ -29,8 +32,6 @@ int distance_monitor_distance;
 #include "../../lib/us_cascade_utils.c"
 #include "../library/auto_utils.h"
 
-const tMUXSensor irr_left = msensor_S4_1;
-const tMUXSensor irr_right = msensor_S4_2;
 const tMUXSensor HTPB = msensor_S4_4;
 
 static int drive_multiplier = 1;
@@ -164,6 +165,14 @@ task limit_shoulder()
         }
     }
     shoulder_enter_state(SHOULDER_STOP);
+
+    if (is_limit_switch_closed(0x05)) {
+        motor[shoulder] = 25;
+        while (abs(nMotorEncoder[shoulder]) < 150) {
+        }
+        motor[shoulder] = 0;
+    }
+
     wait1Msec(500);
     limit_shoulder_running = false;
 }

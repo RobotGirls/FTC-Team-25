@@ -614,4 +614,6 @@ bool center_spasm()
 	} else {
 		turnEncoder(1, 30);
 	}
+
+    return (lfound && rfound);
 }

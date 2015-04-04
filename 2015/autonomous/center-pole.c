@@ -11,6 +11,9 @@
 #include "../../lib/sensors/drivers/hitechnic-gyro.h"
 
 const tMUXSensor HTGYRO  = msensor_S4_3;
+const tMUXSensor irr_left = msensor_S4_1;
+const tMUXSensor irr_right = msensor_S4_2;
+
 bool beacon_done;
 int distance_monitor_distance;
 
@@ -26,8 +29,6 @@ int distance_monitor_distance;
 #include "../../lib/limit_switch.h"
 #include "../library/auto_utils.h"
 
-const tMUXSensor irr_left = msensor_S4_1;
-const tMUXSensor irr_right = msensor_S4_2;
 const tMUXSensor HTPB = msensor_S4_4;
 
 ir_direction_t dir;
@@ -65,6 +66,7 @@ task auto_timer()
             dead_reckon();
 
             servo[fist] = 127;
+            wait1Msec(500);
 
             init_path();
             add_segment(0, 25, 100);
@@ -81,7 +83,14 @@ void move_to_pole(int count)                 // Function that moves the robot to
     case 1:
         init_path();
         add_segment(-18, -45, 50);
-        add_segment(-10, 90, 100);
+        add_segment(-10, 100, 100);
+        stop_path();
+        dead_reckon();
+
+        servo[fist] = 127;
+        wait1Msec(500);
+
+        init_path();
         add_segment(0, 45, 100);
         stop_path();
         dead_reckon();
@@ -160,6 +169,8 @@ task main()
     servo[leftEye] = LSERVO_CENTER;
     servo[rightEye] = RSERVO_CENTER;
     servo[door] = SERVO_DOOR_CLOSED;
+    servo[dockarm] = SERVO_DOCK_ARM_STOPPED;
+    servo[finger] = SERVO_FINGER_UP;
     servo[brush] = 127;
     servo[fist] = 25;
 
@@ -183,58 +194,29 @@ task main()
 	 	 * Raise the shoulder, move to goal, dump the ball.
 		 */
 		raise_the_monster();
-		in_front_of_center = true;
+        in_front_of_center = true;
 
         score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
         done_scoring = true;
     } else if (center_position == 2) {
 
-		/*
-		 * Move to approximate location in front of goal.
-		 */
+        /*
+         * Move to approximate location in front of goal.
+         */
         init_path();
-        add_segment(30, 90, 50);
-        add_segment(0, -45, 40);
+        add_segment(32, 90, 50);
+        add_segment(-10, -45, 40);
         stop_path();
         dead_reckon();
 
 		/*
-		 * If we have an ultrasound signal bouncing off the structure
-		 * consider ourselves close enough.
+	 	 * Raise the shoulder, move to goal, dump the ball.
 		 */
-		if (SensorValue[carrot] > 200) {
-			/*
-			 * No ultrasound, so do some rotation.
-			 */
-        	//find_absolute_center(irr_left, irr_right, false);
-		}
+		raise_the_monster();
+		in_front_of_center = true;
 
-		/*
-		 * Can we see the ultrasound signal now?
-		 */
-		if (SensorValue[carrot] > 200) {
-        	/*
-			 * What do we do?  Abort and attempt
-			 * to find the pole?
-			 */
-			for (j = 0; j < 6; j++) {
-				rotateClockwise(30);
-				wait1Msec(500);
-				rotateCounterClockwise(30);
-				wait1Msec(500);
-			}
-			allMotorsOff();
-		} else {
-			/*
-		 	 * Raise the shoulder, move to goal, dump the ball.
-			 */
-			find_absolute_center(irr_left, irr_right, carrot, false);
-			raise_the_monster();
-			in_front_of_center = true;
-
-	        score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
-	        done_scoring = true;
-		}
+        score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
+        done_scoring = true;
     } else {
         move_to_pole(center_position);
     }

@@ -54,6 +54,13 @@ bool is_limit_switch_closed(ubyte pin)
     if (val) {
         return false;
     } else {
+        wait1Msec(250);
+        val = HTPBreadIO(board, switch_pin_mask);
+        if (val) {
+            return false;
+        } else {
+            return true;
+        }
         return true;
     }
 }

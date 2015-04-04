@@ -55,15 +55,18 @@ void raise_shoulder(tMotor m_shoulder, int speed_half_up, int speed_all_up, int 
 {
 	eraseDisplay();
 
-	if (is_limit_switch_open(0x05)) {
-		nMotorEncoder[m_shoulder] = 0;
-		motor[m_shoulder] = speed_half_up;
-		while (is_limit_switch_open(0x05)) {
-			if (nMotorEncoder[m_shoulder] > half_up) {
-				motor[m_shoulder] = speed_all_up;
-			}
-		}
+	nMotorEncoder[m_shoulder] = 0;
+	motor[m_shoulder] = speed_half_up;
+
+    while (nMotorEncoder[m_shoulder] < half_up) {
     }
+
+	while (is_limit_switch_open(0x05)) {
+		if (nMotorEncoder[m_shoulder] > half_up) {
+			motor[m_shoulder] = speed_all_up;
+		}
+	}
+
 	motor[m_shoulder] = 0;
 }
 
@@ -101,6 +104,14 @@ void raise_the_monster()
 	 * arm.
 	 */
 	nMotorEncoder[shoulder] = 0;
+
+    if (is_limit_switch_closed(0x05)) {
+        motor[shoulder] = 25;
+        while (abs(nMotorEncoder[shoulder]) < 100) {
+        }
+        motor[shoulder] = 0;
+    }
+
     raise_arm(arm_motor);
 
     servo[leftEye] = LSERVO_CENTER + CROSSEYED;
@@ -130,5 +141,5 @@ void raise_the_monster()
 	 * that looks for the shoulder rotating backward, but
 	 * it can't hurt cause it's a noop if the switch is closed.
      */
-    raise_shoulder(shoulder, 10, 10, 500);
+    //raise_shoulder(shoulder, 10, 10, 500);
 }
