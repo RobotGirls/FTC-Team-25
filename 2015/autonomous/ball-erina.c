@@ -11,6 +11,9 @@
 #include "../../lib/sensors/drivers/hitechnic-gyro.h"
 
 const tMUXSensor HTGYRO  = msensor_S4_3;
+const tMUXSensor irr_left = msensor_S4_1;
+const tMUXSensor irr_right = msensor_S4_2;
+
 bool beacon_done;
 int distance_monitor_distance;
 
@@ -26,8 +29,6 @@ int distance_monitor_distance;
 #include "../../lib/limit_switch.h"
 #include "../library/auto_utils.h"
 
-const tMUXSensor irr_left = msensor_S4_1;
-const tMUXSensor irr_right = msensor_S4_2;
 const tMUXSensor HTPB = msensor_S4_4;
 
 task ext_dock_arm()
@@ -41,25 +42,38 @@ task ext_dock_arm()
 
 void initializeRobot()
 {
-    servo[arm] = SERVO_ARM_RETRACTED;
-    servo[finger] = SERVO_FINGER_DOWN;
-    nMotorEncoder(shoulder) = 0;
+	if (!limit_switch_init(HTPB, 0x05)) {
+		nxtDisplayCenteredBigTextLine(3, "ERROR");
+		nxtDisplayTextLine(6, "CF251, LP: IZZIE");
+	}
+
+    nMotorEncoder[shoulder] = 0;
+
+    servo[dockarm] = SERVO_DOCK_ARM_STOPPED;
+    servo[finger] = SERVO_FINGER_UP;
+    servo[door] = SERVO_DOOR_CLOSED;
     servo[brush] = 127;
+    servo[fist] = 25;
+
+    motor[shoulder] = 0;
+
+    move_to(arm_motor, 60, 10251);
 }
 
 task main()
 {
     initializeRobot();
-
-    waitForStart(); // Wait for the beginning of autonomous phase.
+    RNRR_waitForStart();      // Wait for the beginning of autonomous phase.
 
     init_path();
-    add_segment(-83, 0, 30);  //gets off the ramp to medium goal
+    add_segment(-83, 0, 30);  // Gets off the ramp to medium goal
     stop_path();
     dead_reckon();
 
     raise_shoulder(shoulder, 35, 10, 2500);
+    wait1Msec(2000);
 
+    servo[door] = SERVO_DOOR_OPEN;
     servo[brush] = 255;
     wait1Msec(10000);
     servo[brush] = 127;

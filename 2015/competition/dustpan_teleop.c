@@ -92,7 +92,7 @@ door_state_t door_state;
 bool debounce;
 bool deadman_ltd_running;
 bool deadman_rtd_running;
-bool deadman_rtu_running;
+bool deadman_rtu_running
 
 void shoulder_enter_state(shoulder_state_t state);
 void brush_enter_state(brush_state_t state);
@@ -592,10 +592,15 @@ task main()
 	        	handle_joy1_event(RIGHT_TRIGGER_UP);
 	    	} else if (joystick.joy2_TopHat == 0) { // Up d-pad
                 door_enter_state(DOOR_CLOSED);
-            } else if (joystick.joy2_TopHat == 2) { // Left d-pad
+            } else if (joystick.joy2_TopHat == 2) { // Right d-pad
                 door_enter_state(DOOR_CENTERGOAL_RAMP);
             } else if (joystick.joy2_TopHat == 4) { // Down d-pad
                 door_enter_state(DOOR_OPEN);
+            } else if (joystick.joy2_TopHat == 6) {
+                motor[shoulder] = 25;
+                while (abs(nMotorEncoder[shoulder]) < 100) {
+                }
+                motor[shoulder] = 0;
             }
         }
 
@@ -604,13 +609,43 @@ task main()
          */
         if ((!center_goal_task_running) && (!limit_shoulder_running)) {
 	        left_dock_y = joystick.joy2_y1;
-	        right_y = joystick.joy1_y1;
-	        left_y = joystick.joy1_y2;
+            right_y = joystick.joy1_y1;
+            left_y = joystick.joy1_y2;
 
+            float right_y_speed = exp(4.6 * (abs(right_y))/128);
+            float left_y_speed = exp(4.6 * (abs(left_y))/128);
+
+            if (right_y < 0) {
+                right_y_speed = -right_y_speed;
+            }
+            if (left_y < 0) {
+                left_y_speed = -left_y_speed;
+            }
+
+            nxtDisplayCenteredBigTextLine(2, "%d", left_y_speed);
+            nxtDisplayCenteredBigTextLine(5, "%d", right_y_speed);
+
+            if (abs(left_y) > 5) {
+                motor[driveFrontRight] = left_y_speed;
+                motor[driveRearRight] = left_y_speed;
+            } else {
+			    motor[driveFrontRight] = 0;
+			    motor[driveRearRight] = 0;
+            }
+
+            if (abs(right_y) > 5) {
+                motor[driveFrontLeft] = right_y_speed;
+                motor[driveRearLeft] = right_y_speed;
+            } else {
+                motor[driveFrontLeft] = 0;
+                motor[driveRearLeft] = 0;
+            }
+
+            /*
 	        if (abs(left_y) > 20) {
-		    	motor[driveFrontRight] = drive_multiplier * left_y;
-		    	motor[driveRearRight] = drive_multiplier * left_y;
-			}
+                motor[driveFrontRight] = drive_multiplier * left_y;
+                motor[driveRearRight] = drive_multiplier * left_y;
+            }
 			else {
 			    motor[driveFrontRight] = 0;
 			    motor[driveRearRight] = 0;
@@ -625,6 +660,7 @@ task main()
 			    motor[driveFrontLeft] = 0;
 			    motor[driveRearLeft] = 0;
 			}
+            */
         }
 
         if (abs(left_dock_y) > 20) {
