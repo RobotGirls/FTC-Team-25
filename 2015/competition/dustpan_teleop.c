@@ -597,6 +597,7 @@ task main()
             } else if (joystick.joy2_TopHat == 4) { // Down d-pad
                 door_enter_state(DOOR_OPEN);
             } else if (joystick.joy2_TopHat == 6) {
+                nMotorEncoder[shoulder] = 0;
                 motor[shoulder] = 15;
                 while (abs(nMotorEncoder[shoulder]) < 100) {
                 }
