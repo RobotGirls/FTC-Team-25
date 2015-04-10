@@ -92,7 +92,7 @@ door_state_t door_state;
 bool debounce;
 bool deadman_ltd_running;
 bool deadman_rtd_running;
-bool deadman_rtu_running
+bool deadman_rtu_running;
 
 void shoulder_enter_state(shoulder_state_t state);
 void brush_enter_state(brush_state_t state);
