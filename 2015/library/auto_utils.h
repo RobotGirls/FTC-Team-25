@@ -91,7 +91,7 @@ void score_center_goal(int dump_dist)                   // Function that moves t
     servo[door] = SERVO_DOOR_CENTERGOAL_RAMP;           // Open the servo door (releases balls).
 
     servo[brush] = 10;
-    wait1Msec(1000);
+    wait1Msec(1500);
     servo[brush] = 127;
 }
 
@@ -99,11 +99,11 @@ void raise_the_monster()
 {
 	raise_shoulder(shoulder, 35, 15, 2500);
 
-	/*
-	 * Mark the shoulder motor's encoder position before raising the
-	 * arm.
-	 */
-	nMotorEncoder[shoulder] = 0;
+    /*
+     * Mark the shoulder motor's encoder position before raising the
+     * arm.
+     */
+    nMotorEncoder[shoulder] = 0;
 
     if (is_limit_switch_closed(0x05)) {
         motor[shoulder] = 25;
@@ -117,23 +117,25 @@ void raise_the_monster()
     servo[leftEye] = LSERVO_CENTER + CROSSEYED;
     servo[rightEye] = RSERVO_CENTER - CROSSEYED;
 
-	/*
-	 * Did the shoulder move backward?  If so, fix it.
-	 * Start a timer as a failsafe.  e.g. We should be at
-	 * the top of rotation, if it takes more than 3 seconds
-	 * something is wrong anyway.  Abort to prevent damage
-	 * to the robot.
-	 */
-	if (nMotorEncoder[shoulder] < 0) {
-		clearTimer(T1);
-		motor[shoulder] = 10;
-		while (nMotorEncoder[shoulder] < 0) {
-			if (time1[T1] >= 3000) {
-				break;
-			}
+    /*
+     * Did the shoulder move backward?  If so, fix it.
+     * Start a timer as a failsafe.  e.g. We should be at
+     * the top of rotation, if it takes more than 3 seconds
+     * something is wrong anyway.  Abort to prevent damage
+     * to the robot.
+     */
+    /*
+    if (nMotorEncoder[shoulder] < 0) {
+        clearTimer(T1);
+        motor[shoulder] = 10;
+        while (nMotorEncoder[shoulder] < 0) {
+            if (time1[T1] >= 3000) {
+                break;
+            }
 		}
 		motor[shoulder] = 0;
 	}
+    */
 
     /*
      * Ensure the shoulder is all the way up.

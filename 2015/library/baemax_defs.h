@@ -13,7 +13,7 @@
 #define UPCOUNTS                    4200
 
 #define SERVO_DOOR_OPEN             0
-#define SERVO_DOOR_CENTERGOAL_RAMP  90
+#define SERVO_DOOR_CENTERGOAL_RAMP  80
 #define SERVO_DOOR_CLOSED           128
 
 //#define SERVO_ARM_EXTENDED          210

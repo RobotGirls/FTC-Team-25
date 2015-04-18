@@ -148,6 +148,7 @@ task main()
     int center_position;
     int offset;
     int bias;
+    int segment;
 
     //disableDiagnosticsDisplay();
 
@@ -208,6 +209,10 @@ task main()
         add_segment(-10, -45, 40);
         stop_path();
         dead_reckon();
+
+        segment = HTIRS2readACDir(irr_left);
+        eraseDisplay();
+        nxtDisplayCenteredBigTextLine(4, "%d", segment);
 
 		/*
 	 	 * Raise the shoulder, move to goal, dump the ball.

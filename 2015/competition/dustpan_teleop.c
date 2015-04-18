@@ -107,14 +107,14 @@ task debounceTask()
 task deadman_ltd()
 {
     if (!deadman_ltd_running) {
-	    deadman_ltd_running = true;
-	    shoulder_enter_state(SHOULDER_DOWN);
+        deadman_ltd_running = true;
+        shoulder_enter_state(SHOULDER_DOWN);
 
-	    while (joy2Btn(Btn7)) {
-	    }
+        while (joy2Btn(Btn7)) {
+        }
 
-	    shoulder_enter_state(SHOULDER_STOP);
-	    deadman_ltd_running = false;
+        shoulder_enter_state(SHOULDER_STOP);
+        deadman_ltd_running = false;
     }
 }
 
@@ -158,20 +158,13 @@ task limit_shoulder()
 
         wait1Msec(500);
 
-		while (is_limit_switch_open(0x05) && !any_trigger_pressed()) {
-			if (nMotorEncoder[shoulder] > 2500) {
-				motor[shoulder] = 10;
+        while (is_limit_switch_open(0x05) && !any_trigger_pressed()) {
+            if (nMotorEncoder[shoulder] > 2500) {
+                motor[shoulder] = 10;
             }
         }
     }
     shoulder_enter_state(SHOULDER_STOP);
-
-    if (is_limit_switch_closed(0x05)) {
-        motor[shoulder] = 25;
-        while (abs(nMotorEncoder[shoulder]) < 150) {
-        }
-        motor[shoulder] = 0;
-    }
 
     wait1Msec(500);
     limit_shoulder_running = false;
@@ -265,7 +258,7 @@ void brush_enter_state(brush_state_t state)
 
 void arm_enter_state(arm_state_t state)
 {
-	nMotorEncoder[arm_motor] = 0;
+    nMotorEncoder[arm_motor] = 0;
 
     switch (state) {
     case ARM_PICKUP:
@@ -275,36 +268,36 @@ void arm_enter_state(arm_state_t state)
         } else if (arm_state == ARM_RETRACTED) {
             move_to(arm_motor, -ARM_MOTOR_SPEED, ENC_ARM_X);
         } else {
-			motor[arm_motor] = 0;
-    	}
+            motor[arm_motor] = 0;
+        }
         break;
     case ARM_EXTENDED:
         nxtDisplayCenteredBigTextLine(3, "EXTENDED");
         if (arm_state == ARM_GOAL) {
-        	move_to(arm_motor, -ARM_MOTOR_SPEED, ENC_ARM_Z);
+            move_to(arm_motor, -ARM_MOTOR_SPEED, ENC_ARM_Z);
         } else {
-        	motor[arm_motor] = 0;
-    	}
+            motor[arm_motor] = 0;
+        }
         break;
     case ARM_GOAL:
         nxtDisplayCenteredBigTextLine(3, "GOAL");
         if (arm_state == ARM_EXTENDED) {
-	        move_to(arm_motor, ARM_MOTOR_SPEED, ENC_ARM_Z);
-	    } else if (arm_state == ARM_PICKUP) {
-			move_to(arm_motor, -ARM_MOTOR_SPEED, ENC_ARM_Y);
-	    } else {
-			motor[arm_motor] = 0;
-	    }
+            move_to(arm_motor, ARM_MOTOR_SPEED, ENC_ARM_Z);
+        } else if (arm_state == ARM_PICKUP) {
+            move_to(arm_motor, -ARM_MOTOR_SPEED, ENC_ARM_Y);
+        } else {
+            motor[arm_motor] = 0;
+        }
         break;
     case ARM_RETRACTED:
         if (arm_state == ARM_PICKUP) {
-			nxtDisplayCenteredBigTextLine(3, "RET Pick");
-        	move_to(arm_motor, ARM_MOTOR_SPEED, ENC_ARM_X);
+            nxtDisplayCenteredBigTextLine(3, "RET Pick");
+            move_to(arm_motor, ARM_MOTOR_SPEED, ENC_ARM_X);
         } else if (arm_state == ARM_RETRACTED) {
-			nxtDisplayCenteredBigTextLine(3, "RET RET");
-        	move_to(arm_motor, ARM_MOTOR_SPEED, 25100);
-    	} else {
-    		motor[arm_motor] = 0;
+            nxtDisplayCenteredBigTextLine(3, "RET RET");
+            move_to(arm_motor, ARM_MOTOR_SPEED, 25100);
+        } else {
+            motor[arm_motor] = 0;
         }
         break;
     }
@@ -331,7 +324,7 @@ void shoulder_enter_state(shoulder_state_t state)
 
 void handle_joy2_ltu()
 {
-	nxtDisplayCenteredBigTextLine(4, "Joy1 LTU");
+    nxtDisplayCenteredBigTextLine(4, "Joy1 LTU");
 
     if (!limit_shoulder_running) {
         limit_shoulder_running = true;
@@ -344,7 +337,7 @@ void handle_joy2_ltu()
         motor[driveRearLeft]   = 0;
         motor[driveFrontRight] = 0;
         motor[driveRearRight]  = 0;
-	    startTask(limit_shoulder);
+        startTask(limit_shoulder);
     }
 }
 
@@ -381,7 +374,7 @@ void handle_joy2_btn2()
         arm_enter_state(ARM_GOAL);
         break;
     case ARM_RETRACTED:
-		arm_enter_state(ARM_RETRACTED);
+        arm_enter_state(ARM_RETRACTED);
         break;
     case ARM_GOAL:
         arm_enter_state(ARM_PICKUP);
@@ -432,7 +425,7 @@ bool center_goal_task_running = false;
 
 task center_goal()
 {
-	center_goal_task_running = true;
+    center_goal_task_running = true;
     disableDiagnosticsDisplay();
     eraseDisplay();
     playImmediateTone(60, 100);
@@ -447,7 +440,7 @@ void handle_joy1_event(joystick_event_t event)
 {
     switch (event) {
     case BUTTON_ONE:
-		// useable
+        // useable
         break;
     case BUTTON_TWO:
         stopTask(center_goal);
@@ -455,15 +448,15 @@ void handle_joy1_event(joystick_event_t event)
         center_goal_task_running = false;
         break;
     case BUTTON_THREE:
-   		stopTask(limit_shoulder);
-		shoulder_enter_state(SHOULDER_STOP);
-		limit_shoulder_running = false;
+        stopTask(limit_shoulder);
+        shoulder_enter_state(SHOULDER_STOP);
+        limit_shoulder_running = false;
         break;
     case BUTTON_FOUR:
         startTask(center_goal);
         break;
     case RIGHT_TRIGGER_UP:
-    	move_to(arm_motor, ARM_MOTOR_SPEED, 251000);
+        move_to(arm_motor, ARM_MOTOR_SPEED, 251000);
     default:
     }
 
@@ -504,10 +497,10 @@ void handle_joy2_event(joystick_event_t event)
 
 void initialize_robot()
 {
-	if (!limit_switch_init(HTPB, 0x05)) {
-		nxtDisplayCenteredBigTextLine(3, "ERROR");
-		nxtDisplayTextLine(6, "CF251, LP: IZZIE");
-	}
+    if (!limit_switch_init(HTPB, 0x05)) {
+        nxtDisplayCenteredBigTextLine(3, "ERROR");
+        nxtDisplayTextLine(6, "CF251, LP: IZZIE");
+    }
 
     disableDiagnosticsDisplay();
     eraseDisplay();
@@ -545,6 +538,15 @@ void initialize_robot()
     return;
 }
 
+int joy_to_speed (bool normal, int joy_val)
+{
+    if (normal) {
+       return exp(4.6 * (abs(joy_val))/128);
+    } else {
+       return exp(3 * (abs(joy_val))/128);
+    }
+}
+
 task main()
 {
     short right_y;
@@ -564,33 +566,33 @@ task main()
         getJoystickSettings(joystick);
 
         if (!debounce) {
- 	        if (joy2Btn(Btn1)) {
-	            handle_joy2_event(BUTTON_ONE);
- 	        } else if (joy1Btn(Btn1)) {
-	            handle_joy1_event(BUTTON_ONE);
-	        } else if (joy2Btn(Btn2)) {
-	            handle_joy2_event(BUTTON_TWO);
-	        } else if (joy1Btn(Btn2)) {
-	            handle_joy1_event(BUTTON_TWO);
-	        } else if (joy2Btn(Btn3)) {
-	            handle_joy2_event(BUTTON_THREE);
-	        } else if (joy1Btn(Btn3)) {
-	            handle_joy1_event(BUTTON_THREE);
-	        } else if (joy2Btn(Btn4)) {
-	            handle_joy2_event(BUTTON_FOUR);
-	        } else if (joy1Btn(Btn4)) {
-	            handle_joy1_event(BUTTON_FOUR);
-	        } else if (joy2Btn(Btn5)) {
-	            handle_joy2_event(LEFT_TRIGGER_UP);
-	        } else if (joy2Btn(Btn6)) {
-	            handle_joy2_event(RIGHT_TRIGGER_UP);
-	        } else if (joy2Btn(Btn7)) {
-	            handle_joy2_event(LEFT_TRIGGER_DOWN);
+            if (joy2Btn(Btn1)) {
+                handle_joy2_event(BUTTON_ONE);
+            } else if (joy1Btn(Btn1)) {
+                handle_joy1_event(BUTTON_ONE);
+            } else if (joy2Btn(Btn2)) {
+                handle_joy2_event(BUTTON_TWO);
+            } else if (joy1Btn(Btn2)) {
+                handle_joy1_event(BUTTON_TWO);
+            } else if (joy2Btn(Btn3)) {
+                handle_joy2_event(BUTTON_THREE);
+            } else if (joy1Btn(Btn3)) {
+                handle_joy1_event(BUTTON_THREE);
+            } else if (joy2Btn(Btn4)) {
+                handle_joy2_event(BUTTON_FOUR);
+            } else if (joy1Btn(Btn4)) {
+                handle_joy1_event(BUTTON_FOUR);
+            } else if (joy2Btn(Btn5)) {
+                handle_joy2_event(LEFT_TRIGGER_UP);
+            } else if (joy2Btn(Btn6)) {
+                handle_joy2_event(RIGHT_TRIGGER_UP);
+            } else if (joy2Btn(Btn7)) {
+                handle_joy2_event(LEFT_TRIGGER_DOWN);
             } else if (joy2Btn(Btn8)) {
-	            handle_joy2_event(RIGHT_TRIGGER_DOWN);
-	        } else if (joy1Btn(Btn6)) {
-	        	handle_joy1_event(RIGHT_TRIGGER_UP);
-	    	} else if (joystick.joy2_TopHat == 0) { // Up d-pad
+                handle_joy2_event(RIGHT_TRIGGER_DOWN);
+            } else if (joy1Btn(Btn6)) {
+                handle_joy1_event(RIGHT_TRIGGER_UP);
+            } else if (joystick.joy2_TopHat == 0) { // Up d-pad
                 door_enter_state(DOOR_CLOSED);
             } else if (joystick.joy2_TopHat == 2) { // Right d-pad
                 door_enter_state(DOOR_CENTERGOAL_RAMP);
@@ -609,12 +611,20 @@ task main()
          * Lock out the drivetrain if we are doing autonomous center goal dispense
          */
         if ((!center_goal_task_running) && (!limit_shoulder_running)) {
-	        left_dock_y = joystick.joy2_y1;
+            left_dock_y = joystick.joy2_y1;
             right_y = joystick.joy1_y1;
             left_y = joystick.joy1_y2;
 
-            float right_y_speed = exp(4.6 * (abs(right_y))/128);
-            float left_y_speed = exp(4.6 * (abs(left_y))/128);
+            float right_y_speed;
+            float left_y_speed;
+
+            if (arm_state == ARM_EXTENDED) {
+                right_y_speed = joy_to_speed(false, right_y);
+                left_y_speed = joy_to_speed(false, left_y);
+            } else {
+                right_y_speed = joy_to_speed(true, right_y);
+                left_y_speed = joy_to_speed(true, left_y);
+            }
 
             if (right_y < 0) {
                 right_y_speed = -right_y_speed;
@@ -630,8 +640,8 @@ task main()
                 motor[driveFrontRight] = left_y_speed;
                 motor[driveRearRight] = left_y_speed;
             } else {
-			    motor[driveFrontRight] = 0;
-			    motor[driveRearRight] = 0;
+                motor[driveFrontRight] = 0;
+                motor[driveRearRight] = 0;
             }
 
             if (abs(right_y) > 5) {
@@ -643,24 +653,24 @@ task main()
             }
 
             /*
-	        if (abs(left_y) > 20) {
+            if (abs(left_y) > 20) {
                 motor[driveFrontRight] = drive_multiplier * left_y;
                 motor[driveRearRight] = drive_multiplier * left_y;
             }
-			else {
-			    motor[driveFrontRight] = 0;
-			    motor[driveRearRight] = 0;
-			}
+            else {
+                motor[driveFrontRight] = 0;
+                motor[driveRearRight] = 0;
+            }
 
-	        if (abs(right_y) > 20) {
-			    motor[driveFrontLeft] = drive_multiplier * right_y;
-			    motor[driveRearLeft] = drive_multiplier * right_y;
-			}
-			else
-			{
-			    motor[driveFrontLeft] = 0;
-			    motor[driveRearLeft] = 0;
-			}
+            if (abs(right_y) > 20) {
+                motor[driveFrontLeft] = drive_multiplier * right_y;
+                motor[driveRearLeft] = drive_multiplier * right_y;
+            }
+            else
+            {
+                motor[driveFrontLeft] = 0;
+                motor[driveRearLeft] = 0;
+            }
             */
         }
 
