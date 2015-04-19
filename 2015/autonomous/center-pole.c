@@ -217,8 +217,10 @@ task main()
         dead_reckon();
 
         servo[leftEye] = SERVO_INFRARED;
+        wait1Msec(500);
 
         find_midpoint_of_segment(6, irr_right);
+        wait1Msec(500);
 
 	    dist = SensorValue[carrot];
 	    i = 0;
