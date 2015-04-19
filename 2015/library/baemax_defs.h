@@ -1,4 +1,6 @@
 
+#define SERVO_INFRARED 105
+
 #define LSERVO_CENTER 136
 #define RSERVO_CENTER 118
 //#define LSERVO_CENTER 140

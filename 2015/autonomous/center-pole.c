@@ -144,11 +144,14 @@ task distance_monitor()
 
 task main()
 {
-    int i,j ;
+    int i;
     int center_position;
     int offset;
     int bias;
     int segment;
+    int dist;
+
+    bool off_center;
 
     //disableDiagnosticsDisplay();
 
@@ -167,6 +170,8 @@ task main()
 
 	in_front_of_center = false;
     done_scoring = false;
+    off_center = false;
+
     servo[leftEye] = LSERVO_CENTER;
     servo[rightEye] = RSERVO_CENTER;
     servo[door] = SERVO_DOOR_CLOSED;
@@ -186,9 +191,9 @@ task main()
     //    wait1Msec(750);
     //}
 
-    eraseDisplay();
+	eraseDisplay();
 
-    nxtDisplayCenteredBigTextLine(3, "%d", center_position);
+	nxtDisplayCenteredBigTextLine(3, "%d", center_position);
 
     if (center_position == 3) {
 		/*
@@ -204,24 +209,54 @@ task main()
         /*
          * Move to approximate location in front of goal.
          */
+
         init_path();
         add_segment(32, 90, 50);
-        add_segment(-10, -45, 40);
+        add_segment(-15, -45, 40);
         stop_path();
         dead_reckon();
 
-        segment = HTIRS2readACDir(irr_left);
-        eraseDisplay();
-        nxtDisplayCenteredBigTextLine(4, "%d", segment);
+        servo[leftEye] = SERVO_INFRARED;
 
-		/*
-	 	 * Raise the shoulder, move to goal, dump the ball.
-		 */
-		raise_the_monster();
-		in_front_of_center = true;
+        find_midpoint_of_segment(6, irr_right);
 
-        score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
-        done_scoring = true;
+	    dist = SensorValue[carrot];
+	    i = 0;
+
+	    while ((dist >= 255) && (i <= 2)) {
+	        off_center = true;
+
+	        init_path();
+	        add_segment(0, -3, 10);
+	        stop_path();
+	        dead_reckon();
+
+            wait1Msec(500);
+
+	        dist = SensorValue[carrot];
+
+	        if (dist <= 255) {
+	            off_center = false;
+	            break;
+	        }
+
+            i++;
+	    }
+
+        if (!off_center) {
+	        segment = HTIRS2readACDir(irr_left);
+	        eraseDisplay();
+	        nxtDisplayCenteredBigTextLine(4, "%d", segment);
+
+			/*
+		 	 * Raise the shoulder, move to goal, dump the ball.
+			 */
+			raise_the_monster();
+			in_front_of_center = true;
+
+	        score_center_goal(CENTER_GOAL_DUMP_DISTANCE);
+	        done_scoring = true;
+        }
     } else {
         move_to_pole(center_position);
     }
