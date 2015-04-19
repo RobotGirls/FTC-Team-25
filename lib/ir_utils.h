@@ -191,6 +191,73 @@ void do_center_rotation(int ls3, int rs3, int reversed)
     }
 }
 
+#define CENTER_SPEED 5
+
+#ifdef  __HTSMUX_SUPPORT__
+void find_midpoint_of_segment(int target_segment, tMUXSensor irr)
+#else
+void find_midpoint_of_segment(int target_segment, tSensors irr)
+#endif
+{
+    int segment;
+    int left_edge;
+    int right_edge;
+    int dist;
+
+    segment = HTIRS2readACDir(irr);
+
+    /*
+     * Rotate until we see the target segment
+     */
+    while (segment != target_segment) {
+        nxtDisplayCenteredBigTextLine(4, "%d", segment);
+        if (segment > target_segment) {
+            rotateClockwise(CENTER_SPEED);
+        } else {
+            rotateCounterClockwise(CENTER_SPEED);
+        }
+        segment = HTIRS2readACDir(irr_right);
+    }
+    allMotorsOff();
+
+    /*
+     * Rotate through to the left edge of the target segment.
+     */
+    nMotorEncoder[driveFrontRight] = 0;
+    rotateCounterClockwise(CENTER_SPEED);
+    while ((segment = HTIRS2readACDir(irr)) == target_segment) {
+    }
+    allMotorsOff();
+    left_edge = nMotorEncoder[driveFrontRight];
+
+    /*
+     * Now go back and find the right edge of the target segment.
+     */
+    nMotorEncoder[driveFrontRight] = 0;
+    rotateClockwise(CENTER_SPEED);
+    while ((segment = HTIRS2readACDir(irr_right)) <= target_segment) {
+    }
+    allMotorsOff();
+    right_edge = nMotorEncoder[driveFrontRight];
+
+    dist = abs(left_edge) + abs(right_edge);
+
+    nxtDisplayCenteredBigTextLine(2, "%d %d", left_edge, right_edge);
+
+    /*
+     * We are at the right edge, rotate back half way through
+     * the delta between the right and left edge.  We are only
+     * measuring the rotation of a single wheel the idea being
+     * that it will be good enough to get us centered.
+     */
+    nMotorEncoder[driveFrontRight] = 0;
+    rotateCounterClockwise(CENTER_SPEED);
+    while (abs(nMotorEncoder[driveFrontRight]) <= dist/2) {
+        nxtDisplayCenteredBigTextLine(5, "%d", nMotorEncoder[driveFrontRight]);
+    }
+    allMotorsOff();
+}
+
 #ifdef  __HTSMUX_SUPPORT__
 void find_absolute_center(tMUXSensor left, tMUXSensor right,  tSensors uss, bool reversed)
 #else
