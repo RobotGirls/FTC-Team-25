@@ -1,0 +1,39 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "team25.olaf"
+        minSdkVersion 19
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    repositories {
+        flatDir {
+            dirs '../../../../android/sdk.2.0/ftc_app/FtcRobotController/build/outputs/aar'
+            dirs '../../../../android/sdk.2.0/ftc_app/FtcRobotController/libs'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.1.1'
+    compile(name:'FtcRobotController-debug', ext:'aar')
+    compile(name:'FtcCommon-release', ext:'aar')
+    compile(name:'ModernRobotics-release', ext:'aar')
+    compile(name:'RobotCore-release', ext:'aar')
+    compile(name:'WirelessP2p-release', ext:'aar')
+    compile(name:'Analytics-release', ext:'aar')
+    compile(name:'d2xx', ext:'jar')
+}
