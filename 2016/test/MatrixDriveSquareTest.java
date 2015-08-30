@@ -44,7 +44,7 @@ public class MatrixDriveSquareTest extends OpMode {
 
     private class FourWheelDriveDeadReckon extends DeadReckon {
 
-        FourWheelDriveDeadReckon(int encoderTicksPerInch, int encoderTicksPerDegree)
+        FourWheelDriveDeadReckon(int encoderTicksPerInch, double encoderTicksPerDegree)
         {
             super(encoderTicksPerInch, encoderTicksPerDegree);
         }
@@ -52,88 +52,103 @@ public class MatrixDriveSquareTest extends OpMode {
         @Override
         protected void resetEncoders(int ticks)
         {
-            motor1.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-            motor1.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
-            motor1.setTargetPosition(ticks);
+            rearLeft.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+            rearRight.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+            frontLeft.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+            frontRight.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+
+            rearLeft.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+            rearRight.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+            frontLeft.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+            frontRight.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+
+            rearLeft.setTargetPosition(ticks);
+            rearRight.setTargetPosition(ticks);
+            frontLeft.setTargetPosition(ticks);
+            frontRight.setTargetPosition(ticks);
         }
 
         protected void motorStraight(double speed)
         {
-            motor1.setPower(speed);
-            motor2.setPower(speed);
-            motor3.setPower(speed);
-            motor4.setPower(speed);
+            frontRight.setPower(speed);
+            frontLeft.setPower(speed);
+            rearRight.setPower(speed);
+            rearLeft.setPower(speed);
         }
 
         @Override
         protected void motorTurn(double speed)
         {
-            motor1.setPower(speed);
-            motor2.setPower(speed);
-            motor3.setPower(-speed);
-            motor4.setPower(-speed);
+            frontRight.setPower(speed);
+            rearRight.setPower(speed);
+            frontLeft.setPower(-speed);
+            rearLeft.setPower(-speed);
         }
 
         @Override
         protected boolean isBusy()
         {
-            return motor1.isBusy();
+            return (Math.abs(rearLeft.getCurrentPosition()) < Math.abs(rearLeft.getTargetPosition()));
         }
     }
 
-    private FourWheelDriveDeadReckon deadReckon = new FourWheelDriveDeadReckon(100, 100);
-    private DcMotor motor1;
-    private DcMotor motor2;
-    private DcMotor motor3;
-    private DcMotor motor4;
+    private final static int TICKS_PER_INCH = 50;
+    private final static double TICKS_PER_DEGREE = 6;
+    private final static double MOTOR_SPEED = 0.2;
+
+    private FourWheelDriveDeadReckon deadReckon = new FourWheelDriveDeadReckon(TICKS_PER_INCH, TICKS_PER_DEGREE);
+    private DcMotor frontRight;
+    private DcMotor frontLeft;
+    private DcMotor rearRight;
+    private DcMotor rearLeft;
     private ModernRoboticsMatrixDcMotorController mc;
-    private boolean initOnce = false;
     private int battery;
 
     @Override
     public void init()
     {
-        if (!initOnce) {
-            motor1 = hardwareMap.dcMotor.get("motor_1");
-            motor2 = hardwareMap.dcMotor.get("motor_2");
-            motor3 = hardwareMap.dcMotor.get("motor_3");
-            motor4 = hardwareMap.dcMotor.get("motor_4");
-            mc = (ModernRoboticsMatrixDcMotorController)hardwareMap.dcMotorController.get("MatrixControllerMotor");
-            motor1.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
-            motor2.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-            motor3.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-            motor4.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-            initOnce = true;
-
-            deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, 1.0);
-            deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, 1.0);
-            deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, 1.0);
-            deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, 1.0);
-            deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, 1.0);
-            deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, 1.0);
-            deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, 1.0);
-            deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, 1.0);
-        }
+        frontRight = hardwareMap.dcMotor.get("motor_1");
+        frontLeft = hardwareMap.dcMotor.get("motor_2");  //
+        rearRight = hardwareMap.dcMotor.get("motor_3");
+        rearLeft = hardwareMap.dcMotor.get("motor_4");
+        mc = (ModernRoboticsMatrixDcMotorController)hardwareMap.dcMotorController.get("MatrixControllerMotor");
+        frontRight.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        frontLeft.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        rearRight.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        rearLeft.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        rearLeft.setDirection(DcMotor.Direction.REVERSE);
     }
 
     @Override
     public void start()
     {
+        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, MOTOR_SPEED);
+        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, MOTOR_SPEED);
+        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, MOTOR_SPEED);
+        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, MOTOR_SPEED);
+        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, MOTOR_SPEED);
+        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, MOTOR_SPEED);
+        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, MOTOR_SPEED);
+        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, MOTOR_SPEED);
     }
 
     public void stop()
     {
-        motor1.setPower(0.0);
-        motor2.setPower(0.0);
-        motor3.setPower(0.0);
-        motor4.setPower(0.0);
+        deadReckon.stop();
     }
 
     @Override
     public void loop()
     {
+        int position;
+        int target;
+
         deadReckon.runPath();
-        battery = mc.getBattery();
-        telemetry.addData("Battery: ", ((float)battery/1000));
+
+        position = rearLeft.getCurrentPosition();
+        target = rearLeft.getTargetPosition();
+        telemetry.addData("Position: ", Math.abs(position));
+        telemetry.addData("Target: ", Math.abs(target));
     }
 }

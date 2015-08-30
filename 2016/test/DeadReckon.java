@@ -1,6 +1,4 @@
-package com.qualcomm.ftcrobotcontroller.opmodes;
-
-/*
+package com.qualcomm.ftcrobotcontroller.opmodes;/*
  * FTC Team 25: cmacfarl, August 21, 2015
  */
 
@@ -16,7 +14,7 @@ public abstract class DeadReckon {
 
     public Queue<Segment> segments;
     protected int encoderTicksPerInch;
-    protected int encoderTicksPerDegree;
+    protected double encoderTicksPerDegree;
 
     public class Segment {
 
@@ -40,7 +38,7 @@ public abstract class DeadReckon {
     protected abstract void motorTurn(double speed);
     protected abstract boolean isBusy();
 
-    DeadReckon(int encoderTicksPerInch, int encoderTicksPerDegree)
+    DeadReckon(int encoderTicksPerInch, double encoderTicksPerDegree)
     {
         this.encoderTicksPerInch = encoderTicksPerInch;
         this.encoderTicksPerDegree = encoderTicksPerDegree;
@@ -61,7 +59,7 @@ public abstract class DeadReckon {
             resetEncoders((int)seg.distance * encoderTicksPerInch);
             motorStraight(seg.speed);
         } else {
-            resetEncoders((int)seg.distance * encoderTicksPerDegree);
+            resetEncoders((int)(seg.distance * encoderTicksPerDegree));
             motorTurn(seg.speed);
         }
     }
@@ -73,6 +71,16 @@ public abstract class DeadReckon {
         } else if (done() && !isBusy()) {
             motorStraight(0.0);
         }
+    }
+
+    void stop()
+    {
+        /*
+         * Remove all remaining segments and stop the motors.
+         */
+        segments.clear();
+        motorStraight(0.0);
+        resetEncoders(0);
     }
 
     boolean done()
