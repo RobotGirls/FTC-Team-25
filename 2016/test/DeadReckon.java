@@ -45,12 +45,12 @@ public abstract class DeadReckon {
         segments = new LinkedList<Segment>();
     }
 
-    void addSegment(SegmentType type, double distance, double speed)
+    public void addSegment(SegmentType type, double distance, double speed)
     {
         segments.add(new Segment(type, distance, speed));
     }
 
-    void consumeSegment()
+    protected void consumeSegment()
     {
         Segment seg = segments.poll();
 
@@ -64,16 +64,18 @@ public abstract class DeadReckon {
         }
     }
 
-    void runPath()
+    public boolean runPath()
     {
-        if (!done() && !isBusy()) {
+        if (!segments.isEmpty() && !isBusy()) {
             consumeSegment();
-        } else if (done() && !isBusy()) {
+            return true;
+        } else if (segments.isEmpty() && !isBusy()) {
             motorStraight(0.0);
         }
+        return false;
     }
 
-    void stop()
+    public void stop()
     {
         /*
          * Remove all remaining segments and stop the motors.
@@ -85,7 +87,7 @@ public abstract class DeadReckon {
 
     boolean done()
     {
-        return segments.isEmpty();
+        return (segments.isEmpty() && !isBusy());
     }
 }
 

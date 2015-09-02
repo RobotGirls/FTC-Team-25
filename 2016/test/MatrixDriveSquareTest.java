@@ -40,7 +40,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class MatrixDriveSquareTest extends OpMode {
+public class MatrixDriveSquareTest extends Robot {
 
     private class FourWheelDriveDeadReckon extends DeadReckon {
 
@@ -103,6 +103,28 @@ public class MatrixDriveSquareTest extends OpMode {
     private DcMotor rearLeft;
     private ModernRoboticsMatrixDcMotorController mc;
     private int battery;
+    private DeadReckonTask deadReckonTask;
+    private MonitorMotorTask monitorMotorTask;
+
+    protected void handleDeadReckonEvent(DeadReckonTask.DeadReckonEvent e)
+    {
+        switch (e.kind) {
+        case SEGMENT_DONE:
+            telemetry.addDataPersist("Segments Completed: ", ++e.segment_num);
+            break;
+        case PATH_DONE:
+            telemetry.addDataPersist("All Segments Finished", "");
+            break;
+        }
+    }
+
+    @Override
+    public void handleEvent(RobotEvent e)
+    {
+        if (e instanceof DeadReckonTask.DeadReckonEvent) {
+            handleDeadReckonEvent((DeadReckonTask.DeadReckonEvent) e);
+        }
+    }
 
     @Override
     public void init()
@@ -131,24 +153,16 @@ public class MatrixDriveSquareTest extends OpMode {
         deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, MOTOR_SPEED);
         deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, MOTOR_SPEED);
         deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, MOTOR_SPEED);
+
+        monitorMotorTask = new MonitorMotorTask(this, rearLeft);
+        deadReckonTask = new DeadReckonTask(this, deadReckon);
+        addTask(monitorMotorTask);
+        addTask(deadReckonTask);
+
     }
 
     public void stop()
     {
-        deadReckon.stop();
-    }
-
-    @Override
-    public void loop()
-    {
-        int position;
-        int target;
-
-        deadReckon.runPath();
-
-        position = rearLeft.getCurrentPosition();
-        target = rearLeft.getTargetPosition();
-        telemetry.addData("Position: ", Math.abs(position));
-        telemetry.addData("Target: ", Math.abs(target));
+        deadReckonTask.stop();
     }
 }
