@@ -48,11 +48,6 @@ public abstract class Robot extends OpMode {
         RobotEvent e;
 
         /*
-        if (gamepad1.a) {
-            RobotLog.i("Gamepad A pressed");
-        }
-        */
-        /*
          * This is a straight FIFO queue.  Pull an event off the queue, process it,
          * move on to the next one.
          */
