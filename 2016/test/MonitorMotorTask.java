@@ -32,10 +32,10 @@ public class MonitorMotorTask implements RobotTask {
     }
 
     @Override
-    public boolean timeslice() {
-
-        robot.telemetry.addData("Position: ", Math.abs(motor.getCurrentPosition()));
-        robot.telemetry.addData("Target: ", Math.abs(motor.getTargetPosition()));
+    public boolean timeslice()
+    {
+        robot.telemetry.addData(motor.getConnectionInfo() + " Postion: ", Math.abs(motor.getCurrentPosition()));
+        robot.telemetry.addData(motor.getConnectionInfo() + " Target: ", Math.abs(motor.getTargetPosition()));
 
         /*
          * Never stops.
