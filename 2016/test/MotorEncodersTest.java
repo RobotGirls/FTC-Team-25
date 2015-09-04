@@ -36,14 +36,17 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class MotorEncodersTest extends Robot {
 
-    private DcMotor motor1;
-    private DcMotor motor2;
+    private DcMotor matrixMotor1;
+    private DcMotor matrixMotor2;
+    private DcMotor matrixMotor3;
+    private DcMotor matrixMotor4;
+    private DcMotor andymarkMotor;
     private ModernRoboticsMatrixDcMotorController mc;
-    private boolean loopOnce = false;
-    private boolean initOnce = false;
-    private int battery;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -57,8 +60,18 @@ public class MotorEncodersTest extends Robot {
 
     private void handleSwitchModeEvent(RobotEvent e)
     {
-        addTask(new MonitorMotorTask(this, motor1));
-        addTask(new MonitorMotorTask(this, motor2));
+        Set<DcMotor> slaves;
+
+        addTask(new MonitorMotorTask(this, matrixMotor1));
+        addTask(new MonitorMotorTask(this, andymarkMotor));
+
+        slaves = new HashSet<DcMotor>();
+        slaves.add(matrixMotor2);
+        slaves.add(matrixMotor3);
+        slaves.add(matrixMotor4);
+        addTask(new RunToEncoderValueTask(this, matrixMotor1, slaves, 10000));
+        addTask(new RunToEncoderValueTask(this, andymarkMotor, null, 10000));
+
     }
 
     private void handleTimerEvent(RobotEvent e)
@@ -66,29 +79,42 @@ public class MotorEncodersTest extends Robot {
         /*
          * Now switch the controller software to read mode, for the port on the hitechnic controller
          */
-        addTask(new SwitchMotorControllerModeTask(this, motor2.getController(), DcMotorController.DeviceMode.READ_ONLY));
+        addTask(new SwitchMotorControllerModeTask(this, andymarkMotor.getController(), DcMotorController.DeviceMode.READ_ONLY));
     }
 
     @Override
     public void init()
     {
-        motor1 = hardwareMap.dcMotor.get("motor_1");
-        motor2 = hardwareMap.dcMotor.get("andynark");
-        motor1.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-        motor1.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        motor2.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-        motor2.getController().setMotorControllerDeviceMode(DcMotorController.DeviceMode.WRITE_ONLY);
+        matrixMotor1 = hardwareMap.dcMotor.get("motor_1");
+        matrixMotor2 = hardwareMap.dcMotor.get("motor_2");
+        matrixMotor3 = hardwareMap.dcMotor.get("motor_3");
+        matrixMotor4 = hardwareMap.dcMotor.get("motor_4");
+        andymarkMotor = hardwareMap.dcMotor.get("andynark");
+        matrixMotor1.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+        matrixMotor1.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        matrixMotor2.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+        matrixMotor2.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        matrixMotor3.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+        matrixMotor3.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        matrixMotor4.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+        matrixMotor4.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+
+        andymarkMotor.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+        andymarkMotor.getController().setMotorControllerDeviceMode(DcMotorController.DeviceMode.WRITE_ONLY);
     }
 
     @Override
     public void start()
     {
-        motor1.setPower(1.0);
+        matrixMotor1.setPower(1.0);
+        matrixMotor2.setPower(1.0);
+        matrixMotor3.setPower(1.0);
+        matrixMotor4.setPower(1.0);
         /*
          * For ModernRoboticsNxtDcMotorController, the reset and the encoder commands can not be in the same loop cycle.
          */
-        motor2.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        motor2.setPower(1.0);
+        andymarkMotor.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        andymarkMotor.setPower(1.0);
 
         /*
          * Give the robot 200ms to start the motors
@@ -98,8 +124,11 @@ public class MotorEncodersTest extends Robot {
 
     public void stop()
     {
-        motor1.setPower(0.0);
-        motor2.setPower(0.0);
-        initOnce = false;
+        matrixMotor1.setPower(0.0);
+        matrixMotor2.setPower(0.0);
+        matrixMotor3.setPower(0.0);
+        matrixMotor4.setPower(0.0);
+
+        andymarkMotor.setPower(0.0);
     }
 }
