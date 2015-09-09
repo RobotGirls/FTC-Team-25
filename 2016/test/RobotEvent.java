@@ -4,16 +4,14 @@ package com.qualcomm.ftcrobotcontroller.opmodes;/*
 
 public class RobotEvent
 {
-    protected Robot robot;
+    /*
+     * The task this event is associated with
+     */
+    protected RobotTask task;
 
-    public RobotEvent(Robot r)
+    public RobotEvent(RobotTask task)
     {
-        robot = r;
-    }
-
-    public void handleEvent()
-    {
-        robot.handleEvent(this);
+        this.task = task;
     }
 
     public String toString()

@@ -53,16 +53,14 @@ public abstract class Robot extends OpMode {
          */
         e = events.poll();
         while (e != null) {
-            e.handleEvent();
+            handleEvent(e);
             e = events.poll();
         }
 
         /*
          * A list of tasks to give timeslices to.  A task remains in the list
-         * until it tells the Robot that it is finished, at which point it is stopped.
-         *
-         * Note that stop() must remove the task from the queue.  This allows a Robot
-         * to interrupt a running task by calling stop() prior to it's natural finish.
+         * until it tells the Robot that it is finished (true: I'm done, false: I have
+         * more work to do), at which point it is stopped.
          */
         for (RobotTask t : tasks) {
             if (t.timeslice()) {
