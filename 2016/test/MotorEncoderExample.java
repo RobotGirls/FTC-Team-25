@@ -66,7 +66,7 @@ public class MotorEncoderExample extends Robot {
         telemetry.addDataPersist("Threshold ", e.kind.toString());
 
         if (e.kind == RunToEncoderValueTask.EventKind.THRESHOLD_80) {
-                mc.setMotorPower(motorSet, 0.7);
+            mc.setMotorPower(motorSet, 0.7);
         } else if (e.kind == RunToEncoderValueTask.EventKind.THRESHOLD_90) {
             mc.setMotorPower(motorSet, 0.3);
         } else if (e.kind == RunToEncoderValueTask.EventKind.THRESHOLD_95) {
