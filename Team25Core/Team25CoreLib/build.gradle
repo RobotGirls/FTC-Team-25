@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "23.0.0 rc2"
+    compileSdkVersion 19
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 22
+        targetSdkVersion 19
         versionCode 1
         versionName "1.0"
     }
@@ -20,7 +20,7 @@ android {
 
 repositories {
     flatDir {
-        dirs '../../../ftc_lib/ftc_app/FtcRobotController/libs'
+        dirs '../../../ftc_app/FtcRobotController/libs'
     }
 }
 

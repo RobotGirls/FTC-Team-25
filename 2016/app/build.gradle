@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "23.0.0 rc2"
+    compileSdkVersion 19
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "team25.test"
@@ -21,7 +21,7 @@ android {
 
 repositories {
     flatDir {
-        dirs '../../../ftc_lib/ftc_app/FtcRobotController/libs'
+        dirs '../../../ftc_app/FtcRobotController/libs'
     }
 }
 
