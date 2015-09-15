@@ -1,4 +1,5 @@
-package com.qualcomm.ftcrobotcontroller.opmodes;
+package team25.team25core;
+
 
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -6,7 +7,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 /*
  * FTC Team 25: cmacfarl, September 03, 2015
  */
-public class SwitchMotorControllerModeTask implements RobotTask {
+public abstract class SwitchMotorControllerModeTask extends RobotTask {
 
     public enum EventKind {
         DONE,
@@ -17,9 +18,9 @@ public class SwitchMotorControllerModeTask implements RobotTask {
         EventKind kind;
         DcMotorController.DeviceMode mode;
 
-        public SwitchMotorControllerModeEvent(Robot robot, EventKind kind, DcMotorController.DeviceMode mode)
+        public SwitchMotorControllerModeEvent(RobotTask task, EventKind kind, DcMotorController.DeviceMode mode)
         {
-            super(robot);
+            super(task);
             this.kind = kind;
             this.mode = mode;
         }
@@ -31,13 +32,13 @@ public class SwitchMotorControllerModeTask implements RobotTask {
         }
     }
 
-    protected Robot robot;
     protected DcMotorController.DeviceMode mode;
     protected DcMotorController controller;
 
     public SwitchMotorControllerModeTask(Robot robot, DcMotorController controller, DcMotorController.DeviceMode mode)
     {
-        this.robot = robot;
+        super(robot);
+
         this.mode = mode;
         this.controller = controller;
     }
@@ -62,7 +63,7 @@ public class SwitchMotorControllerModeTask implements RobotTask {
 
         currMode = controller.getMotorControllerDeviceMode();
         if (currMode == mode) {
-            robot.queueEvent(new SwitchMotorControllerModeEvent(robot, EventKind.DONE, mode));
+            robot.queueEvent(new SwitchMotorControllerModeEvent(this, EventKind.DONE, mode));
             return true;
         } else {
             switch (currMode) {

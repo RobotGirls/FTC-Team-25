@@ -1,4 +1,5 @@
-package com.qualcomm.ftcrobotcontroller.opmodes;/*
+package team25.team25core;
+/*
  * FTC Team 25: cmacfarl, August 31, 2015
  */
 
@@ -53,7 +54,7 @@ public abstract class Robot extends OpMode {
          */
         e = events.poll();
         while (e != null) {
-            handleEvent(e);
+            e.handleEvent();
             e = events.poll();
         }
 

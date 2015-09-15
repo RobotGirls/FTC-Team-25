@@ -1,4 +1,5 @@
-package com.qualcomm.ftcrobotcontroller.opmodes;/*
+package team25.team25core;
+/*
  * FTC Team 25: cmacfarl, August 21, 2015
  */
 

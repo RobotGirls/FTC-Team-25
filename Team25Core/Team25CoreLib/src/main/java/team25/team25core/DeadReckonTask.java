@@ -1,10 +1,10 @@
-package com.qualcomm.ftcrobotcontroller.opmodes;
+package team25.team25core;
 
 /*
  * FTC Team 25: cmacfarl, September 01, 2015
  */
 
-public class DeadReckonTask implements RobotTask {
+public class DeadReckonTask extends RobotTask {
 
     public enum EventKind {
         SEGMENT_DONE,
@@ -16,9 +16,9 @@ public class DeadReckonTask implements RobotTask {
         EventKind kind;
         int segment_num;
 
-        public DeadReckonEvent(Robot r, EventKind k, int segment_num)
+        public DeadReckonEvent(RobotTask task, EventKind k, int segment_num)
         {
-            super(r);
+            super(task);
             kind = k;
             this.segment_num = segment_num;
         }
@@ -31,13 +31,13 @@ public class DeadReckonTask implements RobotTask {
     }
 
     protected DeadReckon dr;
-    protected Robot robot;
     protected int num;
 
-    public DeadReckonTask(Robot r, DeadReckon dr)
+    public DeadReckonTask(Robot robot, DeadReckon dr)
     {
+        super(robot);
+
         this.num = 0;
-        this.robot = r;
         this.dr = dr;
     }
 
@@ -61,11 +61,11 @@ public class DeadReckonTask implements RobotTask {
          * back to the robot.
          */
         if (dr.runPath()) {
-            robot.queueEvent(new DeadReckonEvent(robot, EventKind.SEGMENT_DONE, num++));
+            robot.queueEvent(new DeadReckonEvent(this, EventKind.SEGMENT_DONE, num++));
         }
 
         if (dr.done()) {
-            robot.queueEvent(new DeadReckonEvent(robot, EventKind.PATH_DONE, num));
+            robot.queueEvent(new DeadReckonEvent(this, EventKind.PATH_DONE, num));
             /*
              * Make sure it's stopped.
              */
