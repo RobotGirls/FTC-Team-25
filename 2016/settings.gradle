@@ -1,9 +1,0 @@
-include ':app'
-include ':FtcLib'
-include ':Team25Core'
-
-project(':Team25Core').projectDir =
-        new File(settingsDir, '../Team25Core/Team25CoreLib')
-
-project(':FtcLib').projectDir =
-        new File(settingsDir, '../../ftc_app/FtcRobotController')
