@@ -59,7 +59,11 @@ void dead_reckon()
         }
 
         if (path[idx].turn != 0) {
+#ifdef DEAD_RECKON_GYRO
+            turn_gyro(path[idx].turn, path[idx].speed);
+#else
             turnEncoder(path[idx].turn, path[idx].speed);
+#endif
         }
         wait1Msec(300);
         if (path[idx].inches != 0) {
