@@ -8,6 +8,11 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class GamepadTask extends RobotTask {
 
+    public enum GamepadNumber {
+        GAMEPAD_1,
+        GAMEPAD_2,
+    };
+
     public enum EventKind {
         BUTTON_A_DOWN,
         BUTTON_A_UP,
@@ -17,6 +22,10 @@ public class GamepadTask extends RobotTask {
         BUTTON_X_UP,
         BUTTON_Y_DOWN,
         BUTTON_Y_UP,
+        LEFT_BUMPER_DOWN,
+        LEFT_BUMPER_UP,
+        RIGHT_BUMPER_DOWN,
+        RIGHT_BUMPER_UP,
     };
 
     public class GamepadEvent extends RobotEvent {
@@ -43,9 +52,10 @@ public class GamepadTask extends RobotTask {
         public boolean y_pressed;
     }
 
+    protected GamepadNumber gamepadNum;
     protected ButtonState buttonState;
 
-    public GamepadTask(Robot robot, Gamepad gamepad)
+    public GamepadTask(Robot robot, GamepadNumber gamepadNum)
     {
         super(robot);
 
@@ -54,6 +64,8 @@ public class GamepadTask extends RobotTask {
         this.buttonState.b_pressed = false;
         this.buttonState.x_pressed = false;
         this.buttonState.y_pressed = false;
+
+        this.gamepadNum = gamepadNum;
     }
 
     @Override
@@ -83,10 +95,12 @@ public class GamepadTask extends RobotTask {
         /*
          * I thought Java passed objects by reference, but oddly enough if you cache
          * the gamepad in the task's contstructor, it will never update.  Hence this.
-         *
-         * TODO: Choose the right gamepad (pass an enumerated value into the constructor).
          */
-        gamepad = robot.gamepad1;
+        if (gamepadNum == GamepadNumber.GAMEPAD_1) {
+            gamepad = robot.gamepad1;
+        } else {
+            gamepad = robot.gamepad2;
+        }
 
         if ((gamepad.a) && (buttonState.a_pressed == false)) {
             robot.queueEvent(new GamepadEvent(this, EventKind.BUTTON_A_DOWN));
