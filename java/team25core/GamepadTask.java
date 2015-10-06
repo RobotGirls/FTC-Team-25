@@ -26,6 +26,10 @@ public class GamepadTask extends RobotTask {
         LEFT_BUMPER_UP,
         RIGHT_BUMPER_DOWN,
         RIGHT_BUMPER_UP,
+        LEFT_TRIGGER_DOWN,
+        LEFT_TRIGGER_UP,
+        RIGHT_TRIGGER_DOWN,
+        RIGHT_TRIGGER_UP,
     };
 
     public class GamepadEvent extends RobotEvent {
@@ -50,10 +54,16 @@ public class GamepadTask extends RobotTask {
         public boolean b_pressed;
         public boolean x_pressed;
         public boolean y_pressed;
+        public boolean left_bumper_pressed;
+        public boolean right_bumper_pressed;
+        public boolean left_trigger_pressed;
+        public boolean right_trigger_pressed;
     }
 
     protected GamepadNumber gamepadNum;
     protected ButtonState buttonState;
+
+    protected final static float TRIGGER_DEADZONE = 0.3f;
 
     public GamepadTask(Robot robot, GamepadNumber gamepadNum)
     {
@@ -64,6 +74,10 @@ public class GamepadTask extends RobotTask {
         this.buttonState.b_pressed = false;
         this.buttonState.x_pressed = false;
         this.buttonState.y_pressed = false;
+        this.buttonState.left_bumper_pressed   = false;
+        this.buttonState.right_bumper_pressed  = false;
+        this.buttonState.left_trigger_pressed  = false;
+        this.buttonState.right_trigger_pressed = false;
 
         this.gamepadNum = gamepadNum;
     }
@@ -77,7 +91,7 @@ public class GamepadTask extends RobotTask {
     @Override
     public void stop()
     {
-        // TODO: ??
+        robot.removeTask(this);
     }
 
     /*
@@ -132,6 +146,38 @@ public class GamepadTask extends RobotTask {
         } else if ((!gamepad.y) && (buttonState.y_pressed == true)) {
             robot.queueEvent(new GamepadEvent(this, EventKind.BUTTON_Y_UP));
             buttonState.y_pressed = false;
+        }
+
+        if ((gamepad.left_bumper) && (buttonState.left_bumper_pressed == false)) {
+            robot.queueEvent(new GamepadEvent(this, EventKind.LEFT_BUMPER_DOWN));
+            buttonState.left_bumper_pressed = true;
+        } else if ((!gamepad.left_bumper) && (buttonState.left_bumper_pressed == true)) {
+            robot.queueEvent(new GamepadEvent(this, EventKind.LEFT_BUMPER_UP));
+            buttonState.left_bumper_pressed = false;
+        }
+
+        if ((gamepad.right_bumper) && (buttonState.right_bumper_pressed == false)) {
+            robot.queueEvent(new GamepadEvent(this, EventKind.RIGHT_BUMPER_DOWN));
+            buttonState.right_bumper_pressed = true;
+        } else if ((!gamepad.right_bumper) && (buttonState.right_bumper_pressed == true)) {
+            robot.queueEvent(new GamepadEvent(this, EventKind.RIGHT_BUMPER_UP));
+            buttonState.right_bumper_pressed = false;
+        }
+
+        if ((gamepad.left_trigger >= TRIGGER_DEADZONE) && (buttonState.left_trigger_pressed == false)) {
+            robot.queueEvent(new GamepadEvent(this, EventKind.LEFT_TRIGGER_DOWN));
+            buttonState.left_trigger_pressed = true;
+        } else if ((gamepad.left_trigger < TRIGGER_DEADZONE) && (buttonState.left_trigger_pressed == true)) {
+            robot.queueEvent(new GamepadEvent(this, EventKind.LEFT_TRIGGER_UP));
+            buttonState.left_trigger_pressed = false;
+        }
+
+        if ((gamepad.right_trigger >= TRIGGER_DEADZONE) && (buttonState.right_trigger_pressed == false)) {
+            robot.queueEvent(new GamepadEvent(this, EventKind.RIGHT_TRIGGER_DOWN));
+            buttonState.right_trigger_pressed = true;
+        } else if ((gamepad.right_trigger < TRIGGER_DEADZONE) && (buttonState.right_trigger_pressed == true)) {
+            robot.queueEvent(new GamepadEvent(this, EventKind.RIGHT_TRIGGER_UP));
+            buttonState.right_trigger_pressed = false;
         }
 
         /*

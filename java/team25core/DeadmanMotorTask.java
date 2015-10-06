@@ -50,6 +50,10 @@ public class DeadmanMotorTask extends RobotTask {
             return true;
         } else if ((kind == GamepadTask.EventKind.RIGHT_BUMPER_DOWN) || (kind == GamepadTask.EventKind.RIGHT_BUMPER_UP) && (button == DeadmanButton.RIGHT_BUMPER)) {
             return true;
+        } else if ((kind == GamepadTask.EventKind.LEFT_TRIGGER_DOWN) || (kind == GamepadTask.EventKind.LEFT_TRIGGER_UP) && (button == DeadmanButton.LEFT_TRIGGER)) {
+            return true;
+        } else if ((kind == GamepadTask.EventKind.RIGHT_TRIGGER_DOWN) || (kind == GamepadTask.EventKind.RIGHT_TRIGGER_UP) && (button == DeadmanButton.RIGHT_TRIGGER)) {
+            return true;
         } else {
             return false;
         }
