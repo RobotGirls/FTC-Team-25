@@ -30,6 +30,7 @@ public class DeadmanMotorTask extends RobotTask {
     {
         super(robot);
 
+        this.motor = motor;
         this.gamepad = gamepad;
         this.button = button;
         this.power = power;
@@ -38,25 +39,28 @@ public class DeadmanMotorTask extends RobotTask {
 
     protected boolean isButtonTracked(GamepadTask.EventKind kind)
     {
-        if ((kind == GamepadTask.EventKind.BUTTON_A_DOWN) || (kind == GamepadTask.EventKind.BUTTON_A_UP) && (button == DeadmanButton.BUTTON_A)) {
-            return true;
-        } else if ((kind == GamepadTask.EventKind.BUTTON_B_DOWN) || (kind == GamepadTask.EventKind.BUTTON_B_UP) && (button == DeadmanButton.BUTTON_B)) {
-            return true;
-        } else if ((kind == GamepadTask.EventKind.BUTTON_X_DOWN) || (kind == GamepadTask.EventKind.BUTTON_X_UP) && (button == DeadmanButton.BUTTON_X)) {
-            return true;
-        } else if ((kind == GamepadTask.EventKind.BUTTON_Y_DOWN) || (kind == GamepadTask.EventKind.BUTTON_Y_UP) && (button == DeadmanButton.BUTTON_Y)) {
-            return true;
-        } else if ((kind == GamepadTask.EventKind.LEFT_BUMPER_DOWN) || (kind == GamepadTask.EventKind.LEFT_BUMPER_UP) && (button == DeadmanButton.LEFT_BUMPER)) {
-            return true;
-        } else if ((kind == GamepadTask.EventKind.RIGHT_BUMPER_DOWN) || (kind == GamepadTask.EventKind.RIGHT_BUMPER_UP) && (button == DeadmanButton.RIGHT_BUMPER)) {
-            return true;
-        } else if ((kind == GamepadTask.EventKind.LEFT_TRIGGER_DOWN) || (kind == GamepadTask.EventKind.LEFT_TRIGGER_UP) && (button == DeadmanButton.LEFT_TRIGGER)) {
-            return true;
-        } else if ((kind == GamepadTask.EventKind.RIGHT_TRIGGER_DOWN) || (kind == GamepadTask.EventKind.RIGHT_TRIGGER_UP) && (button == DeadmanButton.RIGHT_TRIGGER)) {
-            return true;
-        } else {
-            return false;
+        boolean ret;
+
+        ret = false;
+
+        if (((kind == GamepadTask.EventKind.BUTTON_A_DOWN) || (kind == GamepadTask.EventKind.BUTTON_A_UP)) && (button == DeadmanButton.BUTTON_A)) {
+            ret = true;
+        } else if (((kind == GamepadTask.EventKind.BUTTON_B_DOWN) || (kind == GamepadTask.EventKind.BUTTON_B_UP)) && (button == DeadmanButton.BUTTON_B)) {
+            ret = true;
+        } else if (((kind == GamepadTask.EventKind.BUTTON_X_DOWN) || (kind == GamepadTask.EventKind.BUTTON_X_UP)) && (button == DeadmanButton.BUTTON_X)) {
+            ret = true;
+        } else if (((kind == GamepadTask.EventKind.BUTTON_Y_DOWN) || (kind == GamepadTask.EventKind.BUTTON_Y_UP)) && (button == DeadmanButton.BUTTON_Y)) {
+            ret = true;
+        } else if (((kind == GamepadTask.EventKind.LEFT_BUMPER_DOWN) || (kind == GamepadTask.EventKind.LEFT_BUMPER_UP)) && (button == DeadmanButton.LEFT_BUMPER)) {
+            ret = true;
+        } else if (((kind == GamepadTask.EventKind.RIGHT_BUMPER_DOWN) || (kind == GamepadTask.EventKind.RIGHT_BUMPER_UP)) && (button == DeadmanButton.RIGHT_BUMPER)) {
+            ret = true;
+        } else if (((kind == GamepadTask.EventKind.LEFT_TRIGGER_DOWN) || (kind == GamepadTask.EventKind.LEFT_TRIGGER_UP)) && (button == DeadmanButton.LEFT_TRIGGER)) {
+            ret = true;
+        } else if (((kind == GamepadTask.EventKind.RIGHT_TRIGGER_DOWN) || (kind == GamepadTask.EventKind.RIGHT_TRIGGER_UP)) && (button == DeadmanButton.RIGHT_TRIGGER)) {
+            ret = true;
         }
+        return ret;
     }
 
     protected void toggleMotor(GamepadTask.EventKind kind)
@@ -68,6 +72,8 @@ public class DeadmanMotorTask extends RobotTask {
         case BUTTON_Y_DOWN:
         case LEFT_BUMPER_DOWN:
         case RIGHT_BUMPER_DOWN:
+        case LEFT_TRIGGER_DOWN:
+        case RIGHT_TRIGGER_DOWN:
             motor.setPower(power);
             break;
         case BUTTON_A_UP:
@@ -76,6 +82,8 @@ public class DeadmanMotorTask extends RobotTask {
         case BUTTON_Y_UP:
         case LEFT_BUMPER_UP:
         case RIGHT_BUMPER_UP:
+        case LEFT_TRIGGER_UP:
+        case RIGHT_TRIGGER_UP:
             motor.setPower(0.0);
             break;
         }
