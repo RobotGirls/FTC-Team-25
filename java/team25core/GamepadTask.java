@@ -34,7 +34,7 @@ public class GamepadTask extends RobotTask {
 
     public class GamepadEvent extends RobotEvent {
 
-        EventKind kind;
+        public EventKind kind;
 
         public GamepadEvent(RobotTask task, EventKind k)
         {
