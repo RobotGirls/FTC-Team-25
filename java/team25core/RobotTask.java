@@ -7,6 +7,7 @@ package team25core;
 
 public abstract class RobotTask {
 
+    protected Robot robot;
     public RobotTask(Robot robot)
     {
         this.robot = robot;
@@ -28,5 +29,5 @@ public abstract class RobotTask {
      */
     public abstract boolean timeslice();
 
-    protected Robot robot;
+
 }
