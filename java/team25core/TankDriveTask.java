@@ -34,7 +34,7 @@ public class TankDriveTask extends RobotTask {
         Gamepad gamepad;
         gamepad = robot.gamepad1;
 
-        left  = gamepad.left_stick_y;
+        left  = -gamepad.left_stick_y;
         right = gamepad.right_stick_y;
     }
 
