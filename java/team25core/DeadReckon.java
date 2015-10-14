@@ -39,7 +39,7 @@ public abstract class DeadReckon {
     protected abstract void motorTurn(double speed);
     protected abstract boolean isBusy();
 
-    DeadReckon(int encoderTicksPerInch, double encoderTicksPerDegree)
+    public DeadReckon(int encoderTicksPerInch, double encoderTicksPerDegree)
     {
         this.encoderTicksPerInch = encoderTicksPerInch;
         this.encoderTicksPerDegree = encoderTicksPerDegree;

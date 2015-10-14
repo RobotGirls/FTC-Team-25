@@ -13,7 +13,7 @@ public class DeadReckonTask extends RobotTask {
 
     public class DeadReckonEvent extends RobotEvent {
 
-        EventKind kind;
+        public EventKind kind;
         int segment_num;
 
         public DeadReckonEvent(RobotTask task, EventKind k, int segment_num)
