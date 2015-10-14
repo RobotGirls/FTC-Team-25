@@ -20,11 +20,26 @@ public class DeadmanMotorTask extends RobotTask {
         RIGHT_TRIGGER,
     };
 
+    public enum EventKind {
+        DEADMAN_BUTTON_DOWN,
+        DEADMAN_BUTTON_UP,
+    }
+
+    public class DeadmanMotorEvent extends RobotEvent {
+        public EventKind kind;
+
+        public DeadmanMotorEvent (RobotTask task, EventKind k){
+            super(task);
+            kind = k;
+        }
+    }
+
     GamepadTask.GamepadNumber gamepad;
     DcMotor motor;
     double power;
     DeadmanButton button;
     boolean done;
+    boolean buttonDown;
 
     public DeadmanMotorTask(Robot robot, DcMotor motor, double power, GamepadTask.GamepadNumber gamepad, DeadmanButton button)
     {
@@ -75,6 +90,7 @@ public class DeadmanMotorTask extends RobotTask {
         case LEFT_TRIGGER_DOWN:
         case RIGHT_TRIGGER_DOWN:
             motor.setPower(power);
+            robot.queueEvent(new DeadmanMotorEvent(this, EventKind.DEADMAN_BUTTON_DOWN));
             break;
         case BUTTON_A_UP:
         case BUTTON_B_UP:
@@ -85,6 +101,7 @@ public class DeadmanMotorTask extends RobotTask {
         case LEFT_TRIGGER_UP:
         case RIGHT_TRIGGER_UP:
             motor.setPower(0.0);
+            robot.queueEvent(new DeadmanMotorEvent(this, EventKind.DEADMAN_BUTTON_UP));
             break;
         }
     }
@@ -101,6 +118,7 @@ public class DeadmanMotorTask extends RobotTask {
                 if (isButtonTracked(event.kind)) {
                     toggleMotor(event.kind);
                 }
+
             }
         });
     }
@@ -114,6 +132,6 @@ public class DeadmanMotorTask extends RobotTask {
 
     @Override
     public boolean timeslice() {
-        return done;
+       return done;
     }
 }
