@@ -32,6 +32,8 @@ public class DeadReckonTask extends RobotTask {
 
     protected DeadReckon dr;
     protected int num;
+    protected boolean waiting;
+    SingleShotTimerTask sst;
 
     public DeadReckonTask(Robot robot, DeadReckon dr)
     {
@@ -39,6 +41,7 @@ public class DeadReckonTask extends RobotTask {
 
         this.num = 0;
         this.dr = dr;
+        this.waiting = false;
     }
 
     @Override
@@ -56,12 +59,26 @@ public class DeadReckonTask extends RobotTask {
     @Override
     public boolean timeslice()
     {
+        if (waiting == true) {
+            return false;
+        }
+
         /*
          * If runPath returned true it consumed a segment, send an event
          * back to the robot.
          */
         if (dr.runPath()) {
             robot.queueEvent(new DeadReckonEvent(this, EventKind.SEGMENT_DONE, num++));
+            waiting = true;
+            sst = new SingleShotTimerTask(this.robot, 200) {
+                @Override
+                public void handleEvent(RobotEvent e)
+                {
+                    waiting = false;
+                }
+            };
+            this.robot.addTask(sst);
+            return false;
         }
 
         if (dr.done()) {
