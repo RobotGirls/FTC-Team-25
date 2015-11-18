@@ -33,6 +33,7 @@ package test;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.GyroSensor;
 
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
@@ -44,9 +45,9 @@ public class DeadReckonSquareTest extends Robot {
 
     private class FourWheelDriveDeadReckon extends DeadReckon {
 
-        FourWheelDriveDeadReckon(int encoderTicksPerInch, double encoderTicksPerDegree)
+        FourWheelDriveDeadReckon(Robot robot, int encoderTicksPerInch, GyroSensor gyro)
         {
-            super(encoderTicksPerInch, encoderTicksPerDegree);
+            super(robot, encoderTicksPerInch, gyro);
         }
 
         @Override
@@ -96,7 +97,6 @@ public class DeadReckonSquareTest extends Robot {
     private final static double TICKS_PER_DEGREE = 6;
     private final static double MOTOR_SPEED = 0.2;
 
-    private FourWheelDriveDeadReckon deadReckon = new FourWheelDriveDeadReckon(TICKS_PER_INCH, TICKS_PER_DEGREE);
     private DcMotor frontRight;
     private DcMotor frontLeft;
     private DcMotor rearRight;
@@ -105,6 +105,8 @@ public class DeadReckonSquareTest extends Robot {
     private int battery;
     private DeadReckonTask deadReckonTask;
     private MonitorMotorTask monitorMotorTask;
+    private GyroSensor gyro;
+    private FourWheelDriveDeadReckon deadReckon = new FourWheelDriveDeadReckon(this, TICKS_PER_INCH, gyro);
 
     protected void handleDeadReckonEvent(DeadReckonTask.DeadReckonEvent e)
     {
@@ -133,6 +135,7 @@ public class DeadReckonSquareTest extends Robot {
         frontLeft = hardwareMap.dcMotor.get("motor_2");  //
         rearRight = hardwareMap.dcMotor.get("motor_3");
         rearLeft = hardwareMap.dcMotor.get("motor_4");
+        gyro = hardwareMap.gyroSensor.get("gyro");
         mc = hardwareMap.dcMotorController.get("MatrixControllerMotor");
         frontRight.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
         frontLeft.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
