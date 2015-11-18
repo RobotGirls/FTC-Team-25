@@ -3,6 +3,8 @@ package team25core;
  * FTC Team 25: cmacfarl, August 21, 2015
  */
 
+import com.qualcomm.robotcore.hardware.GyroSensor;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -15,7 +17,10 @@ public abstract class DeadReckon {
 
     public Queue<Segment> segments;
     protected int encoderTicksPerInch;
-    protected double encoderTicksPerDegree;
+    protected GyroSensor gyro;
+    protected Segment currSegment;
+    protected Robot robot;
+    protected boolean turning;
 
     public class Segment {
 
@@ -39,10 +44,13 @@ public abstract class DeadReckon {
     protected abstract void motorTurn(double speed);
     protected abstract boolean isBusy();
 
-    public DeadReckon(int encoderTicksPerInch, double encoderTicksPerDegree)
+    public DeadReckon(Robot robot, int encoderTicksPerInch, GyroSensor gyro)
     {
         this.encoderTicksPerInch = encoderTicksPerInch;
-        this.encoderTicksPerDegree = encoderTicksPerDegree;
+        this.gyro = gyro;
+        this.robot = robot;
+        this.currSegment = null;
+        this.turning = false;
         segments = new LinkedList<Segment>();
     }
 
@@ -53,24 +61,52 @@ public abstract class DeadReckon {
 
     protected void consumeSegment()
     {
-        Segment seg = segments.poll();
+        currSegment = segments.poll();
 
-
-        if (seg.type == SegmentType.STRAIGHT) {
-            resetEncoders((int)seg.distance * encoderTicksPerInch);
-            motorStraight(seg.speed);
+        if (currSegment.type == SegmentType.STRAIGHT) {
+            resetEncoders((int)currSegment.distance * encoderTicksPerInch);
+            motorStraight(currSegment.speed);
         } else {
-            resetEncoders((int)(seg.distance * encoderTicksPerDegree));
-            motorTurn(seg.speed);
+            gyro.resetZAxisIntegrator();
+            turning = true;
+            robot.addTask(new GyroTask(robot, gyro, (int)currSegment.distance, true) {
+                              @Override
+                              public void handleEvent(RobotEvent e) {
+                                  GyroEvent event = (GyroEvent) e;
+
+                                  if (event.kind == EventKind.HIT_TARGET || event.kind == EventKind.PAST_TARGET) {
+                                      motorStraight(0);
+                                  } else if (event.kind == EventKind.THRESHOLD_80) {
+                                      motorTurn(currSegment.speed * 0.10);
+                                  } else if (event.kind == EventKind.THRESHOLD_90) {
+                                      motorTurn(currSegment.speed * 0.02);
+                                  }
+                              }
+                          });
+            motorTurn(currSegment.speed);
+        }
+    }
+
+    protected boolean consumingSegment()
+    {
+        if (currSegment.type == SegmentType.STRAIGHT) {
+            return (isBusy());
+        } else {
+            return turning;
         }
     }
 
     public boolean runPath()
     {
-        if (!segments.isEmpty() && !isBusy()) {
+        if (currSegment == null) {
             consumeSegment();
             return true;
-        } else if (segments.isEmpty() && !isBusy()) {
+        }
+
+        if (!segments.isEmpty() && !consumingSegment()) {
+            consumeSegment();
+            return true;
+        } else if (segments.isEmpty() && !consumingSegment()) {
             motorStraight(0.0);
         }
         return false;
@@ -88,7 +124,7 @@ public abstract class DeadReckon {
 
     boolean done()
     {
-        return (segments.isEmpty() && !isBusy());
+        return (segments.isEmpty() && !consumingSegment());
     }
 }
 
