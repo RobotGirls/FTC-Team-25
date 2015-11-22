@@ -1,4 +1,5 @@
 package team25core;
+
 /*
  * FTC Team 25: cmacfarl, August 21, 2015
  */
@@ -124,7 +125,10 @@ public abstract class DeadReckon {
 
     boolean done()
     {
-        return (segments.isEmpty() && !consumingSegment());
+        boolean segmentEmpty = segments.isEmpty();
+        boolean busy = consumingSegment();
+
+        return (segmentEmpty && !busy);
     }
 }
 
