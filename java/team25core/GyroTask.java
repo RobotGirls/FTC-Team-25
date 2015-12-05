@@ -1,5 +1,7 @@
+
 package team25core;
 
+import com.qualcomm.hardware.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 
 /**
@@ -32,7 +34,6 @@ public class GyroTask extends RobotTask {
     protected GyroEvent t_90;
     protected GyroEvent t_95;
 
-
     public GyroTask(Robot robot, GyroSensor sensor, int targetHeading, boolean showHeading)
     {
         super(robot);
@@ -44,6 +45,12 @@ public class GyroTask extends RobotTask {
     @Override
     public void start() {
         sensor.resetZAxisIntegrator();
+
+        if (targetHeading > 0) {
+            ((ModernRoboticsI2cGyro)sensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARDINAL);
+        } else {
+            ((ModernRoboticsI2cGyro)sensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARTESIAN);
+        }
     }
 
     @Override
@@ -55,27 +62,27 @@ public class GyroTask extends RobotTask {
     public boolean timeslice() {
         int currentHeading = sensor.getHeading();
 
-        if(showHeading) {
+        if (showHeading) {
             robot.telemetry.addData("Current heading is: ", currentHeading);
         }
 
-        if (currentHeading == targetHeading) {
+        if (currentHeading == Math.abs(targetHeading)) {
             GyroEvent hitTarget = new GyroEvent(this, EventKind.HIT_TARGET);
             robot.queueEvent(hitTarget);
             return true;
-        } else if (currentHeading >= (targetHeading * 0.80) && t_80 == null) {
+        } else if (currentHeading >= (Math.abs(targetHeading) * 0.80) && t_80 == null) {
             t_80 = new GyroEvent(this, EventKind.THRESHOLD_80);
             robot.queueEvent(t_80);
             return false;
-        } else if (currentHeading >= (targetHeading * 0.90) && t_90 == null) {
+        } else if (currentHeading >= (Math.abs(targetHeading) * 0.90) && t_90 == null) {
             t_90 = new GyroEvent(this, EventKind.THRESHOLD_90);
             robot.queueEvent(t_90);
             return false;
-        } else if (currentHeading >= (targetHeading * 0.95) && t_95 == null) {
+        } else if (currentHeading >= (Math.abs(targetHeading) * 0.95) && t_95 == null) {
             t_95 = new GyroEvent(this, EventKind.THRESHOLD_95);
             robot.queueEvent(t_95);
             return false;
-        } else if (currentHeading >= targetHeading) {
+        } else if (currentHeading >= Math.abs(targetHeading)) {
             GyroEvent pastTarget = new GyroEvent(this, EventKind.PAST_TARGET);
             robot.queueEvent(pastTarget);
             return false;
