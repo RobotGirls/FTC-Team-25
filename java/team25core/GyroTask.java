@@ -1,3 +1,4 @@
+
 package team25core;
 
 import com.qualcomm.hardware.ModernRoboticsI2cGyro;
@@ -61,7 +62,7 @@ public class GyroTask extends RobotTask {
     public boolean timeslice() {
         int currentHeading = sensor.getHeading();
 
-        if(showHeading) {
+        if (showHeading) {
             robot.telemetry.addData("Current heading is: ", currentHeading);
         }
 

@@ -1,9 +1,8 @@
+
 package team25core;
 
-import com.qualcomm.hardware.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
-import com.qualcomm.robotcore.hardware.GyroSensor;
 
 /**
  * Created by katie on 11/14/15.
@@ -13,7 +12,7 @@ public class ColorSensorTask extends RobotTask {
     public enum EventKind {
         RED,
         BLUE,
-        OTHER,
+        PURPLE,
     }
 
     public class ColorSensorEvent extends RobotEvent {
@@ -28,15 +27,17 @@ public class ColorSensorTask extends RobotTask {
     protected ColorSensor colorSensor;
     protected DeviceInterfaceModule cdim;
     protected boolean bEnabled;
+    protected boolean color;
     protected int channelNumber;
 
-    public ColorSensorTask(Robot robot, ColorSensor colorSensor, DeviceInterfaceModule cdim, boolean bEnabled, int channelNumber)
+    public ColorSensorTask(Robot robot, ColorSensor colorSensor, DeviceInterfaceModule cdim, boolean bEnabled, boolean showColor, int channelNumber)
     {
         super(robot);
         this.colorSensor = colorSensor;
         this.cdim = cdim;
         this.bEnabled = bEnabled;
         this.channelNumber = channelNumber;
+        this.color = showColor;
     }
 
     @Override
@@ -56,19 +57,24 @@ public class ColorSensorTask extends RobotTask {
         int blue = colorSensor.blue();
         int red = colorSensor.red();
 
+        if (color) {
+            robot.telemetry.addData("B:", blue);
+            robot.telemetry.addData("R:", red);
+        }
+
         if (blue > red) {
             ColorSensorEvent blueEvent = new ColorSensorEvent(this, EventKind.BLUE);
             robot.queueEvent(blueEvent);
-            return false;
+            return true;
         } else if (red > blue) {
             ColorSensorEvent redEvent = new ColorSensorEvent(this, EventKind.RED);
             robot.queueEvent(redEvent);
-            return false;
+            return true;
         }
         else {
-            ColorSensorEvent otherEvent = new ColorSensorEvent(this, EventKind.OTHER);
-            robot.queueEvent(otherEvent);
-            return false;
+            ColorSensorEvent purpleEvent = new ColorSensorEvent(this, EventKind.PURPLE);
+            robot.queueEvent(purpleEvent);
+            return true;
         }
     }
 }
