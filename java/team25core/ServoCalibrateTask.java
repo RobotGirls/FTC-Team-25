@@ -15,7 +15,7 @@ public class ServoCalibrateTask extends RobotTask {
     protected int direction;
     protected Servo servo;
 
-    protected final static int speed = 500;
+    public static int speed = 251;
 
     public ServoCalibrateTask(Robot robot, Servo servo, int startPoint)
     {
@@ -52,22 +52,40 @@ public class ServoCalibrateTask extends RobotTask {
                 }
             }
         };
+        robot.addTask(gamepadTask);
     }
 
     @Override
-    public void stop() { }
+    public void stop() {
+    }
 
     @Override
     public boolean timeslice()
     {
+        // Toggle speed.
+        robot.addTask(new GamepadTask(robot, GamepadTask.GamepadNumber.GAMEPAD_1) {
+            public void handleEvent(RobotEvent e)
+            {
+                GamepadEvent event = (GamepadEvent) e;
+
+                if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
+                    speed = 100;
+                } else if (event.kind == EventKind.LEFT_TRIGGER_DOWN) {
+                    speed = 500;
+                }
+            }
+        });
+
         if (timer.time() > speed) {
             if (position >= 256) {
                 direction = -1;
             } else if (position <= 0) {
                 direction = 1;
             }
+
             position += direction;
-            servo.setPosition(position);
+            servo.setPosition((float)position/(float)256.0);
+            timer.reset();
         }
         robot.telemetry.addData("Position: ", position);
         return false;
