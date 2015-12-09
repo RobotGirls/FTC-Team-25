@@ -51,11 +51,14 @@ public class TwoMotorDriveTask extends RobotTask {
     {
         getJoystick();
 
-        double leftPowerValue = Math.exp((4.6 * left) / 100);
-        double rightPowerValue = Math.exp((4.6 * right) / 100);
+        double leftPowerValue = left;
+        double rightPowerValue = right;
 
         motorLeft.setPower(leftPowerValue);
         motorRight.setPower(rightPowerValue);
+
+        robot.telemetry.addData("L: ", leftPowerValue);
+        robot.telemetry.addData("R: ", rightPowerValue);
 
         return false;
     }

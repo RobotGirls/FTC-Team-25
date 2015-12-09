@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.ColorSensorTask;
 import team25core.DeadReckon;
@@ -49,10 +50,11 @@ public class BlueAutonomous extends Robot {
     {
         switch (e.kind) {
         case SEGMENT_DONE:
-            // telemetry.addDataPersist("Segments Completed: ", ++e.segment_num);
+            RobotLog.i("251 Segment done " + e.segment_num);
             break;
         case PATH_DONE:
-            handleBeacon();
+            RobotLog.i("251 Path done " + e.segment_num);
+            //handleBeacon();
             break;
         }
     }
@@ -73,11 +75,6 @@ public class BlueAutonomous extends Robot {
                 } else {
                     pushers.allStow();
                 }
-
-                deadReckonPush = new TwoWheelDriveDeadReckon(robot, TICKS_PER_INCH, gyro, leftTread, rightTread);
-
-                deadReckonPush.addSegment(DeadReckon.SegmentType.STRAIGHT, 7.5, 0.4);
-                deadReckonPush.addSegment(DeadReckon.SegmentType.STRAIGHT, 7.5, -0.4);
 
                 deadReckonPushTask = new DeadReckonTask(robot, deadReckonPush);
                 addTask(deadReckonPushTask);
@@ -101,11 +98,11 @@ public class BlueAutonomous extends Robot {
         gyro.calibrate();
 
         // Color.
-        color = hardwareMap.colorSensor.get("color");
-        core = hardwareMap.deviceInterfaceModule.get("interface");
+        //color = hardwareMap.colorSensor.get("color");
+        //core = hardwareMap.deviceInterfaceModule.get("interface");
 
-        core.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
-        core.setDigitalChannelState(LED_CHANNEL, false);
+        //core.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
+        //core.setDigitalChannelState(LED_CHANNEL, false);
 
         // Servos.
         rightPusher = hardwareMap.servo.get("rightPusher");
@@ -126,20 +123,24 @@ public class BlueAutonomous extends Robot {
 
         rightTread.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
         leftTread.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+
+        // Class: Dead reckon.
+        deadReckon = new TwoWheelDriveDeadReckon(this, TICKS_PER_INCH, gyro, leftTread, rightTread);
+        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 52, -0.5);
+        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 0.5251);
+        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 34, -0.5);
+        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 0.5251);
+        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 20, -0.5);
+
+        deadReckonPush = new TwoWheelDriveDeadReckon(this, TICKS_PER_INCH, gyro, leftTread, rightTread);
+        deadReckonPush.addSegment(DeadReckon.SegmentType.STRAIGHT, 7.5, 0.4);
+        deadReckonPush.addSegment(DeadReckon.SegmentType.STRAIGHT, 7.5, -0.4);
     }
 
     @Override
     public void start()
     {
         gyro.resetZAxisIntegrator();
-
-        deadReckon = new TwoWheelDriveDeadReckon(this, TICKS_PER_INCH, gyro, leftTread, rightTread);
-
-        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 52, -0.5);
-        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 0.5);
-        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 34, -0.5);
-        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 0.5);
-        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 20, -0.5);
 
         monitorMotorTask = new MonitorMotorTask(this, leftTread);
         deadReckonTask = new DeadReckonTask(this, deadReckon);

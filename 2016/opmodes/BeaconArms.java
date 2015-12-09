@@ -5,9 +5,8 @@ package opmodes;
  */
 
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.robot.Robot;
 
-public class BeaconArms extends Robot {
+public class BeaconArms {
     Servo right;
     Servo left;
 

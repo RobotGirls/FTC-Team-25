@@ -49,11 +49,11 @@ public class TankDriveTeleop extends Robot {
         gyro.calibrate();
 
         // Color.
-        color = hardwareMap.colorSensor.get("color");
-        core = hardwareMap.deviceInterfaceModule.get("interface");
+        //color = hardwareMap.colorSensor.get("color");
+        //core = hardwareMap.deviceInterfaceModule.get("interface");
 
-        core.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
-        core.setDigitalChannelState(LED_CHANNEL, false);
+        //core.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
+        //core.setDigitalChannelState(LED_CHANNEL, false);
 
         // Servos.
         rightPusher = hardwareMap.servo.get("rightPusher");
@@ -77,8 +77,8 @@ public class TankDriveTeleop extends Robot {
 
         leftTread.setDirection(DcMotor.Direction.REVERSE);
 
-        rightTread.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        leftTread.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        rightTread.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        leftTread.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 
         // Hook.
         hook = hardwareMap.dcMotor.get("hook");
@@ -107,6 +107,7 @@ public class TankDriveTeleop extends Robot {
         DeadmanMotorTask hookRetract = new DeadmanMotorTask(this, hook, -0.75, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.RIGHT_TRIGGER);
         this.addTask(hookRetract);
 
+        /*
         // Buttons: moves flags to position - (X) raise left, (A) lower left, (Y) raise right, (B) lower right.
         // Display: gyro heading - (LB) start task.
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
@@ -132,5 +133,6 @@ public class TankDriveTeleop extends Robot {
         if (displayEnabled) {
             addTask(display);
         }
+        */
     }
 }

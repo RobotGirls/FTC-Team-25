@@ -5,11 +5,13 @@ package team25core;
  */
 
 import com.qualcomm.robotcore.hardware.GyroSensor;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 public abstract class DeadReckon {
+    static int foo = 0;
 
     public enum SegmentType {
         STRAIGHT,
@@ -76,6 +78,7 @@ public abstract class DeadReckon {
                                   GyroEvent event = (GyroEvent) e;
 
                                   if (event.kind == EventKind.HIT_TARGET || event.kind == EventKind.PAST_TARGET) {
+                                      turning = false;
                                       motorStraight(0);
                                   } else if (event.kind == EventKind.THRESHOLD_80) {
                                       motorTurn(currSegment.speed * 0.10);
@@ -106,9 +109,13 @@ public abstract class DeadReckon {
 
         if (!segments.isEmpty() && !consumingSegment()) {
             consumeSegment();
+            RobotLog.i("251 Consuming segment:" + foo++);
+            RobotLog.i("251 Segment: STRAIGHT");
             return true;
         } else if (segments.isEmpty() && !consumingSegment()) {
             motorStraight(0.0);
+            RobotLog.i("251 Consuming segment:" + foo);
+            RobotLog.i("251 Segment: TURNING");
         }
         return false;
     }

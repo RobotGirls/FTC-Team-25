@@ -14,7 +14,7 @@ public class DeadReckonTask extends RobotTask {
     public class DeadReckonEvent extends RobotEvent {
 
         public EventKind kind;
-        int segment_num;
+        public int segment_num;
 
         public DeadReckonEvent(RobotTask task, EventKind k, int segment_num)
         {
@@ -72,7 +72,7 @@ public class DeadReckonTask extends RobotTask {
             waiting = true;
             sst = new SingleShotTimerTask(this.robot, 200) {
                 @Override
-                public void handleEvent(RobotEvent e)
+          tu      public void handleEvent(RobotEvent e)
                 {
                     waiting = false;
                 }
