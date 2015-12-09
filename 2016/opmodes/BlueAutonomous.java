@@ -5,6 +5,7 @@ package opmodes;
  * FTC Team 5218: izzielau, November 02, 2015
  */
 
+import com.qualcomm.hardware.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
@@ -18,6 +19,7 @@ import team25core.ColorSensorTask;
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.GyroTask;
+import team25core.MonitorGyroTask;
 import team25core.MonitorMotorTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -31,7 +33,7 @@ public class BlueAutonomous extends Robot {
     private DcMotor leftTread;
     private DcMotor rightTread;
     private DeviceInterfaceModule core;
-    private GyroSensor gyro;
+    private ModernRoboticsI2cGyro gyro;
     private ColorSensor color;
     private Servo leftPusher;
     private Servo rightPusher;
@@ -42,7 +44,7 @@ public class BlueAutonomous extends Robot {
     private TwoWheelDriveDeadReckon deadReckonPush;
     private DeadReckonTask deadReckonPushTask;
     private DeadReckonTask deadReckonTask;
-    private GyroTask displayGyroTask;
+    private MonitorGyroTask monitorGyroTask;
 
     private MonitorMotorTask monitorMotorTask;
 
@@ -50,20 +52,18 @@ public class BlueAutonomous extends Robot {
     {
         switch (e.kind) {
         case SEGMENT_DONE:
-            RobotLog.i("251 Segment done " + e.segment_num);
             break;
         case PATH_DONE:
-            RobotLog.i("251 Path done " + e.segment_num);
             //handleBeacon();
             break;
         }
     }
 
     public void handleBeacon() {
-        final BeaconArms pushers = new BeaconArms(rightPusher, leftPusher, true);
 
         addTask(new ColorSensorTask(this, color, core, true, true, LED_CHANNEL) {
             public void handleEvent(RobotEvent e) {
+                BeaconArms pushers = new BeaconArms(rightPusher, leftPusher, true);
                 ColorSensorEvent event = (ColorSensorEvent)e;
 
                 if (event.kind == EventKind.BLUE) {
@@ -94,7 +94,8 @@ public class BlueAutonomous extends Robot {
     public void init()
     {
         // Gyro.
-        gyro = hardwareMap.gyroSensor.get("gyro");
+        gyro = (ModernRoboticsI2cGyro)hardwareMap.gyroSensor.get("gyro");
+        gyro.setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARDINAL);
         gyro.calibrate();
 
         // Color.
@@ -105,15 +106,15 @@ public class BlueAutonomous extends Robot {
         //core.setDigitalChannelState(LED_CHANNEL, false);
 
         // Servos.
-        rightPusher = hardwareMap.servo.get("rightPusher");
-        leftPusher = hardwareMap.servo.get("leftPusher");
-        rightFlag = hardwareMap.servo.get("rightFlag");
-        leftFlag = hardwareMap.servo.get("leftFlag");
+        // rightPusher = hardwareMap.servo.get("rightPusher");
+        // leftPusher = hardwareMap.servo.get("leftPusher");
+        // rightFlag = hardwareMap.servo.get("rightFlag");
+        // leftFlag = hardwareMap.servo.get("leftFlag");
 
-        rightPusher.setPosition(NeverlandServoConstants.RIGHT_PUSHER_STOWED);
-        leftPusher.setPosition(NeverlandServoConstants.LEFT_PUSHER_STOWED);
-        rightFlag.setPosition(NeverlandServoConstants.RIGHT_FLAG_NINETY);
-        leftFlag.setPosition(NeverlandServoConstants.LEFT_FLAG_NINETY);
+        // rightPusher.setPosition(NeverlandServoConstants.RIGHT_PUSHER_STOWED);
+        // leftPusher.setPosition(NeverlandServoConstants.LEFT_PUSHER_STOWED);
+        // rightFlag.setPosition(NeverlandServoConstants.RIGHT_FLAG_NINETY);
+        // leftFlag.setPosition(NeverlandServoConstants.LEFT_FLAG_NINETY);
 
         // Treads.
         rightTread = hardwareMap.dcMotor.get("rightTread");
@@ -121,16 +122,19 @@ public class BlueAutonomous extends Robot {
 
         leftTread.setDirection(DcMotor.Direction.REVERSE);
 
-        rightTread.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        leftTread.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        rightTread.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        leftTread.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
 
         // Class: Dead reckon.
         deadReckon = new TwoWheelDriveDeadReckon(this, TICKS_PER_INCH, gyro, leftTread, rightTread);
         deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 52, -0.5);
-        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 0.5251);
+        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 0.2);
         deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 34, -0.5);
-        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 0.5251);
+        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 0.2);
         deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 20, -0.5);
+        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 0, 0);
 
         deadReckonPush = new TwoWheelDriveDeadReckon(this, TICKS_PER_INCH, gyro, leftTread, rightTread);
         deadReckonPush.addSegment(DeadReckon.SegmentType.STRAIGHT, 7.5, 0.4);
@@ -144,10 +148,10 @@ public class BlueAutonomous extends Robot {
 
         monitorMotorTask = new MonitorMotorTask(this, leftTread);
         deadReckonTask = new DeadReckonTask(this, deadReckon);
-        displayGyroTask = new GyroTask(this, gyro, 360, true);
+        monitorGyroTask = new MonitorGyroTask(this, gyro);
 
         addTask(monitorMotorTask);
-        addTask(displayGyroTask);
+        addTask(monitorGyroTask);
         addTask(deadReckonTask);
     }
 

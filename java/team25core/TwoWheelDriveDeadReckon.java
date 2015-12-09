@@ -17,7 +17,7 @@ public class TwoWheelDriveDeadReckon extends DeadReckon {
 
     public TwoWheelDriveDeadReckon(Robot robot, int encoderTicksPerInch, GyroSensor gyroSensor, DcMotor motorLeft, DcMotor motorRight)
     {
-        super(robot, encoderTicksPerInch, gyroSensor);
+        super(robot, encoderTicksPerInch, gyroSensor, motorLeft);
 
         this.rightMotor = motorRight;
         this.leftMotor = motorLeft;
@@ -26,12 +26,8 @@ public class TwoWheelDriveDeadReckon extends DeadReckon {
     @Override
     protected void resetEncoders(int ticks)
     {
-        leftMotor.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-        rightMotor.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-
-        leftMotor.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        rightMotor.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-
+        leftMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        rightMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         targetPosition = ticks;
     }
 
@@ -45,8 +41,8 @@ public class TwoWheelDriveDeadReckon extends DeadReckon {
     @Override
     protected void motorTurn(double speed)
     {
-        leftMotor.setPower(-speed);
-        rightMotor.setPower(speed);
+        leftMotor.setPower(speed);
+        rightMotor.setPower(-speed);
     }
 
     @Override

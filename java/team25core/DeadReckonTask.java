@@ -4,6 +4,8 @@ package team25core;
  * FTC Team 25: cmacfarl, September 01, 2015
  */
 
+import com.qualcomm.robotcore.util.RobotLog;
+
 public class DeadReckonTask extends RobotTask {
 
     public enum EventKind {
@@ -59,25 +61,14 @@ public class DeadReckonTask extends RobotTask {
     @Override
     public boolean timeslice()
     {
-        if (waiting == true) {
-            return false;
-        }
-
         /*
          * If runPath returned true it consumed a segment, send an event
          * back to the robot.
          */
+        robot.telemetry.addData("Segment: ", num);
+
         if (dr.runPath()) {
             robot.queueEvent(new DeadReckonEvent(this, EventKind.SEGMENT_DONE, num++));
-            waiting = true;
-            sst = new SingleShotTimerTask(this.robot, 200) {
-                @Override
-          tu      public void handleEvent(RobotEvent e)
-                {
-                    waiting = false;
-                }
-            };
-            this.robot.addTask(sst);
             return false;
         }
 
@@ -86,6 +77,7 @@ public class DeadReckonTask extends RobotTask {
             /*
              * Make sure it's stopped.
              */
+            RobotLog.i("251 Done with path, stopping all");
             dr.stop();
             return true;
         } else {

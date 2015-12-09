@@ -47,7 +47,7 @@ public class DeadReckonSquareTest extends Robot {
 
         FourWheelDriveDeadReckon(Robot robot, int encoderTicksPerInch, GyroSensor gyro)
         {
-            super(robot, encoderTicksPerInch, gyro);
+            super(robot, encoderTicksPerInch, gyro, rearLeft);
         }
 
         @Override

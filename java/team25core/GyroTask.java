@@ -63,7 +63,7 @@ public class GyroTask extends RobotTask {
         int currentHeading = sensor.getHeading();
 
         if (showHeading) {
-            robot.telemetry.addData("Current heading is: ", currentHeading);
+            robot.telemetry.addData("Current/target heading is: ", currentHeading + "/" + targetHeading);
         }
 
         if (currentHeading == Math.abs(targetHeading)) {
