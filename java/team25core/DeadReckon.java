@@ -49,6 +49,8 @@ public abstract class DeadReckon {
     protected abstract void resetEncoders(int ticks);
     protected abstract void motorStraight(double speed);
     protected abstract void motorTurn(double speed);
+    protected abstract void motorStop();
+
     protected abstract boolean isBusy();
 
     public DeadReckon(Robot robot, int encoderTicksPerInch, GyroSensor gyro, DcMotor masterMotor)
@@ -83,7 +85,7 @@ public abstract class DeadReckon {
 
                     if (event.kind == EventKind.HIT_TARGET || event.kind == EventKind.PAST_TARGET) {
                         turning = false;
-                        motorStraight(0);
+                        motorStop();
                     } else if (event.kind == EventKind.THRESHOLD_80) {
                         motorTurn(Math.max(0.20, currSegment.speed * 0.10));
                     } else if (event.kind == EventKind.THRESHOLD_90) {
@@ -97,7 +99,7 @@ public abstract class DeadReckon {
 
     protected void setupSegment()
     {
-        motorStraight(0.0);
+        motorStop();
 
         currSegment = segments.poll();
         setup = true;
@@ -153,7 +155,7 @@ public abstract class DeadReckon {
             setupSegment();
             return true;
         } else if (segments.isEmpty() && !consumingSegment()) {
-            motorStraight(0.0);
+            motorStop();
         }
         return false;
     }
@@ -164,7 +166,7 @@ public abstract class DeadReckon {
          * Remove all remaining segments and stop the motors.
          */
         segments.clear();
-        motorStraight(0.0);
+        motorStop();
         resetEncoders(0);
     }
 

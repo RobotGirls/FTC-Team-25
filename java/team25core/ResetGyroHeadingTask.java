@@ -41,14 +41,22 @@ public class ResetGyroHeadingTask extends RobotTask {
     @Override
     public void start()
     {
-        gyro.resetZAxisIntegrator();
-        PeriodicTimerTask ptt = new PeriodicTimerTask(this.robot, 200) {
+        SingleShotTimerTask sst = new SingleShotTimerTask(this.robot, 5000) {
             @Override
             public void handleEvent(RobotEvent e)
             {
                 gyro.resetZAxisIntegrator();
+                ptt = new PeriodicTimerTask(this.robot, 200) {
+                    @Override
+                    public void handleEvent(RobotEvent e)
+                    {
+                        gyro.resetZAxisIntegrator();
+                    }
+                };
+                this.robot.addTask(ptt);
             }
         };
+        this.robot.addTask(sst);
     }
 
     @Override
