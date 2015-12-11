@@ -80,16 +80,28 @@ public abstract class DeadReckon {
             turning = true;
             robot.addTask(new GyroTask(robot, gyro, (int)currSegment.distance, true) {
                 @Override
-                public void handleEvent(RobotEvent e) {
-                    GyroEvent event = (GyroEvent) e;
+                public void handleEvent(RobotEvent ev) {
+                    GyroEvent event = (GyroEvent) ev;
+                    double speed;
 
                     if (event.kind == EventKind.HIT_TARGET || event.kind == EventKind.PAST_TARGET) {
                         turning = false;
+                        RobotLog.i("251 Turned " + gyro.getHeading() + "/" + currSegment.distance);
                         motorStop();
                     } else if (event.kind == EventKind.THRESHOLD_80) {
-                        motorTurn(Math.max(0.20, currSegment.speed * 0.10));
+                        // motorTurn(Math.max(0.20, currSegment.speed * 0.10));
                     } else if (event.kind == EventKind.THRESHOLD_90) {
-                        motorTurn(Math.max(0.20, currSegment.speed * 0.02));
+                        // motorTurn(Math.max(0.15, currSegment.speed * 0.02));
+                    } else if (event.kind == EventKind.ERROR_UPDATE) {
+                        double e = Math.exp(1.0);
+                        double logVal = Math.pow(e, (5.6 * (event.val / Math.abs(currSegment.distance))));
+                        if (currSegment.distance < 0) {
+                            speed = -(logVal / 100) - 0.01;
+                        } else {
+                            speed = (logVal / 100) + 0.01;
+                        }
+                        motorTurn(speed);
+                        RobotLog.i("251 Gyro error " + event.val);
                     }
                 }
             });

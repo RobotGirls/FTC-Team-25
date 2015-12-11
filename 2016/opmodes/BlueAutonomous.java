@@ -19,15 +19,18 @@ import team25core.MonitorGyroTask;
 import team25core.MonitorMotorTask;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.Team25DcMotor;
 import team25core.TwoWheelDirectDriveDeadReckon;
+import team25core.TwoWheelGearedDriveDeadReckon;
 
 public class BlueAutonomous extends Robot {
 
     private final static int TICKS_PER_INCH = 100;
     private final static int LED_CHANNEL = 0;
 
-    private DcMotor leftTread;
-    private DcMotor rightTread;
+    private DcMotorController mc;
+    private Team25DcMotor leftTread;
+    private Team25DcMotor rightTread;
     private DeviceInterfaceModule core;
     private ModernRoboticsI2cGyro gyro;
     private ColorSensor color;
@@ -36,8 +39,8 @@ public class BlueAutonomous extends Robot {
     private Servo leftFlag;
     private Servo rightFlag;
 
-    private TwoWheelDirectDriveDeadReckon deadReckon;
-    private TwoWheelDirectDriveDeadReckon deadReckonPush;
+    private TwoWheelGearedDriveDeadReckon deadReckon;
+    private TwoWheelGearedDriveDeadReckon deadReckonPush;
     private DeadReckonTask deadReckonPushTask;
     private DeadReckonTask deadReckonTask;
     private MonitorGyroTask monitorGyroTask;
@@ -112,8 +115,10 @@ public class BlueAutonomous extends Robot {
         //leftFlag.setPosition(NeverlandServoConstants.LEFT_FLAG_NINETY);
 
         // Treads.
-        rightTread = hardwareMap.dcMotor.get("rightTread");
-        leftTread = hardwareMap.dcMotor.get("leftTread");
+        mc = hardwareMap.dcMotorController.get("motorController1");
+
+        rightTread = new Team25DcMotor(this, mc, 1);
+        leftTread = new Team25DcMotor(this, mc, 2);
 
         rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
@@ -121,7 +126,7 @@ public class BlueAutonomous extends Robot {
         leftTread.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
 
         // Class: Dead reckon.
-        deadReckon = new TwoWheelDirectDriveDeadReckon(this, TICKS_PER_INCH, gyro, leftTread, rightTread);
+        deadReckon = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, gyro, leftTread, rightTread);
         deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 52, 0.5);
         deadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 0.2);
         deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 34, 0.5);
@@ -130,7 +135,7 @@ public class BlueAutonomous extends Robot {
         deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 0, 0);
 
         // Class: Dead reckon (push beacon button).
-        deadReckonPush = new TwoWheelDirectDriveDeadReckon(this, TICKS_PER_INCH, gyro, leftTread, rightTread);
+        deadReckonPush = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, gyro, leftTread, rightTread);
         deadReckonPush.addSegment(DeadReckon.SegmentType.STRAIGHT, 7.5, 0.4);
         deadReckonPush.addSegment(DeadReckon.SegmentType.STRAIGHT, 7.5, -0.4);
         deadReckonPush.addSegment(DeadReckon.SegmentType.STRAIGHT, 0, 0);

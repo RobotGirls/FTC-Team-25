@@ -49,16 +49,6 @@ public abstract class Robot extends OpMode {
         RobotEvent e;
 
         /*
-         * This is a straight FIFO queue.  Pull an event off the queue, process it,
-         * move on to the next one.
-         */
-        e = events.poll();
-        while (e != null) {
-            e.handleEvent();
-            e = events.poll();
-        }
-
-        /*
          * A list of tasks to give timeslices to.  A task remains in the list
          * until it tells the Robot that it is finished (true: I'm done, false: I have
          * more work to do), at which point it is stopped.
@@ -68,5 +58,16 @@ public abstract class Robot extends OpMode {
                 t.stop();
             }
         }
+
+        /*
+         * This is a straight FIFO queue.  Pull an event off the queue, process it,
+         * move on to the next one.
+         */
+        e = events.poll();
+        while (e != null) {
+            e.handleEvent();
+            e = events.poll();
+        }
+
     }
 }

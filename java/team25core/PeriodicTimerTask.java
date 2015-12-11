@@ -37,6 +37,11 @@ public abstract class PeriodicTimerTask extends RobotTask {
         this.timeout = timeout;
     }
 
+    public void setRobot(Robot robot)
+    {
+        this.robot = robot;
+    }
+
     public void start()
     {
          timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);

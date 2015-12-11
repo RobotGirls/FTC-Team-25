@@ -11,14 +11,14 @@ import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
 public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
+
     private int targetPosition;
     public int lCurrentPosition;
 
-    DcMotor rightMotor;
-    DcMotor leftMotor;
-    PeriodicTimerTask ptt;
+    Team25DcMotor rightMotor;
+    Team25DcMotor leftMotor;
 
-    public TwoWheelGearedDriveDeadReckon(Robot robot, int encoderTicksPerInch, GyroSensor gyroSensor, DcMotor motorLeft, DcMotor motorRight)
+    public TwoWheelGearedDriveDeadReckon(Robot robot, int encoderTicksPerInch, GyroSensor gyroSensor, Team25DcMotor motorLeft, Team25DcMotor motorRight)
     {
         super(robot, encoderTicksPerInch, gyroSensor, motorLeft);
 
@@ -33,25 +33,15 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
     {
         leftMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         rightMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        targetPosition = ticks;
+        leftMotor.setTargetPosition(ticks);
     }
 
     @Override
     protected void motorStraight(final double speed)
     {
+        RobotLog.i("251 Straight speed " + speed);
         leftMotor.setPower(speed);
         rightMotor.setPower(speed);
-
-        ptt = new PeriodicTimerTask(this.robot, 200) {
-            @Override
-            public void handleEvent(RobotEvent e)
-            {
-                RobotLog.i("251 Setting power " + speed);
-                leftMotor.setPower(speed);
-                rightMotor.setPower(speed);
-            }
-        };
-        robot.addTask(ptt);
     }
 
     @Override
@@ -65,6 +55,7 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
     @Override
     protected void motorStop()
     {
+        RobotLog.i("251 Stopping motors");
         leftMotor.setPower(0.0);
         rightMotor.setPower(0.0);
     }
@@ -72,16 +63,12 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
     @Override
     protected boolean isBusy()
     {
-        lCurrentPosition = leftMotor.getCurrentPosition();
+        boolean busy = leftMotor.isBusy();
 
-        if (Math.abs(lCurrentPosition) >= targetPosition) {
-            ptt.stop();
-            RobotLog.i("251 Stopping motors");
-            leftMotor.setPower(0.0);
-            rightMotor.setPower(0.0);
+        if (!busy) {
+            motorStop();
         }
 
-        return (Math.abs(lCurrentPosition) < targetPosition);
-
+        return (busy);
     }
 }
