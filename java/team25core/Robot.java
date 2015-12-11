@@ -37,7 +37,11 @@ public abstract class Robot extends OpMode {
         events.add(event);
     }
 
-    @Override
+    public boolean taskRunning(RobotTask task)
+    {
+        return tasks.contains(task);
+    }
+
     public void init()
     {
         // TODO: ??
