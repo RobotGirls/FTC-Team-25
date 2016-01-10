@@ -35,8 +35,16 @@ public class BeaconArms {
         right.setPosition(NeverlandServoConstants.RIGHT_PUSHER_DEPLOYED);
     }
 
+    public void rightStow() {
+        right.setPosition(NeverlandServoConstants.RIGHT_PUSHER_STOWED);
+    }
+
+    public void leftStow() {
+        left.setPosition(NeverlandServoConstants.LEFT_PUSHER_STOWED);
+    }
+
     public void allStow() {
-        left.setPosition(NeverlandServoConstants.LEFT_PUSHER_DEPLOYED);
-        right.setPosition(NeverlandServoConstants.RIGHT_PUSHER_DEPLOYED);
+        left.setPosition(NeverlandServoConstants.LEFT_PUSHER_STOWED);
+        right.setPosition(NeverlandServoConstants.RIGHT_PUSHER_STOWED);
     }
 }

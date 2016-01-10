@@ -32,7 +32,11 @@ public class Team25DcMotor extends DcMotor
         this.power = 0.0;
     }
 
-    @Override
+    public void stopPeriodic()
+    {
+        this.robot.removeTask(ptt);
+    }
+
     public void setPower(double power)
     {
         if (power > 1.0) {
@@ -42,6 +46,7 @@ public class Team25DcMotor extends DcMotor
         }
 
         this.power = power;
+        super.setPower(power);
     }
 
     @Override

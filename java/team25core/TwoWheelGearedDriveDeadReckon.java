@@ -15,10 +15,10 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
     private int targetPosition;
     public int lCurrentPosition;
 
-    Team25DcMotor rightMotor;
-    Team25DcMotor leftMotor;
+    DcMotor rightMotor;
+    DcMotor leftMotor;
 
-    public TwoWheelGearedDriveDeadReckon(Robot robot, int encoderTicksPerInch, GyroSensor gyroSensor, Team25DcMotor motorLeft, Team25DcMotor motorRight)
+    public TwoWheelGearedDriveDeadReckon(Robot robot, int encoderTicksPerInch, GyroSensor gyroSensor, DcMotor motorLeft, DcMotor motorRight)
     {
         super(robot, encoderTicksPerInch, gyroSensor, motorLeft);
 
