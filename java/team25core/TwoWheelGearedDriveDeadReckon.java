@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.swerverobotics.library.internal.EasyModernMotorController;
+
 public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
 
     private int targetPosition;
@@ -18,6 +20,9 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
     DcMotor rightMotor;
     DcMotor leftMotor;
 
+    /*
+     * Assumes that both motors are on the same controller.
+     */
     public TwoWheelGearedDriveDeadReckon(Robot robot, int encoderTicksPerInch, GyroSensor gyroSensor, DcMotor motorLeft, DcMotor motorRight)
     {
         super(robot, encoderTicksPerInch, gyroSensor, motorLeft);
@@ -39,15 +44,13 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
     @Override
     protected void motorStraight(final double speed)
     {
-        RobotLog.i("251 Straight speed " + speed);
-        leftMotor.setPower(speed);
-        rightMotor.setPower(speed);
+        EasyModernMotorController mc = (EasyModernMotorController)leftMotor.getController();
+        mc.setMotorPower(speed);
     }
 
     @Override
     protected void motorTurn(double speed)
     {
-        RobotLog.i("251 Turning speed " + speed);
         leftMotor.setPower(speed);
         rightMotor.setPower(-speed);
     }
@@ -56,8 +59,7 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
     protected void motorStop()
     {
         RobotLog.i("251 Stopping motors");
-        leftMotor.setPower(0.0);
-        rightMotor.setPower(0.0);
+        motorStraight(0.0);
     }
 
     @Override
