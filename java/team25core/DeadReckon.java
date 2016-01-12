@@ -28,6 +28,8 @@ public abstract class DeadReckon {
     protected Robot robot;
     protected boolean turning;
     protected boolean setup;
+    protected int lastHeading;
+    protected int target;
 
     public class Segment {
 
@@ -62,6 +64,7 @@ public abstract class DeadReckon {
         this.currSegment = null;
         this.turning = false;
         this.setup = false;
+        this.lastHeading = 0;
         segments = new LinkedList<Segment>();
     }
 
@@ -76,9 +79,11 @@ public abstract class DeadReckon {
             RobotLog.i("251 Moving straight");
             motorStraight(currSegment.speed);
         } else {
-            RobotLog.i("251 Turning " + currSegment.distance + " degrees");
             turning = true;
-            robot.addTask(new GyroTask(robot, gyro, (int)currSegment.distance, true) {
+            target = lastHeading + (int)currSegment.distance;
+            lastHeading = target;
+            RobotLog.i("251 Turning " + currSegment.distance + " degrees " + " to target " + target);
+            robot.addTask(new GyroTask(robot, gyro, target, false) {
                 @Override
                 public void handleEvent(RobotEvent ev) {
                     GyroEvent event = (GyroEvent) ev;
@@ -101,7 +106,6 @@ public abstract class DeadReckon {
                             speed = (logVal / 100) + 0.01;
                         }
                         motorTurn(speed);
-                        RobotLog.i("251 Gyro error " + event.val);
                     }
                 }
             });
@@ -131,6 +135,9 @@ public abstract class DeadReckon {
             this.robot.addTask(rmt);
         } else {
             RobotLog.i("251 Setting up turn segment: " + foo);
+            setup = false;
+            consumeSegment();
+            /*
             ResetGyroHeadingTask rgt = new ResetGyroHeadingTask(this.robot, gyro) {
                 @Override
                 public void handleEvent(RobotEvent e)
@@ -141,6 +148,7 @@ public abstract class DeadReckon {
                 }
             };
             this.robot.addTask(rgt);
+            */
         }
     }
 
