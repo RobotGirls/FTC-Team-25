@@ -54,7 +54,7 @@ public class GyroTask extends RobotTask {
 
     @Override
     public void start() {
-        sensor.resetZAxisIntegrator();
+        // sensor.resetZAxisIntegrator();
 
         if (targetHeading > 0) {
             ((ModernRoboticsI2cGyro)sensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARDINAL);
@@ -79,8 +79,6 @@ public class GyroTask extends RobotTask {
         }
 
         error = (absTarget - currentHeading + 360) % 360;
-
-        RobotLog.i("251 Current/target heading is: " + currentHeading + "/" + targetHeading);
 
         GyroEvent errorUpdate = new GyroEvent(this, EventKind.ERROR_UPDATE, error);
         robot.queueEvent(errorUpdate);
