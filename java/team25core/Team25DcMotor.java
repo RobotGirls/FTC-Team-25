@@ -19,10 +19,19 @@ import java.util.Set;
 
 public class Team25DcMotor extends DcMotor
 {
+    public enum MotorLocation {
+        UNKNOWN,
+        FRONT_LEFT,
+        FRONT_RIGHT,
+        REAR_LEFT,
+        REAR_RIGHT,
+    }
+
     protected Robot robot;
     protected double power;
     protected int targetPosition;
     protected Set<Team25DcMotor> slaves = null;
+    protected MotorLocation location;
     private final static double powerMax = 1.0;
     private final static double powerMin = -1.0;
 
@@ -40,6 +49,15 @@ public class Team25DcMotor extends DcMotor
         this.robot = robot;
         this.ptt.setRobot(robot);
         this.power = 0.0;
+    }
+
+    public Team25DcMotor(Robot robot, DcMotorController controller, int portNumber, MotorLocation loc)
+    {
+        super(controller, portNumber);
+        this.robot = robot;
+        this.ptt.setRobot(robot);
+        this.power = 0.0;
+        this.location = loc;
     }
 
     public void stopPeriodic()
@@ -62,11 +80,10 @@ public class Team25DcMotor extends DcMotor
         power = Range.clip(power, powerMin, powerMax);
 
         if (slaves != null) {
-            if (slaves.size() == 1) {
+            if ((slaves.size() == 1) && (isEasyController() == true)) {
                 Team25DcMotor m = (Team25DcMotor) slaves.toArray()[0];
                 DcMotorController mc = m.getController();
-                if (mc == this.getController() &&
-                    mc instanceof org.swerverobotics.library.internal.EasyModernMotorController) {
+                if (mc == this.getController()) {
                     ((EasyModernMotorController) mc).setMotorPower(power);
                     return;
                 }
@@ -81,22 +98,45 @@ public class Team25DcMotor extends DcMotor
     }
 
     /**
-     * Rotates two motors in opposite directions.  This motor must be
-     * bound with one, and only one, slave.
+     * Rotates two/four motors in opposite directions.  This motor must be
+     * bound with one slave or three slaves.  If three, the user must
+     * specify motor location in the constructor.
      *
      * @param power The motor power to apply to the master.  The slave is
      * applied a negated power value.
      */
     public void turn(double power)
     {
-        if ((slaves == null) || (slaves.size() != 1)) {
-            throw new UnsupportedOperationException("Turn must be called only with a motor with one slave");
+        if (slaves == null) {
+            throw new UnsupportedOperationException("Turn must be called with at least one slave");
         }
 
         power = Range.clip(power, powerMin, powerMax);
-        this.power = power;
-        super.setPower(power);
-        ((Team25DcMotor)slaves.toArray()[0]).setPower(-power);
+
+        if (slaves.size() == 1) {
+            this.power = power;
+            super.setPower(power);
+            ((Team25DcMotor)slaves.toArray()[0]).setPower(-power);
+        } else if (slaves.size() == 3) {
+            if (this.location == MotorLocation.UNKNOWN) {
+                throw new UnsupportedOperationException("All motors must have location specified for the turn operation");
+            }
+            this.power = power;
+            super.setPower(power);
+
+            for (Team25DcMotor m : slaves) {
+                if (this.location == MotorLocation.UNKNOWN) {
+                    throw new UnsupportedOperationException("All motors must have location specified for the turn operation");
+                } else if (this.location.toString().substring(this.location.toString().indexOf('_')) ==
+                            m.location.toString().substring(m.location.toString().indexOf('_'))) {
+                    m.setPower(power);
+                } else {
+                    m.setPower(-power);
+                }
+            }
+        } else {
+            throw new UnsupportedOperationException("Turn must be called with either one or three slaves");
+        }
     }
 
     public void setTargetPosition(int position)
@@ -123,6 +163,41 @@ public class Team25DcMotor extends DcMotor
     }
 
     /**
+     * Bind three other motors to this one, making this one the master.
+     * Assumes there's a second motor on the master's controller and two
+     * motors on the controller passed in.
+     *
+     * Throws an exception if this is not running on an EasyModernMotorController
+     *
+     * @param mc The other two
+     */
+    public void bind(DcMotorController mc)
+    {
+        if ((isEasyController() == false) || (isEasyController(mc) == false)) {
+            throw new UnsupportedOperationException("Binding only supported in conjunction with EasyModernMotorController");
+        }
+
+        this.slaves = new HashSet<Team25DcMotor>();
+
+        /*
+         * What port am I on?
+         */
+        int port = this.getPortNumber();
+        if (port == 1) {
+            this.slaves.add((Team25DcMotor)((EasyModernMotorController) this.getController()).getMotor(2));
+        } else {
+            this.slaves.add((Team25DcMotor)((EasyModernMotorController) this.getController()).getMotor(1));
+        }
+
+        /*
+         * Add the other motor controller's motors.
+         */
+        this.slaves.add((Team25DcMotor)((EasyModernMotorController)mc).getMotor(1));
+        this.slaves.add((Team25DcMotor)((EasyModernMotorController)mc).getMotor(2));
+    }
+
+
+    /**
      * A convenience function to bind a single motor to this master.  Will throw
      * away any previous binds/pairs.  If you want to bind multiple motors to
      * this motor use bind().
@@ -138,5 +213,19 @@ public class Team25DcMotor extends DcMotor
     public void unbind()
     {
         this.slaves = null;
+    }
+
+    private boolean isEasyController()
+    {
+        return isEasyController(this.getController());
+    }
+
+    private static boolean isEasyController(DcMotorController mc)
+    {
+        if (mc instanceof org.swerverobotics.library.internal.EasyModernMotorController) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
