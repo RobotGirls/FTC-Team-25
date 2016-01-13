@@ -55,7 +55,7 @@ public class Team25DcMotor extends DcMotor
     /**
      * Sets the power for this motor and any of its slaves.
      *
-     * @param double The power to apply to the motor.
+     * @param power The power to apply to the motor.
      */
     public void setPower(double power)
     {
@@ -65,7 +65,8 @@ public class Team25DcMotor extends DcMotor
             if (slaves.size() == 1) {
                 Team25DcMotor m = (Team25DcMotor) slaves.toArray()[0];
                 DcMotorController mc = m.getController();
-                if (mc instanceof org.swerverobotics.library.internal.EasyModernMotorController) {
+                if (mc == this.getController() &&
+                    mc instanceof org.swerverobotics.library.internal.EasyModernMotorController) {
                     ((EasyModernMotorController) mc).setMotorPower(power);
                     return;
                 }
