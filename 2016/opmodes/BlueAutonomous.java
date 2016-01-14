@@ -14,12 +14,14 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.swerverobotics.library.ClassFactory;
+import org.swerverobotics.library.interfaces.Autonomous;
 
 import team25core.ColorSensorTask;
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.MonitorGyroTask;
 import team25core.MonitorMotorTask;
+import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
@@ -27,6 +29,7 @@ import team25core.Team25DcMotor;
 import team25core.TwoWheelDirectDriveDeadReckon;
 import team25core.TwoWheelGearedDriveDeadReckon;
 
+@Autonomous(name="BlueAutonomous", group="AutoTeam25")
 public class BlueAutonomous extends Robot {
 
     private final static int TICKS_PER_INCH = 318;
@@ -49,6 +52,7 @@ public class BlueAutonomous extends Robot {
     private DeadReckonTask deadReckonTask;
     private MonitorGyroTask monitorGyroTask;
     private BeaconArms pushers;
+    private PersistentTelemetryTask telemetryTask = new PersistentTelemetryTask(this);
 
     private MonitorMotorTask monitorMotorTask;
 
@@ -56,6 +60,7 @@ public class BlueAutonomous extends Robot {
     {
         switch (e.kind) {
         case SEGMENT_DONE:
+            telemetryTask.addData("Segment " + e.segment_num, "Done");
             break;
         case PATH_DONE:
             pushers.colorDeploy();
@@ -138,26 +143,23 @@ public class BlueAutonomous extends Robot {
 
         // Treads.
         mc = hardwareMap.dcMotorController.get("motors");
-
         rightTread = new Team25DcMotor(this, mc, 2);
         leftTread = new Team25DcMotor(this, mc, 1);
-        rightTread.stopPeriodic();
-        leftTread.stopPeriodic();
+
+        ClassFactory.createEasyMotorController(this, leftTread, rightTread);
 
         rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         rightTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         leftTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 
-        ClassFactory.createEasyMotorController(this, leftTread, rightTread);
-
         // Class: Dead reckon.
         deadReckon = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, gyro, leftTread, rightTread);
-        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 38, 0.7);
-        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 0.4);
-        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 38, 0.7);
-        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 0.4);
-        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 14, 0.7);
+        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 38, 1.0);
+        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 1.0);
+        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 43, 1.0);
+        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 1.0);
+        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 3, 1.0);
         deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 0, 0);
 
         // Class: Dead reckon (push beacon button).
@@ -168,6 +170,15 @@ public class BlueAutonomous extends Robot {
     }
 
     @Override
+    public void init_loop()
+    {
+        if (gyro.isCalibrating() == true) {
+            telemetry.addData("Gyro", " is calibrating");
+        } else {
+            telemetry.addData("Gyro", " is not calibrating");
+        }
+    }
+
     public void start()
     {
         gyro.resetZAxisIntegrator();
