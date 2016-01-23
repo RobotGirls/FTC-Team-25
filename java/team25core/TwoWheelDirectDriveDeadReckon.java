@@ -18,6 +18,9 @@ public class TwoWheelDirectDriveDeadReckon extends DeadReckon {
     Team25DcMotor rightMotor;
     Team25DcMotor leftMotor;
 
+    /*
+     * For gyro based turns
+     */
     public TwoWheelDirectDriveDeadReckon(Robot robot, int encoderTicksPerInch, GyroSensor gyroSensor, Team25DcMotor motorLeft, Team25DcMotor motorRight)
     {
         super(robot, encoderTicksPerInch, gyroSensor, motorLeft);
@@ -28,12 +31,31 @@ public class TwoWheelDirectDriveDeadReckon extends DeadReckon {
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
+    /*
+     * For encoder based turns
+     */
+    public TwoWheelDirectDriveDeadReckon(Robot robot, int encoderTicksPerInch, int encoderTicksPerDegree, Team25DcMotor motorLeft, Team25DcMotor motorRight)
+    {
+        super(robot, encoderTicksPerInch, encoderTicksPerDegree, motorLeft);
+
+        this.rightMotor = motorRight;
+        this.leftMotor = motorLeft;
+
+        rightMotor.setDirection(DcMotor.Direction.REVERSE);
+    }
+
     @Override
-    protected void resetEncoders(int ticks)
+    protected void resetEncoders()
+    {
+        leftMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        rightMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+    }
+
+    @Override
+    protected void encodersOn()
     {
         leftMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         rightMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        targetPosition = ticks;
     }
 
     @Override

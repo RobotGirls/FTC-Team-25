@@ -20,8 +20,25 @@ public abstract class DeadReckon {
         TURN
     }
 
+    public enum SegmentState {
+        INITIALIZE,
+        ENCODER_RESET,
+        SET_TARGET,
+        CONSUME_SEGMENT,
+        ENCODER_TARGET,
+        STOP_MOTORS,
+        WAIT,
+        DONE,
+    }
+
+    protected enum TurnKind {
+        TURN_USING_ENCODERS,
+        TURN_USING_GYRO,
+    }
+
     public Queue<Segment> segments;
     protected int encoderTicksPerInch;
+    protected double encoderTicksPerDegree;
     protected GyroSensor gyro;
     protected DcMotor masterMotor;
     protected Segment currSegment;
@@ -30,15 +47,19 @@ public abstract class DeadReckon {
     protected boolean setup;
     protected int lastHeading;
     protected int target;
+    protected TurnKind turnKind;
+    protected PersistentTelemetryTask ptt;
 
     public class Segment {
 
-        protected SegmentType type;
+        public SegmentType type;
+        public SegmentState state;
         public double distance;
         public double speed;
 
         Segment(SegmentType type, double distance, double speed)
         {
+            this.state = SegmentState.INITIALIZE;
             this.distance = distance;
             this.type = type;
             this.speed = speed;
@@ -48,7 +69,8 @@ public abstract class DeadReckon {
     /*
      * The abstract functions are provided by the bot.
      */
-    protected abstract void resetEncoders(int ticks);
+    protected abstract void resetEncoders();
+    protected abstract void encodersOn();
     protected abstract void motorStraight(double speed);
     protected abstract void motorTurn(double speed);
     protected abstract void motorStop();
@@ -58,6 +80,7 @@ public abstract class DeadReckon {
     public DeadReckon(Robot robot, int encoderTicksPerInch, GyroSensor gyro, DcMotor masterMotor)
     {
         this.encoderTicksPerInch = encoderTicksPerInch;
+        this.encoderTicksPerDegree = 0;
         this.gyro = gyro;
         this.masterMotor = masterMotor;
         this.robot = robot;
@@ -65,12 +88,74 @@ public abstract class DeadReckon {
         this.turning = false;
         this.setup = false;
         this.lastHeading = 0;
+        this.turnKind = TurnKind.TURN_USING_GYRO;
         segments = new LinkedList<Segment>();
+        ptt = new PersistentTelemetryTask(robot);
+        robot.addTask(ptt);
+    }
+
+    public DeadReckon(Robot robot, int encoderTicksPerInch, double encoderTicksPerDegree, DcMotor masterMotor)
+    {
+        this.encoderTicksPerInch = encoderTicksPerInch;
+        this.encoderTicksPerDegree = encoderTicksPerDegree;
+        this.gyro = gyro;
+        this.masterMotor = masterMotor;
+        this.robot = robot;
+        this.currSegment = null;
+        this.turning = false;
+        this.setup = false;
+        this.lastHeading = 0;
+        this.turnKind = TurnKind.TURN_USING_ENCODERS;
+        segments = new LinkedList<Segment>();
+        ptt = new PersistentTelemetryTask(robot);
+        robot.addTask(ptt);
     }
 
     public void addSegment(SegmentType type, double distance, double speed)
     {
         segments.add(new Segment(type, distance, speed));
+    }
+
+    public void setTarget()
+    {
+        if (getCurrentSegment().type == SegmentType.STRAIGHT) {
+            this.target = Math.abs((int)(getCurrentSegment().distance * encoderTicksPerInch));
+        } else {
+            this.target = Math.abs((int)(getCurrentSegment().distance * encoderTicksPerDegree));
+        }
+        ptt.addData("Target: ", this.target);
+    }
+
+    public boolean areEncodersReset()
+    {
+        if (masterMotor.getCurrentPosition() == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean hitTarget()
+    {
+        int position;
+
+        position = Math.abs(masterMotor.getCurrentPosition());
+        ptt.addData("Position: ", position);
+        if (position >= target) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void nextSegment()
+    {
+        segments.remove();
+    }
+
+    public Segment getCurrentSegment()
+    {
+        return segments.peek();
     }
 
     protected void consumeSegment()
@@ -127,7 +212,7 @@ public abstract class DeadReckon {
                 public void handleEvent(RobotEvent e)
                 {
                     RobotLog.i("251 Encoder reset done, consuming segment:" + foo);
-                    resetEncoders((int) currSegment.distance * encoderTicksPerInch);
+                    resetEncoders();
                     setup = false;
                     consumeSegment();
                 }
@@ -187,7 +272,7 @@ public abstract class DeadReckon {
          */
         segments.clear();
         motorStop();
-        resetEncoders(0);
+        resetEncoders();
     }
 
     boolean done()

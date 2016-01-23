@@ -33,12 +33,28 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
+    public TwoWheelGearedDriveDeadReckon(Robot robot, int encoderTicksPerInch, int encoderTicksPerDegree, DcMotor motorLeft, DcMotor motorRight)
+    {
+        super(robot, encoderTicksPerInch, encoderTicksPerDegree, motorLeft);
+
+        this.rightMotor = motorRight;
+        this.leftMotor = motorLeft;
+
+        leftMotor.setDirection(DcMotor.Direction.REVERSE);
+    }
+
     @Override
-    protected void resetEncoders(int ticks)
+    protected void resetEncoders()
+    {
+        leftMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        rightMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+    }
+
+    @Override
+    protected void encodersOn()
     {
         leftMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         rightMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        leftMotor.setTargetPosition(ticks);
     }
 
     @Override

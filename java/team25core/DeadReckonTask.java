@@ -36,6 +36,7 @@ public class DeadReckonTask extends RobotTask {
     protected int num;
     protected boolean waiting;
     SingleShotTimerTask sst;
+    int waitState = 0;
 
     public DeadReckonTask(Robot robot, DeadReckon dr)
     {
@@ -44,6 +45,7 @@ public class DeadReckonTask extends RobotTask {
         this.num = 0;
         this.dr = dr;
         this.waiting = false;
+        this.waitState = 0;
     }
 
     @Override
@@ -61,27 +63,75 @@ public class DeadReckonTask extends RobotTask {
     @Override
     public boolean timeslice()
     {
+        DeadReckon.Segment segment;
+
         /*
-         * If runPath returned true it consumed a segment, send an event
-         * back to the robot.
+         * Get current segment
          */
-        robot.telemetry.addData("Segment: ", num);
+        segment = dr.getCurrentSegment();
 
-        if (dr.runPath()) {
-            robot.queueEvent(new DeadReckonEvent(this, EventKind.SEGMENT_DONE, num++));
-            return false;
-        }
-
-        if (dr.done()) {
+        if (segment == null) {
             robot.queueEvent(new DeadReckonEvent(this, EventKind.PATH_DONE, num));
-            /*
-             * Make sure it's stopped.
-             */
+                /*
+                 * Make sure it's stopped.
+                 */
             RobotLog.i("251 Done with path, stopping all");
             dr.stop();
             return true;
-        } else {
-            return false;
         }
+
+        switch (segment.state) {
+        case INITIALIZE:
+            dr.resetEncoders();
+            segment.state = DeadReckon.SegmentState.ENCODER_RESET;
+            break;
+        case ENCODER_RESET:
+            if (dr.areEncodersReset()) {
+                segment.state = DeadReckon.SegmentState.SET_TARGET;
+            } else {
+                dr.resetEncoders();
+            }
+            break;
+        case SET_TARGET:
+            dr.encodersOn();
+            dr.setTarget();
+            segment.state = DeadReckon.SegmentState.CONSUME_SEGMENT;
+            break;
+        case CONSUME_SEGMENT:
+            if (segment.type == DeadReckon.SegmentType.STRAIGHT) {
+                dr.motorStraight(segment.speed);
+            } else {
+                dr.motorTurn(segment.speed);
+            }
+            segment.state = DeadReckon.SegmentState.ENCODER_TARGET;
+            break;
+        case ENCODER_TARGET:
+            if (dr.hitTarget()) {
+                segment.state = DeadReckon.SegmentState.STOP_MOTORS;
+            }
+            break;
+        case STOP_MOTORS:
+            dr.motorStraight(0.0);
+            segment.state = DeadReckon.SegmentState.WAIT;
+            waitState = 0;
+        case WAIT:
+            waitState++;
+            /*
+             * About 1/2 a second give or take, this is really stupid, nobody
+             * would design a system like this from scratch.
+             */
+            if (waitState > 50) {
+                segment.state = DeadReckon.SegmentState.DONE;
+            }
+        case DONE:
+            num++;
+            dr.nextSegment();
+            segment.state = DeadReckon.SegmentState.INITIALIZE;
+        }
+
+        robot.telemetry.addData("Segment: ", num);
+        robot.telemetry.addData("State: ", segment.state.toString());
+
+        return false;
     }
 }

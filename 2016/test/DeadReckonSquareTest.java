@@ -37,70 +37,12 @@ import com.qualcomm.robotcore.hardware.GyroSensor;
 
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
+import team25core.FourWheelDirectDriveDeadReckon;
 import team25core.MonitorMotorTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 
 public class DeadReckonSquareTest extends Robot {
-
-    private class FourWheelDriveDeadReckon extends DeadReckon {
-
-        FourWheelDriveDeadReckon(Robot robot, int encoderTicksPerInch, GyroSensor gyro)
-        {
-            super(robot, encoderTicksPerInch, gyro, rearLeft);
-        }
-
-        @Override
-        protected void resetEncoders(int ticks)
-        {
-            rearLeft.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-            rearRight.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-            frontLeft.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-            frontRight.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-
-            rearLeft.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-            rearRight.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-            frontLeft.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-            frontRight.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-
-            rearLeft.setTargetPosition(ticks);
-            rearRight.setTargetPosition(ticks);
-            frontLeft.setTargetPosition(ticks);
-            frontRight.setTargetPosition(ticks);
-        }
-
-        protected void motorStraight(double speed)
-        {
-            frontRight.setPower(speed);
-            frontLeft.setPower(speed);
-            rearRight.setPower(speed);
-            rearLeft.setPower(speed);
-        }
-
-        @Override
-        protected void motorTurn(double speed)
-        {
-            frontRight.setPower(speed);
-            rearRight.setPower(speed);
-            frontLeft.setPower(-speed);
-            rearLeft.setPower(-speed);
-        }
-
-        @Override
-        protected void motorStop()
-        {
-            frontLeft.setPower(0.0);
-            frontRight.setPower(0.0);
-            rearLeft.setPower(0.0);
-            rearRight.setPower(0.0);
-        }
-
-        @Override
-        protected boolean isBusy()
-        {
-            return (Math.abs(rearLeft.getCurrentPosition()) < Math.abs(rearLeft.getTargetPosition()));
-        }
-    }
 
     private final static int TICKS_PER_INCH = 50;
     private final static double TICKS_PER_DEGREE = 6;
@@ -115,7 +57,7 @@ public class DeadReckonSquareTest extends Robot {
     private DeadReckonTask deadReckonTask;
     private MonitorMotorTask monitorMotorTask;
     private GyroSensor gyro;
-    private FourWheelDriveDeadReckon deadReckon = new FourWheelDriveDeadReckon(this, TICKS_PER_INCH, gyro);
+    private FourWheelDirectDriveDeadReckon deadReckon;
 
     protected void handleDeadReckonEvent(DeadReckonTask.DeadReckonEvent e)
     {
@@ -157,6 +99,7 @@ public class DeadReckonSquareTest extends Robot {
     @Override
     public void start()
     {
+        deadReckon = new FourWheelDirectDriveDeadReckon(this, TICKS_PER_INCH, gyro, frontRight, rearRight, frontLeft, rearLeft);
         deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, MOTOR_SPEED);
         deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, MOTOR_SPEED);
         deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, MOTOR_SPEED);

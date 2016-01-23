@@ -29,6 +29,11 @@ public class PersistentTelemetryTask extends RobotTask {
         objs.put(key, value);
     }
 
+    public void addData(String key, int value)
+    {
+        objs.put(key, Integer.toString(value));
+    }
+
     @Override
     public boolean timeslice()
     {
