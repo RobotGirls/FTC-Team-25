@@ -117,8 +117,7 @@ public class DeadReckonTask extends RobotTask {
         case WAIT:
             waitState++;
             /*
-             * About 1/2 a second give or take, this is really stupid, nobody
-             * would design a system like this from scratch.
+             * About 1/2 a second give or take, just insure we are stopped before moving on.
              */
             if (waitState > 50) {
                 segment.state = DeadReckon.SegmentState.DONE;
