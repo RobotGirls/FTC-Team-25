@@ -19,6 +19,7 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
 
     DcMotor rightMotor;
     DcMotor leftMotor;
+    MonitorMotorTask mmt;
 
     /*
      * Assumes that both motors are on the same controller.
@@ -29,6 +30,7 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
 
         this.rightMotor = motorRight;
         this.leftMotor = motorLeft;
+        this.mmt = null;
 
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
     }
@@ -39,6 +41,7 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
 
         this.rightMotor = motorRight;
         this.leftMotor = motorLeft;
+        this.mmt = null;
 
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
     }
@@ -67,13 +70,39 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
     @Override
     protected void motorTurn(double speed)
     {
-        leftMotor.setPower(speed);
-        rightMotor.setPower(-speed);
+        if (speed == 0) {
+            mmt = new MonitorMotorTask(robot, leftMotor, target) {
+                @Override
+                public void handleEvent(RobotEvent event)
+                {
+                    MonitorMotorEvent ev = (MonitorMotorEvent)event;
+                    double speed;
+                    double e = Math.exp(1.0);
+
+                    double logVal = Math.pow(e, (5.6 * (ev.val / Math.abs(target))));
+                    if (currSegment.distance < 0) {
+                        speed = -(logVal / 100) - 0.01;
+                    } else {
+                        speed = (logVal / 100) + 0.01;
+                    }
+                    rightMotor.setPower(-speed);
+                    leftMotor.setPower(speed);
+
+                }
+            };
+            robot.addTask(mmt);
+        } else {
+            rightMotor.setPower(-speed);
+            leftMotor.setPower(speed);
+        }
     }
 
     @Override
     protected void motorStop()
     {
+        if (mmt != null) {
+            mmt.stop();
+        }
         RobotLog.i("251 Stopping motors");
         motorStraight(0.0);
     }
