@@ -32,6 +32,19 @@ public class DeadReckonTask extends RobotTask {
         }
     }
 
+    protected class LimitSwitchListener implements RobotEventListener {
+        @Override
+        public void handleEvent(RobotEvent event)
+        {
+            DeadReckon.Segment segment;
+
+            segment = dr.getCurrentSegment();
+            if (segment != null) {
+                segment.state = DeadReckon.SegmentState.DONE;
+            }
+        }
+    }
+
     protected DeadReckon dr;
     protected int num;
     protected boolean waiting;
