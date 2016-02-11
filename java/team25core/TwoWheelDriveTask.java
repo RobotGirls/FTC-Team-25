@@ -8,7 +8,7 @@ package team25core;
 import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-public class TwoMotorDriveTask extends RobotTask {
+public class TwoWheelDriveTask extends RobotTask {
     protected Robot robot;
     protected DcMotor motorRight;
     protected DcMotor motorLeft;
@@ -16,7 +16,7 @@ public class TwoMotorDriveTask extends RobotTask {
     public float right;
     public float left;
 
-    public TwoMotorDriveTask(Robot robot, DcMotor rightMotor, DcMotor leftMotor)
+    public TwoWheelDriveTask(Robot robot, DcMotor rightMotor, DcMotor leftMotor)
     {
         super(robot);
 
@@ -51,8 +51,8 @@ public class TwoMotorDriveTask extends RobotTask {
     {
         getJoystick();
 
-        double leftPowerValue = left;
-        double rightPowerValue = right;
+        double leftPowerValue  = -left;
+        double rightPowerValue = -right;
 
         motorLeft.setPower(leftPowerValue);
         motorRight.setPower(rightPowerValue);
