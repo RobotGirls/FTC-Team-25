@@ -16,8 +16,9 @@ public class TwoWheelDriveTask extends RobotTask {
     public float right;
     public float left;
 
-    public TwoWheelDriveTask(Robot robot, DcMotor rightMotor, DcMotor leftMotor)
-    {
+    public boolean slow = false;
+
+    public TwoWheelDriveTask(Robot robot, DcMotor rightMotor, DcMotor leftMotor) {
         super(robot);
 
         this.motorRight = rightMotor;
@@ -25,42 +26,54 @@ public class TwoWheelDriveTask extends RobotTask {
         this.robot = robot;
     }
 
-    private void getJoystick()
-    {
+    private void getJoystick() {
         Gamepad gamepad;
         gamepad = robot.gamepad1;
 
-        left  = gamepad.left_stick_y;
-        right = gamepad.right_stick_y;
+        left = -gamepad.left_stick_y;
+        right = -gamepad.right_stick_y;
     }
 
     @Override
-    public void start()
-    {
+    public void start() {
         // Nothing.
     }
 
     @Override
-    public void stop()
-    {
+    public void stop() {
         robot.removeTask(this);
     }
 
     @Override
-    public boolean timeslice()
-    {
+    public boolean timeslice() {
         getJoystick();
 
-        double leftPowerValue  = -left;
-        double rightPowerValue = -right;
+        double leftPowerValue = left;
+        double rightPowerValue = right;
 
-        motorLeft.setPower(leftPowerValue);
-        motorRight.setPower(rightPowerValue);
+        if (slow) {
+            robot.telemetry.addData("Slow: ", "true");
 
-        robot.telemetry.addData("L: ", leftPowerValue);
-        robot.telemetry.addData("R: ", rightPowerValue);
+            double alteredLeftPower = leftPowerValue / 10;
+            double alteredRightPower = rightPowerValue / 10;
+            motorLeft.setPower(alteredLeftPower);
+            motorRight.setPower(alteredRightPower);
+
+            robot.telemetry.addData("L: ", alteredLeftPower);
+            robot.telemetry.addData("R: ", alteredRightPower);
+        } else {
+            robot.telemetry.addData("Slow: ", "false");
+            motorLeft.setPower(leftPowerValue);
+            motorRight.setPower(rightPowerValue);
+
+            robot.telemetry.addData("L: ", leftPowerValue);
+            robot.telemetry.addData("R: ", rightPowerValue);
+        }
 
         return false;
     }
 
+    public void slow(boolean on) {
+        slow = on;
+    }
 }
