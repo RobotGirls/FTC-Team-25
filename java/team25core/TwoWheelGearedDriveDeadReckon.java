@@ -32,7 +32,7 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
         this.leftMotor = motorLeft;
         this.mmt = null;
 
-        leftMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
     public TwoWheelGearedDriveDeadReckon(Robot robot, int encoderTicksPerInch, int encoderTicksPerDegree, DcMotor motorLeft, DcMotor motorRight)
@@ -43,7 +43,7 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
         this.leftMotor = motorLeft;
         this.mmt = null;
 
-        leftMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
     @Override
