@@ -19,7 +19,7 @@ import team25core.GyroTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
-import team25core.TwoMotorDriveTask;
+import team25core.TwoWheelDriveTask;
 
 public class TankDriveTeleop extends Robot {
 
@@ -29,8 +29,8 @@ public class TankDriveTeleop extends Robot {
 
     private Servo leftPusher;
     private Servo rightPusher;
-    private Servo leftFlag;
-    private Servo rightFlag;
+    private Servo leftBumper;
+    private Servo rightBumper;
 
     private DeviceInterfaceModule core;
     private GyroSensor gyro;
@@ -48,34 +48,15 @@ public class TankDriveTeleop extends Robot {
         gyro = hardwareMap.gyroSensor.get("gyro");
         gyro.calibrate();
 
-        // Color.
-        //color = hardwareMap.colorSensor.get("color");
-        //core = hardwareMap.deviceInterfaceModule.get("interface");
-
-        //core.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
-        //core.setDigitalChannelState(LED_CHANNEL, false);
-
-        // Servos.
+         // Servos.
         rightPusher = hardwareMap.servo.get("rightPusher");
         leftPusher = hardwareMap.servo.get("leftPusher");
-        rightFlag = hardwareMap.servo.get("rightFlag");
-        leftFlag = hardwareMap.servo.get("leftFlag");
-
-        rightFlag.setPosition(NeverlandServoConstants.RIGHT_FLAG_STOWED);
-        leftFlag.setPosition(NeverlandServoConstants.LEFT_FLAG_STOWED);
-        addTask(new SingleShotTimerTask(this, 1500) {
-            public void handleEvent(RobotEvent e)
-            {
-                rightPusher.setPosition(NeverlandServoConstants.RIGHT_PUSHER_STOWED);
-                leftPusher.setPosition(NeverlandServoConstants.LEFT_PUSHER_STOWED);
-            }
-        });
+        rightBumper = hardwareMap.servo.get("rightBumper");
+        leftBumper = hardwareMap.servo.get("leftBumper");
 
         // Treads.
         rightTread = hardwareMap.dcMotor.get("rightTread");
         leftTread = hardwareMap.dcMotor.get("leftTread");
-
-        leftTread.setDirection(DcMotor.Direction.REVERSE);
 
         rightTread.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         leftTread.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
@@ -96,43 +77,33 @@ public class TankDriveTeleop extends Robot {
         super.start();
 
         // Joystick control: controls two motor drive.
-        TwoMotorDriveTask drive = new TwoMotorDriveTask(this, rightTread, leftTread);
+        TwoWheelDriveTask drive = new TwoWheelDriveTask(this, rightTread, leftTread);
         this.addTask(drive);
 
         // Right bumper: extends hook.
-        DeadmanMotorTask hookExtend = new DeadmanMotorTask(this, hook, 0.75, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.RIGHT_BUMPER);
+        DeadmanMotorTask hookExtend = new DeadmanMotorTask(this, hook, 1.0, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.RIGHT_BUMPER);
         this.addTask(hookExtend);
 
         // Right trigger: retracts hook.
-        DeadmanMotorTask hookRetract = new DeadmanMotorTask(this, hook, -0.75, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.RIGHT_TRIGGER);
+        DeadmanMotorTask hookRetract = new DeadmanMotorTask(this, hook, -1.0, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.RIGHT_TRIGGER);
         this.addTask(hookRetract);
 
-        /*
-        // Buttons: moves flags to position - (X) raise left, (A) lower left, (Y) raise right, (B) lower right.
-        // Display: gyro heading - (LB) start task.
+        // Buttons.
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e)
             {
                 GamepadEvent event = (GamepadEvent) e;
 
                 if (event.kind == EventKind.BUTTON_X_DOWN) {
-                    leftFlag.setPosition(NeverlandServoConstants.LEFT_FLAG_NINETY);
+                    leftBumper.setPosition(NeverlandServoConstants.LEFT_BUMPER_DOWN);
+                    rightBumper.setPosition(NeverlandServoConstants.RIGHT_BUMPER_DOWN);
                 } else if (event.kind == EventKind.BUTTON_A_DOWN) {
-                    leftFlag.setPosition(NeverlandServoConstants.LEFT_FLAG_DEPLOYED);
+                    leftBumper.setPosition(NeverlandServoConstants.LEFT_BUMPER_UP);
+                    rightBumper.setPosition(NeverlandServoConstants.RIGHT_BUMPER_UP);
                 } else if (event.kind == EventKind.BUTTON_Y_DOWN) {
-                    rightFlag.setPosition(NeverlandServoConstants.RIGHT_FLAG_NINETY);
                 } else if (event.kind == EventKind.BUTTON_B_DOWN) {
-                    rightFlag.setPosition(NeverlandServoConstants.RIGHT_FLAG_DEPLOYED);
-                } else if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
-                    displayEnabled = true;
-                    display = new GyroTask(robot, gyro, 360, true);
                 }
             }
         });
-
-        if (displayEnabled) {
-            addTask(display);
-        }
-        */
     }
 }

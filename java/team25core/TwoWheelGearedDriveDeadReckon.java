@@ -10,8 +10,6 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import org.swerverobotics.library.internal.EasyModernMotorController;
-
 public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
 
     private int targetPosition;
@@ -63,8 +61,8 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
     @Override
     protected void motorStraight(final double speed)
     {
-        EasyModernMotorController mc = (EasyModernMotorController)leftMotor.getController();
-        mc.setMotorPower(speed);
+        leftMotor.setPower(speed);
+        rightMotor.setPower(speed);
     }
 
     @Override

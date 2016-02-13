@@ -35,10 +35,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 
-import org.swerverobotics.library.ClassFactory;
-import org.swerverobotics.library.interfaces.Autonomous;
-import org.swerverobotics.library.interfaces.Disabled;
-
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.MonitorGyroTask;
@@ -48,7 +44,6 @@ import team25core.RobotEvent;
 import team25core.Team25DcMotor;
 import team25core.TwoWheelGearedDriveDeadReckon;
 
-@Autonomous(name="DeadReckonTest", group="AutoTeam25")
 public class LameingoDeadReckonSquareTest extends Robot {
 
     private DcMotor r;
@@ -80,8 +75,6 @@ public class LameingoDeadReckonSquareTest extends Robot {
         gyro = hardwareMap.gyroSensor.get("gyro");
         gyro.calibrate();
 
-        ClassFactory.createEasyMotorController(this, frontLeft, frontRight);
-        
         frontLeft.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
         frontRight.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
         frontLeft.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);

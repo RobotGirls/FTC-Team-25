@@ -35,9 +35,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 
-import org.swerverobotics.library.ClassFactory;
-import org.swerverobotics.library.interfaces.Autonomous;
-
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.MonitorGyroTask;
@@ -47,7 +44,6 @@ import team25core.RobotEvent;
 import team25core.Team25DcMotor;
 import team25core.TwoWheelGearedDriveDeadReckon;
 
-@Autonomous(name="DriftTest", group="AutoTeam25")
 public class DriftTest extends Robot {
 
     private GyroSensor gyro;

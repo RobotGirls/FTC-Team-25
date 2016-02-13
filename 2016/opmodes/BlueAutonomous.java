@@ -5,16 +5,13 @@ package opmodes;
  * FTC Team 5218: izzielau, November 02, 2015
  */
 
-import com.qualcomm.hardware.ModernRoboticsI2cGyro;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.swerverobotics.library.ClassFactory;
-import org.swerverobotics.library.interfaces.Autonomous;
 
 import team25core.ColorSensorTask;
 import team25core.DeadReckon;
@@ -29,7 +26,6 @@ import team25core.Team25DcMotor;
 import team25core.TwoWheelDirectDriveDeadReckon;
 import team25core.TwoWheelGearedDriveDeadReckon;
 
-@Autonomous(name="BlueAutonomous", group="AutoTeam25")
 public class BlueAutonomous extends Robot {
 
     private final static int TICKS_PER_INCH = 318;
@@ -145,8 +141,6 @@ public class BlueAutonomous extends Robot {
         mc = hardwareMap.dcMotorController.get("motors");
         rightTread = new Team25DcMotor(this, mc, 2);
         leftTread = new Team25DcMotor(this, mc, 1);
-
-        ClassFactory.createEasyMotorController(this, leftTread, rightTread);
 
         rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);

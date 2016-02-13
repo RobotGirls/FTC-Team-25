@@ -8,7 +8,7 @@ package team25core;
 import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-public class TwoMotorDriveTask extends RobotTask {
+public class TwoWheelDriveTask extends RobotTask {
     protected Robot robot;
     protected DcMotor motorRight;
     protected DcMotor motorLeft;
@@ -50,12 +50,9 @@ public class TwoMotorDriveTask extends RobotTask {
 
         double leftPowerValue = left;
         double rightPowerValue = right;
-<<<<<<< HEAD:java/team25core/TwoMotorDriveTask.java
-=======
 
         if (slow) {
             robot.telemetry.addData("Slow: ", "true");
->>>>>>> 9510fe5... Fix for reversed gamepad controls.:java/team25core/TwoWheelDriveTask.java
 
             double alteredLeftPower = leftPowerValue / 10;
             double alteredRightPower = rightPowerValue / 10;
