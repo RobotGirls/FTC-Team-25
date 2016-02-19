@@ -139,7 +139,7 @@ public class CaffeineTeleop extends Robot {
                 } else if (event.kind == EventKind.BUTTON_Y_DOWN) {
                     drive.slow(false);
                 } else if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
-                    displayHeading.reset();
+                    // displayHeading.reset();
                 }
             }
         });
