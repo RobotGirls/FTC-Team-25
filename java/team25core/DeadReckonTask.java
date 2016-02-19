@@ -121,6 +121,14 @@ public class DeadReckonTask extends RobotTask {
             RobotLog.i("251 Done with path, stopping all");
             dr.stop();
             return true;
+        } else if (segment.state == DeadReckon.SegmentState.DONE) {
+            if (reason == DoneReason.ENCODER_REACHED) {
+                RobotLog.e("251 Dead reckon segment %d done", num);
+                robot.queueEvent(new DeadReckonEvent(this, EventKind.SEGMENT_DONE, num));
+            } else if (reason == DoneReason.SENSOR_SATISFIED) {
+                RobotLog.e("251 Dead reckon sensor criteria segment %d satisfied", num);
+                robot.queueEvent(new DeadReckonEvent(this, EventKind.SENSOR_SATISFIED, num));
+            }
         }
 
         switch (segment.state) {
