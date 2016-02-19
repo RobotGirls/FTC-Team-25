@@ -149,7 +149,7 @@ public class DeadReckonTask extends RobotTask {
             segment.state = DeadReckon.SegmentState.ENCODER_TARGET;
             break;
         case ENCODER_TARGET:
-            if (criteria.satisfied()) {
+            if ((criteria != null) && (criteria.satisfied())) {
                 segment.state = DeadReckon.SegmentState.STOP_MOTORS;
                 reason = DoneReason.SENSOR_SATISFIED;
             } else if (dr.hitTarget()) {
