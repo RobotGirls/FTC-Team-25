@@ -10,8 +10,14 @@ public class DeadReckonTask extends RobotTask {
 
     public enum EventKind {
         SEGMENT_DONE,
+        SENSOR_SATISFIED,
         PATH_DONE,
     }
+
+    protected enum DoneReason {
+        ENCODER_REACHED,
+        SENSOR_SATISFIED,
+    };
 
     public class DeadReckonEvent extends RobotEvent {
 
@@ -48,6 +54,9 @@ public class DeadReckonTask extends RobotTask {
     protected DeadReckon dr;
     protected int num;
     protected boolean waiting;
+    protected SensorCriteria criteria;
+    protected DoneReason reason;
+
     SingleShotTimerTask sst;
     int waitState = 0;
 
@@ -59,6 +68,18 @@ public class DeadReckonTask extends RobotTask {
         this.dr = dr;
         this.waiting = false;
         this.waitState = 0;
+        this.criteria = null;
+    }
+
+    public DeadReckonTask(Robot robot, DeadReckon dr, SensorCriteria criteria)
+    {
+        super(robot);
+
+        this.num = 0;
+        this.dr = dr;
+        this.waiting = false;
+        this.waitState = 0;
+        this.criteria = criteria;
     }
 
     @Override
@@ -84,10 +105,19 @@ public class DeadReckonTask extends RobotTask {
         segment = dr.getCurrentSegment();
 
         if (segment == null) {
-            robot.queueEvent(new DeadReckonEvent(this, EventKind.PATH_DONE, num));
-                /*
-                 * Make sure it's stopped.
-                 */
+            if (reason == DoneReason.ENCODER_REACHED) {
+                RobotLog.e("251 Dead reckon path done");
+                robot.queueEvent(new DeadReckonEvent(this, EventKind.PATH_DONE, num));
+            } else if (reason == DoneReason.SENSOR_SATISFIED) {
+                RobotLog.e("251 Dead reckon sensor criteria satisfied");
+                robot.queueEvent(new DeadReckonEvent(this, EventKind.SENSOR_SATISFIED, num));
+            } else {
+                RobotLog.e("Oops, unknown reason for dead reckon stop");
+                robot.queueEvent(new DeadReckonEvent(this, EventKind.PATH_DONE, num));
+            }
+            /*
+             * Make sure it's stopped.
+             */
             RobotLog.i("251 Done with path, stopping all");
             dr.stop();
             return true;
@@ -119,8 +149,12 @@ public class DeadReckonTask extends RobotTask {
             segment.state = DeadReckon.SegmentState.ENCODER_TARGET;
             break;
         case ENCODER_TARGET:
-            if (dr.hitTarget()) {
+            if (criteria.satisfied()) {
                 segment.state = DeadReckon.SegmentState.STOP_MOTORS;
+                reason = DoneReason.SENSOR_SATISFIED;
+            } else if (dr.hitTarget()) {
+                segment.state = DeadReckon.SegmentState.STOP_MOTORS;
+                reason = DoneReason.ENCODER_REACHED;
             }
             break;
         case STOP_MOTORS:
