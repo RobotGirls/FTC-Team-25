@@ -21,7 +21,7 @@ public abstract class Robot extends OpMode {
 
     public abstract void handleEvent(RobotEvent e);
 
-    protected void addTask(RobotTask task)
+    public void addTask(RobotTask task)
     {
         tasks.add(task);
         task.start();
