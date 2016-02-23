@@ -111,7 +111,7 @@ public class CaffeineBlueFollowAutonomous extends Robot {
                                                               ultrasonicRightAverage, 1);
 
         // Distance criteria.
-        distanceCriteria = new UltrasonicSensorCriteria(ultrasonicLeftAverage, 15);
+        distanceCriteria = new UltrasonicSensorCriteria(ultrasonicLeftAverage, 19);
 
         // Servos.
         climber = hardwareMap.servo.get("climber");
