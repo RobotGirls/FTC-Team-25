@@ -85,15 +85,15 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
                     } else {
                         speed = (logVal / 100) + 0.01;
                     }
-                    rightMotor.setPower(-speed);
-                    leftMotor.setPower(speed);
+                    rightMotor.setPower(speed);
+                    leftMotor.setPower(-speed);
 
                 }
             };
             robot.addTask(mmt);
         } else {
-            rightMotor.setPower(-speed);
-            leftMotor.setPower(speed);
+            rightMotor.setPower(speed);
+            leftMotor.setPower(-speed);
         }
     }
 
