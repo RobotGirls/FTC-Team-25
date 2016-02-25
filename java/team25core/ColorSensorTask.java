@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
  */
 public class ColorSensorTask extends RobotTask {
 
+    public final static float BEACON_THRESHOLD = (float)300;
+
     public enum EventKind {
         RED,
         BLUE,
@@ -29,6 +31,7 @@ public class ColorSensorTask extends RobotTask {
     protected boolean bEnabled;
     protected boolean color;
     protected int channelNumber;
+    protected int count;
 
     public ColorSensorTask(Robot robot, ColorSensor colorSensor, DeviceInterfaceModule cdim, boolean bEnabled, boolean showColor, int channelNumber)
     {
@@ -42,6 +45,7 @@ public class ColorSensorTask extends RobotTask {
 
     @Override
     public void start() {
+        count = 0;
         if (bEnabled) {
             cdim.setDigitalChannelState(channelNumber, bEnabled);
         }
@@ -62,16 +66,20 @@ public class ColorSensorTask extends RobotTask {
             robot.telemetry.addData("R:", red);
         }
 
-        if (blue > red) {
+        if (count < 50) {
+            count++;
+            return false;
+        }
+
+        if ((blue > red) && (blue > BEACON_THRESHOLD)) {
             ColorSensorEvent blueEvent = new ColorSensorEvent(this, EventKind.BLUE);
             robot.queueEvent(blueEvent);
             return true;
-        } else if (red > blue) {
+        } else if ((red > blue) && (red > BEACON_THRESHOLD)) {
             ColorSensorEvent redEvent = new ColorSensorEvent(this, EventKind.RED);
             robot.queueEvent(redEvent);
             return true;
-        }
-        else {
+        } else {
             ColorSensorEvent purpleEvent = new ColorSensorEvent(this, EventKind.PURPLE);
             robot.queueEvent(purpleEvent);
             return true;
