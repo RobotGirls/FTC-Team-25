@@ -5,6 +5,7 @@ package team25core;
  */
 
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 public class UltrasonicDualSensorCriteria implements SensorCriteria {
@@ -12,6 +13,7 @@ public class UltrasonicDualSensorCriteria implements SensorCriteria {
     UltrasonicAveragingTask left;
     UltrasonicAveragingTask right;
     int margin;
+    ElapsedTime et = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
     public UltrasonicDualSensorCriteria(UltrasonicAveragingTask left, UltrasonicAveragingTask right, int margin)
     {
@@ -30,10 +32,13 @@ public class UltrasonicDualSensorCriteria implements SensorCriteria {
     @Override
     public boolean satisfied()
     {
-        RobotLog.i("251 Right avg: %d", (int)right.getAverage());
-        RobotLog.i("251 Left avg: %d", (int)left.getAverage());
+        if (et.time() >= 200) {
+            RobotLog.i("251 Left %3.1f, right %3.1f", left.getAverage(), right.getAverage());
+            et.reset();
+        }
 
         if (Math.abs(left.getAverage() - right.getAverage()) <= margin) {
+            RobotLog.i("251 Ultrasonic satisfied: Left %3.1f, right %3.1f", left.getAverage(), right.getAverage());
             return true;
         } else {
             return false;
