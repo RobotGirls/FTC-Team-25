@@ -141,7 +141,7 @@ public class CaffeineBlueFollowAutonomous extends Robot {
 
         // Dead-reckon: turn.
         deadReckonTurn = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-        deadReckonTurn.addSegment(DeadReckon.SegmentType.TURN, 70, 0.10);
+        deadReckonTurn.addSegment(DeadReckon.SegmentType.TURN, NeverlandAutonomousConstants.TURN_TOWARD_BEACON, 0.10);
 
         // Dead-reckon: straight:
         deadReckonStraight = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
@@ -174,7 +174,7 @@ public class CaffeineBlueFollowAutonomous extends Robot {
                  */
                 RobotLog.e("Missed the white line.");
                 TwoWheelGearedDriveDeadReckon missedLine = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-                missedLine.addSegment(DeadReckon.SegmentType.TURN, -30, 0.10);
+                missedLine.addSegment(DeadReckon.SegmentType.TURN, 30, -0.10);
                 missedLine.addSegment(DeadReckon.SegmentType.STRAIGHT, -12, 0.10);
                 addTask(new DeadReckonTask(this, missedLine, lightCriteria) {
                     public void handleEvent(RobotEvent e)
@@ -199,7 +199,7 @@ public class CaffeineBlueFollowAutonomous extends Robot {
                 ultrasonicCriteria = new UltrasonicDualSensorCriteria(ultrasonicLeftAverage,
                         ultrasonicRightAverage, NeverlandAutonomousConstants.ULTRASONIC_DIFFERENCE);
 
-                addTask(new SingleShotTimerTask(this, 1000) {
+                addTask(new SingleShotTimerTask(this, NeverlandAutonomousConstants.DELAY_BEFORE_TURN) {
                             @Override
                             public void handleEvent(RobotEvent e)
                             {
