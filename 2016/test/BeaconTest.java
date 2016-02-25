@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.swerverobotics.library.ClassFactory;
 import org.swerverobotics.library.interfaces.Autonomous;
+import org.swerverobotics.library.interfaces.Disabled;
 
 import java.util.HashSet;
 
@@ -31,6 +32,7 @@ import team25core.TwoWheelGearedDriveDeadReckon;
  */
 
 @Autonomous(name="TEST Beacon", group = "AutoTest")
+@Disabled
 public class BeaconTest extends Robot {
 
     public static final int TICKS_PER_DEGREE = 23;

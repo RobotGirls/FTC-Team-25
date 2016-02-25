@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.swerverobotics.library.ClassFactory;
 import org.swerverobotics.library.interfaces.Autonomous;
+import org.swerverobotics.library.interfaces.Disabled;
 
 import opmodes.BeaconArms;
 import opmodes.NeverlandServoConstants;
@@ -25,6 +26,7 @@ import team25core.TwoWheelGearedDriveDeadReckon;
  */
 
 @Autonomous (name="TEST Turn", group = "AutoTeam25")
+@Disabled
 public class DeadReckonLinearTest extends Robot {
     public static final int TICKS_PER_DEGREE = 29;
     private final static int TICKS_PER_INCH = 212;

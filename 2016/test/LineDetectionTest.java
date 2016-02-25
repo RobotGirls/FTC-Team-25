@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.swerverobotics.library.ClassFactory;
 import org.swerverobotics.library.interfaces.Autonomous;
+import org.swerverobotics.library.interfaces.Disabled;
 
 import opmodes.NeverlandLightConstants;
 import opmodes.NeverlandMotorConstants;
@@ -29,6 +30,7 @@ import team25core.TwoWheelGearedDriveDeadReckon;
  */
 
 @Autonomous(name = "TEST Line Detection")
+@Disabled
 public class LineDetectionTest extends Robot {
 
     protected final static int TICKS_PER_DEGREE = NeverlandMotorConstants.ENCODER_TICKS_PER_DEGREE;

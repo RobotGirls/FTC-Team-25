@@ -49,6 +49,7 @@ import team25core.Team25DcMotor;
 import team25core.TwoWheelGearedDriveDeadReckon;
 
 @Autonomous(name="DeadReckonTest", group="AutoTeam25")
+@Disabled
 public class LameingoDeadReckonSquareTest extends Robot {
 
     private DcMotor r;
