@@ -21,10 +21,6 @@ public class CaffeineServoTest extends Robot {
 
     private Servo servo;
     private ServoCalibrateTask servoTask;
-    private Servo leftPusher;
-    private Servo rightPusher;
-    private Servo leftBumper;
-    private Servo rightBumper;
 
     @Override
     public void handleEvent(RobotEvent e) {
@@ -33,18 +29,12 @@ public class CaffeineServoTest extends Robot {
 
     @Override
     public void init() {
-        rightPusher = hardwareMap.servo.get("rightPusher");
-
-        rightBumper = hardwareMap.servo.get("rightBumper");
-        leftBumper = hardwareMap.servo.get("leftBumper");
-
-        rightBumper.setPosition(NeverlandServoConstants.RIGHT_BUMPER_DOWN);
-        leftBumper.setPosition(NeverlandServoConstants.LEFT_BUMPER_DOWN);
+        servo = hardwareMap.servo.get("servo");
     }
 
     @Override
     public void start() {
-        ServoCalibrateTask calibrate = new ServoCalibrateTask(this, rightPusher);
+        ServoCalibrateTask calibrate = new ServoCalibrateTask(this, servo);
         addTask(calibrate);
     }
 
