@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.swerverobotics.library.interfaces.Autonomous;
+import org.swerverobotics.library.interfaces.Disabled;
 
 import team25core.Robot;
 
@@ -17,6 +18,7 @@ import team25core.Robot;
  */
 
 @Autonomous(name="RED Beacon", group = "AutoTeam25")
+@Disabled
 public class CaffeineRedBeaconAutonomous extends OpMode {
 
     public Robot robot;

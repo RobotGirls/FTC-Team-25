@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.swerverobotics.library.ClassFactory;
 import org.swerverobotics.library.interfaces.Autonomous;
+import org.swerverobotics.library.interfaces.Disabled;
 
 import team25core.ColorSensorTask;
 import team25core.DeadReckon;
@@ -28,6 +29,7 @@ import team25core.Team25DcMotor;
 import team25core.TwoWheelGearedDriveDeadReckon;
 
 @Autonomous(name="BLUE Beacon", group = "AutoTeam25")
+@Disabled
 public class CaffeineBlueBeaconAutonomous extends Robot {
 
     public static final int TICKS_PER_DEGREE = NeverlandMotorConstants.ENCODER_TICKS_PER_DEGREE;
