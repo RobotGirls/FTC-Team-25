@@ -5,6 +5,7 @@ package team25core;
  */
 
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -13,6 +14,8 @@ public class UltrasonicAveragingTask extends RobotTask {
     protected int setSize;
     DescriptiveStatistics movingAvg;
     UltrasonicSensor sensor;
+    protected final double ULTRASONIC_MAX = 255.0;
+    protected double min;
 
     public UltrasonicAveragingTask(Robot robot, UltrasonicSensor sensor, int setSize)
     {
@@ -20,6 +23,7 @@ public class UltrasonicAveragingTask extends RobotTask {
         this.setSize = setSize;
         this.movingAvg = new DescriptiveStatistics(setSize);
         this.sensor = sensor;
+        this.min = ULTRASONIC_MAX;
     }
 
     public double getAverage()
@@ -39,6 +43,16 @@ public class UltrasonicAveragingTask extends RobotTask {
 
     }
 
+    public void resetMin()
+    {
+        min = ULTRASONIC_MAX;
+    }
+
+    public double getMin()
+    {
+        return min;
+    }
+
     @Override
     public boolean timeslice()
     {
@@ -48,6 +62,12 @@ public class UltrasonicAveragingTask extends RobotTask {
             return false;
         }
 
+        if (val < min) {
+            min = val;
+            // RobotLog.i(sensor.getConnectionInfo() + " min %3.1f", min);
+        }
+
+        robot.telemetry.addData("Distance " + sensor.getConnectionInfo(), val);
         movingAvg.addValue(sensor.getUltrasonicLevel());
 
         /*
