@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.swerverobotics.library.ClassFactory;
 import org.swerverobotics.library.interfaces.Autonomous;
+import org.swerverobotics.library.interfaces.Disabled;
 
 import opmodes.NeverlandLightConstants;
 import opmodes.NeverlandMotorConstants;
@@ -30,6 +31,7 @@ import team25core.TwoWheelGearedDriveDeadReckon;
  */
 
 @Autonomous(name = "TEST Line Follower")
+@Disabled
 public class LineFollowerTest extends Robot {
 
     protected final static int TICKS_PER_DEGREE = NeverlandMotorConstants.ENCODER_TICKS_PER_DEGREE;
@@ -121,7 +123,7 @@ public class LineFollowerTest extends Robot {
 
         // Light criteria.
         whiteCriteria = new LightSensorCriteria(light, LIGHT_MIN, LIGHT_MAX);
-        blackCriteria = new LightSensorCriteria(light, LightSensorCriteria.LightPolarity.BLACK, LIGHT_MIN, LIGHT_MAX);
+        // blackCriteria = new LightSensorCriteria(light, LightSensorCriteria.LightPolarity.BLACK, LIGHT_MIN, LIGHT_MAX);
 
         // Servos.
         climber = hardwareMap.servo.get("climber");
