@@ -43,7 +43,7 @@ public class BeaconHelper {
     public int TICKS_PER_INCH = 0;
     public int TICKS_PER_DEGREE = 0;
 
-    public BeaconHelper(Alliance alliance, Robot robot, ColorSensor color,
+    public BeaconHelper(Alliance alliance, Robot robot, ColorSensor color, DeviceInterfaceModule core,
                         BeaconArms pushers, Servo climber,
                         DcMotor rightTread, DcMotor leftTread,
                         int ticksDegree, int ticksInch) {
@@ -56,18 +56,18 @@ public class BeaconHelper {
         this.climber = climber;
         this.TICKS_PER_DEGREE = ticksDegree;
         this.TICKS_PER_INCH = ticksInch;
+        this.core = core;
     }
 
     public void doBeaconWork()
     {
         pushers.colorDeploy();
-        final SingleShotTimerTask sstt = new SingleShotTimerTask(robot, 1000) {
+        robot.addTask(new SingleShotTimerTask(robot, 1000) {
             @Override
             public void handleEvent(RobotEvent e) {
                 pushAndDump();
             }
-        };
-        robot.addTask(sstt);
+        });
     }
     protected void pushAndDump() {
         robot.addTask(new ColorSensorTask(robot, color, core, true, true, 0) {
@@ -111,13 +111,18 @@ public class BeaconHelper {
     }
 
     protected void pressBeacon () {
-        climber.setPosition(NeverlandServoConstants.CLIMBER_SCORE);
+        robot.addTask(new SingleShotTimerTask(robot, 1000) {
+            public void handleEvent(RobotEvent e) {
 
-        deadReckonPush = new TwoWheelGearedDriveDeadReckon(robot, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-        deadReckonPush.addSegment(DeadReckon.SegmentType.STRAIGHT, 1, 1.0);
-        deadReckonPush.addSegment(DeadReckon.SegmentType.STRAIGHT, 5, -0.4);
+                deadReckonPush = new TwoWheelGearedDriveDeadReckon(robot, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+                deadReckonPush.addSegment(DeadReckon.SegmentType.STRAIGHT, 1, 0.40);
 
-        deadReckonPushTask = new DeadReckonTask(robot, deadReckonPush);
-        robot.addTask(deadReckonPushTask);
+                robot.addTask(new DeadReckonTask(robot, deadReckonPush) {
+                    public void handleEvent(RobotEvent e) {
+                        climber.setPosition(NeverlandServoConstants.CLIMBER_SCORE);
+                    };
+                });
+            }
+        });
     }
 }
