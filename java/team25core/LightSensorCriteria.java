@@ -27,7 +27,7 @@ public class LightSensorCriteria implements SensorCriteria {
     @Override
     public boolean satisfied()
     {
-        if (sensor.getLightDetected() > threshold) {
+        if (sensor.getLightDetectedRaw() < threshold) {
             return true;
         } else {
             return false;
