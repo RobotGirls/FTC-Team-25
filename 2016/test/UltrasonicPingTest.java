@@ -17,7 +17,8 @@ import team25core.UltrasonicSensorArbitratorTask;
 
 public class UltrasonicPingTest extends Robot {
 
-    Team25UltrasonicSensor sensor;
+    Team25UltrasonicSensor left;
+    Team25UltrasonicSensor right;
     ModernRoboticsUsbLegacyModule legacyModule;
     UltrasonicSensorArbitratorTask arbitrator;
     UltrasonicAveragingTask averaging;
@@ -33,7 +34,17 @@ public class UltrasonicPingTest extends Robot {
     {
         legacyModule = (ModernRoboticsUsbLegacyModule)hardwareMap.legacyModule.get("legacy");
 
-        sensor = new Team25UltrasonicSensor(legacyModule, 4);
+        left = new Team25UltrasonicSensor(legacyModule, 4);
+        right = new Team25UltrasonicSensor(legacyModule, 5);
+        /*
+         * Make sure one of them is turned off.  This won't happen unless
+         * we do a single ping as the default state for the sensor is on.
+         * The ping will turn it off (see the datasheet).
+         *
+         * As long as a second sensor is connected and we only want to test one of
+         * them this is necessary.
+         */
+        right.doPing();;
 
     }
 
@@ -41,11 +52,15 @@ public class UltrasonicPingTest extends Robot {
     public void start()
     {
         HashSet<Team25UltrasonicSensor> sensors = new HashSet<Team25UltrasonicSensor>();
-        sensors.add(sensor);
+        sensors.add(left);
+        /*
+         * You can add a second sensor here via sensors.add(right), and also create a new averaging
+         * task for it below.
+         */
 
         arbitrator = new UltrasonicSensorArbitratorTask(this, sensors);
         addTask(arbitrator);
-        averaging = new UltrasonicAveragingTask(this, arbitrator, sensor, 5);
+        averaging = new UltrasonicAveragingTask(this, arbitrator, left, 5);
         addTask(averaging);
     }
 
