@@ -12,6 +12,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 public class UltrasonicAveragingTask extends RobotTask {
 
     protected int setSize;
+    UltrasonicSensorArbitratorTask arbitrator;
     DescriptiveStatistics movingAvg;
     UltrasonicSensor sensor;
     protected final double ULTRASONIC_MAX = 255.0;
@@ -24,6 +25,17 @@ public class UltrasonicAveragingTask extends RobotTask {
         this.movingAvg = new DescriptiveStatistics(setSize);
         this.sensor = sensor;
         this.min = ULTRASONIC_MAX;
+        this.arbitrator = null;
+    }
+
+    public UltrasonicAveragingTask(Robot robot, UltrasonicSensorArbitratorTask arbitrator, UltrasonicSensor sensor, int setSize)
+    {
+        super(robot);
+        this.setSize = setSize;
+        this.movingAvg = new DescriptiveStatistics(setSize);
+        this.sensor = sensor;
+        this.min = ULTRASONIC_MAX;
+        this.arbitrator = arbitrator;
     }
 
     public double getAverage()
@@ -56,7 +68,13 @@ public class UltrasonicAveragingTask extends RobotTask {
     @Override
     public boolean timeslice()
     {
-        double val = sensor.getUltrasonicLevel();
+        double val;
+
+        if (arbitrator != null) {
+            val = arbitrator.getUltrasonicLevel((Team25UltrasonicSensor)sensor);
+        } else {
+            val = sensor.getUltrasonicLevel();
+        }
 
         if ((val == 0) || (val == 255)) {
             return false;
@@ -68,7 +86,7 @@ public class UltrasonicAveragingTask extends RobotTask {
         }
 
         robot.telemetry.addData("Distance " + sensor.getConnectionInfo(), val);
-        movingAvg.addValue(sensor.getUltrasonicLevel());
+        movingAvg.addValue(val);
 
         /*
          * Never stops
