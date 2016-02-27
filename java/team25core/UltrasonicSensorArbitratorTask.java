@@ -40,14 +40,7 @@ public class UltrasonicSensorArbitratorTask extends RobotTask {
     {
         super(robot);
 
-        sensors = new HashSet<SensorCache>();
-
-        for (Team25UltrasonicSensor s : set) {
-            this.sensors.add(new SensorCache(s));
-        }
-
-        this.iterator = this.sensors.iterator();
-        this.sensor = iterator.next();
+        this.setSensors(set);
         this.state = SensorState.PING;
     }
 
@@ -60,6 +53,18 @@ public class UltrasonicSensorArbitratorTask extends RobotTask {
         }
         RobotLog.e("Could not find sensor in set");
         return 255;
+    }
+
+    public void setSensors(Set<Team25UltrasonicSensor> sensors)
+    {
+        this.sensors = new HashSet<SensorCache>();
+
+        for (Team25UltrasonicSensor s : sensors) {
+            this.sensors.add(new SensorCache(s));
+        }
+
+        this.iterator = this.sensors.iterator();
+        this.sensor = iterator.next();
     }
 
     @Override
