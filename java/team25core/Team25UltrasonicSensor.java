@@ -6,6 +6,7 @@ package team25core;
 
 
 import com.qualcomm.hardware.matrix.MatrixI2cTransaction;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsUsbLegacyModule;
 import com.qualcomm.robotcore.hardware.I2cController;
 import com.qualcomm.robotcore.hardware.LegacyModulePortDeviceImpl;
@@ -121,6 +122,8 @@ public class Team25UltrasonicSensor extends LegacyModulePortDeviceImpl implement
     {
         super(legacyModule, physicalPort);
         this.legacyModule = legacyModule;
+        transactionQueue = new ConcurrentLinkedQueue<UltrasonicI2cTransaction>();
+        memoryMap = new UltrasonicMemoryMap();
         throwIfPortIsInvalid(physicalPort);
         finishConstruction();
     }

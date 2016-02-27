@@ -4,14 +4,17 @@ package team25core;
  * FTC Team 25: cmacfarl, February 22, 2016
  */
 
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 public class UltrasonicSensorArbitratorTask extends RobotTask {
 
-    Set<SensorCache> sensors;
+    ElapsedTime rateLimit = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    HashSet<SensorCache> sensors;
     Iterator<SensorCache> iterator;
     SensorCache sensor;
     protected SensorState state;
@@ -33,11 +36,13 @@ public class UltrasonicSensorArbitratorTask extends RobotTask {
         PONG,
     };
 
-    public UltrasonicSensorArbitratorTask(Robot robot, Set<Team25UltrasonicSensor> sensors)
+    public UltrasonicSensorArbitratorTask(Robot robot, Set<Team25UltrasonicSensor> set)
     {
         super(robot);
 
-        for (Team25UltrasonicSensor s : sensors) {
+        sensors = new HashSet<SensorCache>();
+
+        for (Team25UltrasonicSensor s : set) {
             this.sensors.add(new SensorCache(s));
         }
 
@@ -72,17 +77,26 @@ public class UltrasonicSensorArbitratorTask extends RobotTask {
     @Override
     public boolean timeslice()
     {
+        if (rateLimit.time() <= 20) {
+            return false;
+        }
+
+        rateLimit.reset();
+
         if (state == SensorState.PING) {
+            RobotLog.i("Arbitrator: " + sensor.sensor.getConnectionInfo() + " : Ping");
             sensor.sensor.doPing();
             state = SensorState.PONG;
         } else {
+            RobotLog.i("Arbitrator: " + sensor.sensor.getConnectionInfo() + " : Pong");
             double val = sensor.sensor.getUltrasonicLevel();
 
             if ((val == 0) || (val == 255)) {
                 return false;
             }
 
-            robot.telemetry.addData("Distance " + sensor.sensor.getConnectionInfo(), val);
+            // robot.telemetry.addData("Distance " + sensor.sensor.getConnectionInfo(), val);
+            sensor.cacheVal = val;
 
             if (iterator.hasNext()) {
                 sensor = iterator.next();

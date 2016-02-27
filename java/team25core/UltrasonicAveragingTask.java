@@ -85,7 +85,7 @@ public class UltrasonicAveragingTask extends RobotTask {
             // RobotLog.i(sensor.getConnectionInfo() + " min %3.1f", min);
         }
 
-        robot.telemetry.addData("Distance " + sensor.getConnectionInfo(), val);
+        robot.telemetry.addData("Avg Task Distance " + sensor.getConnectionInfo(), val);
         movingAvg.addValue(val);
 
         /*
