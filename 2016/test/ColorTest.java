@@ -19,7 +19,7 @@ import team25core.RobotEvent;
  * Created by Izzie on 2/10/2016.
  */
 @Autonomous(name = "TEST Color", group="AutoTeam25")
-@Disabled
+//@Disabled
 public class ColorTest extends Robot {
 
     private DeviceInterfaceModule core;
