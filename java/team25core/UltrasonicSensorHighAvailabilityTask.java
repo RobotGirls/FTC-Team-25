@@ -22,9 +22,9 @@ public class UltrasonicSensorHighAvailabilityTask extends UltrasonicSensorArbitr
     {
         super(robot, null);
         this.primarySet = new HashSet<Team25UltrasonicSensor>();
-        this.primarySet.add(primary);
+        this.primarySet.add(p);
         this.secondarySet = new HashSet<Team25UltrasonicSensor>();
-        this.secondarySet.add(primary);
+        this.secondarySet.add(s);
         super.setSensors(primarySet);
 
         this.primary = p;
@@ -36,14 +36,18 @@ public class UltrasonicSensorHighAvailabilityTask extends UltrasonicSensorArbitr
     public static UltrasonicSensorHighAvailabilityTask factory(Robot robot, Team25UltrasonicSensor primary,
                   Team25UltrasonicSensor secondary)
     {
-        return new UltrasonicSensorHighAvailabilityTask(robot, primary, secondary);
+        UltrasonicSensorHighAvailabilityTask task;
+
+        task = new UltrasonicSensorHighAvailabilityTask(robot, primary, secondary);
+        task.setFilterGarbage(false);
+        return task;
     }
 
     public double getUltrasonicLevel()
     {
         double val;
 
-        val = super.getUltrasonicLevel(primary);
+        val = super.getUltrasonicLevel(active);
         failureDetection.addValue(val);
 
         if (failureDetection.getN() >= 50) {
@@ -56,9 +60,24 @@ public class UltrasonicSensorHighAvailabilityTask extends UltrasonicSensorArbitr
                     super.setSensors(primarySet);
                 }
                 failureDetection.clear();
+                state = SensorState.PING;
             }
         }
 
-        return super.getUltrasonicLevel(active);
+        return val;
     }
+
+    @Override
+    public boolean timeslice()
+    {
+        super.timeslice();
+
+        if (active == primary) {
+            this.robot.telemetry.addData("Active: ", "Right");
+        } else {
+            this.robot.telemetry.addData("Active: ", "Left");
+        }
+        return false;
+    }
+
 }

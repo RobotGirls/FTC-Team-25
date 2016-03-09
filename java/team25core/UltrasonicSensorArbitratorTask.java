@@ -18,6 +18,7 @@ public class UltrasonicSensorArbitratorTask extends RobotTask {
     Iterator<SensorCache> iterator;
     SensorCache sensor;
     protected SensorState state;
+    protected boolean filterGarbage;
 
     private class SensorCache {
 
@@ -42,6 +43,7 @@ public class UltrasonicSensorArbitratorTask extends RobotTask {
 
         this.setSensors(set);
         this.state = SensorState.PING;
+        this.filterGarbage = true;
     }
 
     public double getUltrasonicLevel(Team25UltrasonicSensor sensor)
@@ -51,12 +53,15 @@ public class UltrasonicSensorArbitratorTask extends RobotTask {
                 return s.cacheVal;
             }
         }
-        RobotLog.e("Could not find sensor in set");
+        RobotLog.e("Could not find sensor " + sensor.getConnectionInfo() + " in set");
         return 255;
     }
 
     public void setSensors(Set<Team25UltrasonicSensor> sensors)
     {
+        if (sensors == null) {
+            return;
+        }
         this.sensors = new HashSet<SensorCache>();
 
         for (Team25UltrasonicSensor s : sensors) {
@@ -65,6 +70,11 @@ public class UltrasonicSensorArbitratorTask extends RobotTask {
 
         this.iterator = this.sensors.iterator();
         this.sensor = iterator.next();
+    }
+
+    public void setFilterGarbage(boolean filter)
+    {
+        filterGarbage = filter;
     }
 
     @Override
@@ -96,7 +106,7 @@ public class UltrasonicSensorArbitratorTask extends RobotTask {
             RobotLog.i("Arbitrator: " + sensor.sensor.getConnectionInfo() + " : Pong");
             double val = sensor.sensor.getUltrasonicLevel();
 
-            if ((val == 0) || (val == 255)) {
+            if ((filterGarbage == true) && ((val == 0) || (val == 255))) {
                 return false;
             }
 
