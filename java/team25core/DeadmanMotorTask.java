@@ -109,6 +109,8 @@ public class DeadmanMotorTask extends RobotTask {
     @Override
     public void start()
     {
+        motor.setPower(0.0);
+
         robot.addTask(new GamepadTask(robot, gamepad) {
             @Override
             public void handleEvent(RobotEvent e)
