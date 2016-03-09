@@ -6,9 +6,9 @@ package opmodes;
 
 public class NeverlandServoConstants {
 
-    public final static float RIGHT_BUMPER_UP      = (float)231/(float)256;
-    public final static float RIGHT_BUMPER_DOWN    = (float)012/(float)256;
-    public final static float LEFT_BUMPER_UP       = (float)031/(float)256;
+    public final static float RIGHT_BUMPER_UP      = (float)251/(float)256;
+    public final static float RIGHT_BUMPER_DOWN    = (float)003/(float)256;
+    public final static float LEFT_BUMPER_UP       = (float)003/(float)256;
     public final static float LEFT_BUMPER_DOWN     = (float)251/(float)256;
 
     public final static float LEFT_PUSHER_DEPLOYED  = (float)256/(float)256;
