@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.swerverobotics.library.ClassFactory;
 import org.swerverobotics.library.interfaces.TeleOp;
 
 import team25core.DeadmanMotorTask;
@@ -74,6 +75,9 @@ public class CaffeineTeleop extends Robot {
         rightTread = hardwareMap.dcMotor.get("rightTread");
         leftTread = hardwareMap.dcMotor.get("leftTread");
 
+        // Class factory.
+        ClassFactory.createEasyMotorController(this, leftTread, rightTread);
+
         leftTread.setDirection(DcMotor.Direction.REVERSE);
 
         rightTread.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
@@ -81,6 +85,7 @@ public class CaffeineTeleop extends Robot {
 
         // Hook.
         hook = hardwareMap.dcMotor.get("hook");
+        hook.setDirection(DcMotor.Direction.REVERSE);
     }
 
     @Override
