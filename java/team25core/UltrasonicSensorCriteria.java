@@ -21,7 +21,10 @@ public class UltrasonicSensorCriteria implements SensorCriteria {
     @Override
     public boolean satisfied()
     {
-        if (average.getAverage() <= distance) {
+        double avg = average.getAverage();
+        RobotLog.i("251 Average %d", (int)avg);
+
+        if (avg <= distance) {
             return true;
         } else {
             return false;
