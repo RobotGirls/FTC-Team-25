@@ -36,7 +36,8 @@ public class TwoWheelDriveTask extends RobotTask {
 
     @Override
     public void start() {
-        // Nothing.
+        motorLeft.setPower(0.0);
+        motorRight.setPower(0.0);
     }
 
     @Override
