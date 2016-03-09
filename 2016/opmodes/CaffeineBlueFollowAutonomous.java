@@ -14,6 +14,8 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.swerverobotics.library.ClassFactory;
 import org.swerverobotics.library.interfaces.Autonomous;
 
+import java.nio.channels.InterruptibleChannel;
+
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.LightSensorCriteria;
@@ -33,12 +35,15 @@ import team25core.UltrasonicSensorCriteria;
 
 @Autonomous(name = "BLUE Target", group = "AutoTeam25")
 public class CaffeineBlueFollowAutonomous extends Robot {
+    protected final static int TURN_MULTIPLIER = 1;
 
     protected final static int TICKS_PER_DEGREE = NeverlandMotorConstants.ENCODER_TICKS_PER_DEGREE;
     protected final static int TICKS_PER_INCH = NeverlandMotorConstants.ENCODER_TICKS_PER_INCH;
 
-    protected final static int LIGHT_MIN = NeverlandLightConstants.LIGHT_MINIMUM;
-    protected final static int LIGHT_MAX = NeverlandLightConstants.LIGHT_MAXIMUM;
+    protected final static int LIGHT_MIN = NeverlandLightConstants.ROOM_LIGHT_MIN;
+    protected final static int LIGHT_MAX = NeverlandLightConstants.ROOM_LIGHT_MAX;
+    protected final static int LIGHT_MIN_BACK = NeverlandLightConstants.ROOM_BACK_LIGHT_MIN;
+    protected final static int LIGHT_MAX_BACK = NeverlandLightConstants.ROOM_BACK_LIGHT_MAX;
 
     private final static int LED_CHANNEL = 0;
 
@@ -48,7 +53,8 @@ public class CaffeineBlueFollowAutonomous extends Robot {
     private DeviceInterfaceModule core;
     private ModernRoboticsI2cGyro gyro;
     private ColorSensor color;
-    private LightSensor light;
+    private LightSensor frontLight;
+    private LightSensor backLight;
     private UltrasonicSensor leftSound;
     private UltrasonicSensor rightSound;
     private Servo leftPusher;
@@ -60,7 +66,9 @@ public class CaffeineBlueFollowAutonomous extends Robot {
     private BeaconArms pushers;
     private BeaconHelper helper;
 
-    private LightSensorCriteria lightCriteria;
+    private LightSensorCriteria frontLightCriteria;
+    private LightSensorCriteria backLightCriteria;
+    private LightSensorCriteria frontDarkCriteria;
     private UltrasonicDualSensorCriteria ultrasonicCriteria;
     private UltrasonicSensorCriteria distanceCriteria;
     private UltrasonicAveragingTask ultrasonicLeftAverage;
@@ -68,10 +76,10 @@ public class CaffeineBlueFollowAutonomous extends Robot {
 
     private DeadReckon deadReckon;
     private DeadReckonTask deadReckonTask;
-    private DeadReckon deadReckonTurn;
-    private DeadReckonTask deadReckonTurnTask;
     private DeadReckon deadReckonStraight;
     private DeadReckonTask deadReckonStraightTask;
+    private DeadReckon deadReckonLightTurn;
+    private DeadReckonTask deadReckonLightTurnTask;
 
     private ElapsedTime elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private PersistentTelemetryTask ptt;
@@ -97,15 +105,26 @@ public class CaffeineBlueFollowAutonomous extends Robot {
         core.setDigitalChannelState(LED_CHANNEL, false);
 
         // Light.
-        light = hardwareMap.lightSensor.get("light");
-        light.enableLed(true);
+        frontLight = hardwareMap.lightSensor.get("frontLight");
+        frontLight.enableLed(true);
+        backLight = hardwareMap.lightSensor.get("backLight");
+        backLight.enableLed(true);
 
-        // Light criteria.
-        lightCriteria = new LightSensorCriteria(light, LIGHT_MIN, LIGHT_MAX);
+        // Right light criteria.
+        frontLightCriteria = new LightSensorCriteria(frontLight, LIGHT_MIN, LIGHT_MAX);
+        frontDarkCriteria = new LightSensorCriteria(frontLight, LightSensorCriteria.LightPolarity.BLACK, LIGHT_MIN, LIGHT_MAX);
+        backLightCriteria = new LightSensorCriteria(backLight, LIGHT_MIN_BACK, LIGHT_MAX_BACK);
+        frontLightCriteria.setThreshold(NeverlandLightConstants.BLUE_THRESHOLD);
+        backLightCriteria.setThreshold(NeverlandLightConstants.BLUE_THRESHOLD);
+        frontDarkCriteria.setThreshold(NeverlandLightConstants.BLUE_THRESHOLD);
 
         // Ultrasonic.
         leftSound = hardwareMap.ultrasonicSensor.get("leftSound");
         rightSound = hardwareMap.ultrasonicSensor.get("rightSound");
+
+        // Ultrasonic criteria.
+        ultrasonicLeftAverage = new UltrasonicAveragingTask(this, leftSound, 4);
+        distanceCriteria = new UltrasonicSensorCriteria(ultrasonicLeftAverage, NeverlandAutonomousConstants.DISTANCE_FROM_BEACON);
 
         // Servos.
         climber = hardwareMap.servo.get("climber");
@@ -137,15 +156,16 @@ public class CaffeineBlueFollowAutonomous extends Robot {
 
         // Dead-reckon.
         deadReckon = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 100, 0.65);
+        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 88, NeverlandAutonomousConstants.SPEED_STRAIGHT);
 
-        // Dead-reckon: turn.
-        deadReckonTurn = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-        deadReckonTurn.addSegment(DeadReckon.SegmentType.TURN, NeverlandAutonomousConstants.TURN_TOWARD_BEACON, 0.10);
-
-        // Dead-reckon: straight:
+        // Dead-reckon: straight.
         deadReckonStraight = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
         deadReckonStraight.addSegment(DeadReckon.SegmentType.STRAIGHT, 24, 0.10);
+
+        // Dead-reckon: in case of light.
+        deadReckonLightTurn = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+        deadReckonLightTurn.addSegment(DeadReckon.SegmentType.STRAIGHT, 1, -0.251);
+        deadReckonLightTurn.addSegment(DeadReckon.SegmentType.TURN, 90, TURN_MULTIPLIER * 0.152);
 
         // Beacon.
         pushers = new BeaconArms(rightPusher, leftPusher, true);
@@ -157,8 +177,8 @@ public class CaffeineBlueFollowAutonomous extends Robot {
     @Override
     public void start() {
         // Dead reckon task.
-        // Start dead reckon. Run until light sees white or until the path ends.
-        deadReckonTask = new DeadReckonTask(this, deadReckon, lightCriteria) {
+        // Start dead reckon. Run until frontLight sees white or until the path ends.
+        deadReckonTask = new DeadReckonTask(this, deadReckon, backLightCriteria) {
             public void handleEvent(RobotEvent e) {
                 handleDeadReckonEvent((DeadReckonTask.DeadReckonEvent) e);
             }
@@ -174,9 +194,9 @@ public class CaffeineBlueFollowAutonomous extends Robot {
                  */
                 RobotLog.e("Missed the white line.");
                 TwoWheelGearedDriveDeadReckon missedLine = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-                missedLine.addSegment(DeadReckon.SegmentType.TURN, 30, -0.10);
-                missedLine.addSegment(DeadReckon.SegmentType.STRAIGHT, -12, 0.10);
-                addTask(new DeadReckonTask(this, missedLine, lightCriteria) {
+                missedLine.addSegment(DeadReckon.SegmentType.TURN, 30, TURN_MULTIPLIER * -0.10);
+                missedLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, -0.10);
+                addTask(new DeadReckonTask(this, missedLine, backLightCriteria) {
                     public void handleEvent(RobotEvent e)
                     {
                         DeadReckonEvent ev = (DeadReckonEvent)e;
@@ -190,74 +210,36 @@ public class CaffeineBlueFollowAutonomous extends Robot {
                 });
                 break;
             case SENSOR_SATISFIED:
-                // If deadReckonTask is stopped because it saw a white line, turn until the ultrasonic
-                // sensors return the same value (not zero).
-                ultrasonicLeftAverage = new UltrasonicAveragingTask(this, leftSound, NeverlandAutonomousConstants.MOVING_AVG_SET_SIZE);
-                ultrasonicRightAverage = new UltrasonicAveragingTask(this, rightSound, NeverlandAutonomousConstants.MOVING_AVG_SET_SIZE);
-                addTask(ultrasonicLeftAverage);
-                addTask(ultrasonicRightAverage);
-                ultrasonicCriteria = new UltrasonicDualSensorCriteria(ultrasonicLeftAverage,
-                        ultrasonicRightAverage, NeverlandAutonomousConstants.ULTRASONIC_DIFFERENCE);
+                // If deadReckonTask is stopped because it saw a white line, turn until the front
+                // light sensor sees white.
 
-                addTask(new SingleShotTimerTask(this, NeverlandAutonomousConstants.DELAY_BEFORE_TURN) {
-                            @Override
-                            public void handleEvent(RobotEvent e)
-                            {
-                                if (ultrasonicCriteria.satisfied()) {
-                                    /*
-                                     * Something is wrong.  We can't be satisfied without having turned.  So abort.
-                                     */
-                                    RobotLog.e("Aborting after hitting line because ultrasonic sensors broken");
-                                    ptt.addData("Abort: ", "Ultrasonic sensors both failed");
-                                } else {
-                                    elapsedTime.reset();
-                                    deadReckonTurnTask = new DeadReckonTask(this.robot, deadReckonTurn, ultrasonicCriteria) {
-                                        public void handleEvent(RobotEvent e)
-                                        {
-                                            if (elapsedTime.time() <= NeverlandAutonomousConstants.TURN_SAFETY_TIME) {
-                                                RobotLog.e("Aborting because we could not possibly have turned enough");
-                                                ptt.addData("Abort: ", "Impossibly short turn");
-                                            } else {
-                                                handleTurnReckonEvent((DeadReckonTask.DeadReckonEvent) e);
-                                            }
-                                        }
-                                    };
-                                    addTask(deadReckonTurnTask);
-                                }
-                            }
-                        });
+                RobotLog.e("251 Adding dead reckon turn task for front light sensor");
+                deadReckonLightTurnTask = new DeadReckonTask(this, deadReckonLightTurn, frontLightCriteria) {
+                    public void handleEvent(RobotEvent e) {
+                        elapsedTime.reset();
+                        RobotLog.e("251 Finished the turn task");
+                        handleAlignedReckonEvent((DeadReckonTask.DeadReckonEvent) e);
+                    }
+                };
+                addTask(deadReckonLightTurnTask);
                 break;
         }
     }
 
-    protected void handleTurnReckonEvent(DeadReckonTask.DeadReckonEvent e) {
+    protected void handleAlignedReckonEvent(DeadReckonTask.DeadReckonEvent e) {
         switch (e.kind) {
-            case PATH_DONE:
-                /*
-                 * We moved through square to the wall.
-                 */
-                RobotLog.e("Rotated past square to the wall");
-                double min = ultrasonicRightAverage.getMin();
-                if (min < ultrasonicRightAverage.getAverage()) {
-                    RobotLog.i("Last ditch effort to square to the wall");
-                    TwoWheelGearedDriveDeadReckon lastDitchTurn = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-                    lastDitchTurn.addSegment(DeadReckon.SegmentType.TURN, 60, -0.10);
-                    distanceCriteria = new UltrasonicSensorCriteria(ultrasonicRightAverage, (int)min);
-                    addTask(new DeadReckonTask(this, lastDitchTurn, distanceCriteria) {
-                        public void handleEvent(RobotEvent e) {
-                            handleStraightReckonEvent((DeadReckonTask.DeadReckonEvent)e);
-                        }
-                    });
-                } else {
-                    RobotLog.e("Aborting everything is completely broken");
-                    ptt.addData("Abort: ", "Rotated past wall no recovery");
-                }
+            case SEGMENT_DONE:
+                RobotLog.e("Aborting because the ultrasonic sensors are not working");
+                ptt.addData("Abort: ", "Beacon approach failed");
                 break;
             case SENSOR_SATISFIED:
-                distanceCriteria = new UltrasonicSensorCriteria(ultrasonicRightAverage, NeverlandAutonomousConstants.DISTANCE_FROM_BEACON);
+                RobotLog.i("Moving forward to beacon");
+                ptt.addData("Path Success: ", "Both light sensors aligned with the white line");
+                addTask(ultrasonicLeftAverage);
                 deadReckonStraightTask = new DeadReckonTask(this, deadReckonStraight, distanceCriteria) {
+                    @Override
                     public void handleEvent(RobotEvent e) {
-                        handleStraightReckonEvent((DeadReckonTask.DeadReckonEvent)e);
+                        handleStraightReckonEvent((DeadReckonEvent)e);
                     }
                 };
                 addTask(deadReckonStraightTask);
@@ -274,11 +256,11 @@ public class CaffeineBlueFollowAutonomous extends Robot {
             case SENSOR_SATISFIED:
                 RobotLog.i("Doing beacon work");
                 ptt.addData("Path Success: ", "Doing beacon work");
-                helper = new BeaconHelper(BeaconHelper.Alliance.BLUE, this, color, core, pushers, climber, rightTread, leftTread, TICKS_PER_DEGREE, TICKS_PER_INCH);
+                helper = new BeaconHelper(BeaconHelper.Alliance.BLUE, this, color, core, pushers,
+                               climber, rightTread, leftTread, TICKS_PER_DEGREE, TICKS_PER_INCH);
                 helper.doBeaconWork();
                 break;
         }
-
     }
 
     @Override
@@ -286,5 +268,4 @@ public class CaffeineBlueFollowAutonomous extends Robot {
     {
     }
 }
-
 
