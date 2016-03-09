@@ -14,7 +14,8 @@ import org.swerverobotics.library.interfaces.Autonomous;
 public class CaffeineSensorsTest extends OpMode {
     public UltrasonicSensor leftUltrasound;
     public UltrasonicSensor rightUltrasound;
-    public LightSensor light;
+    public LightSensor backLight;
+    public LightSensor frontLight;
     public ColorSensor color;
     public GyroSensor gyro;
 
@@ -22,7 +23,8 @@ public class CaffeineSensorsTest extends OpMode {
     public void init() {
         leftUltrasound = hardwareMap.ultrasonicSensor.get("leftSound");
         rightUltrasound = hardwareMap.ultrasonicSensor.get("rightSound");
-        light = hardwareMap.lightSensor.get("light");
+        frontLight = hardwareMap.lightSensor.get("frontLight");
+        backLight = hardwareMap.lightSensor.get("backLight");
         color = hardwareMap.colorSensor.get("color");
         gyro = hardwareMap.gyroSensor.get("gyro");
 
@@ -31,10 +33,11 @@ public class CaffeineSensorsTest extends OpMode {
 
     @Override
     public void loop() {
-        light.enableLed(true);
-        telemetry.addData("Left ultrasonic: ", leftUltrasound.getUltrasonicLevel());
-        telemetry.addData("Right ultrasonic: ", rightUltrasound.getUltrasonicLevel());
-        telemetry.addData("NXT Light raw value: ", light.getLightDetectedRaw());
+        backLight.enableLed(true);
+        telemetry.addData("NXT Left ultrasonic: ", leftUltrasound.getUltrasonicLevel());
+        telemetry.addData("NXT Right ultrasonic: ", rightUltrasound.getUltrasonicLevel());
+        telemetry.addData("NXT Front light raw: ", frontLight.getLightDetectedRaw());
+        telemetry.addData("NXT Back light raw: ", backLight.getLightDetectedRaw());
         telemetry.addData("Color red value: ", color.red());
         telemetry.addData("Color blue value: ", color.blue());
         telemetry.addData("Gyro value: ", gyro.getHeading());
