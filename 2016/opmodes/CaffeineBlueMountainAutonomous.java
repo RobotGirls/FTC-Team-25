@@ -21,8 +21,8 @@ import team25core.RobotEvent;
 @Autonomous(name="BLUE Mountain", group = "AutoTeam25")
 public class CaffeineBlueMountainAutonomous extends OpMode {
 
-    public static final int TICKS_PER_INCH = 318;
-    public static final int TICKS_PER_DEGREE = 45;
+    public static final int TICKS_PER_INCH = NeverlandMotorConstants.ENCODER_TICKS_PER_INCH;
+    public static final int TICKS_PER_DEGREE = NeverlandMotorConstants.ENCODER_TICKS_PER_DEGREE;
 
     private DcMotorController mc;
     private DcMotor leftTread;
@@ -67,8 +67,8 @@ public class CaffeineBlueMountainAutonomous extends OpMode {
         switch(state) {
             // Case 1 - 4: Move 62.5 inches forward.
             case 1:
-                leftTread.setPower(1.0);
-                rightTread.setPower(1.0);
+                leftTread.setPower(0.5);
+                rightTread.setPower(0.5);
                 if (Math.abs(leftTread.getCurrentPosition()) >= (62.5 * TICKS_PER_INCH)) {
                     state = 2;
                 }
@@ -92,8 +92,8 @@ public class CaffeineBlueMountainAutonomous extends OpMode {
                 break;
             // Case 5 - 9: Turn 90 degrees.
             case 5:
-                leftTread.setPower(1.0);
-                rightTread.setPower(-1.0);
+                leftTread.setPower(0.251);
+                rightTread.setPower(0.251);
                 if (Math.abs(leftTread.getCurrentPosition()) >= (90 * TICKS_PER_DEGREE)) {
                     state = 6;
                 }
@@ -117,8 +117,8 @@ public class CaffeineBlueMountainAutonomous extends OpMode {
                 break;
             // Case 9 - 12: Move 20 inches forward.
             case 9:
-                leftTread.setPower(1.0);
-                rightTread.setPower(1.0);
+                leftTread.setPower(0.5);
+                rightTread.setPower(0.5);
                 if (Math.abs(leftTread.getCurrentPosition()) >= (20 * TICKS_PER_INCH)) {
                     state = 10;
                 }
@@ -143,8 +143,8 @@ public class CaffeineBlueMountainAutonomous extends OpMode {
                 break;
             // Case 13 - 16: Backward 12 inches.
             case 13:
-                leftTread.setPower(-1.0);
-                rightTread.setPower(-1.0);
+                leftTread.setPower(-0.5);
+                rightTread.setPower(-0.5);
                 leftBumper.setPosition(NeverlandServoConstants.LEFT_BUMPER_UP);
                 rightBumper.setPosition(NeverlandServoConstants.RIGHT_BUMPER_UP);
                 if (Math.abs(leftTread.getCurrentPosition()) >= (12 * TICKS_PER_INCH)) {
