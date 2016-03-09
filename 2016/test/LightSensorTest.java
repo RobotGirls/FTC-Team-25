@@ -11,18 +11,22 @@ import org.swerverobotics.library.interfaces.Autonomous;
 @Autonomous(name = "TEST Light")
 public class LightSensorTest extends OpMode{
 
-    LightSensor sensor;
+    LightSensor front;
+    LightSensor back;
 
     @Override
     public void init()
     {
-        sensor = hardwareMap.lightSensor.get("light");
-        sensor.enableLed(true);
+        front = hardwareMap.lightSensor.get("frontLight");
+        front.enableLed(true);
+        back = hardwareMap.lightSensor.get("backLight");
+        back.enableLed(true);
     }
 
     @Override
     public void loop()
     {
-        telemetry.addData("Light: ", sensor.getLightDetectedRaw());
+        telemetry.addData("Back light: ", back.getLightDetectedRaw());
+        telemetry.addData("Front light: ", front.getLightDetectedRaw());
     }
 }
