@@ -5,8 +5,6 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import org.swerverobotics.library.interfaces.Autonomous;
-
 import opmodes.NeverlandLightConstants;
 
 /*
