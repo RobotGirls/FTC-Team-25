@@ -20,6 +20,8 @@ import team25core.ServoCalibrateTask;
 public class CaffeineServoTest extends Robot {
 
     private Servo servo;
+    private Servo rightPusher;
+    private Servo leftBumper;
     private ServoCalibrateTask servoTask;
 
     @Override
@@ -29,6 +31,13 @@ public class CaffeineServoTest extends Robot {
 
     @Override
     public void init() {
+        if (rightPusher != null && leftBumper != null) {
+            rightPusher = hardwareMap.servo.get("rightPusher");
+            leftBumper = hardwareMap.servo.get("leftBumper");
+
+            rightPusher.setPosition(NeverlandServoConstants.RIGHT_PUSHER_STOWED);
+            leftBumper.setPosition(0);
+        }
         servo = hardwareMap.servo.get("servo");
     }
 
@@ -36,6 +45,10 @@ public class CaffeineServoTest extends Robot {
     public void start() {
         ServoCalibrateTask calibrate = new ServoCalibrateTask(this, servo);
         addTask(calibrate);
+
+        if (leftBumper != null) {
+            leftBumper.setPosition(0);
+        }
     }
 
 }
