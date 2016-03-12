@@ -34,11 +34,15 @@ import team25core.UltrasonicSensorCriteria;
  */
 
 @Autonomous(name = "BLUE Target", group = "AutoTeam25")
-public class CaffeineBlueFollowAutonomous extends Robot {
-    protected final static int TURN_MULTIPLIER = 1;
+public class CaffeineBlueTargetAutonomous extends Robot {
 
+    protected final static int TURN_MULTIPLIER = NeverlandAutonomousConstants.BLUE_TURN_MULTIPLIER;
+    protected final static int START_DELAY = NeverlandAutonomousConstants.DELAY_BEFORE_START;
     protected final static int TICKS_PER_DEGREE = NeverlandMotorConstants.ENCODER_TICKS_PER_DEGREE;
     protected final static int TICKS_PER_INCH = NeverlandMotorConstants.ENCODER_TICKS_PER_INCH;
+
+    protected final static double SPEED_TURN = NeverlandAutonomousConstants.SPEED_TURN;
+    protected final static double SPEED_STRAIGHT = NeverlandAutonomousConstants.SPEED_STRAIGHT;
 
     protected final static int LIGHT_MIN = NeverlandLightConstants.ROOM_LIGHT_MIN;
     protected final static int LIGHT_MAX = NeverlandLightConstants.ROOM_LIGHT_MAX;
@@ -69,17 +73,8 @@ public class CaffeineBlueFollowAutonomous extends Robot {
     private LightSensorCriteria frontLightCriteria;
     private LightSensorCriteria backLightCriteria;
     private LightSensorCriteria frontDarkCriteria;
-    private UltrasonicDualSensorCriteria ultrasonicCriteria;
     private UltrasonicSensorCriteria distanceCriteria;
     private UltrasonicAveragingTask ultrasonicLeftAverage;
-    private UltrasonicAveragingTask ultrasonicRightAverage;
-
-    private DeadReckon deadReckon;
-    private DeadReckonTask deadReckonTask;
-    private DeadReckon deadReckonStraight;
-    private DeadReckonTask deadReckonStraightTask;
-    private DeadReckon deadReckonLightTurn;
-    private DeadReckonTask deadReckonLightTurnTask;
 
     private ElapsedTime elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private PersistentTelemetryTask ptt;
@@ -112,7 +107,8 @@ public class CaffeineBlueFollowAutonomous extends Robot {
 
         // Right light criteria.
         frontLightCriteria = new LightSensorCriteria(frontLight, LIGHT_MIN, LIGHT_MAX);
-        frontDarkCriteria = new LightSensorCriteria(frontLight, LightSensorCriteria.LightPolarity.BLACK, LIGHT_MIN, LIGHT_MAX);
+        frontDarkCriteria = new LightSensorCriteria(frontLight, LightSensorCriteria.LightPolarity.BLACK,
+                                                                                  LIGHT_MIN, LIGHT_MAX);
         backLightCriteria = new LightSensorCriteria(backLight, LIGHT_MIN_BACK, LIGHT_MAX_BACK);
         frontLightCriteria.setThreshold(NeverlandLightConstants.BLUE_THRESHOLD);
         backLightCriteria.setThreshold(NeverlandLightConstants.BLUE_THRESHOLD);
@@ -124,7 +120,8 @@ public class CaffeineBlueFollowAutonomous extends Robot {
 
         // Ultrasonic criteria.
         ultrasonicLeftAverage = new UltrasonicAveragingTask(this, leftSound, 4);
-        distanceCriteria = new UltrasonicSensorCriteria(ultrasonicLeftAverage, NeverlandAutonomousConstants.DISTANCE_FROM_BEACON);
+        distanceCriteria = new UltrasonicSensorCriteria(ultrasonicLeftAverage,
+                           NeverlandAutonomousConstants.DISTANCE_FROM_BEACON);
 
         // Servos.
         climber = hardwareMap.servo.get("climber");
@@ -154,36 +151,42 @@ public class CaffeineBlueFollowAutonomous extends Robot {
         rightTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         leftTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 
-        // Dead-reckon.
-        deadReckon = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 88, NeverlandAutonomousConstants.SPEED_STRAIGHT);
-
-        // Dead-reckon: straight.
-        deadReckonStraight = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-        deadReckonStraight.addSegment(DeadReckon.SegmentType.STRAIGHT, 24, 0.10);
-
-        // Dead-reckon: in case of light.
-        deadReckonLightTurn = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-        deadReckonLightTurn.addSegment(DeadReckon.SegmentType.STRAIGHT, 1, -0.251);
-        deadReckonLightTurn.addSegment(DeadReckon.SegmentType.TURN, 90, TURN_MULTIPLIER * 0.152);
-
         // Beacon.
         pushers = new BeaconArms(rightPusher, leftPusher, true);
-        helper = new BeaconHelper(BeaconHelper.Alliance.BLUE, this, color, core, pushers, climber, rightTread, leftTread, TICKS_PER_DEGREE, TICKS_PER_INCH);
+        helper = new BeaconHelper(BeaconHelper.Alliance.BLUE, this, color, core, pushers, climber,
+                                         rightTread, leftTread, TICKS_PER_DEGREE, TICKS_PER_INCH);
 
         ptt = new PersistentTelemetryTask(this);
     }
 
     @Override
     public void start() {
-        // Dead reckon task.
-        // Start dead reckon. Run until frontLight sees white or until the path ends.
-        deadReckonTask = new DeadReckonTask(this, deadReckon, backLightCriteria) {
-            public void handleEvent(RobotEvent e) {
-                handleDeadReckonEvent((DeadReckonTask.DeadReckonEvent) e);
+        // Adds delay before start task, if the delay is not zero.
+        if (START_DELAY != 0) {
+            addTask(new SingleShotTimerTask(this, START_DELAY) {
+                @Override
+                public void handleEvent(RobotEvent e) {
+                }
+            });
+        }
+
+        RobotLog.e("Starting initial straight segment.");
+
+        TwoWheelGearedDriveDeadReckon targetingLine = new TwoWheelGearedDriveDeadReckon
+                       (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+        targetingLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 88, 0.75 * SPEED_STRAIGHT);
+
+        addTask(new DeadReckonTask(this, targetingLine, backLightCriteria) {
+            public void handleEvent(RobotEvent e)
+            {
+                DeadReckonEvent event = (DeadReckonEvent)e;
+                if (event.kind == EventKind.SENSOR_SATISFIED) {
+                    handleDeadReckonEvent(event);
+                } else {
+                    RobotLog.e("251 Initial move missed the white line.");
+                }
             }
-        };
-        addTask(deadReckonTask);
+        });
     }
 
     protected void handleDeadReckonEvent(DeadReckonTask.DeadReckonEvent e) {
@@ -192,10 +195,15 @@ public class CaffeineBlueFollowAutonomous extends Robot {
                 /*
                  * We missed the white line.  Turn counter clockwise and see if we can grab it.
                  */
-                RobotLog.e("Missed the white line.");
-                TwoWheelGearedDriveDeadReckon missedLine = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-                missedLine.addSegment(DeadReckon.SegmentType.TURN, 30, TURN_MULTIPLIER * -0.10);
-                missedLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, -0.10);
+                RobotLog.e("251 Missed the white line.");
+
+                // (1) Turn 30 degrees.
+                // (2) Move backwards to move back onto the line OR stop if sensor sees white.
+                TwoWheelGearedDriveDeadReckon missedLine = new TwoWheelGearedDriveDeadReckon
+                            (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+                missedLine.addSegment(DeadReckon.SegmentType.TURN, 30, -SPEED_TURN * TURN_MULTIPLIER);
+                missedLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, -0.75 * SPEED_STRAIGHT);
+
                 addTask(new DeadReckonTask(this, missedLine, backLightCriteria) {
                     public void handleEvent(RobotEvent e)
                     {
@@ -210,18 +218,29 @@ public class CaffeineBlueFollowAutonomous extends Robot {
                 });
                 break;
             case SENSOR_SATISFIED:
-                // If deadReckonTask is stopped because it saw a white line, turn until the front
-                // light sensor sees white.
-
                 RobotLog.e("251 Adding dead reckon turn task for front light sensor");
-                deadReckonLightTurnTask = new DeadReckonTask(this, deadReckonLightTurn, frontLightCriteria) {
+
+                // (1) Move forward to account for off-centered beacon placement.
+                // (2) Over-turn right OR until front light sensors sees the white line.
+                TwoWheelGearedDriveDeadReckon searchWhiteLine = new TwoWheelGearedDriveDeadReckon
+                                 (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+                searchWhiteLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 1, -SPEED_STRAIGHT);
+                searchWhiteLine.addSegment(DeadReckon.SegmentType.TURN, 120, TURN_MULTIPLIER * SPEED_TURN);
+
+                addTask(new DeadReckonTask(this, searchWhiteLine, frontLightCriteria) {
                     public void handleEvent(RobotEvent e) {
-                        elapsedTime.reset();
+                        // elapsedTime.reset();
+                        DeadReckonEvent event = (DeadReckonEvent) e;
                         RobotLog.e("251 Finished the turn task");
-                        handleAlignedReckonEvent((DeadReckonTask.DeadReckonEvent) e);
+
+                        if (event.kind == EventKind.SENSOR_SATISFIED) {
+                            RobotLog.i("251 Robot is parallel to the white line");
+                            handleAlignedReckonEvent((DeadReckonTask.DeadReckonEvent)e);
+                        } else {
+                            RobotLog.e("251 Overturn did not catch the white line");
+                        }
                     }
-                };
-                addTask(deadReckonLightTurnTask);
+                });
                 break;
         }
     }
@@ -229,20 +248,28 @@ public class CaffeineBlueFollowAutonomous extends Robot {
     protected void handleAlignedReckonEvent(DeadReckonTask.DeadReckonEvent e) {
         switch (e.kind) {
             case SEGMENT_DONE:
-                RobotLog.e("Aborting because the ultrasonic sensors are not working");
+                RobotLog.e("251 Aborting because the light sensors are not working");
                 ptt.addData("Abort: ", "Beacon approach failed");
                 break;
             case SENSOR_SATISFIED:
-                RobotLog.i("Moving forward to beacon");
+                RobotLog.i("251 Moving forward to beacon, using ultrasonic sensor");
                 ptt.addData("Path Success: ", "Both light sensors aligned with the white line");
+
+                // Turns on left ultrasonic sensor.
                 addTask(ultrasonicLeftAverage);
-                deadReckonStraightTask = new DeadReckonTask(this, deadReckonStraight, distanceCriteria) {
-                    @Override
+
+                // (1) Moves forward OR until ultrasonic sensor is certain distance away from wall.
+                TwoWheelGearedDriveDeadReckon moveToBeacon = new TwoWheelGearedDriveDeadReckon
+                              (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+                moveToBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 24, SPEED_STRAIGHT);
+
+                addTask(new DeadReckonTask(this, moveToBeacon, distanceCriteria) {
                     public void handleEvent(RobotEvent e) {
-                        handleStraightReckonEvent((DeadReckonEvent)e);
+                        elapsedTime.reset();
+                        RobotLog.e("251 Finished moving in front of beacon");
+                        handleStraightReckonEvent((DeadReckonTask.DeadReckonEvent) e);
                     }
-                };
-                addTask(deadReckonStraightTask);
+                });
                 break;
         }
     }
@@ -250,12 +277,17 @@ public class CaffeineBlueFollowAutonomous extends Robot {
     protected void handleStraightReckonEvent(DeadReckonTask.DeadReckonEvent e) {
         switch (e.kind) {
             case SEGMENT_DONE:
-                RobotLog.e("Aborting because could not find beacon distance");
+                RobotLog.e("251 Aborting because could not find beacon distance");
                 ptt.addData("Abort: ", "Beacon approach failed");
                 break;
             case SENSOR_SATISFIED:
-                RobotLog.i("Doing beacon work");
+                RobotLog.i("251 Doing beacon work");
                 ptt.addData("Path Success: ", "Doing beacon work");
+
+                // (1) Swings out left pusher (servo with color sensor).
+                // (2) Senses color of beacon.
+                // (3) Swings correct pusher out to press beacon button.
+                // (4) Dispenses climbers.
                 helper = new BeaconHelper(BeaconHelper.Alliance.BLUE, this, color, core, pushers,
                                climber, rightTread, leftTread, TICKS_PER_DEGREE, TICKS_PER_INCH);
                 helper.doBeaconWork();
@@ -268,4 +300,3 @@ public class CaffeineBlueFollowAutonomous extends Robot {
     {
     }
 }
-
