@@ -1,4 +1,3 @@
-
 package opmodes;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
@@ -15,30 +14,43 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.swerverobotics.library.ClassFactory;
 import org.swerverobotics.library.interfaces.Autonomous;
 
-import java.nio.channels.InterruptibleChannel;
+import java.lang.annotation.Target;
 
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
+import team25core.GamepadTask;
 import team25core.LightSensorCriteria;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.RobotTask;
 import team25core.SingleShotTimerTask;
 import team25core.Team25DcMotor;
+import team25core.TwoWheelDriveTask;
 import team25core.TwoWheelGearedDriveDeadReckon;
 import team25core.UltrasonicAveragingTask;
-import team25core.UltrasonicDualSensorCriteria;
 import team25core.UltrasonicSensorCriteria;
 
 /*
  * FTC Team 5218: izzielau, February 17, 2016
  */
 
-@Autonomous(name = "RED Target", group = "AutoTeam25")
-public class CaffeineRedTargetAutonomous extends Robot {
+@Autonomous(name = "Caffeine Autonomous", group = "AutoTeam25")
+public class CaffeineAutonomous extends Robot {
 
-    protected final static int TURN_MULTIPLIER = NeverlandAutonomousConstants.RED_TURN_MULTIPLIER;
-    protected final static int START_DELAY = NeverlandAutonomousConstants.DELAY_BEFORE_START;
+    public enum EventKind {
+        BEACON_DONE,
+    }
+
+    public class AutonomousEvent extends RobotEvent {
+        public EventKind kind;
+
+        public AutonomousEvent(RobotTask task, EventKind kind) {
+            super(task);
+            this.kind = kind;
+        }
+    }
+
     protected final static int TICKS_PER_DEGREE = NeverlandMotorConstants.ENCODER_TICKS_PER_DEGREE;
     protected final static int TICKS_PER_INCH = NeverlandMotorConstants.ENCODER_TICKS_PER_INCH;
 
@@ -51,6 +63,9 @@ public class CaffeineRedTargetAutonomous extends Robot {
     protected final static int LIGHT_MAX_BACK = NeverlandLightConstants.ROOM_BACK_LIGHT_MAX;
 
     private final static int LED_CHANNEL = 0;
+    private static int TURN_MULTIPLIER = 0;
+
+    private int START_DELAY;
 
     private DcMotorController mc;
     private Team25DcMotor leftTread;
@@ -76,17 +91,60 @@ public class CaffeineRedTargetAutonomous extends Robot {
     private LightSensorCriteria frontDarkCriteria;
     private UltrasonicSensorCriteria distanceCriteria;
     private UltrasonicAveragingTask ultrasonicLeftAverage;
+    private GamepadTask gamepad;
 
     private ElapsedTime elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private PersistentTelemetryTask ptt;
 
+    private enum Alliance {
+        BLUE,
+        RED,
+        PURPLE
+    }
+
+    Alliance alliance;
+
     @Override
     public void handleEvent(RobotEvent e) {
+        if (e instanceof GamepadTask.GamepadEvent) {
+            GamepadTask.GamepadEvent event = (GamepadTask.GamepadEvent) e;
 
+            if (event.kind == GamepadTask.EventKind.BUTTON_X_DOWN) {
+                // Blue.
+                alliance = Alliance.BLUE;
+                ptt.addData("ALLIANCE: ", "" + alliance);
+            } else if (event.kind == GamepadTask.EventKind.BUTTON_B_DOWN) {
+                // Red.
+                alliance = Alliance.RED;
+                ptt.addData("ALLIANCE: ", "" + alliance);
+            } else if (event.kind == GamepadTask.EventKind.BUTTON_Y_DOWN) {
+                // Add one second to delay.
+                START_DELAY++;
+                ptt.addData("DELAY: ", START_DELAY);
+            } else if (event.kind == GamepadTask.EventKind.BUTTON_A_DOWN) {
+                // Subtract one second from delay.
+                START_DELAY--;
+                ptt.addData("DELAY: ", START_DELAY);
+            }
+        }
     }
 
     @Override
     public void init() {
+
+        // Reset delay.
+        START_DELAY = 0;
+
+        // Reset alliance.
+        alliance = Alliance.PURPLE;
+
+        // Persistent telemetry task.
+        ptt = new PersistentTelemetryTask(this);
+        addTask(ptt);
+
+        // Telemetry for autonomous specificity.
+        ptt.addData("ALLIANCE: ", "NOT SELECTED");
+        ptt.addData("DELAY: ", START_DELAY);
 
         // Gyro.
         gyro = (ModernRoboticsI2cGyro)hardwareMap.gyroSensor.get("gyro");
@@ -109,20 +167,18 @@ public class CaffeineRedTargetAutonomous extends Robot {
         // Right light criteria.
         frontLightCriteria = new LightSensorCriteria(frontLight, LIGHT_MIN, LIGHT_MAX);
         frontDarkCriteria = new LightSensorCriteria(frontLight, LightSensorCriteria.LightPolarity.BLACK,
-                LIGHT_MIN, LIGHT_MAX);
+                                                                                  LIGHT_MIN, LIGHT_MAX);
         backLightCriteria = new LightSensorCriteria(backLight, LIGHT_MIN_BACK, LIGHT_MAX_BACK);
-        frontLightCriteria.setThreshold(NeverlandLightConstants.RED_THRESHOLD);
-        backLightCriteria.setThreshold(NeverlandLightConstants.RED_THRESHOLD);
-        frontDarkCriteria.setThreshold(NeverlandLightConstants.RED_THRESHOLD);
 
         // Ultrasonic.
         leftSound = hardwareMap.ultrasonicSensor.get("leftSound");
         rightSound = hardwareMap.ultrasonicSensor.get("rightSound");
 
         // Ultrasonic criteria.
-        ultrasonicLeftAverage = new UltrasonicAveragingTask(this, leftSound, 4);
+        ultrasonicLeftAverage = new UltrasonicAveragingTask(this, leftSound,
+                          NeverlandAutonomousConstants.MOVING_AVG_SET_SIZE);
         distanceCriteria = new UltrasonicSensorCriteria(ultrasonicLeftAverage,
-                NeverlandAutonomousConstants.DISTANCE_FROM_BEACON);
+                           NeverlandAutonomousConstants.DISTANCE_FROM_BEACON);
 
         // Servos.
         climber = hardwareMap.servo.get("climber");
@@ -154,40 +210,73 @@ public class CaffeineRedTargetAutonomous extends Robot {
 
         // Beacon.
         pushers = new BeaconArms(rightPusher, leftPusher, true);
-        helper = new BeaconHelper(BeaconHelper.Alliance.RED, this, color, core, pushers, climber,
-                rightTread, leftTread, TICKS_PER_DEGREE, TICKS_PER_INCH);
 
-        ptt = new PersistentTelemetryTask(this);
+        // Creates gamepad task for init_loop().
+        gamepad = new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1);
+        addTask(gamepad);
     }
 
-    @Override
-    public void start() {
-        // Adds delay before start task, if the delay is not zero.
-        if (START_DELAY != 0) {
-            addTask(new SingleShotTimerTask(this, START_DELAY) {
-                @Override
-                public void handleEvent(RobotEvent e) {
-                }
-            });
-        }
+    public void blueInit() {
+        TURN_MULTIPLIER = NeverlandAutonomousConstants.BLUE_TURN_MULTIPLIER;
 
-        RobotLog.e("Starting initial straight segment.");
+        frontLightCriteria.setThreshold(NeverlandLightConstants.BLUE_THRESHOLD);
+        backLightCriteria.setThreshold(NeverlandLightConstants.BLUE_THRESHOLD);
+        frontDarkCriteria.setThreshold(NeverlandLightConstants.BLUE_THRESHOLD);
 
-        TwoWheelGearedDriveDeadReckon targetingLine = new TwoWheelGearedDriveDeadReckon
-                (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-        targetingLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 88, 0.75 * SPEED_STRAIGHT);
+        helper = new BeaconHelper(BeaconHelper.Alliance.BLUE, this, color, core, pushers, climber,
+                rightTread, leftTread, TICKS_PER_DEGREE, TICKS_PER_INCH);
+    }
 
-        addTask(new DeadReckonTask(this, targetingLine, backLightCriteria) {
+    public void redInit() {
+        TURN_MULTIPLIER = NeverlandAutonomousConstants.RED_TURN_MULTIPLIER;
+
+        frontLightCriteria.setThreshold(NeverlandLightConstants.RED_THRESHOLD);
+        backLightCriteria.setThreshold(NeverlandLightConstants.RED_THRESHOLD);
+        frontDarkCriteria.setThreshold(NeverlandLightConstants.RED_THRESHOLD);
+
+        helper = new BeaconHelper(BeaconHelper.Alliance.RED, this, color, core, pushers, climber,
+                rightTread, leftTread, TICKS_PER_DEGREE, TICKS_PER_INCH);
+    }
+
+    public void initialMove(final DeadReckon path) {
+        addTask(new DeadReckonTask(this, path, backLightCriteria) {
             public void handleEvent(RobotEvent e)
             {
-                DeadReckonEvent ev = (DeadReckonEvent)e;
-                if (ev.kind == EventKind.SENSOR_SATISFIED) {
-                    handleDeadReckonEvent(ev);
+                DeadReckonEvent event = (DeadReckonEvent)e;
+                if (event.kind == EventKind.SENSOR_SATISFIED) {
+                    handleDeadReckonEvent(event);
                 } else {
                     RobotLog.e("251 Initial move missed the white line.");
                 }
             }
         });
+    }
+
+    @Override
+    public void start() {
+
+        if (alliance == Alliance.BLUE) {
+            blueInit();
+        } else if (alliance == Alliance.RED) {
+            redInit();
+        }
+
+        RobotLog.e("251 Starting initial straight segment");
+
+        final TwoWheelGearedDriveDeadReckon targetingLine = new TwoWheelGearedDriveDeadReckon
+                             (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+        targetingLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 88, SPEED_STRAIGHT);
+
+        if (START_DELAY > 0) {
+            addTask(new SingleShotTimerTask(this, 1000 * START_DELAY) {
+                @Override
+                public void handleEvent(RobotEvent e) {
+                    initialMove(targetingLine);
+                }
+            });
+        } else {
+            initialMove(targetingLine);
+        }
     }
 
     protected void handleDeadReckonEvent(DeadReckonTask.DeadReckonEvent e) {
@@ -201,7 +290,7 @@ public class CaffeineRedTargetAutonomous extends Robot {
                 // (1) Turn 30 degrees.
                 // (2) Move backwards to move back onto the line OR stop if sensor sees white.
                 TwoWheelGearedDriveDeadReckon missedLine = new TwoWheelGearedDriveDeadReckon
-                        (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+                            (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
                 missedLine.addSegment(DeadReckon.SegmentType.TURN, 30, -SPEED_TURN * TURN_MULTIPLIER);
                 missedLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, -0.75 * SPEED_STRAIGHT);
 
@@ -224,7 +313,7 @@ public class CaffeineRedTargetAutonomous extends Robot {
                 // (1) Move forward to account for off-centered beacon placement.
                 // (2) Over-turn right OR until front light sensors sees the white line.
                 TwoWheelGearedDriveDeadReckon searchWhiteLine = new TwoWheelGearedDriveDeadReckon
-                        (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+                                 (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
                 searchWhiteLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 1, -SPEED_STRAIGHT);
                 searchWhiteLine.addSegment(DeadReckon.SegmentType.TURN, 120, TURN_MULTIPLIER * SPEED_TURN);
 
@@ -236,10 +325,30 @@ public class CaffeineRedTargetAutonomous extends Robot {
 
                         if (event.kind == EventKind.SENSOR_SATISFIED) {
                             RobotLog.i("251 Robot is parallel to the white line");
-                            handleAlignedReckonEvent((DeadReckonTask.DeadReckonEvent)e);
+                            handleRealignReckonEvent((DeadReckonTask.DeadReckonEvent) e);
                         } else {
                             RobotLog.e("251 Overturn did not catch the white line");
                         }
+                    }
+                });
+                break;
+        }
+    }
+
+    protected void handleRealignReckonEvent(DeadReckonTask.DeadReckonEvent e) {
+        switch (e.kind) {
+            case SEGMENT_DONE:
+                break;
+            case SENSOR_SATISFIED:
+                TwoWheelGearedDriveDeadReckon alignWithLine = new TwoWheelGearedDriveDeadReckon
+                               (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+                alignWithLine.addSegment(DeadReckon.SegmentType.TURN, 45, TURN_MULTIPLIER * SPEED_TURN);
+
+                addTask(new DeadReckonTask(this, alignWithLine, frontDarkCriteria) {
+                    public void handleEvent(RobotEvent e) {
+                        elapsedTime.reset();
+                        RobotLog.e("251 Finished aligning in front of beacon");
+                        handleAlignedReckonEvent((DeadReckonTask.DeadReckonEvent) e);
                     }
                 });
                 break;
@@ -261,8 +370,8 @@ public class CaffeineRedTargetAutonomous extends Robot {
 
                 // (1) Moves forward OR until ultrasonic sensor is certain distance away from wall.
                 TwoWheelGearedDriveDeadReckon moveToBeacon = new TwoWheelGearedDriveDeadReckon
-                        (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-                moveToBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 24, SPEED_STRAIGHT);
+                              (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+                moveToBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 24, 0.5 * SPEED_STRAIGHT);
 
                 addTask(new DeadReckonTask(this, moveToBeacon, distanceCriteria) {
                     public void handleEvent(RobotEvent e) {
@@ -299,4 +408,3 @@ public class CaffeineRedTargetAutonomous extends Robot {
     {
     }
 }
-
