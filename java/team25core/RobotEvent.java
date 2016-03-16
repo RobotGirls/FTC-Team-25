@@ -14,7 +14,6 @@ public class RobotEvent
     /*
      * For events associated with tasks.
      */
-
     public RobotEvent(RobotTask task)
     {
         this.task = task;
@@ -33,12 +32,11 @@ public class RobotEvent
     /*
      * Call the event handler for the particular task/robot.  The
      * default event handler simply hands the task off the to
-     * robot. Events should not be associated with a task and a
-     * robot at the same time.
+     * robot.  Events should not be associated with a robot and a
+     * task at the same time.
      */
     public void handleEvent()
     {
-        task.handleEvent(this);
         if (task != null) {
             task.handleEvent(this);
         } else if (robot != null) {
