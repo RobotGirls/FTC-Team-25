@@ -14,8 +14,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.swerverobotics.library.ClassFactory;
 import org.swerverobotics.library.interfaces.Autonomous;
 
-import java.lang.annotation.Target;
-
+import team25core.AutonomousEvent;
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.GamepadTask;
@@ -23,10 +22,9 @@ import team25core.LightSensorCriteria;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
-import team25core.RobotTask;
+import team25core.ServoOscillateTask;
 import team25core.SingleShotTimerTask;
 import team25core.Team25DcMotor;
-import team25core.TwoWheelDriveTask;
 import team25core.TwoWheelGearedDriveDeadReckon;
 import team25core.UltrasonicAveragingTask;
 import team25core.UltrasonicSensorCriteria;
@@ -35,21 +33,8 @@ import team25core.UltrasonicSensorCriteria;
  * FTC Team 5218: izzielau, February 17, 2016
  */
 
-@Autonomous(name = "Caffeine Autonomous", group = "AutoTeam25")
+@Autonomous(name = "Caffeine Autonomous", group = "5218")
 public class CaffeineAutonomous extends Robot {
-
-    public enum EventKind {
-        BEACON_DONE,
-    }
-
-    public class AutonomousEvent extends RobotEvent {
-        public EventKind kind;
-
-        public AutonomousEvent(RobotTask task, EventKind kind) {
-            super(task);
-            this.kind = kind;
-        }
-    }
 
     protected final static int TICKS_PER_DEGREE = NeverlandMotorConstants.ENCODER_TICKS_PER_DEGREE;
     protected final static int TICKS_PER_INCH = NeverlandMotorConstants.ENCODER_TICKS_PER_INCH;
@@ -63,7 +48,7 @@ public class CaffeineAutonomous extends Robot {
     protected final static int LIGHT_MAX_BACK = NeverlandLightConstants.ROOM_BACK_LIGHT_MAX;
 
     private final static int LED_CHANNEL = 0;
-    private static int TURN_MULTIPLIER = 0;
+    private static int TURN_MULTIPLY = 0;
 
     private int START_DELAY;
 
@@ -102,29 +87,68 @@ public class CaffeineAutonomous extends Robot {
         PURPLE
     }
 
+    private enum AfterBeacon {
+        MOVE_TO_MOUNTAIN,
+        MOVE_TO_PARK,
+        STAY_AT_WASABI_WONTON
+    }
+
     Alliance alliance;
+    AfterBeacon afterBeacon;
 
     @Override
     public void handleEvent(RobotEvent e) {
         if (e instanceof GamepadTask.GamepadEvent) {
             GamepadTask.GamepadEvent event = (GamepadTask.GamepadEvent) e;
 
-            if (event.kind == GamepadTask.EventKind.BUTTON_X_DOWN) {
-                // Blue.
-                alliance = Alliance.BLUE;
-                ptt.addData("ALLIANCE: ", "" + alliance);
-            } else if (event.kind == GamepadTask.EventKind.BUTTON_B_DOWN) {
-                // Red.
-                alliance = Alliance.RED;
-                ptt.addData("ALLIANCE: ", "" + alliance);
-            } else if (event.kind == GamepadTask.EventKind.BUTTON_Y_DOWN) {
-                // Add one second to delay.
-                START_DELAY++;
-                ptt.addData("DELAY: ", START_DELAY);
-            } else if (event.kind == GamepadTask.EventKind.BUTTON_A_DOWN) {
-                // Subtract one second from delay.
-                START_DELAY--;
-                ptt.addData("DELAY: ", START_DELAY);
+            switch (event.kind) {
+                case BUTTON_X_DOWN:
+                    // Blue.
+                    alliance = Alliance.BLUE;
+                    ptt.addData("ALLIANCE: ", "" + alliance);
+                    break;
+                case BUTTON_B_DOWN:
+                    // Red.
+                    alliance = Alliance.RED;
+                    ptt.addData("ALLIANCE: ", "" + alliance);
+                    break;
+                case BUTTON_Y_DOWN:
+                    // Add one second to delay.
+                    START_DELAY++;
+                    ptt.addData("DELAY: ", START_DELAY);
+                    break;
+                case BUTTON_A_DOWN:
+                    // Subtract one second from delay.
+                    START_DELAY--;
+                    ptt.addData("DELAY: ", START_DELAY);
+                    break;
+                case LEFT_BUMPER_DOWN:
+                    // Park in floor zone.
+                    afterBeacon = AfterBeacon.MOVE_TO_PARK;
+                    break;
+                case RIGHT_BUMPER_DOWN:
+                    // Park on low zone of mountain.
+                    afterBeacon = AfterBeacon.MOVE_TO_MOUNTAIN;
+                    break;
+                case LEFT_TRIGGER_DOWN:
+                    // Stay at wasabi wonton.
+                    afterBeacon = AfterBeacon.STAY_AT_WASABI_WONTON;
+                    break;
+            }
+            beaconTelemetry(afterBeacon);
+        } else if (e instanceof AutonomousEvent) {
+            AutonomousEvent event = (AutonomousEvent) e;
+            if (event.kind == AutonomousEvent.EventKind.BEACON_DONE) {
+                addTask(new SingleShotTimerTask(this, 500) {
+                    @Override
+                    public void handleEvent(RobotEvent e) {
+                        // Wait for timer to finish.
+                        SingleShotTimerEvent eva = (SingleShotTimerEvent) e;
+                        if (eva.kind == EventKind.EXPIRED) {
+                            handleBeaconReckonEvent(afterBeacon);
+                        }
+                    }
+                });
             }
         }
     }
@@ -132,19 +156,19 @@ public class CaffeineAutonomous extends Robot {
     @Override
     public void init() {
 
-        // Reset delay.
-        START_DELAY = 0;
-
-        // Reset alliance.
+        // Set globals to default so no errors occur.
         alliance = Alliance.PURPLE;
+        afterBeacon = AfterBeacon.STAY_AT_WASABI_WONTON;
+        START_DELAY = 0;
 
         // Persistent telemetry task.
         ptt = new PersistentTelemetryTask(this);
         addTask(ptt);
 
         // Telemetry for autonomous specificity.
-        ptt.addData("ALLIANCE: ", "NOT SELECTED");
         ptt.addData("DELAY: ", START_DELAY);
+        ptt.addData("ALLIANCE: ", "NOT SELECTED");
+        beaconTelemetry(afterBeacon);
 
         // Gyro.
         gyro = (ModernRoboticsI2cGyro)hardwareMap.gyroSensor.get("gyro");
@@ -214,10 +238,18 @@ public class CaffeineAutonomous extends Robot {
         // Creates gamepad task for init_loop().
         gamepad = new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1);
         addTask(gamepad);
+
+        // Creates task for servo oscillation.
+        //ServoOscillateTask oscillate = new ServoOscillateTask(this, rightPusher, 128, 20);
+        //addTask(oscillate);
+
+        //if (alliance != Alliance.PURPLE) {
+        //    oscillate.stop();
+        //}
     }
 
     public void blueInit() {
-        TURN_MULTIPLIER = NeverlandAutonomousConstants.BLUE_TURN_MULTIPLIER;
+        TURN_MULTIPLY = NeverlandAutonomousConstants.BLUE_TURN_MULTIPLIER;
 
         frontLightCriteria.setThreshold(NeverlandLightConstants.BLUE_THRESHOLD);
         backLightCriteria.setThreshold(NeverlandLightConstants.BLUE_THRESHOLD);
@@ -228,7 +260,7 @@ public class CaffeineAutonomous extends Robot {
     }
 
     public void redInit() {
-        TURN_MULTIPLIER = NeverlandAutonomousConstants.RED_TURN_MULTIPLIER;
+        TURN_MULTIPLY = NeverlandAutonomousConstants.RED_TURN_MULTIPLIER;
 
         frontLightCriteria.setThreshold(NeverlandLightConstants.RED_THRESHOLD);
         backLightCriteria.setThreshold(NeverlandLightConstants.RED_THRESHOLD);
@@ -238,11 +270,24 @@ public class CaffeineAutonomous extends Robot {
                 rightTread, leftTread, TICKS_PER_DEGREE, TICKS_PER_INCH);
     }
 
+    public void beaconTelemetry(AfterBeacon after) {
+        switch (after) {
+            case MOVE_TO_MOUNTAIN:
+                ptt.addData("AFTER BEACON: ", "MOUNTAIN");
+                break;
+            case MOVE_TO_PARK:
+                ptt.addData("AFTER BEACON: ", "PARK");
+                break;
+            case STAY_AT_WASABI_WONTON:
+                ptt.addData("AFTER BEACON: ", "WASABI WONTON!");
+                break;
+        }
+    }
+
     public void initialMove(final DeadReckon path) {
         addTask(new DeadReckonTask(this, path, backLightCriteria) {
-            public void handleEvent(RobotEvent e)
-            {
-                DeadReckonEvent event = (DeadReckonEvent)e;
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent event = (DeadReckonEvent) e;
                 if (event.kind == EventKind.SENSOR_SATISFIED) {
                     handleDeadReckonEvent(event);
                 } else {
@@ -268,7 +313,7 @@ public class CaffeineAutonomous extends Robot {
         targetingLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 88, SPEED_STRAIGHT);
 
         if (START_DELAY > 0) {
-            addTask(new SingleShotTimerTask(this, 1000 * START_DELAY) {
+            addTask(new SingleShotTimerTask(this, 900 * START_DELAY) {
                 @Override
                 public void handleEvent(RobotEvent e) {
                     initialMove(targetingLine);
@@ -291,7 +336,7 @@ public class CaffeineAutonomous extends Robot {
                 // (2) Move backwards to move back onto the line OR stop if sensor sees white.
                 TwoWheelGearedDriveDeadReckon missedLine = new TwoWheelGearedDriveDeadReckon
                             (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-                missedLine.addSegment(DeadReckon.SegmentType.TURN, 30, -SPEED_TURN * TURN_MULTIPLIER);
+                missedLine.addSegment(DeadReckon.SegmentType.TURN, 30, -SPEED_TURN * TURN_MULTIPLY);
                 missedLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, -0.75 * SPEED_STRAIGHT);
 
                 addTask(new DeadReckonTask(this, missedLine, backLightCriteria) {
@@ -315,7 +360,7 @@ public class CaffeineAutonomous extends Robot {
                 TwoWheelGearedDriveDeadReckon searchWhiteLine = new TwoWheelGearedDriveDeadReckon
                                  (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
                 searchWhiteLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 1, -SPEED_STRAIGHT);
-                searchWhiteLine.addSegment(DeadReckon.SegmentType.TURN, 120, TURN_MULTIPLIER * SPEED_TURN);
+                searchWhiteLine.addSegment(DeadReckon.SegmentType.TURN, 120, TURN_MULTIPLY * SPEED_TURN);
 
                 addTask(new DeadReckonTask(this, searchWhiteLine, frontLightCriteria) {
                     public void handleEvent(RobotEvent e) {
@@ -342,7 +387,7 @@ public class CaffeineAutonomous extends Robot {
             case SENSOR_SATISFIED:
                 TwoWheelGearedDriveDeadReckon alignWithLine = new TwoWheelGearedDriveDeadReckon
                                (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-                alignWithLine.addSegment(DeadReckon.SegmentType.TURN, 45, TURN_MULTIPLIER * SPEED_TURN);
+                alignWithLine.addSegment(DeadReckon.SegmentType.TURN, 45, TURN_MULTIPLY * SPEED_TURN);
 
                 addTask(new DeadReckonTask(this, alignWithLine, frontDarkCriteria) {
                     public void handleEvent(RobotEvent e) {
@@ -403,8 +448,28 @@ public class CaffeineAutonomous extends Robot {
         }
     }
 
+    protected void handleBeaconReckonEvent(AfterBeacon afterBeacon) {
+        if (afterBeacon == AfterBeacon.MOVE_TO_PARK) {
+            TwoWheelGearedDriveDeadReckon parkDeadReckon = new TwoWheelGearedDriveDeadReckon
+                            (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+            // (1) Move backwards 8 inches.
+            // (2) Turn 90 degrees
+            parkDeadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8.0, -SPEED_STRAIGHT);
+            parkDeadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, 0.5 * SPEED_TURN * -TURN_MULTIPLY);
+            parkDeadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8.0, -SPEED_STRAIGHT);
+        } else if (afterBeacon == AfterBeacon.MOVE_TO_MOUNTAIN) {
+            TwoWheelGearedDriveDeadReckon mountainDeadReckon = new TwoWheelGearedDriveDeadReckon
+                                (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+            mountainDeadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 24.0, -SPEED_STRAIGHT);
+            mountainDeadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, SPEED_TURN * TURN_MULTIPLY);
+            mountainDeadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 28, SPEED_STRAIGHT);
+            mountainDeadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, 0.5218 * SPEED_TURN * -TURN_MULTIPLY);
+        }
+    }
+
     @Override
     public void stop()
     {
     }
 }
+

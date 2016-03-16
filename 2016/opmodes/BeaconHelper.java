@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import team25core.AutonomousEvent;
 import team25core.ColorSensorTask;
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
@@ -120,9 +121,13 @@ public class BeaconHelper {
                 robot.addTask(new DeadReckonTask(robot, deadReckonPush) {
                     public void handleEvent(RobotEvent e) {
                         climber.setPosition(NeverlandServoConstants.CLIMBER_SCORE);
-                    };
+
+                        AutonomousEvent event = new AutonomousEvent(robot, AutonomousEvent.EventKind.BEACON_DONE);
+                        robot.queueEvent(event);
+                    }
                 });
             }
         });
+
     }
 }
