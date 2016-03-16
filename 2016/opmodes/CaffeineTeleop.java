@@ -23,7 +23,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.TwoWheelDriveTask;
 
-@TeleOp(name="CaffeineTeleop", group = "AutoTeam25")
+@TeleOp(name="Caffeine Teleop", group = "5218")
 public class CaffeineTeleop extends Robot {
 
     private final static int LED_CHANNEL = 0;
@@ -135,6 +135,7 @@ public class CaffeineTeleop extends Robot {
                 }
             }
         });
+
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
             public void handleEvent(RobotEvent e) {
                 GamepadEvent event = (GamepadEvent) e;
