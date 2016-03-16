@@ -8,6 +8,7 @@ import com.qualcomm.hardware.modernrobotics.ModernRoboticsUsbLegacyModule;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.swerverobotics.library.interfaces.Autonomous;
+import org.swerverobotics.library.interfaces.Disabled;
 
 import java.util.HashSet;
 
@@ -18,6 +19,7 @@ import team25core.UltrasonicAveragingTask;
 import team25core.UltrasonicSensorArbitratorTask;
 
 @Autonomous(name = "TEST Ping")
+@Disabled
 public class UltrasonicPingTest extends Robot {
 
     Team25UltrasonicSensor left;

@@ -4,11 +4,13 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.LightSensor;
 
 import org.swerverobotics.library.interfaces.Autonomous;
+import org.swerverobotics.library.interfaces.Disabled;
 
 /**
  * Created by Izzie on 2/17/2016.
  */
 @Autonomous(name = "TEST Light")
+@Disabled
 public class LightSensorTest extends OpMode{
 
     LightSensor front;
