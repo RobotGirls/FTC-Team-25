@@ -47,6 +47,14 @@ public abstract class Robot extends OpMode {
         // TODO: ??
     }
 
+    public void init_loop() {
+        if (gamepad1 == null) {
+            return;
+        }
+
+        loop();
+    }
+
     @Override
     public void loop()
     {
