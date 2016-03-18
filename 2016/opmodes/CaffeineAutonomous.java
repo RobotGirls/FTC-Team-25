@@ -310,7 +310,7 @@ public class CaffeineAutonomous extends Robot {
 
         final TwoWheelGearedDriveDeadReckon targetingLine = new TwoWheelGearedDriveDeadReckon
                              (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-        targetingLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 88, SPEED_STRAIGHT);
+        targetingLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 90, SPEED_STRAIGHT);
 
         if (START_DELAY > 0) {
             addTask(new SingleShotTimerTask(this, 900 * START_DELAY) {
