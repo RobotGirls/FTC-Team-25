@@ -24,7 +24,9 @@ public class CaffeineSensorsTest extends OpMode {
         leftUltrasound = hardwareMap.ultrasonicSensor.get("leftSound");
         rightUltrasound = hardwareMap.ultrasonicSensor.get("rightSound");
         frontLight = hardwareMap.lightSensor.get("frontLight");
+        frontLight.enableLed(true);
         backLight = hardwareMap.lightSensor.get("backLight");
+        backLight.enableLed(true);
         color = hardwareMap.colorSensor.get("color");
         gyro = hardwareMap.gyroSensor.get("gyro");
 
