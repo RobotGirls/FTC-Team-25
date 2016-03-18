@@ -370,30 +370,10 @@ public class CaffeineAutonomous extends Robot {
 
                         if (event.kind == EventKind.SENSOR_SATISFIED) {
                             RobotLog.i("251 Robot is parallel to the white line");
-                            handleRealignReckonEvent((DeadReckonTask.DeadReckonEvent) e);
+                            handleAlignedReckonEvent((DeadReckonTask.DeadReckonEvent) e);
                         } else {
                             RobotLog.e("251 Overturn did not catch the white line");
                         }
-                    }
-                });
-                break;
-        }
-    }
-
-    protected void handleRealignReckonEvent(DeadReckonTask.DeadReckonEvent e) {
-        switch (e.kind) {
-            case SEGMENT_DONE:
-                break;
-            case SENSOR_SATISFIED:
-                TwoWheelGearedDriveDeadReckon alignWithLine = new TwoWheelGearedDriveDeadReckon
-                               (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-                alignWithLine.addSegment(DeadReckon.SegmentType.TURN, 45, TURN_MULTIPLY * SPEED_TURN);
-
-                addTask(new DeadReckonTask(this, alignWithLine, frontDarkCriteria) {
-                    public void handleEvent(RobotEvent e) {
-                        elapsedTime.reset();
-                        RobotLog.e("251 Finished aligning in front of beacon");
-                        handleAlignedReckonEvent((DeadReckonTask.DeadReckonEvent) e);
                     }
                 });
                 break;
