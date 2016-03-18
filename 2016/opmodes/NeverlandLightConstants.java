@@ -10,8 +10,8 @@ public class NeverlandLightConstants {
     public final static int BACK_LIGHT_MAXIMUM = 774;
     public final static int BACK_LIGHT_MINIMUM = 643;
 
-    public final static int ROOM_LIGHT_MAX = 759;
-    public final static int ROOM_LIGHT_MIN = 671;
+    public final static int ROOM_LIGHT_MAX = 723;
+    public final static int ROOM_LIGHT_MIN = 571;
     public final static int ROOM_BACK_LIGHT_MAX = 789;
     public final static int ROOM_BACK_LIGHT_MIN = 677;
 
