@@ -97,7 +97,8 @@ public class CaffeineAutonomous extends Robot {
     AfterBeacon afterBeacon;
 
     @Override
-    public void handleEvent(RobotEvent e) {
+    public void handleEvent(RobotEvent e)
+    {
         if (e instanceof GamepadTask.GamepadEvent) {
             GamepadTask.GamepadEvent event = (GamepadTask.GamepadEvent) e;
 
@@ -154,7 +155,8 @@ public class CaffeineAutonomous extends Robot {
     }
 
     @Override
-    public void init() {
+    public void init()
+    {
 
         // Set globals to default so no errors occur.
         alliance = Alliance.PURPLE;
@@ -248,7 +250,8 @@ public class CaffeineAutonomous extends Robot {
         //}
     }
 
-    public void blueInit() {
+    public void blueInit()
+    {
         TURN_MULTIPLY = NeverlandAutonomousConstants.BLUE_TURN_MULTIPLIER;
 
         frontLightCriteria.setThreshold(NeverlandLightConstants.BLUE_THRESHOLD);
@@ -259,7 +262,8 @@ public class CaffeineAutonomous extends Robot {
                 rightTread, leftTread, TICKS_PER_DEGREE, TICKS_PER_INCH);
     }
 
-    public void redInit() {
+    public void redInit()
+    {
         TURN_MULTIPLY = NeverlandAutonomousConstants.RED_TURN_MULTIPLIER;
 
         frontLightCriteria.setThreshold(NeverlandLightConstants.RED_THRESHOLD);
@@ -270,7 +274,8 @@ public class CaffeineAutonomous extends Robot {
                 rightTread, leftTread, TICKS_PER_DEGREE, TICKS_PER_INCH);
     }
 
-    public void beaconTelemetry(AfterBeacon after) {
+    public void beaconTelemetry(AfterBeacon after)
+    {
         switch (after) {
             case MOVE_TO_MOUNTAIN:
                 ptt.addData("AFTER BEACON: ", "MOUNTAIN");
@@ -284,22 +289,55 @@ public class CaffeineAutonomous extends Robot {
         }
     }
 
-    public void initialMove(final DeadReckon path) {
+    /*
+     * Move from the wall to the white line, stopping when we see the white line.
+     */
+    public void initialMove(final DeadReckon path)
+    {
         addTask(new DeadReckonTask(this, path, backLightCriteria) {
-            public void handleEvent(RobotEvent e) {
+            public void handleEvent(RobotEvent e)
+            {
                 DeadReckonEvent event = (DeadReckonEvent) e;
-                if (event.kind == EventKind.SENSOR_SATISFIED) {
-                    handleDeadReckonEvent(event);
-                } else {
-                    RobotLog.e("251 Initial move missed the white line.");
+                switch (event.kind) {
+                    case SENSOR_SATISFIED:
+                        handleDeadReckonEvent(event);
+                        break;
+                    case PATH_DONE:
+                        /*
+                         * We missed the white line.  Turn counter clockwise and see if we can grab it.
+                         */
+                        RobotLog.e("251 Initial move missed the white line.");
+
+                        // (1) Turn 30 degrees.
+                        // (2) Move backwards to move back onto the line OR stop if sensor sees white.
+                        TwoWheelGearedDriveDeadReckon missedLine = new TwoWheelGearedDriveDeadReckon
+                                (this.robot, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
+                        missedLine.addSegment(DeadReckon.SegmentType.TURN, 30, -SPEED_TURN * TURN_MULTIPLY);
+                        missedLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, -0.75 * SPEED_STRAIGHT);
+
+                        addTask(new DeadReckonTask(this.robot, missedLine, backLightCriteria) {
+                            public void handleEvent(RobotEvent e)
+                            {
+                                DeadReckonEvent ev = (DeadReckonEvent)e;
+                                if (ev.kind == EventKind.SENSOR_SATISFIED) {
+                                    handleDeadReckonEvent(ev);
+                                } else {
+                                    RobotLog.e("Aborting after failing to find white line");
+                                    ptt.addData("Abort: ", "Failed to find line");
+                                }
+                            }
+                        });
+                        break;
+                    default:
+                        RobotLog.e("251 Unknown event kind");
                 }
             }
         });
     }
 
     @Override
-    public void start() {
-
+    public void start()
+    {
         if (alliance == Alliance.BLUE) {
             blueInit();
         } else if (alliance == Alliance.RED) {
@@ -315,7 +353,8 @@ public class CaffeineAutonomous extends Robot {
         if (START_DELAY > 0) {
             addTask(new SingleShotTimerTask(this, 900 * START_DELAY) {
                 @Override
-                public void handleEvent(RobotEvent e) {
+                public void handleEvent(RobotEvent e)
+                {
                     initialMove(targetingLine);
                 }
             });
@@ -324,34 +363,9 @@ public class CaffeineAutonomous extends Robot {
         }
     }
 
-    protected void handleDeadReckonEvent(DeadReckonTask.DeadReckonEvent e) {
+    protected void handleDeadReckonEvent(DeadReckonTask.DeadReckonEvent e)
+    {
         switch (e.kind) {
-            case PATH_DONE:
-                /*
-                 * We missed the white line.  Turn counter clockwise and see if we can grab it.
-                 */
-                RobotLog.e("251 Missed the white line.");
-
-                // (1) Turn 30 degrees.
-                // (2) Move backwards to move back onto the line OR stop if sensor sees white.
-                TwoWheelGearedDriveDeadReckon missedLine = new TwoWheelGearedDriveDeadReckon
-                            (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-                missedLine.addSegment(DeadReckon.SegmentType.TURN, 30, -SPEED_TURN * TURN_MULTIPLY);
-                missedLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 12, -0.75 * SPEED_STRAIGHT);
-
-                addTask(new DeadReckonTask(this, missedLine, backLightCriteria) {
-                    public void handleEvent(RobotEvent e)
-                    {
-                        DeadReckonEvent ev = (DeadReckonEvent)e;
-                        if (ev.kind == EventKind.SENSOR_SATISFIED) {
-                            handleDeadReckonEvent(ev);
-                        } else {
-                            RobotLog.e("Aborting after failing to find white line");
-                            ptt.addData("Abort: ", "Failed to find line");
-                        }
-                    }
-                });
-                break;
             case SENSOR_SATISFIED:
                 RobotLog.e("251 Adding dead reckon turn task for front light sensor");
 
@@ -380,7 +394,8 @@ public class CaffeineAutonomous extends Robot {
         }
     }
 
-    protected void handleAlignedReckonEvent(DeadReckonTask.DeadReckonEvent e) {
+    protected void handleAlignedReckonEvent(DeadReckonTask.DeadReckonEvent e)
+    {
         switch (e.kind) {
             case SEGMENT_DONE:
                 RobotLog.e("251 Aborting because the light sensors are not working");
@@ -409,7 +424,8 @@ public class CaffeineAutonomous extends Robot {
         }
     }
 
-    protected void handleStraightReckonEvent(DeadReckonTask.DeadReckonEvent e) {
+    protected void handleStraightReckonEvent(DeadReckonTask.DeadReckonEvent e)
+    {
         switch (e.kind) {
             case SEGMENT_DONE:
                 RobotLog.e("251 Aborting because could not find beacon distance");
@@ -428,7 +444,8 @@ public class CaffeineAutonomous extends Robot {
         }
     }
 
-    protected void handleBeaconReckonEvent(AfterBeacon afterBeacon) {
+    protected void handleBeaconReckonEvent(AfterBeacon afterBeacon)
+    {
         if (afterBeacon == AfterBeacon.MOVE_TO_PARK) {
             TwoWheelGearedDriveDeadReckon parkDeadReckon = new TwoWheelGearedDriveDeadReckon
                             (this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
