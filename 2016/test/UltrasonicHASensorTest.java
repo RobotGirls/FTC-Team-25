@@ -7,6 +7,7 @@ import com.qualcomm.hardware.modernrobotics.ModernRoboticsUsbLegacyModule;
 import org.swerverobotics.library.interfaces.Autonomous;
 import org.swerverobotics.library.interfaces.Disabled;
 
+import team25core.GamepadTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.Team25UltrasonicSensor;
@@ -50,6 +51,17 @@ public class UltrasonicHASensorTest extends Robot {
     @Override
     public void start()
     {
+        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
+            @Override
+            public void handleEvent(RobotEvent ev) {
+                GamepadEvent ge = (GamepadEvent)ev;
+                switch (ge.kind) {
+                    case BUTTON_A_DOWN:
+                        usTask.forceSwitchover();
+                }
+            }
+        });
+
         usTask = UltrasonicSensorHighAvailabilityTask.factory(this, left, right);
         addTask(usTask);
     }
