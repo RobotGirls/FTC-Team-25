@@ -22,13 +22,16 @@ public class CaffeineLightTest extends Robot {
 
     protected int frontMinimum;
     protected int backMinimum;
+    protected int frontMaximum;
+    protected int backMaximum;
 
     protected int TICKS_PER_INCH = NeverlandMotorConstants.ENCODER_TICKS_PER_INCH;
     protected int TICKS_PER_DEGREE = NeverlandMotorConstants.ENCODER_TICKS_PER_DEGREE;
 
     protected DcMotor leftTread;
     protected DcMotor rightTread;
-    protected LightSensor light;
+    protected LightSensor frontLight;
+    protected LightSensor backLight;
     protected DeadReckon deadReckonStraight;
     protected DeadReckonTask deadReckonStraightTask;
 
@@ -41,7 +44,8 @@ public class CaffeineLightTest extends Robot {
     public void init() {
         rightTread = hardwareMap.dcMotor.get("rightTread");
         leftTread = hardwareMap.dcMotor.get("leftTread");
-        light = hardwareMap.lightSensor.get("light");
+        frontLight = hardwareMap.lightSensor.get("frontLight");
+        backLight = hardwareMap.lightSensor.get("backLight");
 
         deadReckonStraight = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
         deadReckonStraight.addSegment(DeadReckon.SegmentType.STRAIGHT, 15, 0.251);
@@ -52,16 +56,20 @@ public class CaffeineLightTest extends Robot {
     @Override
     public void start() {
 
-        int currentFront = light.getLightDetectedRaw();
-        int currentBack = light.getLightDetectedRaw();
+        int currentFront = frontLight.getLightDetectedRaw();
+        int currentBack = backLight.getLightDetectedRaw();
 
         telemetry.addData("FRONT: ", currentFront);
         telemetry.addData("BACK: ", currentBack);
 
         if (currentFront < frontMinimum) {
             frontMinimum = currentFront;
+        } else if (currentFront > frontMaximum) {
+            frontMaximum = currentFront;
         } else if (currentBack < backMinimum) {
             backMinimum = currentBack;
+        } else if (currentBack > backMaximum) {
+            backMaximum = currentBack;
         }
 
         telemetry.addData("FRONT Minimum: ", frontMinimum);

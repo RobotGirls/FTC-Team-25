@@ -5,6 +5,7 @@ package test;/*
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsUsbLegacyModule;
 
 import org.swerverobotics.library.interfaces.Autonomous;
+import org.swerverobotics.library.interfaces.Disabled;
 
 import team25core.GamepadTask;
 import team25core.Robot;
@@ -13,6 +14,7 @@ import team25core.Team25UltrasonicSensor;
 import team25core.UltrasonicSensorHighAvailabilityTask;
 
 @Autonomous(name="HA US Test")
+@Disabled
 public class UltrasonicHASensorTest extends Robot {
 
     Team25UltrasonicSensor left;

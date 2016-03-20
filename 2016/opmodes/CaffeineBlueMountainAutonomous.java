@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.swerverobotics.library.interfaces.Autonomous;
+import org.swerverobotics.library.interfaces.Disabled;
 
 import opmodes.NeverlandServoConstants;
 import team25core.Robot;
@@ -19,6 +20,7 @@ import team25core.RobotEvent;
  */
 
 @Autonomous(name="BLUE Mountain", group = "AutoTeam25")
+@Disabled
 public class CaffeineBlueMountainAutonomous extends OpMode {
 
     public static final int TICKS_PER_INCH = NeverlandMotorConstants.ENCODER_TICKS_PER_INCH;
