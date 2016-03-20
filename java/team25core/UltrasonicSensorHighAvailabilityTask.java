@@ -43,6 +43,19 @@ public class UltrasonicSensorHighAvailabilityTask extends UltrasonicSensorArbitr
         return task;
     }
 
+    public void forceSwitchover()
+    {
+        if (active == primary) {
+            active = secondary;
+            super.setSensors(secondarySet);
+        } else {
+            active = primary;
+            super.setSensors(primarySet);
+        }
+        failureDetection.clear();
+        state = SensorState.PING;
+    }
+
     public double getUltrasonicLevel()
     {
         double val;
@@ -52,15 +65,7 @@ public class UltrasonicSensorHighAvailabilityTask extends UltrasonicSensorArbitr
 
         if (failureDetection.getN() >= 50) {
             if ((failureDetection.getMean() == 0) || (failureDetection.getMean() == 255)) {
-                if (active == primary) {
-                    active = secondary;
-                    super.setSensors(secondarySet);
-                } else {
-                    active = primary;
-                    super.setSensors(primarySet);
-                }
-                failureDetection.clear();
-                state = SensorState.PING;
+                forceSwitchover();
             }
         }
 
