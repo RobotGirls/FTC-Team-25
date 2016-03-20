@@ -4,12 +4,15 @@ package team25core;
  * FTC Team 25: cmacfarl, February 26, 2016
  */
 
+import com.qualcomm.robotcore.hardware.UltrasonicSensor;
+
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class UltrasonicSensorHighAvailabilityTask extends UltrasonicSensorArbitratorTask {
+public class UltrasonicSensorHighAvailabilityTask extends UltrasonicSensorArbitratorTask
+        implements IUltrasonicAveraging {
 
     Team25UltrasonicSensor active;
     Team25UltrasonicSensor primary;
@@ -18,7 +21,15 @@ public class UltrasonicSensorHighAvailabilityTask extends UltrasonicSensorArbitr
     HashSet<Team25UltrasonicSensor> primarySet;
     HashSet<Team25UltrasonicSensor> secondarySet;
 
-    private UltrasonicSensorHighAvailabilityTask(Robot robot, Team25UltrasonicSensor p, Team25UltrasonicSensor s)
+    public double getAverage() {
+        // Not an average yet.
+        double val;
+        val = getUltrasonicLevel();
+
+        return val;
+    }
+
+    public UltrasonicSensorHighAvailabilityTask(Robot robot, Team25UltrasonicSensor p, Team25UltrasonicSensor s)
     {
         super(robot, null);
         this.primarySet = new HashSet<Team25UltrasonicSensor>();
