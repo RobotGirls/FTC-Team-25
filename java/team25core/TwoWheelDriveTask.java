@@ -8,6 +8,10 @@ package team25core;
 import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.swerverobotics.library.interfaces.Autonomous;
+
+import opmodes.NeverlandTeleopConstants;
+
 public class TwoWheelDriveTask extends RobotTask {
     protected Robot robot;
     protected DcMotor motorRight;
@@ -17,6 +21,8 @@ public class TwoWheelDriveTask extends RobotTask {
     public float left;
 
     public boolean slow = false;
+
+    public double SLOW_MULTIPLIER = NeverlandTeleopConstants.SLOW_MULTIPLIER;
 
     public TwoWheelDriveTask(Robot robot, DcMotor rightMotor, DcMotor leftMotor) {
         super(robot);
@@ -55,8 +61,8 @@ public class TwoWheelDriveTask extends RobotTask {
         if (slow) {
             robot.telemetry.addData("Slow: ", "true");
 
-            double alteredLeftPower = leftPowerValue / 10;
-            double alteredRightPower = rightPowerValue / 10;
+            double alteredLeftPower = leftPowerValue * SLOW_MULTIPLIER;
+            double alteredRightPower = rightPowerValue * SLOW_MULTIPLIER;
             motorLeft.setPower(alteredLeftPower);
             motorRight.setPower(alteredRightPower);
 
