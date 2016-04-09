@@ -15,6 +15,6 @@ public class NeverlandLightConstants {
     public final static int ROOM_BACK_LIGHT_MAX = 789;
     public final static int ROOM_BACK_LIGHT_MIN = 677;
 
-    public final static double RED_THRESHOLD = 0.7;
+    public final static double RED_THRESHOLD = 0.85;
     public final static double BLUE_THRESHOLD = 0.7;
 }

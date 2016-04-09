@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.AutonomousEvent;
 import team25core.ColorSensorTask;
@@ -63,7 +64,7 @@ public class BeaconHelper {
     public void doBeaconWork()
     {
         pushers.colorDeploy();
-        robot.addTask(new SingleShotTimerTask(robot, 1000) {
+        robot.addTask(new SingleShotTimerTask(robot, 1251) {
             @Override
             public void handleEvent(RobotEvent e) {
                 pushAndDump();
@@ -116,14 +117,15 @@ public class BeaconHelper {
             public void handleEvent(RobotEvent e) {
 
                 deadReckonPush = new TwoWheelGearedDriveDeadReckon(robot, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);
-                deadReckonPush.addSegment(DeadReckon.SegmentType.STRAIGHT, 1, 0.40);
+                deadReckonPush.addSegment(DeadReckon.SegmentType.STRAIGHT, 1, 0.5);
 
                 robot.addTask(new DeadReckonTask(robot, deadReckonPush) {
                     public void handleEvent(RobotEvent e) {
                         climber.setPosition(NeverlandServoConstants.CLIMBER_SCORE);
 
-                        AutonomousEvent event = new AutonomousEvent(robot, AutonomousEvent.EventKind.BEACON_DONE);
-                        robot.queueEvent(event);
+                        RobotLog.i("251 Beacon done");
+                        AutonomousEvent beaconDone = new AutonomousEvent(robot, AutonomousEvent.EventKind.BEACON_DONE);
+                        robot.queueEvent(beaconDone);
                     }
                 });
             }

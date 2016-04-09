@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
+import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.swerverobotics.library.ClassFactory;
@@ -18,6 +19,7 @@ import org.swerverobotics.library.interfaces.TeleOp;
 
 import team25core.DeadmanMotorTask;
 import team25core.GamepadTask;
+import team25core.LightSensorCriteria;
 import team25core.MonitorGyroTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -35,6 +37,8 @@ public class CaffeineTeleop extends Robot {
     private DeviceInterfaceModule core;
     private ModernRoboticsI2cGyro gyro;
     private ColorSensor color;
+    private LightSensor frontLight;
+    private LightSensor backLight;
     private Servo leftPusher;
     private Servo rightPusher;
     private Servo leftBumper;
@@ -54,6 +58,12 @@ public class CaffeineTeleop extends Robot {
         core = hardwareMap.deviceInterfaceModule.get("interface");
         core.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
         core.setDigitalChannelState(LED_CHANNEL, false);
+
+        // Light.
+        frontLight = hardwareMap.lightSensor.get("frontLight");
+        frontLight.enableLed(false);
+        backLight = hardwareMap.lightSensor.get("backLight");
+        backLight.enableLed(false);
 
         // Servos.
         rightPusher = hardwareMap.servo.get("rightPusher");
@@ -77,7 +87,6 @@ public class CaffeineTeleop extends Robot {
 
         // Class factory.
         ClassFactory.createEasyMotorController(this, leftTread, rightTread);
-
         leftTread.setDirection(DcMotor.Direction.REVERSE);
 
         rightTread.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
@@ -145,7 +154,7 @@ public class CaffeineTeleop extends Robot {
                 } else if (event.kind == EventKind.BUTTON_Y_DOWN) {
                     drive.slow(false);
                 } else if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
-                    // displayHeading.reset();
+                    displayHeading.reset();
                 }
             }
         });
