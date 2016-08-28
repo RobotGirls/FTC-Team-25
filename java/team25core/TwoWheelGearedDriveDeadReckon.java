@@ -49,15 +49,15 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
     @Override
     protected void resetEncoders()
     {
-        leftMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        rightMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        leftMotor.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        rightMotor.setMode(DcMotor.RunMode.RESET_ENCODERS);
     }
 
     @Override
     protected void encodersOn()
     {
-        leftMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        rightMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     }
 
     @Override

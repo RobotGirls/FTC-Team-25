@@ -9,6 +9,7 @@ import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
@@ -158,12 +159,12 @@ public class CaffeineBlueBeaconAutonomous extends Robot {
         //leftTread.startPeriodic();
 
         // Class factory (motor controller).
-        ClassFactory.createEasyMotorController(this, leftTread, rightTread);
+        // ClassFactory.createEasyMotorController(this, leftTread, rightTread);
 
-        rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        rightTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        leftTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        leftTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        leftTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
         // Class: Dead reckon.
         deadReckon = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);

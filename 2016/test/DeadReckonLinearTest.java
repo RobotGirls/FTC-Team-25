@@ -87,10 +87,10 @@ public class DeadReckonLinearTest extends Robot {
         // Class factory (motor controller).
         ClassFactory.createEasyMotorController(this, leftTread, rightTread);
 
-        rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        rightTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        leftTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        leftTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        leftTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
         // Class: Dead reckon.
         deadReckon = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, leftTread, rightTread);

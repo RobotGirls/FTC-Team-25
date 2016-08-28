@@ -117,10 +117,10 @@ public class BeaconTest extends Robot {
         ClassFactory.createEasyServoController(this, servos);
 
         // Motors.
-        rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        rightTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        leftTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        leftTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        leftTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
         // Servos.
         rightPusher.setPosition(NeverlandServoConstants.RIGHT_PUSHER_STOWED);

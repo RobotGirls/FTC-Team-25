@@ -8,8 +8,6 @@ package team25core;
 import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.swerverobotics.library.interfaces.Autonomous;
-
 import opmodes.NeverlandTeleopConstants;
 
 public class TwoWheelDriveTask extends RobotTask {

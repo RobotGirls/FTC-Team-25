@@ -30,8 +30,8 @@ public class GyroTest extends Robot {
         leftMotor = hardwareMap.dcMotor.get("leftMotor");
         rightMotor = hardwareMap.dcMotor.get("rightMotor");
 
-        leftMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        rightMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
     }
 

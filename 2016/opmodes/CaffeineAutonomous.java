@@ -1,7 +1,9 @@
 package opmodes;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
@@ -10,9 +12,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
-
-import org.swerverobotics.library.ClassFactory;
-import org.swerverobotics.library.interfaces.Autonomous;
 
 import team25core.AutonomousEvent;
 import team25core.DeadReckon;
@@ -237,12 +236,12 @@ public class CaffeineAutonomous extends Robot {
         leftTread = new Team25DcMotor(this, mc, 2);
 
         // Class factory (motor controller).
-        ClassFactory.createEasyMotorController(this, leftTread, rightTread);
+        // ClassFactory.createEasyMotorController(this, leftTread, rightTread);
 
-        rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        rightTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        leftTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        leftTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        leftTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
         // Beacon.
         pushers = new BeaconArms(rightPusher, leftPusher, true);

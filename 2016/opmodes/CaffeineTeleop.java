@@ -84,11 +84,11 @@ public class CaffeineTeleop extends Robot {
         leftTread = hardwareMap.dcMotor.get("leftTread");
 
         // Class factory.
-        ClassFactory.createEasyMotorController(this, leftTread, rightTread);
+        // ClassFactory.createEasyMotorController(this, leftTread, rightTread);
         leftTread.setDirection(DcMotor.Direction.REVERSE);
 
-        rightTread.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        leftTread.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        rightTread.setChannelMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        leftTread.setChannelMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
         // Hook.
         hook = hardwareMap.dcMotor.get("hook");

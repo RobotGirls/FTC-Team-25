@@ -46,8 +46,8 @@ public class CaffeineBlueMountainAutonomous extends OpMode {
 
         leftTread.setDirection(DcMotor.Direction.REVERSE);
 
-        rightTread.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        leftTread.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        rightTread.setChannelMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        leftTread.setChannelMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
         // Servos.
         rightPusher = hardwareMap.servo.get("rightPusher");
@@ -80,15 +80,15 @@ public class CaffeineBlueMountainAutonomous extends OpMode {
                 state = 3;
                 break;
             case 3:
-                leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-                rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+                leftTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+                rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
                 state = 4;
                 break;
             case 4:
                 if ((leftTread.getCurrentPosition() == 0) && (rightTread.getCurrentPosition() == 0)) {
                     state = 13;
-                    leftTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-                    rightTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+                    leftTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+                    rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
                 }
                 break;
             // Case 5 - 9: Turn 90 degrees.
@@ -105,15 +105,15 @@ public class CaffeineBlueMountainAutonomous extends OpMode {
                 state = 7;
                 break;
             case 7:
-                leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-                rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+                leftTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+                rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
                 state = 8;
                 break;
             case 8:
                 if ((leftTread.getCurrentPosition() == 0) && (rightTread.getCurrentPosition() == 0)) {
                     state = 9;
-                    leftTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-                    rightTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+                    leftTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+                    rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
                 }
                 break;
             // Case 9 - 12: Move 20 inches forward.
@@ -130,15 +130,15 @@ public class CaffeineBlueMountainAutonomous extends OpMode {
                 state = 11;
                 break;
             case 11:
-                leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-                rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+                leftTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+                rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
                 state = 12;
                 break;
             case 12:
                 if ((leftTread.getCurrentPosition() == 0) && (rightTread.getCurrentPosition() == 0)) {
                     //state = 1;
-                    leftTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-                    rightTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+                    leftTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+                    rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
                     state = 17;
                 }
                 break;
@@ -158,14 +158,14 @@ public class CaffeineBlueMountainAutonomous extends OpMode {
                 state = 15;
                 break;
             case 15:
-                leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-                rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+                leftTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+                rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
                 state = 16;
                 break;
             case 16:
                 if ((leftTread.getCurrentPosition() == 0) && (rightTread.getCurrentPosition() == 0)) {
-                    leftTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-                    rightTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+                    leftTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+                    rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
                     state = 5;
                 }
                 break;
@@ -183,15 +183,15 @@ public class CaffeineBlueMountainAutonomous extends OpMode {
                 state = 19;
                 break;
             case 19:
-                leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-                rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+                leftTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+                rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
                 state = 20;
                 break;
             case 20:
                 if ((leftTread.getCurrentPosition() == 0) && (rightTread.getCurrentPosition() == 0)) {
                     //state = 1;
-                    leftTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-                    rightTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+                    leftTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+                    rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
                 }
                 break;
         }

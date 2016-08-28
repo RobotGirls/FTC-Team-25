@@ -65,10 +65,10 @@ public class LineFollowerTask extends RobotTask {
     public void start()
     {
         RobotLog.i("251 LF Starting line follower task");
-        left.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        right.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        left.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        right.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        left.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        right.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        left.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        right.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
         left.setDirection(DcMotor.Direction.REVERSE);
     }

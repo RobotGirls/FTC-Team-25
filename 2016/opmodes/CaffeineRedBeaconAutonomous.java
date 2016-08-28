@@ -52,8 +52,8 @@ public class CaffeineRedBeaconAutonomous extends OpMode {
 
         leftTread.setDirection(DcMotor.Direction.REVERSE);
 
-        rightTread.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        leftTread.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        rightTread.setChannelMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        leftTread.setChannelMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
         // Servos.
         rightPusher = hardwareMap.servo.get("rightPusher");
@@ -90,14 +90,14 @@ public class CaffeineRedBeaconAutonomous extends OpMode {
                 stateMove = 3;
                 break;
             case 3:
-                leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-                rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+                leftTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+                rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
                 stateMove = 4;
                 break;
             case 4:
                 if ((leftTread.getCurrentPosition() == 0) && (rightTread.getCurrentPosition() == 0)) {
-                    leftTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-                    rightTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+                    leftTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+                    rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
                 }
                 state = change;
                 break;
@@ -125,14 +125,14 @@ public class CaffeineRedBeaconAutonomous extends OpMode {
                 stateTurn = 3;
                 break;
             case 3:
-                leftTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-                rightTread.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+                leftTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
+                rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
                 stateTurn = 4;
                 break;
             case 4:
                 if ((leftTread.getCurrentPosition() == 0) && (rightTread.getCurrentPosition() == 0)) {
-                    leftTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-                    rightTread.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+                    leftTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+                    rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
                 }
                 state = change;
                 break;

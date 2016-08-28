@@ -44,19 +44,19 @@ public class FourWheelDirectDriveDeadReckon extends DeadReckon {
     @Override
     protected void resetEncoders()
     {
-        rearLeft.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        rearRight.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        frontLeft.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        frontRight.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        rearLeft.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        rearRight.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        frontLeft.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        frontRight.setMode(DcMotor.RunMode.RESET_ENCODERS);
     }
 
     @Override
     protected void encodersOn()
     {
-        rearLeft.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        rearRight.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        frontLeft.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        frontRight.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     }
 
     protected void motorStraight(double speed)
