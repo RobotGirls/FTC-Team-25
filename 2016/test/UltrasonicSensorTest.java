@@ -1,9 +1,8 @@
 package test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
-
-import org.swerverobotics.library.interfaces.Autonomous;
-import org.swerverobotics.library.interfaces.Disabled;
 
 import team25core.MonitorUltrasonicSensorTask;
 import team25core.Robot;

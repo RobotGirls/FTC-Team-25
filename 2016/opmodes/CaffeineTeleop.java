@@ -6,6 +6,7 @@ package opmodes;
  */
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
@@ -13,9 +14,6 @@ import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.swerverobotics.library.ClassFactory;
-import org.swerverobotics.library.interfaces.TeleOp;
 
 import team25core.DeadmanMotorTask;
 import team25core.GamepadTask;
@@ -154,7 +152,7 @@ public class CaffeineTeleop extends Robot {
                 } else if (event.kind == EventKind.BUTTON_Y_DOWN) {
                     drive.slow(false);
                 } else if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
-                    displayHeading.reset();
+                    // displayHeading.reset();
                 }
             }
         });

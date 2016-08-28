@@ -1,15 +1,13 @@
 package test;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.swerverobotics.library.ClassFactory;
-import org.swerverobotics.library.interfaces.Autonomous;
-import org.swerverobotics.library.interfaces.Disabled;
 
 import opmodes.BeaconArms;
 import opmodes.NeverlandServoConstants;
@@ -25,7 +23,7 @@ import team25core.TwoWheelGearedDriveDeadReckon;
  * FTC Team 5218: izzielau, February 06, 2016
  */
 
-@Autonomous (name="TEST Turn", group = "AutoTeam25")
+@Autonomous(name="TEST Turn", group = "AutoTeam25")
 @Disabled
 public class DeadReckonLinearTest extends Robot {
     public static final int TICKS_PER_DEGREE = 29;

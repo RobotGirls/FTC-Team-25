@@ -1,7 +1,7 @@
 package test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import org.swerverobotics.library.interfaces.Autonomous;
 
 @Autonomous(name = "GamepadTest")
 public class GamepadLinearTest extends LinearOpMode{

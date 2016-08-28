@@ -2,13 +2,12 @@ package test;/*
  * FTC Team 25: cmacfarl, February 24, 2016
  */
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
-
-import org.swerverobotics.library.interfaces.Autonomous;
 
 @Autonomous(name = "TEST Sensors")
 public class CaffeineSensorsTest extends OpMode {

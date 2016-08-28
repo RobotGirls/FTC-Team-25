@@ -3,9 +3,8 @@ package test;/*
  */
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsUsbLegacyModule;
-
-import org.swerverobotics.library.interfaces.Autonomous;
-import org.swerverobotics.library.interfaces.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import team25core.GamepadTask;
 import team25core.Robot;

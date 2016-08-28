@@ -1,10 +1,9 @@
 package test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.LightSensor;
-
-import org.swerverobotics.library.interfaces.Autonomous;
 
 import opmodes.NeverlandMotorConstants;
 import team25core.DeadReckon;

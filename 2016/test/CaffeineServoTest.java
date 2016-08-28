@@ -4,11 +4,8 @@ package test;
  * FTC Team 5218: izzielau, January 15, 2015
  */
 
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
-
-//import org.swerverobotics.library.interfaces.TeleOp;
-
-import org.swerverobotics.library.interfaces.TeleOp;
 
 import opmodes.NeverlandServoConstants;
 import team25core.GamepadTask;
