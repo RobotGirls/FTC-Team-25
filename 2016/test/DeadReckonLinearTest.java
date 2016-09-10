@@ -4,6 +4,7 @@ import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
@@ -85,7 +86,6 @@ public class DeadReckonLinearTest extends Robot {
         //leftTread.startPeriodic();
 
         // Class factory (motor controller).
-        ClassFactory.createEasyMotorController(this, leftTread, rightTread);
 
         rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
         leftTread.setMode(DcMotor.RunMode.RESET_ENCODERS);

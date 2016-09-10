@@ -4,6 +4,7 @@ import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
@@ -107,8 +108,6 @@ public class LineDetectionTest extends Robot {
         leftTread = new Team25DcMotor(this, mc, 2);
 
         // Class factory (motor controller).
-        ClassFactory.createEasyMotorController(this, leftTread, rightTread);
-
         rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
         leftTread.setMode(DcMotor.RunMode.RESET_ENCODERS);
         rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);

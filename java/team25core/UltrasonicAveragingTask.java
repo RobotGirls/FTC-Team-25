@@ -7,13 +7,13 @@ package team25core;
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+// import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class UltrasonicAveragingTask extends RobotTask {
 
     protected int setSize;
     UltrasonicSensorArbitratorTask arbitrator;
-    DescriptiveStatistics movingAvg;
+    // DescriptiveStatistics movingAvg;
     UltrasonicSensor sensor;
     protected final double ULTRASONIC_MAX = 255.0;
     protected double min;
@@ -22,7 +22,7 @@ public class UltrasonicAveragingTask extends RobotTask {
     {
         super(robot);
         this.setSize = setSize;
-        this.movingAvg = new DescriptiveStatistics(setSize);
+        // this.movingAvg = new DescriptiveStatistics(setSize);
         this.sensor = sensor;
         this.min = ULTRASONIC_MAX;
         this.arbitrator = null;
@@ -32,7 +32,7 @@ public class UltrasonicAveragingTask extends RobotTask {
     {
         super(robot);
         this.setSize = setSize;
-        this.movingAvg = new DescriptiveStatistics(setSize);
+        // this.movingAvg = new DescriptiveStatistics(setSize);
         this.sensor = sensor;
         this.min = ULTRASONIC_MAX;
         this.arbitrator = arbitrator;
@@ -40,7 +40,8 @@ public class UltrasonicAveragingTask extends RobotTask {
 
     public double getAverage()
     {
-        return movingAvg.getMean();
+        // return movingAvg.getMean();
+        return 0.0;
     }
 
     @Override
@@ -86,7 +87,7 @@ public class UltrasonicAveragingTask extends RobotTask {
         }
 
         robot.telemetry.addData("Avg Task Distance " + sensor.getConnectionInfo(), val);
-        movingAvg.addValue(val);
+        // movingAvg.addValue(val);
 
         /*
          * Never stops

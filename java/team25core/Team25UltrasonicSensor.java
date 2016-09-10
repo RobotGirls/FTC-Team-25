@@ -8,6 +8,8 @@ package team25core;
 import com.qualcomm.hardware.matrix.MatrixI2cTransaction;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsUsbLegacyModule;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
+import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cController;
 import com.qualcomm.robotcore.hardware.LegacyModulePortDeviceImpl;
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
@@ -259,11 +261,11 @@ public class Team25UltrasonicSensor extends LegacyModulePortDeviceImpl implement
 
         try {
             if (transaction.write) {
-                legacyModule.enableI2cWriteMode(port, I2C_ADDRESS, transaction.offset, transaction.len);
+                legacyModule.enableI2cWriteMode(port, I2cAddr.create7bit(I2C_ADDRESS), transaction.offset, transaction.len);
                 legacyModule.copyBufferIntoWriteBuffer(port, transaction.buffer);
                 transaction.state = I2cTransactionState.PENDING_I2C_WRITE;
             } else {
-                legacyModule.enableI2cReadMode(port, I2C_ADDRESS, transaction.offset, transaction.len);
+                legacyModule.enableI2cReadMode(port, I2cAddr.create7bit(I2C_ADDRESS), transaction.offset, transaction.len);
                 transaction.state = I2cTransactionState.PENDING_I2C_READ;
             }
             legacyModule.writeI2cCacheToController(port);
@@ -331,6 +333,11 @@ public class Team25UltrasonicSensor extends LegacyModulePortDeviceImpl implement
                 module.getSerialNumber().toString(), physicalPort);  }
 
     @Override
+    public Manufacturer getManufacturer() {
+        return null;
+    }
+
+    @Override
     public String getDeviceName() {
         return "NXT Ultrasonic Sensor";
     }
@@ -343,6 +350,11 @@ public class Team25UltrasonicSensor extends LegacyModulePortDeviceImpl implement
     @Override
     public int getVersion() {
         return 1;
+    }
+
+    @Override
+    public void resetDeviceConfigurationForOpMode() {
+
     }
 
     @Override

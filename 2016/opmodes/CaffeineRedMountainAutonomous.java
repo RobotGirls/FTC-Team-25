@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -46,8 +47,8 @@ public class CaffeineRedMountainAutonomous extends OpMode {
 
         leftTread.setDirection(DcMotor.Direction.REVERSE);
 
-        rightTread.setChannelMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-        leftTread.setChannelMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        leftTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
         // Servos.
         rightPusher = hardwareMap.servo.get("rightPusher");

@@ -46,8 +46,8 @@ public class CaffeineBlueMountainAutonomous extends OpMode {
 
         leftTread.setDirection(DcMotor.Direction.REVERSE);
 
-        rightTread.setChannelMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-        leftTread.setChannelMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        rightTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        leftTread.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
         // Servos.
         rightPusher = hardwareMap.servo.get("rightPusher");

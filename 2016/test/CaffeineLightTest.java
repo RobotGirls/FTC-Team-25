@@ -19,10 +19,10 @@ import team25core.TwoWheelGearedDriveDeadReckon;
 @Autonomous(name = "TEST Display Color")
 public class CaffeineLightTest extends Robot {
 
-    protected int frontMinimum;
-    protected int backMinimum;
-    protected int frontMaximum;
-    protected int backMaximum;
+    protected double frontMinimum;
+    protected double backMinimum;
+    protected double frontMaximum;
+    protected double backMaximum;
 
     protected int TICKS_PER_INCH = NeverlandMotorConstants.ENCODER_TICKS_PER_INCH;
     protected int TICKS_PER_DEGREE = NeverlandMotorConstants.ENCODER_TICKS_PER_DEGREE;
@@ -55,8 +55,8 @@ public class CaffeineLightTest extends Robot {
     @Override
     public void start() {
 
-        int currentFront = frontLight.getLightDetectedRaw();
-        int currentBack = backLight.getLightDetectedRaw();
+        double currentFront = frontLight.getRawLightDetected();
+        double currentBack = backLight.getRawLightDetected();
 
         telemetry.addData("FRONT: ", currentFront);
         telemetry.addData("BACK: ", currentBack);

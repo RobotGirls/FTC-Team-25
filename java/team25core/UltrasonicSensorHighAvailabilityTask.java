@@ -6,7 +6,7 @@ package team25core;
 
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+// import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +17,7 @@ public class UltrasonicSensorHighAvailabilityTask extends UltrasonicSensorArbitr
     Team25UltrasonicSensor active;
     Team25UltrasonicSensor primary;
     Team25UltrasonicSensor secondary;
-    DescriptiveStatistics failureDetection;
+    // DescriptiveStatistics failureDetection;
     HashSet<Team25UltrasonicSensor> primarySet;
     HashSet<Team25UltrasonicSensor> secondarySet;
 
@@ -40,7 +40,7 @@ public class UltrasonicSensorHighAvailabilityTask extends UltrasonicSensorArbitr
 
         this.primary = p;
         this.secondary = s;
-        this.failureDetection = new DescriptiveStatistics(50);
+        // this.failureDetection = new DescriptiveStatistics(50);
         this.active = primary;
     }
 
@@ -63,7 +63,7 @@ public class UltrasonicSensorHighAvailabilityTask extends UltrasonicSensorArbitr
             active = primary;
             super.setSensors(primarySet);
         }
-        failureDetection.clear();
+        // failureDetection.clear();
         state = SensorState.PING;
     }
 
@@ -72,13 +72,15 @@ public class UltrasonicSensorHighAvailabilityTask extends UltrasonicSensorArbitr
         double val;
 
         val = super.getUltrasonicLevel(active);
-        failureDetection.addValue(val);
+        // failureDetection.addValue(val);
 
+        /*
         if (failureDetection.getN() >= 50) {
             if ((failureDetection.getMean() == 0) || (failureDetection.getMean() == 255)) {
                 forceSwitchover();
             }
         }
+        */
 
         return val;
     }

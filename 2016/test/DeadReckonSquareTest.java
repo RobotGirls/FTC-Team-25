@@ -88,10 +88,10 @@ public class DeadReckonSquareTest extends Robot {
         rearLeft = hardwareMap.dcMotor.get("motor_4");
         gyro = hardwareMap.gyroSensor.get("gyro");
         mc = hardwareMap.dcMotorController.get("MatrixControllerMotor");
-        frontRight.setChannelMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontLeft.setChannelMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rearRight.setChannelMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rearLeft.setChannelMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rearRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rearLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         rearLeft.setDirection(DcMotor.Direction.REVERSE);
     }

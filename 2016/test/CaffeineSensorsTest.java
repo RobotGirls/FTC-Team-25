@@ -37,8 +37,8 @@ public class CaffeineSensorsTest extends OpMode {
         backLight.enableLed(true);
         telemetry.addData("NXT Left ultrasonic: ", leftUltrasound.getUltrasonicLevel());
         telemetry.addData("NXT Right ultrasonic: ", rightUltrasound.getUltrasonicLevel());
-        telemetry.addData("NXT Front light raw: ", frontLight.getLightDetectedRaw());
-        telemetry.addData("NXT Back light raw: ", backLight.getLightDetectedRaw());
+        telemetry.addData("NXT Front light raw: ", frontLight.getRawLightDetected());
+        telemetry.addData("NXT Back light raw: ", backLight.getRawLightDetected());
         telemetry.addData("Color red value: ", color.red());
         telemetry.addData("Color blue value: ", color.blue());
         telemetry.addData("Gyro value: ", gyro.getHeading());

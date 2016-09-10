@@ -4,6 +4,7 @@ import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
@@ -111,10 +112,6 @@ public class BeaconTest extends Robot {
         leftTread = new Team25DcMotor(this, mc, 2);
         rightTread.startPeriodic();
         leftTread.startPeriodic();
-
-        // Class factories.
-        ClassFactory.createEasyMotorController(this, leftTread, rightTread);
-        ClassFactory.createEasyServoController(this, servos);
 
         // Motors.
         rightTread.setMode(DcMotor.RunMode.RESET_ENCODERS);

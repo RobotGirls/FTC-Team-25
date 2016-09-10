@@ -27,7 +27,7 @@ public class LightSensorTest extends OpMode{
     @Override
     public void loop()
     {
-        telemetry.addData("Back light: ", back.getLightDetectedRaw());
-        telemetry.addData("Front light: ", front.getLightDetectedRaw());
+        telemetry.addData("Back light: ", back.getRawLightDetected());
+        telemetry.addData("Front light: ", front.getRawLightDetected());
     }
 }

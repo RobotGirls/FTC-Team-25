@@ -79,12 +79,10 @@ public class LameingoDeadReckonSquareTest extends Robot {
         gyro = hardwareMap.gyroSensor.get("gyro");
         gyro.calibrate();
 
-        ClassFactory.createEasyMotorController(this, frontLeft, frontRight);
-        
-        frontLeft.setChannelMode(DcMotor.RunMode.RESET_ENCODERS);
-        frontRight.setChannelMode(DcMotor.RunMode.RESET_ENCODERS);
-        frontLeft.setChannelMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-        frontRight.setChannelMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        frontLeft.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        frontRight.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
 /*
         deadReckon = new TwoWheelGearedDriveDeadReckon(this, 251, gyro, frontLeft, frontRight);

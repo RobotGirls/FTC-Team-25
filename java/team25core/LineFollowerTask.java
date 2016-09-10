@@ -16,7 +16,7 @@ public class LineFollowerTask extends RobotTask {
     protected double inches;
 
     // Proportional variables.
-    protected int raw;
+    protected double raw;
     protected double lightError;
     protected double adjustedError;
     protected double PROPORTIONAL_K = .7;
@@ -81,7 +81,7 @@ public class LineFollowerTask extends RobotTask {
 
     @Override
     public boolean timeslice() {
-        raw = light.getLightDetectedRaw();
+        raw = light.getRawLightDetected();
         lightValue = (1 - ((raw - MINIMUM)/(MAXIMUM - MINIMUM))) * 100;
 
         if (zigzag) {
