@@ -5,26 +5,43 @@ package team25core;
  */
 
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
+import com.qualcomm.robotcore.util.RobotLog;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+// import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class UltrasonicAveragingTask extends RobotTask {
 
     protected int setSize;
-    DescriptiveStatistics movingAvg;
+    UltrasonicSensorArbitratorTask arbitrator;
+    // DescriptiveStatistics movingAvg;
     UltrasonicSensor sensor;
+    protected final double ULTRASONIC_MAX = 255.0;
+    protected double min;
 
     public UltrasonicAveragingTask(Robot robot, UltrasonicSensor sensor, int setSize)
     {
         super(robot);
         this.setSize = setSize;
-        this.movingAvg = new DescriptiveStatistics(setSize);
+        // this.movingAvg = new DescriptiveStatistics(setSize);
         this.sensor = sensor;
+        this.min = ULTRASONIC_MAX;
+        this.arbitrator = null;
+    }
+
+    public UltrasonicAveragingTask(Robot robot, UltrasonicSensorArbitratorTask arbitrator, UltrasonicSensor sensor, int setSize)
+    {
+        super(robot);
+        this.setSize = setSize;
+        // this.movingAvg = new DescriptiveStatistics(setSize);
+        this.sensor = sensor;
+        this.min = ULTRASONIC_MAX;
+        this.arbitrator = arbitrator;
     }
 
     public double getAverage()
     {
-        return movingAvg.getMean();
+        // return movingAvg.getMean();
+        return 0.0;
     }
 
     @Override
@@ -39,16 +56,34 @@ public class UltrasonicAveragingTask extends RobotTask {
 
     }
 
+    public void resetMin()
+    {
+        min = ULTRASONIC_MAX;
+    }
+
+    public double getMin()
+    {
+        return min;
+    }
+
     @Override
     public boolean timeslice()
     {
-        double val = sensor.getUltrasonicLevel();
+        double val;
 
-        if ((val == 0) || (val == 255)) {
-            return false;
+        if (arbitrator != null) {
+            val = arbitrator.getUltrasonicLevel((Team25UltrasonicSensor)sensor);
+        } else {
+            val = sensor.getUltrasonicLevel();
         }
 
-        movingAvg.addValue(sensor.getUltrasonicLevel());
+        if (val < min) {
+            min = val;
+            // RobotLog.i(sensor.getConnectionInfo() + " min %3.1f", min);
+        }
+
+        robot.telemetry.addData("Avg Task Distance " + sensor.getConnectionInfo(), val);
+        // movingAvg.addValue(val);
 
         /*
          * Never stops

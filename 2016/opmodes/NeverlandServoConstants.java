@@ -5,23 +5,17 @@ package opmodes;
  */
 
 public class NeverlandServoConstants {
-    public final static float RIGHT_FLAG_DEPLOYED   = (float)189.0/(float)256;
-    public final static float RIGHT_FLAG_STOWED     = (float)0.0/(float)256;
-    public final static float RIGHT_FLAG_NINETY     = (float)38.0/(float)256;
-    public final static float LEFT_FLAG_DEPLOYED    = (float)0.0/(float)256;
-    public final static float LEFT_FLAG_STOWED      = (float)185.0/(float)256;
-    public final static float LEFT_FLAG_NINETY      = (float)126.0/(float)256;
 
-    public final static float RIGHT_BUMPER_UP      = (float)231/(float)256;
-    public final static float RIGHT_BUMPER_DOWN    = (float)012/(float)256;
-    public final static float LEFT_BUMPER_UP       = (float)031/(float)256;
+    public final static float RIGHT_BUMPER_UP      = (float)255/(float)256;
+    public final static float RIGHT_BUMPER_DOWN    = (float)017/(float)256;
+    public final static float LEFT_BUMPER_UP       = (float)006/(float)256;
     public final static float LEFT_BUMPER_DOWN     = (float)251/(float)256;
 
-    public final static float LEFT_PUSHER_DEPLOYED  = (float)256/(float)256;
-    public final static float LEFT_PUSHER_STOWED    = (float)0.0/(float)256;
-    public final static float RIGHT_PUSHER_DEPLOYED = (float)0.0/(float)256;
+    public final static float LEFT_PUSHER_DEPLOYED  = (float)230/(float)256;
+    public final static float LEFT_PUSHER_STOWED    = (float)000/(float)256;
+    public final static float RIGHT_PUSHER_DEPLOYED = (float)022/(float)256;
     public final static float RIGHT_PUSHER_STOWED   = (float)256/(float)256;
 
-    public final static float CLIMBER_SCORE = (float)225.0/(float)256.0;
-    public final static float CLIMBER_STORE = (float)0.0/(float)256.0;
+    public final static float CLIMBER_SCORE = (float)245/(float)256;
+    public final static float CLIMBER_STORE = (float)000/(float)256;
 }

@@ -6,7 +6,6 @@ package team25core;
  */
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -30,7 +29,7 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
         this.leftMotor = motorLeft;
         this.mmt = null;
 
-        leftMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
     public TwoWheelGearedDriveDeadReckon(Robot robot, int encoderTicksPerInch, int encoderTicksPerDegree, DcMotor motorLeft, DcMotor motorRight)
@@ -41,21 +40,21 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
         this.leftMotor = motorLeft;
         this.mmt = null;
 
-        leftMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
     @Override
     protected void resetEncoders()
     {
-        leftMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        rightMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        leftMotor.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        rightMotor.setMode(DcMotor.RunMode.RESET_ENCODERS);
     }
 
     @Override
     protected void encodersOn()
     {
-        leftMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        rightMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     }
 
     @Override
@@ -83,15 +82,15 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
                     } else {
                         speed = (logVal / 100) + 0.01;
                     }
-                    rightMotor.setPower(-speed);
-                    leftMotor.setPower(speed);
+                    rightMotor.setPower(speed);
+                    leftMotor.setPower(-speed);
 
                 }
             };
             robot.addTask(mmt);
         } else {
-            rightMotor.setPower(-speed);
-            leftMotor.setPower(speed);
+            rightMotor.setPower(speed);
+            leftMotor.setPower(-speed);
         }
     }
 

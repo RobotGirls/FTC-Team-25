@@ -6,14 +6,17 @@ package team25core;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorImpl;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class Team25DcMotor extends DcMotor
+public class Team25DcMotor extends DcMotorImpl
 {
     public enum MotorLocation {
         UNKNOWN,
@@ -80,7 +83,7 @@ public class Team25DcMotor extends DcMotor
                 Team25DcMotor m = (Team25DcMotor) slaves.toArray()[0];
                 DcMotorController mc = m.getController();
                 if (mc == this.getController()) {
-                    //((EasyModernMotorController) mc).setMotorPower(power);
+                    mc.setMotorPower(m.getPortNumber(), power);
                     return;
                 }
             }
@@ -180,16 +183,16 @@ public class Team25DcMotor extends DcMotor
          */
         int port = this.getPortNumber();
         if (port == 1) {
-            //this.slaves.add((Team25DcMotor)((EasyModernMotorController) this.getController()).getMotor(2));
+            // this.slaves.add((Team25DcMotor)(this.getController()).getMotor(2));
         } else {
-            //this.slaves.add((Team25DcMotor)((EasyModernMotorController) this.getController()).getMotor(1));
+            // this.slaves.add((Team25DcMotor)(this.getController()).getMotor(1));
         }
 
         /*
          * Add the other motor controller's motors.
          */
-        //this.slaves.add((Team25DcMotor)((EasyModernMotorController)mc).getMotor(1));
-        //this.slaves.add((Team25DcMotor)((EasyModernMotorController)mc).getMotor(2));
+        // this.slaves.add((Team25DcMotor)(mc.getMotor(1));
+        // this.slaves.add((Team25DcMotor)(mc.getMotor(2));
     }
 
 
@@ -219,8 +222,8 @@ public class Team25DcMotor extends DcMotor
     private static boolean isEasyController(DcMotorController mc)
     {
         /*
-        if (mc instanceof org.swerverobotics.library.internal.EasyModernMotorController) {
-                   return true;
+        if (mc instanceof Team25DcMotorControllerWrapper) {
+            return true;
         } else {
             return false;
         }

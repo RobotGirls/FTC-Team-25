@@ -44,6 +44,7 @@ import team25core.RobotEvent;
 import team25core.Team25DcMotor;
 import team25core.TwoWheelGearedDriveDeadReckon;
 
+//@Autonomous(name="DriftTest", group="AutoTeam25")
 public class DriftTest extends Robot {
 
     private GyroSensor gyro;

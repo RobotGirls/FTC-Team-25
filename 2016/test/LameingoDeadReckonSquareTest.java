@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
@@ -44,6 +46,8 @@ import team25core.RobotEvent;
 import team25core.Team25DcMotor;
 import team25core.TwoWheelGearedDriveDeadReckon;
 
+@Autonomous(name="DeadReckonTest", group="AutoTeam25")
+@Disabled
 public class LameingoDeadReckonSquareTest extends Robot {
 
     private DcMotor r;
@@ -75,10 +79,10 @@ public class LameingoDeadReckonSquareTest extends Robot {
         gyro = hardwareMap.gyroSensor.get("gyro");
         gyro.calibrate();
 
-        frontLeft.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-        frontRight.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-        frontLeft.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        frontRight.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        frontLeft.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        frontRight.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
 /*
         deadReckon = new TwoWheelGearedDriveDeadReckon(this, 251, gyro, frontLeft, frontRight);

@@ -39,7 +39,7 @@ public class ResetMotorEncoderTask extends RobotTask {
     @Override
     public void start()
     {
-        motor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        motor.setMode(DcMotor.RunMode.RESET_ENCODERS);
     }
 
     @Override

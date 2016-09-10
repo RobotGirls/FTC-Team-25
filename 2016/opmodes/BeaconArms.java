@@ -12,7 +12,7 @@ public class BeaconArms {
 
     public boolean sensorOnLeft;
 
-    BeaconArms (Servo rightServo, Servo leftServo, boolean isSensorOnLeft) {
+    public BeaconArms (Servo rightServo, Servo leftServo, boolean isSensorOnLeft) {
         this.right = rightServo;
         this.left = leftServo;
         this.sensorOnLeft = isSensorOnLeft;

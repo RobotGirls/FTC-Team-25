@@ -12,7 +12,7 @@ public abstract class SingleShotTimerTask extends RobotTask {
 
     public class SingleShotTimerEvent extends RobotEvent {
 
-        EventKind kind;
+        public EventKind kind;
 
         public SingleShotTimerEvent(RobotTask task, EventKind kind)
         {

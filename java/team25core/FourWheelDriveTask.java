@@ -8,7 +8,7 @@ package team25core;
 import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-public class TankDriveTask extends RobotTask {
+public class FourWheelDriveTask extends RobotTask {
     protected Robot robot;
     protected DcMotor motorOne;
     protected DcMotor motorTwo;
@@ -18,7 +18,7 @@ public class TankDriveTask extends RobotTask {
     public float right;
     public float left;
 
-    public TankDriveTask(Robot robot, DcMotor motorOne, DcMotor motorTwo, DcMotor motorThree, DcMotor motorFour)
+    public FourWheelDriveTask(Robot robot, DcMotor motorOne, DcMotor motorTwo, DcMotor motorThree, DcMotor motorFour)
     {
         super(robot);
 
