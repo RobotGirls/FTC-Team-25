@@ -2,7 +2,7 @@
 package team25core;
 
 /*
- * FTC Team 25: katie
+ * FTC Team 25: Created by Katelyn Biesiadecki on 11/12/2016.
  */
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -54,10 +54,10 @@ public class FourWheelGearedDriveDeadReckon extends DeadReckon {
     @Override
     protected void resetEncoders()
     {
-        frontLeftMotor.setMode(DcMotor.RunMode.RESET_ENCODERS);
-        frontRightMotor.setMode(DcMotor.RunMode.RESET_ENCODERS);
-        rearLeftMotor.setMode(DcMotor.RunMode.RESET_ENCODERS);
-        rearRightMotor.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        frontLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rearLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rearRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class FourWheelGearedDriveDeadReckon extends DeadReckon {
     }
 
     @Override
-    protected void motorStraight(final double speed)
+    protected void motorStraight(double speed)
     {
         frontLeftMotor.setPower(speed);
         frontRightMotor.setPower(speed);
