@@ -6,6 +6,7 @@ package team25core;
  */
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class MecanumWheelDriveTask extends RobotTask {
@@ -38,25 +39,25 @@ public class MecanumWheelDriveTask extends RobotTask {
         gamepad = robot.gamepad1;
 
         // If joysticks are pointed left, counter rotate wheels.
-        // +0.5 assumes left temporarily.
+        // -0.5 assumes left temporarily.
         // threshold for joystick values in the x may vary.
         // or? and?
         // which is better? I like this because you see that it's counter rotating, but it's kind of ugly...
         if (gamepad.left_stick_x > 0.5 && gamepad.right_stick_x > 0.5) {
-            fl = gamepad.left_stick_x;
+            fl = -gamepad.left_stick_x;
             rl = fl * -1;
-            fr = gamepad.right_stick_x;
+            fr = -gamepad.right_stick_x;
             rr = fr * -1;
         } else if (gamepad.left_stick_x < -0.5 && gamepad.right_stick_x < -0.5) {
-            fl = -gamepad.left_stick_x;
-            rl = gamepad.left_stick_x;
-            fr = -gamepad.right_stick_x;
-            rr = gamepad.right_stick_x;
+            fl = gamepad.left_stick_x;
+            rl = -gamepad.left_stick_x;
+            fr = gamepad.right_stick_x;
+            rr = -gamepad.right_stick_x;
         } else {
-            fl = -gamepad.left_stick_y;
-            rl = -gamepad.left_stick_y;
-            fr = gamepad.left_stick_y;
-            rr = gamepad.left_stick_y;
+            fl = gamepad.left_stick_y;
+            rl = gamepad.left_stick_y;
+            fr = -gamepad.right_stick_y;
+            rr = -gamepad.right_stick_y;
         }
     }
 
