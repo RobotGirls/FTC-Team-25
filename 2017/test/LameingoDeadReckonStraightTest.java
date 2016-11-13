@@ -42,7 +42,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.TwoWheelGearedDriveDeadReckon;
 
-@Autonomous(name="DeadReckonStraightTest", group="AutoTeam25")
+@Autonomous(name="Lameingo: Straight Test", group="AutoTeam25")
 public class LameingoDeadReckonStraightTest extends Robot {
 
     private DcMotor frontRight;

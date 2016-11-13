@@ -48,8 +48,8 @@ public class DaisyTeleop extends Robot
         conveyor = hardwareMap.dcMotor.get("conveyor");
         launcher = hardwareMap.dcMotor.get("launcher");
 
-    //    frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-      //  frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        //frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        //frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
     }
@@ -69,6 +69,7 @@ public class DaisyTeleop extends Robot
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e) {
                 GamepadEvent event = (GamepadEvent) e;
+
                 if (event.kind == EventKind.BUTTON_A_DOWN) {
                     flowerPower.setPower(1.0);
                     conveyor.setPower(-1.0);
@@ -76,16 +77,14 @@ public class DaisyTeleop extends Robot
                     flowerPower.setPower(-1.0);
                     conveyor.setPower(1.0);
                 } else if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
-                   launcher.setPower(1.0);
+                    launcher.setPower(1.0);
                 } else {
                     flowerPower.setPower(0.0);
                     conveyor.setPower(0.0);
                     launcher.setPower(0.0);
                 }
-
             }
         });
-
     }
 
     @Override

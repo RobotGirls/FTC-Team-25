@@ -25,7 +25,7 @@ public class LightSensorCriteria implements SensorCriteria {
     protected LightSensor sensor;
     protected LightPolarity polarity;
 
-    public LightSensorCriteria(LightSensor sensor, int min, int max)
+    public LightSensorCriteria(LightSensor sensor, double min, double max)
     {
         this.sensor = sensor;
         this.polarity = LightPolarity.WHITE;

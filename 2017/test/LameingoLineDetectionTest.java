@@ -34,34 +34,47 @@ package test;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
+import team25core.GamepadTask;
+import team25core.LightSensorCriteria;
+import team25core.MRLightSensor;
+import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.TwoWheelGearedDriveDeadReckon;
 
-@Autonomous(name="Lameingo: Turn Test", group="AutoTeam25")
-public class LameingoDeadReckonTurnTest extends Robot {
-
+@Autonomous(name="Lameingo: Line Detection", group="AutoTeam25")
+public class LameingoLineDetectionTest extends Robot
+{
     private DcMotor frontRight;
     private DcMotor frontLeft;
-    private DeadReckonTask deadReckonTask;
+
+    private OpticalDistanceSensor opticalDistanceSensor;
+    private MRLightSensor ods;
+
+    private DeadReckonTask nearBeaconTask;
+    private PersistentTelemetryTask ptt;
+
     private final static double STRAIGHT_SPEED = LameingoConfiguration.STRAIGHT_SPEED;
     private final static double TURN_SPEED = LameingoConfiguration.TURN_SPEED;
     private final static int TICKS_PER_INCH = LameingoConfiguration.TICKS_PER_INCH;
     private final static int TICKS_PER_DEGREE = LameingoConfiguration.TICKS_PER_DEGREE;
-    private TwoWheelGearedDriveDeadReckon deadReckon;
+
+    private TwoWheelGearedDriveDeadReckon approachNearBeacon;
+    LightSensorCriteria lightCriteria;
 
     @Override
     public void handleEvent(RobotEvent e)
     {
-        // Nothing.
     }
 
     @Override
     public void init()
     {
+        // Motor setup.
         frontRight = hardwareMap.dcMotor.get("rightMotor");
         frontLeft = hardwareMap.dcMotor.get("leftMotor");
 
@@ -70,24 +83,32 @@ public class LameingoDeadReckonTurnTest extends Robot {
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        deadReckon = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight);
+        // Path setup.
+        approachNearBeacon = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight);
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, STRAIGHT_SPEED);
+        approachNearBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 10, STRAIGHT_SPEED);
+
+        // Optical Distance Sensor setup.
+        opticalDistanceSensor = hardwareMap.opticalDistanceSensor.get("ods");
+        ods = new MRLightSensor(opticalDistanceSensor);
+        lightCriteria = new LightSensorCriteria(ods, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
+
+        // Telemetry setup.
+        ptt = new PersistentTelemetryTask(this);
     }
 
     @Override
     public void start()
     {
-        deadReckonTask = new DeadReckonTask(this, deadReckon);
-        addTask(deadReckonTask);
-
+        nearBeaconTask = new DeadReckonTask(this, approachNearBeacon, lightCriteria);
+        addTask(nearBeaconTask);
     }
 
     public void stop()
     {
-        if (deadReckonTask != null) {
-            deadReckonTask.stop();
+        if (nearBeaconTask != null) {
+            nearBeaconTask.stop();
         }
     }
 }

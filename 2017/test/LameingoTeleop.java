@@ -13,7 +13,7 @@ import team25core.TwoWheelGearedDriveDeadReckon;
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/12/2016.
  */
 
-@TeleOp(name="Lameingo Teleop", group="Team25")
+@TeleOp(name="Lameingo: Teleop", group="Team25")
 public class LameingoTeleop extends Robot {
     DcMotor left;
     DcMotor right;

@@ -43,6 +43,8 @@ public class GeneralBeaconArms
         } else if (!sensedMyAlliance && sensorOnLeft) {
             deployRight();
             stowLeft();
+        } else {
+            stowAll();
         }
     }
 
