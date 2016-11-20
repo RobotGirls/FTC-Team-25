@@ -4,17 +4,15 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
-import team25core.DeadmanMotorTask;
 import team25core.FourWheelDriveTask;
 import team25core.GamepadTask;
+import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
-import team25core.TwoWheelDriveTask;
 
 /**
- * Created by katie on 10/22/2016.
+ * Created by Katelyn Biesiadecki on 10/22/2016.
  */
 
 @TeleOp(name = "Daisy Teleop", group = "Team25")
@@ -28,8 +26,13 @@ public class DaisyTeleop extends Robot
     private DcMotor conveyor;
     private DcMotor launcher;
 
+    private FourWheelDriveTask drive;
+    private PersistentTelemetryTask ptt;
+
     private final double FLOWER_POWER = 0.5;
     private final double CONVEYOR_POWER = 0.5;
+
+    private boolean slow;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -40,25 +43,30 @@ public class DaisyTeleop extends Robot
     @Override
     public void init()
     {
-        //frontLeft = hardwareMap.dcMotor.get("frontLeft");
-        //frontRight = hardwareMap.dcMotor.get("frontRight");
+        frontLeft = hardwareMap.dcMotor.get("frontLeft");
+        frontRight = hardwareMap.dcMotor.get("frontRight");
         rearLeft = hardwareMap.dcMotor.get("rearLeft");
         rearRight = hardwareMap.dcMotor.get("rearRight");
         flowerPower = hardwareMap.dcMotor.get("flowerPower");
         conveyor = hardwareMap.dcMotor.get("conveyor");
         launcher = hardwareMap.dcMotor.get("launcher");
 
-        //frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        //frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        slow = false;
+
+        ptt = new PersistentTelemetryTask(this);
     }
 
     @Override
     public void start()
     {
-        //this.addTask(new FourWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight));
-        this.addTask(new TwoWheelDriveTask(this, rearRight, rearLeft));
+        drive = new FourWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
+        this.addTask(drive);
+        //this.addTask(new TwoWheelDriveTask(this, rearRight, rearLeft));
 
         // Gamepad 2: Mechanism Controller
         // (lt bumper)           (rt bumper)
@@ -82,6 +90,25 @@ public class DaisyTeleop extends Robot
                     flowerPower.setPower(0.0);
                     conveyor.setPower(0.0);
                     launcher.setPower(0.0);
+                }
+            }
+        });
+
+        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
+            public void handleEvent(RobotEvent e) {
+                GamepadEvent event = (GamepadEvent) e;
+
+                if (event.kind == EventKind.BUTTON_A_DOWN) {
+                   // Toggles slowness of motors.
+                    if (!slow) {
+                       drive.slowDown(true);
+                       slow = true;
+                        ptt.addData("Slow: ","true");
+                   } else {
+                       drive.slowDown(false);
+                       slow = false;
+                        ptt.addData("Slow: ","false");
+                   }
                 }
             }
         });

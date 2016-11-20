@@ -15,8 +15,9 @@ public class FourWheelDriveTask extends RobotTask {
     protected DcMotor motorThree;
     protected DcMotor motorFour;
 
-    public float right;
-    public float left;
+    public double right;
+    public double left;
+    public double slowMultiplier = 1;
 
     public FourWheelDriveTask(Robot robot, DcMotor motorOne, DcMotor motorTwo, DcMotor motorThree, DcMotor motorFour)
     {
@@ -34,9 +35,19 @@ public class FourWheelDriveTask extends RobotTask {
         Gamepad gamepad;
         gamepad = robot.gamepad1;
 
-        left  = -gamepad.left_stick_y;
-        right = gamepad.right_stick_y;
+        left  = -gamepad.left_stick_y * slowMultiplier;
+        right = gamepad.right_stick_y * slowMultiplier;
     }
+
+    public void slowDown(boolean slow)
+    {
+        if (slow) {
+            slowMultiplier = 0.5;
+        } else {
+            slowMultiplier = 1;
+        }
+    }
+
 
     @Override
     public void start()
@@ -61,5 +72,7 @@ public class FourWheelDriveTask extends RobotTask {
         motorFour.setPower(right);
         return false;
     }
+
+
 
 }
