@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import opmodes.NeverlandLightConstants;
+//import opmodes.NeverlandLightConstants;
 
 /*
  * FTC Team 5218: izzielau, February 18, 2016
@@ -30,8 +30,8 @@ public class LineFollowerTask extends RobotTask {
     protected DcMotor right;
 
     protected int IDEAL_VALUE = 25;
-    protected int MAXIMUM = NeverlandLightConstants.LIGHT_MAXIMUM;
-    protected int MINIMUM = NeverlandLightConstants.LIGHT_MINIMUM;
+    protected int MAXIMUM = 735;
+    protected int MINIMUM = 574;
 
     public enum EventKind {
         FOLLOWING,

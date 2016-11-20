@@ -8,7 +8,6 @@ package team25core;
 import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import opmodes.NeverlandTeleopConstants;
 
 public class TwoWheelDriveTask extends RobotTask {
     protected Robot robot;
@@ -20,7 +19,7 @@ public class TwoWheelDriveTask extends RobotTask {
 
     public boolean slow = false;
 
-    public double SLOW_MULTIPLIER = NeverlandTeleopConstants.SLOW_MULTIPLIER;
+    public double SLOW_MULTIPLIER = 0.125;
 
     public TwoWheelDriveTask(Robot robot, DcMotor rightMotor, DcMotor leftMotor) {
         super(robot);

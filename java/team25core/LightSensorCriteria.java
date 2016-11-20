@@ -25,7 +25,7 @@ public class LightSensorCriteria implements SensorCriteria {
     protected LightSensor sensor;
     protected LightPolarity polarity;
 
-    public LightSensorCriteria(LightSensor sensor, double min, double max)
+    public LightSensorCriteria(LightSensor sensor, int min, int max)
     {
         this.sensor = sensor;
         this.polarity = LightPolarity.WHITE;
@@ -50,7 +50,7 @@ public class LightSensorCriteria implements SensorCriteria {
     @Override
     public boolean satisfied()
     {
-        RobotLog.i("251 Light: %d, Threshold: %d", sensor.getRawLightDetected(), threshold);
+        RobotLog.i("251 Light: %f, Threshold: %d", sensor.getRawLightDetected(), threshold);
         if (polarity == LightPolarity.WHITE) {
             if (sensor.getRawLightDetected() < threshold) {
                 return true;

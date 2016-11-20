@@ -4,14 +4,12 @@ package team25core;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 
-import opmodes.NeverlandAutonomousConstants;
-
 /**
  * Created by katie on 12/14/15.
  */
 public class ColorSensorTask extends RobotTask {
 
-    public final static float BEACON_THRESHOLD = NeverlandAutonomousConstants.COLOR_THRESHOLD;
+    public final static float BEACON_THRESHOLD = 287;
 
     public enum EventKind {
         RED,
