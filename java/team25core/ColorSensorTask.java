@@ -5,22 +5,22 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 
 /**
- * Created by katie on 12/14/15.
+ * FTC Team 25: Created by Katelyn Biesiadecki on 12/14/15.
  */
-public class ColorSensorTask extends RobotTask {
-
-    public final static float BEACON_THRESHOLD = 287;
-
+public class ColorSensorTask extends RobotTask
+{
     public enum EventKind {
         RED,
         BLUE,
         PURPLE,
     }
 
-    public class ColorSensorEvent extends RobotEvent {
+    public class ColorSensorEvent extends RobotEvent
+    {
         public EventKind kind;
 
-        public ColorSensorEvent(RobotTask task, EventKind kind) {
+        public ColorSensorEvent(RobotTask task, EventKind kind)
+        {
             super(task);
             this.kind = kind;
         }
@@ -32,8 +32,10 @@ public class ColorSensorTask extends RobotTask {
     protected boolean color;
     protected int channelNumber;
     protected int count;
+    int threshold = 287;
 
-    public ColorSensorTask(Robot robot, ColorSensor colorSensor, DeviceInterfaceModule cdim, boolean bEnabled, boolean showColor, int channelNumber)
+    public ColorSensorTask(Robot robot, ColorSensor colorSensor, DeviceInterfaceModule cdim, boolean bEnabled,
+                           boolean showColor, int channelNumber)
     {
         super(robot);
         this.colorSensor = colorSensor;
@@ -43,8 +45,21 @@ public class ColorSensorTask extends RobotTask {
         this.color = showColor;
     }
 
+    public ColorSensorTask(Robot robot, ColorSensor colorSensor, DeviceInterfaceModule cdim, boolean bEnabled,
+                           boolean showColor, int channelNumber, int threshold)
+    {
+        super(robot);
+        this.colorSensor = colorSensor;
+        this.cdim = cdim;
+        this.bEnabled = bEnabled;
+        this.channelNumber = channelNumber;
+        this.color = showColor;
+        this.threshold = threshold;
+    }
+
     @Override
-    public void start() {
+    public void start()
+    {
         count = 0;
         if (bEnabled) {
             cdim.setDigitalChannelState(channelNumber, bEnabled);
@@ -52,12 +67,14 @@ public class ColorSensorTask extends RobotTask {
     }
 
     @Override
-    public void stop() {
+    public void stop()
+    {
         robot.removeTask(this);
     }
 
     @Override
-    public boolean timeslice() {
+    public boolean timeslice()
+    {
         int blue = colorSensor.blue();
         int red = colorSensor.red();
 
@@ -71,11 +88,11 @@ public class ColorSensorTask extends RobotTask {
             return false;
         }
 
-        if ((blue > red) && (blue > BEACON_THRESHOLD)) {
+        if ((blue > red) && (blue > threshold)) {
             ColorSensorEvent blueEvent = new ColorSensorEvent(this, EventKind.BLUE);
             robot.queueEvent(blueEvent);
             return true;
-        } else if ((red > blue) && (red > BEACON_THRESHOLD)) {
+        } else if ((red > blue) && (red > threshold)) {
             ColorSensorEvent redEvent = new ColorSensorEvent(this, EventKind.RED);
             robot.queueEvent(redEvent);
             return true;

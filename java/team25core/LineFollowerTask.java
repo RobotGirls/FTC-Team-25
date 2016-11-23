@@ -30,8 +30,8 @@ public class LineFollowerTask extends RobotTask {
     protected DcMotor right;
 
     protected int IDEAL_VALUE = 25;
-    protected int MAXIMUM = 735;
-    protected int MINIMUM = 574;
+    protected int maximum = 735;
+    protected int minimum = 574;
 
     public enum EventKind {
         FOLLOWING,
@@ -39,7 +39,8 @@ public class LineFollowerTask extends RobotTask {
         ERROR,
     }
 
-    public class LineFollowerEvent extends RobotEvent {
+    public class LineFollowerEvent extends RobotEvent
+    {
         public EventKind kind;
         public int val;
 
@@ -61,6 +62,19 @@ public class LineFollowerTask extends RobotTask {
         this.right = right;
     }
 
+    public LineFollowerTask(Robot robot, LightSensor light, DcMotor left, DcMotor right, int ticksInch, double inches, boolean zigzag,
+                            int maximum, int minimum)
+    {
+        super(robot);
+        this.light = light;
+        this.inches = inches;
+        this.zigzag = zigzag;
+        this.ticksPerInch = ticksInch;
+        this.left = left;
+        this.right = right;
+        this.minimum = minimum;
+        this.maximum = maximum;
+    }
     @Override
     public void start()
     {
@@ -80,9 +94,10 @@ public class LineFollowerTask extends RobotTask {
     }
 
     @Override
-    public boolean timeslice() {
+    public boolean timeslice()
+    {
         raw = light.getRawLightDetected();
-        lightValue = (1 - ((raw - MINIMUM)/(MAXIMUM - MINIMUM))) * 100;
+        lightValue = (1 - ((raw - minimum)/(maximum - minimum))) * 100;
 
         if (zigzag) {
             // Follows the left side of the line.
