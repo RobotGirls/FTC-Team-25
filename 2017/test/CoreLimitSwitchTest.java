@@ -10,7 +10,8 @@ import team25core.LimitSwitchTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 
-public class CoreLimitSwitchTest extends Robot {
+public class CoreLimitSwitchTest extends Robot
+{
 
     public DeviceInterfaceModule interfaceModule;
 
@@ -21,13 +22,14 @@ public class CoreLimitSwitchTest extends Robot {
     }
 
     @Override
-    public void init() {
+    public void init()
+    {
         interfaceModule = hardwareMap.deviceInterfaceModule.get("interface");
     }
 
     @Override
-    public void start() {
-        // public LimitSwitchTask(Robot robot, DeviceInterfaceModule module, int limitPort)
+    public void start()
+    {
         addTask(new LimitSwitchTask(this, interfaceModule, 0) {
             @Override
             public void handleEvent(RobotEvent e)

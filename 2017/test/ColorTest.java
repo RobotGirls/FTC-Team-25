@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.ServiceConfigurationError;
 
-import opmodes.NeverlandServoConstants;
 import team25core.ColorSensorTask;
 import team25core.Robot;
 import team25core.RobotEvent;
