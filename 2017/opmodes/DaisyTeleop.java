@@ -51,11 +51,6 @@ public class DaisyTeleop extends Robot
         conveyor = hardwareMap.dcMotor.get("conveyor");
         launcher = hardwareMap.dcMotor.get("launcher");
 
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
-
         slow = false;
 
         ptt = new PersistentTelemetryTask(this);
@@ -66,7 +61,6 @@ public class DaisyTeleop extends Robot
     {
         drive = new FourWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
         this.addTask(drive);
-        //this.addTask(new TwoWheelDriveTask(this, rearRight, rearLeft));
 
         // Gamepad 2: Mechanism Controller
         // (lt bumper)           (rt bumper)
