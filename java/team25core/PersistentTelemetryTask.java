@@ -5,8 +5,8 @@ package team25core;/*
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class PersistentTelemetryTask extends RobotTask {
-
+public class PersistentTelemetryTask extends RobotTask
+{
     private final Map<String, String> objs = new LinkedHashMap<String, String>();  // linked so as to preserve addition order as iteration order
 
     public PersistentTelemetryTask(Robot robot)

@@ -1,10 +1,11 @@
-package team25core;/*
+package team25core;
+/*
  * FTC Team 25: cmacfarl, September 03, 2015
  */
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public abstract class SingleShotTimerTask extends RobotTask {
+public class SingleShotTimerTask extends RobotTask {
 
     public enum EventKind {
         EXPIRED,

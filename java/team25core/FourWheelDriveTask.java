@@ -10,33 +10,48 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class FourWheelDriveTask extends RobotTask {
     protected Robot robot;
-    protected DcMotor motorOne;
-    protected DcMotor motorTwo;
-    protected DcMotor motorThree;
-    protected DcMotor motorFour;
+    protected DcMotor frontLeft;
+    protected DcMotor frontRight;
+    protected DcMotor rearLeft;
+    protected DcMotor rearRight;
 
-    public float right;
-    public float left;
+    public double right;
+    public double left;
+    public double slowMultiplier = 1;
 
-    public FourWheelDriveTask(Robot robot, DcMotor motorOne, DcMotor motorTwo, DcMotor motorThree, DcMotor motorFour)
+    public FourWheelDriveTask(Robot robot, DcMotor frontLeft, DcMotor frontRight, DcMotor rearLeft, DcMotor rearRight)
     {
         super(robot);
 
-        this.motorOne = motorOne;
-        this.motorTwo = motorTwo;
-        this.motorThree = motorThree;
-        this.motorFour = motorFour;
+        this.frontLeft = frontLeft;
+        this.frontRight = frontRight;
+        this.rearLeft = rearLeft;
+        this.rearRight = rearRight;
         this.robot = robot;
     }
 
     private void getJoystick()
     {
-        Gamepad gamepad;
-        gamepad = robot.gamepad1;
+        Gamepad gamepad = robot.gamepad1;
 
-        left  = -gamepad.left_stick_y;
-        right = gamepad.right_stick_y;
+        left  = -gamepad.left_stick_y * slowMultiplier;
+        right = gamepad.right_stick_y * slowMultiplier;
     }
+
+    public void slowDown(boolean slow)
+    {
+        if (slow) {
+            slowMultiplier = 0.5;
+        } else {
+            slowMultiplier = 1;
+        }
+    }
+
+    public void slowDown(double mult)
+    {
+        slowMultiplier = mult;
+    }
+
 
     @Override
     public void start()
@@ -55,11 +70,13 @@ public class FourWheelDriveTask extends RobotTask {
     {
         getJoystick();
 
-        motorOne.setPower(left);
-        motorThree.setPower(left);
-        motorTwo.setPower(right);
-        motorFour.setPower(right);
+        frontLeft.setPower(left);
+        rearLeft.setPower(left);
+        frontRight.setPower(right);
+        rearRight.setPower(right);
         return false;
     }
+
+
 
 }
