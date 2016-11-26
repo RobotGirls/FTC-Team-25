@@ -41,7 +41,6 @@ public class MecanumWheelDriveTask extends RobotTask {
         // If joysticks are pointed left, counter rotate wheels.
         // -0.5 assumes left temporarily.
         // threshold for joystick values in the x may vary.
-        // or? and?
         // which is better? I like this because you see that it's counter rotating, but it's kind of ugly...
         if (gamepad.left_stick_x > 0.5 && gamepad.right_stick_x > 0.5) {
             fl = -gamepad.left_stick_x;
