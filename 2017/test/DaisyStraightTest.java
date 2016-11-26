@@ -81,6 +81,10 @@ public class DaisyStraightTest extends Robot {
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         deadReckon = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        rearRight.setDirection(DcMotorSimple.Direction.FORWARD);
         deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 10, STRAIGHT_SPEED);
     }
 
