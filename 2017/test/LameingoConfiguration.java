@@ -11,7 +11,6 @@ public class LameingoConfiguration
     public final static double STRAIGHT_SPEED = 0.8;
     public final static double TURN_SPEED = 0.4;
 
-    public final static double ODS_MIN = 1.3;
-    public final static double ODS_MAX = 4.5;
-
+    public final static double ODS_MIN = 0;
+    public final static double ODS_MAX = 2;
 }
