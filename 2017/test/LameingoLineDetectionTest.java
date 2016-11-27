@@ -41,6 +41,7 @@ import team25core.DeadReckonTask;
 import team25core.GamepadTask;
 import team25core.LightSensorCriteria;
 import team25core.MRLightSensor;
+import team25core.OpticalDistanceSensorCriteria;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -64,7 +65,7 @@ public class LameingoLineDetectionTest extends Robot
     private final static int TICKS_PER_DEGREE = LameingoConfiguration.TICKS_PER_DEGREE;
 
     private TwoWheelGearedDriveDeadReckon approachNearBeacon;
-    LightSensorCriteria lightCriteria;
+    OpticalDistanceSensorCriteria lightCriteria;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -92,7 +93,7 @@ public class LameingoLineDetectionTest extends Robot
         // Optical Distance Sensor setup.
         opticalDistanceSensor = hardwareMap.opticalDistanceSensor.get("ods");
         ods = new MRLightSensor(opticalDistanceSensor);
-        lightCriteria = new LightSensorCriteria(ods, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
+        lightCriteria = new OpticalDistanceSensorCriteria(ods, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
 
         // Telemetry setup.
         ptt = new PersistentTelemetryTask(this);
