@@ -88,12 +88,12 @@ public class LameingoLineDetectionTest extends Robot
         approachNearBeacon = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight);
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        approachNearBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 10, STRAIGHT_SPEED);
+        approachNearBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 40, STRAIGHT_SPEED);
 
         // Optical Distance Sensor setup.
-        opticalDistanceSensor = hardwareMap.opticalDistanceSensor.get("ods");
+        opticalDistanceSensor = hardwareMap.opticalDistanceSensor.get("frontLight");
         ods = new MRLightSensor(opticalDistanceSensor);
-        lightCriteria = new OpticalDistanceSensorCriteria(ods, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
+        lightCriteria = new OpticalDistanceSensorCriteria(this, ods, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
 
         // Telemetry setup.
         ptt = new PersistentTelemetryTask(this);

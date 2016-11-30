@@ -17,23 +17,26 @@ public class OpticalDistanceSensorCriteria implements SensorCriteria {
     protected double threshold;
     protected LightSensor sensor;
     protected LightPolarity polarity;
+    protected Robot robot;
 
-    public OpticalDistanceSensorCriteria(LightSensor sensor, double min, double max)
+    public OpticalDistanceSensorCriteria(Robot robot, LightSensor sensor, double min, double max)
     {
         this.sensor = sensor;
         this.polarity = LightPolarity.WHITE;
         this.min = min;
         this.max = max;
         this.threshold = (min + ((max - min)/2));
+        this.robot = robot;
     }
 
-    public OpticalDistanceSensorCriteria(LightSensor sensor, LightPolarity polarity, int min, int max)
+    public OpticalDistanceSensorCriteria(Robot robot, LightSensor sensor, LightPolarity polarity, int min, int max)
     {
         this.sensor = sensor;
         this.polarity = polarity;
         this.min = min;
         this.max = max;
         this.threshold = (min + ((max - min)/2));
+        this.robot = robot;
     }
 
     public void setThreshold(double percent) {
@@ -44,6 +47,9 @@ public class OpticalDistanceSensorCriteria implements SensorCriteria {
     public boolean satisfied()
     {
         RobotLog.i("251 Light: %f, Threshold: %f", sensor.getRawLightDetected(), threshold);
+        robot.telemetry.addData("Light:", sensor.getRawLightDetected());
+        robot.telemetry.addData("Threshold:", threshold);
+
         if (polarity == LightPolarity.WHITE) {
             if (sensor.getRawLightDetected() > threshold) {
                 return true;
