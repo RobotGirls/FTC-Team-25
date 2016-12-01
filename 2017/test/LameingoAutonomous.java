@@ -138,21 +138,16 @@ public class LameingoAutonomous extends Robot
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         lineDetectTurnPath.addSegment(DeadReckon.SegmentType.TURN, 60,  TURN_SPEED);
 
-        //Beacon alignment turn.
-        beaconAlignTurn = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight);
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        beaconAlignTurn.addSegment(DeadReckon.SegmentType.TURN, 60,  TURN_SPEED);
 
         // Optical Distance Sensor (front) setup.
         frontOds = hardwareMap.opticalDistanceSensor.get("frontLight");
         frontLight = new MRLightSensor(frontOds);
-        lightCriteria = new OpticalDistanceSensorCriteria(this, frontLight, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
+        lightCriteria = new OpticalDistanceSensorCriteria(frontLight, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
 
         // Optical Distance Sensor (back) setup.
         backOds = hardwareMap.opticalDistanceSensor.get("backLight");
         backLight = new MRLightSensor(backOds);
-        backLightCriteria = new OpticalDistanceSensorCriteria(this, backLight, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX);
+        backLightCriteria = new OpticalDistanceSensorCriteria(backLight, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX);
 
         // Telemetry setup.
         ptt = new PersistentTelemetryTask(this);
@@ -173,20 +168,24 @@ public class LameingoAutonomous extends Robot
                     DeadReckonTask.DeadReckonEvent drEvent = (DeadReckonTask.DeadReckonEvent) e;
 
                     if (drEvent.kind == DeadReckonTask.EventKind.SENSOR_SATISFIED) {
-                        robot.addTask(new DeadReckonTask(robot, lineDetectTurnPath, lightCriteria) {
-                            @Override
-                            public void handleEvent(RobotEvent e)
-                            {
-                                DeadReckonTask.DeadReckonEvent drEvent = (DeadReckonTask.DeadReckonEvent) e;
-
-                                if (drEvent.kind == DeadReckonTask.EventKind.SENSOR_SATISFIED) {
-                                    robot.addTask(new DeadReckonTask(robot, beaconAlignTurn, backLightCriteria));
-                                }
-                            }
-                        });
+                        doTurnOnLine();
 
                     }
                 }
+            }
+
+            private void doTurnOnLine() {
+                robot.addTask(new DeadReckonTask(robot, lineDetectTurnPath, lightCriteria) {
+                    @Override
+                    public void handleEvent(RobotEvent e)
+                    {
+                        DeadReckonEvent drEvent = (DeadReckonEvent) e;
+
+                        if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
+                            robot.addTask(new DeadReckonTask(robot, beaconAlignTurn, backLightCriteria));
+                        }
+                    }
+                });
             }
         });
     }

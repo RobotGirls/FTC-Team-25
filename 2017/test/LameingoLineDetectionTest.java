@@ -93,7 +93,7 @@ public class LameingoLineDetectionTest extends Robot
         // Optical Distance Sensor setup.
         opticalDistanceSensor = hardwareMap.opticalDistanceSensor.get("frontLight");
         ods = new MRLightSensor(opticalDistanceSensor);
-        lightCriteria = new OpticalDistanceSensorCriteria(this, ods, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
+        lightCriteria = new OpticalDistanceSensorCriteria(ods, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
 
         // Telemetry setup.
         ptt = new PersistentTelemetryTask(this);
