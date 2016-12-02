@@ -33,7 +33,6 @@ public class RobbieTeleop extends Robot {
     private DcMotor shooterRight;
     private DcMotor sbod;
 
-    private boolean driverTwoEnabled = false;
     private PersistentTelemetryTask ptt;
 
     @Override
@@ -60,7 +59,8 @@ public class RobbieTeleop extends Robot {
         // Hook.
         sbod = hardwareMap.dcMotor.get("brush");
 
-
+        ptt = new PersistentTelemetryTask(this);
+        addTask(ptt);
     }
 
     @Override
@@ -71,11 +71,9 @@ public class RobbieTeleop extends Robot {
             switch (event.kind) {
                 case BUTTON_X_DOWN:
                     // Blue.
-                    driverTwoEnabled = false;
                     ptt.addData("DRIVER TWO: ", "missing");
                 case BUTTON_B_DOWN:
                     // Red.
-                    driverTwoEnabled = true;
                     ptt.addData("DRIVER TWO: ", "present");
                     break;
             }
@@ -95,23 +93,23 @@ public class RobbieTeleop extends Robot {
         this.addTask(drive);
 
         // SBOD
-        DeadmanMotorTask collect = new DeadmanMotorTask(this, sbod, 0.7, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.RIGHT_BUMPER);
+        DeadmanMotorTask collect = new DeadmanMotorTask(this, sbod, 0.7, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.RIGHT_BUMPER);
         addTask(collect);
-        DeadmanMotorTask dispense = new DeadmanMotorTask(this, sbod, -0.7, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.RIGHT_TRIGGER);
+        DeadmanMotorTask dispense = new DeadmanMotorTask(this, sbod, -0.7, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.RIGHT_TRIGGER);
         addTask(dispense);
 
         // Shooters
-        DeadmanMotorTask shootFastLeft = new DeadmanMotorTask(this, shooterLeft, 0.9, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_X);
+        DeadmanMotorTask shootFastLeft = new DeadmanMotorTask(this, shooterLeft, 0.9, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_X);
         addTask(shootFastLeft);
-        DeadmanMotorTask shootFastRight = new DeadmanMotorTask(this, shooterRight, -0.9, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_X);
+        DeadmanMotorTask shootFastRight = new DeadmanMotorTask(this, shooterRight, -0.9, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_X);
         addTask(shootFastRight);
-        DeadmanMotorTask shootLeft = new DeadmanMotorTask(this, shooterLeft, 0.65, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
+        DeadmanMotorTask shootLeft = new DeadmanMotorTask(this, shooterLeft, 0.65, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
         addTask(shootLeft);
-        DeadmanMotorTask shootRight = new DeadmanMotorTask(this, shooterRight, -0.65, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
+        DeadmanMotorTask shootRight = new DeadmanMotorTask(this, shooterRight, -0.65, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
         addTask(shootRight);
-        DeadmanMotorTask shootSlowLeft = new DeadmanMotorTask(this, shooterLeft, 0.5, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_A);
+        DeadmanMotorTask shootSlowLeft = new DeadmanMotorTask(this, shooterLeft, 0.5, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
         addTask(shootSlowLeft);
-        DeadmanMotorTask shootSlowRight = new DeadmanMotorTask(this, shooterRight, -0.5, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_A);
+        DeadmanMotorTask shootSlowRight = new DeadmanMotorTask(this, shooterRight, -0.5, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
         addTask(shootSlowRight);
 
     }
