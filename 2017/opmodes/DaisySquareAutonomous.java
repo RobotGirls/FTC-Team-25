@@ -9,7 +9,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 
 /**
- * Created by Katelyn Biesiadecki on 11/5/2016.
+ * FTC Team 25: Created by Katelyn Biesiadecki on 11/5/2016.
  */
 
 public class DaisySquareAutonomous extends Robot
