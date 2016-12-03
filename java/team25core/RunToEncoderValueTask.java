@@ -43,6 +43,7 @@ public class RunToEncoderValueTask extends RobotTask {
     protected DcMotor master;
     protected int encoderValue;
     protected Set<DcMotor> slaves;
+    protected double power;
 
     /*
      * A cheap and easy way to do one shot events.
@@ -63,7 +64,6 @@ public class RunToEncoderValueTask extends RobotTask {
     protected RunToEncoderValueEvent t_95 = null;
     protected RunToEncoderValueEvent t_98 = null;
 
-
     /*
      *
      */
@@ -76,10 +76,22 @@ public class RunToEncoderValueTask extends RobotTask {
         this.encoderValue = encoderValue;
     }
 
+    public RunToEncoderValueTask(Robot robot, DcMotor master, Set<DcMotor> slaves, int encoderValue, double power)
+    {
+        super(robot);
+        this.master = master;
+        this.master = master;
+        this.slaves = slaves;
+        this.encoderValue = encoderValue;
+        this.power = power;
+    }
+
     @Override
     public void start()
     {
-        // TODO: ??
+        master.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        master.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        master.setPower(power);
     }
 
     @Override

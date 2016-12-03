@@ -12,7 +12,6 @@ public class LameingoConfiguration
     public final static double TURN_SPEED = 0.4;
 
     public final static double ODS_MIN = 0;
-<<<<<<< HEAD
     public final static double ODS_MAX = 0.8;
 
     /*
@@ -24,7 +23,4 @@ public class LameingoConfiguration
     public final static double RIGHT_STOW_POS = 0;
     public final static double LEFT_STOW_POS = 0;
 
-=======
-    public final static double ODS_MAX = 0.9;
->>>>>>> 1b45f61763431cc7e93a8b0bd62ca982af840a18
 }

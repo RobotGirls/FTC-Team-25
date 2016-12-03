@@ -9,6 +9,7 @@ import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDriveDeadReckon;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
 
 /**
@@ -25,6 +26,7 @@ public class DaisyLaunchAutonomous extends Robot
     private DcMotor rearRight;
     private DcMotor launcher;
     private DeadReckonTask deadReckonTask;
+    private RunToEncoderValueTask runToPositionTask;
     private SingleShotTimerTask stt;
     private FourWheelDirectDriveDeadReckon path;
     private final int TICKS_PER_INCH = DaisyConfiguration.TICKS_PER_INCH;
@@ -51,11 +53,10 @@ public class DaisyLaunchAutonomous extends Robot
         rearRight = hardwareMap.dcMotor.get("rearRight");
         launcher = hardwareMap.dcMotor.get("launcher");
 
-        launcher.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
         path = new FourWheelDirectDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontRight, rearRight, frontLeft, rearLeft);
-
         deadReckonTask = new DeadReckonTask(this, path);
+
+        runToPositionTask = new RunToEncoderValueTask(this, launcher, null, LAUNCH_POSITION, 1.0);
 
         stt = new SingleShotTimerTask(this, 1000);
     }
@@ -64,10 +65,7 @@ public class DaisyLaunchAutonomous extends Robot
     public void start()
     {
         addTask(deadReckonTask);
-        launcher.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        launcher.setPower(1.0);
-        launcher.setTargetPosition(LAUNCH_POSITION);
+        addTask(runToPositionTask);
         //addTask(stt);
-        //launcher.setPower(0.5);
     }
 }

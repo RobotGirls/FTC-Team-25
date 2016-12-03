@@ -13,7 +13,7 @@ public class DaisyConfiguration
     public final static double TURN_SPEED = 0.3;
     public final static double ODS_MIN = 0;
     public final static double ODS_MAX = 0.8;
-    public final static int LAUNCH_POSITION = 3;
+    public final static int LAUNCH_POSITION = 300;
     public final static int STARTING_LAUNCH_POSITION = 0;
 
     // Teleop constants. Maybe I'll use these, maybe not...
