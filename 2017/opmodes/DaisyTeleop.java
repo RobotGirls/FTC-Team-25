@@ -12,7 +12,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 
 /**
- * Created by Katelyn Biesiadecki on 10/22/2016.
+ * FTC Team 25: Created by Katelyn Biesiadecki on 10/22/2016.
  */
 
 @TeleOp(name = "Daisy Teleop", group = "Team25")
@@ -61,6 +61,7 @@ public class DaisyTeleop extends Robot
     {
         drive = new FourWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
         this.addTask(drive);
+        this.addTask(ptt);
 
         // Gamepad 2: Mechanism Controller
         // (lt bumper)           (rt bumper)
@@ -95,7 +96,7 @@ public class DaisyTeleop extends Robot
                 if (event.kind == EventKind.BUTTON_A_DOWN) {
                    // Toggles slowness of motors.
                     if (!slow) {
-                       drive.slowDown(true);
+                       drive.slowDown(0.35);
                        slow = true;
                         ptt.addData("Slow: ","true");
                    } else {

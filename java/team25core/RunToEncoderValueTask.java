@@ -6,6 +6,7 @@ package team25core;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class RunToEncoderValueTask extends RobotTask {
@@ -43,6 +44,7 @@ public class RunToEncoderValueTask extends RobotTask {
     protected DcMotor master;
     protected int encoderValue;
     protected Set<DcMotor> slaves;
+    protected double power;
 
     /*
      * A cheap and easy way to do one shot events.
@@ -63,7 +65,6 @@ public class RunToEncoderValueTask extends RobotTask {
     protected RunToEncoderValueEvent t_95 = null;
     protected RunToEncoderValueEvent t_98 = null;
 
-
     /*
      *
      */
@@ -76,10 +77,22 @@ public class RunToEncoderValueTask extends RobotTask {
         this.encoderValue = encoderValue;
     }
 
+    public RunToEncoderValueTask(Robot robot, DcMotor master, int encoderValue, double power)
+    {
+        super(robot);
+        this.master = master;
+        this.master = master;
+        this.slaves = new HashSet<DcMotor>();
+        this.encoderValue = encoderValue;
+        this.power = power;
+    }
+
     @Override
     public void start()
     {
-        // TODO: ??
+        master.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        master.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        master.setPower(power);
     }
 
     @Override
@@ -89,6 +102,7 @@ public class RunToEncoderValueTask extends RobotTask {
         for (DcMotor slave : slaves) {
             slave.setPower(0.0);
         }
+
         robot.removeTask(this);
     }
 

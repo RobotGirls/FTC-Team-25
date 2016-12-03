@@ -16,7 +16,6 @@ public class MecanumWheelDriveTask extends RobotTask {
     protected DcMotor rearLeft;
     protected DcMotor rearRight;
 
-    // ITF: better variables names can be used.
     public double fr;
     public double fl;
     public double rr;
