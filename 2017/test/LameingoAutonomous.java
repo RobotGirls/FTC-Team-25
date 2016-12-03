@@ -53,11 +53,16 @@ public class LameingoAutonomous extends Robot
     private DcMotor frontRight;
     private DcMotor frontLeft;
 
-    private OpticalDistanceSensor opticalDistanceSensor;
-    private MRLightSensor ods;
+    private OpticalDistanceSensor frontOds;
+    private OpticalDistanceSensor backOds;
+    private MRLightSensor frontLight;
+    private MRLightSensor backLight;
+
 
     private DeadReckonTask nearBeaconTask;
+    private DeadReckonTask lineDetectTurnTask;
     private DeadReckonTask farBeaconTask;
+
     private PersistentTelemetryTask ptt;
 
     private final static double STRAIGHT_SPEED = LameingoConfiguration.STRAIGHT_SPEED;
@@ -68,7 +73,15 @@ public class LameingoAutonomous extends Robot
 
     private TwoWheelGearedDriveDeadReckon approachNearBeacon;
     private TwoWheelGearedDriveDeadReckon approachFarBeacon;
+<<<<<<< HEAD
     OpticalDistanceSensorCriteria lightCriteria;
+=======
+    private TwoWheelGearedDriveDeadReckon lineDetectTurnPath;
+    private TwoWheelGearedDriveDeadReckon beaconAlignTurn;
+
+    OpticalDistanceSensorCriteria lightCriteria;
+    OpticalDistanceSensorCriteria backLightCriteria;
+>>>>>>> 1b45f61763431cc7e93a8b0bd62ca982af840a18
 
     public enum Alliance {
         RED,
@@ -87,9 +100,17 @@ public class LameingoAutonomous extends Robot
                 selectAlliance(Alliance.RED);
             }
         }
+
+
     }
 
+<<<<<<< HEAD
     private void selectAlliance(Alliance color)
+=======
+
+
+    public void selectAlliance(Alliance color)
+>>>>>>> 1b45f61763431cc7e93a8b0bd62ca982af840a18
     {
        if (color == Alliance.BLUE) {
            // do blue setup.
@@ -117,6 +138,7 @@ public class LameingoAutonomous extends Robot
         approachNearBeacon = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight);
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+<<<<<<< HEAD
         approachNearBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 10, STRAIGHT_SPEED);
         approachNearBeacon.addSegment(DeadReckon.SegmentType.TURN,      0,  TURN_SPEED * TURN_MULTIPLER);
 
@@ -124,6 +146,26 @@ public class LameingoAutonomous extends Robot
         opticalDistanceSensor = hardwareMap.opticalDistanceSensor.get("ods");
         ods = new MRLightSensor(opticalDistanceSensor);
         lightCriteria = new OpticalDistanceSensorCriteria(ods, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
+=======
+        approachNearBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 40, STRAIGHT_SPEED);
+
+        // Line detect turn path setup.
+        lineDetectTurnPath = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight);
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        lineDetectTurnPath.addSegment(DeadReckon.SegmentType.TURN, 60,  TURN_SPEED);
+
+
+        // Optical Distance Sensor (front) setup.
+        frontOds = hardwareMap.opticalDistanceSensor.get("frontLight");
+        frontLight = new MRLightSensor(frontOds);
+        lightCriteria = new OpticalDistanceSensorCriteria(frontLight, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
+
+        // Optical Distance Sensor (back) setup.
+        backOds = hardwareMap.opticalDistanceSensor.get("backLight");
+        backLight = new MRLightSensor(backOds);
+        backLightCriteria = new OpticalDistanceSensorCriteria(backLight, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX);
+>>>>>>> 1b45f61763431cc7e93a8b0bd62ca982af840a18
 
         // Telemetry setup.
         ptt = new PersistentTelemetryTask(this);
@@ -138,8 +180,33 @@ public class LameingoAutonomous extends Robot
     @Override
     public void start()
     {
-        nearBeaconTask = new DeadReckonTask(this, approachNearBeacon, lightCriteria);
-        addTask(nearBeaconTask);
+        this.addTask(new DeadReckonTask(this, approachNearBeacon, backLightCriteria) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                if (e instanceof DeadReckonTask.DeadReckonEvent) {
+                    DeadReckonTask.DeadReckonEvent drEvent = (DeadReckonTask.DeadReckonEvent) e;
+
+                    if (drEvent.kind == DeadReckonTask.EventKind.SENSOR_SATISFIED) {
+                        doTurnOnLine();
+
+                    }
+                }
+            }
+
+            private void doTurnOnLine() {
+                robot.addTask(new DeadReckonTask(robot, lineDetectTurnPath, lightCriteria) {
+                    @Override
+                    public void handleEvent(RobotEvent e)
+                    {
+                        DeadReckonEvent drEvent = (DeadReckonEvent) e;
+
+                        if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
+                            robot.addTask(new DeadReckonTask(robot, beaconAlignTurn, backLightCriteria));
+                        }
+                    }
+                });
+            }
+        });
     }
 
     public void stop()
