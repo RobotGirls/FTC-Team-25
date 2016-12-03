@@ -3,13 +3,14 @@ package opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import team25core.FourWheelDriveTask;
 import team25core.GamepadTask;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.RunToEncoderValueTask;
 
 /**
  * FTC Team 25: Created by Katelyn Biesiadecki on 10/22/2016.
@@ -18,6 +19,26 @@ import team25core.RobotEvent;
 @TeleOp(name = "Daisy Teleop", group = "Team25")
 public class DaisyTeleop extends Robot
 {
+    /*
+
+    GAMEPAD 1: DRIVETRAIN CONTROLLER
+    --------------------------------------------------------------------------------------------
+      (L trigger)        (R trigger)    |
+      (L bumper)         (R bumper)     |
+                            (y)         |
+      arrow pad          (x)   (b)      |
+                            (a)         |  (a) toggle slowness
+
+    GAMEPAD 2: MECHANISM CONTROLLER
+    --------------------------------------------------------------------------------------------
+      (L trigger)        (R trigger)    | (LT) toggle L pusher out     (RT) toggle R pusher out
+      (L bumper)         (R bumper)     | (LB) rotate flea forward     (RB) rotate flea backward
+                            (y)         |  (y) launch particle
+      arrow pad          (x)   (b)      |  (b) flower power (accept)
+                            (a)         |  (a) flower power (reject)
+
+    */
+
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor rearLeft;
@@ -25,14 +46,20 @@ public class DaisyTeleop extends Robot
     private DcMotor flowerPower;
     private DcMotor conveyor;
     private DcMotor launcher;
+    private Servo leftPusher;
+    private Servo rightPusher;
 
     private FourWheelDriveTask drive;
     private PersistentTelemetryTask ptt;
+    private RunToEncoderValueTask runToPositionTask;
 
-    private final double FLOWER_POWER = 0.5;
-    private final double CONVEYOR_POWER = 0.5;
+    private final int LAUNCH_POSITION = DaisyConfiguration.LAUNCH_POSITION;
+    private double leftPosition  = 0;
+    private double rightPosition = 0;
 
     private boolean slow;
+    private boolean leftPusherOut;
+    private boolean rightPusherOut;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -40,18 +67,51 @@ public class DaisyTeleop extends Robot
         // Nothing.
     }
 
+    private void toggleLeftPusher()
+    {
+        if (!leftPusherOut) {
+            leftPosition = 1.0;
+            leftPusherOut = true;
+        } else {
+            leftPosition = 0;
+            leftPusherOut = false;
+        }
+        leftPusher.setPosition(leftPosition);
+    }
+
+    private void toggleRightPusher()
+    {
+        if (!rightPusherOut) {
+            rightPosition = 1.0;
+            rightPusherOut = true;
+        } else {
+            rightPosition = 0;
+            rightPusherOut = false;
+        }
+        rightPusher.setPosition(rightPosition);
+    }
+
     @Override
     public void init()
     {
-        frontLeft = hardwareMap.dcMotor.get("frontLeft");
-        frontRight = hardwareMap.dcMotor.get("frontRight");
-        rearLeft = hardwareMap.dcMotor.get("rearLeft");
-        rearRight = hardwareMap.dcMotor.get("rearRight");
+        frontLeft   = hardwareMap.dcMotor.get("frontLeft");
+        frontRight  = hardwareMap.dcMotor.get("frontRight");
+        rearLeft    = hardwareMap.dcMotor.get("rearLeft");
+        rearRight   = hardwareMap.dcMotor.get("rearRight");
         flowerPower = hardwareMap.dcMotor.get("flowerPower");
-        conveyor = hardwareMap.dcMotor.get("conveyor");
-        launcher = hardwareMap.dcMotor.get("launcher");
+        conveyor    = hardwareMap.dcMotor.get("conveyor");
+        launcher    = hardwareMap.dcMotor.get("launcher");
+        leftPusher  = hardwareMap.servo.get("leftPusher");
+        rightPusher = hardwareMap.servo.get("rightPusher");
+
+        leftPusher.setPosition(leftPosition);
+        rightPusher.setPosition(rightPosition);
+
+        runToPositionTask = new RunToEncoderValueTask(this, launcher, LAUNCH_POSITION, 1.0);
 
         slow = false;
+        rightPusherOut = false;
+        leftPusherOut = false;
 
         ptt = new PersistentTelemetryTask(this);
     }
@@ -62,12 +122,6 @@ public class DaisyTeleop extends Robot
         drive = new FourWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
         this.addTask(drive);
         this.addTask(ptt);
-
-        // Gamepad 2: Mechanism Controller
-        // (lt bumper)           (rt bumper)
-        //                          (y)
-        //  arrow pad            (x)   (b)           (b) flower power (accept)    (x) conveyor belt
-        //                          (a)              (a) flower power (reject)
 
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e) {
@@ -81,6 +135,14 @@ public class DaisyTeleop extends Robot
                     conveyor.setPower(1.0);
                 } else if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
                     launcher.setPower(1.0);
+                } else if (event.kind == EventKind.RIGHT_BUMPER_DOWN) {
+                    launcher.setPower(-1.0);
+                } else if (event.kind == EventKind.BUTTON_Y_DOWN) {
+                    addTask(runToPositionTask);
+                } else if (event.kind == EventKind.LEFT_TRIGGER_DOWN) {
+                    toggleLeftPusher();
+                } else if (event.kind == EventKind.RIGHT_TRIGGER_DOWN) {
+                    toggleRightPusher();
                 } else {
                     flowerPower.setPower(0.0);
                     conveyor.setPower(0.0);

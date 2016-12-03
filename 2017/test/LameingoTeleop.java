@@ -1,5 +1,6 @@
 package test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -14,6 +15,7 @@ import team25core.TwoWheelGearedDriveDeadReckon;
  */
 
 @TeleOp(name="Lameingo: Teleop", group="Team25")
+@Disabled
 public class LameingoTeleop extends Robot {
     DcMotor left;
     DcMotor right;

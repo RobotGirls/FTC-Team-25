@@ -22,6 +22,7 @@ public class DaisyAutonomous extends Robot
     private DcMotor frontRight;
     private DcMotor rearLeft;
     private DcMotor rearRight;
+    private DcMotor launcher;
     private DeadReckonTask deadReckonTask;
     private PersistentTelemetryTask ptt;
     private FourWheelGearedDriveDeadReckon deadReckonPath;
@@ -95,7 +96,7 @@ public class DaisyAutonomous extends Robot
         } else if (pathChoice == AutonomousPath.CAP_BALL) {
             path.addSegment(DeadReckon.SegmentType.STRAIGHT, 60,  STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.LAUNCH) {
-                // something, eventually.
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 0, STRAIGHT_SPEED);
         }
 
         return path;

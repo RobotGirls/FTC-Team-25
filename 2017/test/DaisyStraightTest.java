@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -44,6 +45,7 @@ import team25core.RobotEvent;
 import team25core.TwoWheelGearedDriveDeadReckon;
 
 @Autonomous(name="Daisy: Straight Test", group="AutoTeam25")
+@Disabled
 public class DaisyStraightTest extends Robot {
 
     private DcMotor frontRight;

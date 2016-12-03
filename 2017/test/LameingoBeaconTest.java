@@ -1,6 +1,7 @@
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -18,6 +19,7 @@ import team25core.TwoWheelGearedDriveDeadReckon;
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/29/2016.
  */
 @Autonomous(name = "Lameingo: Beacon Test", group = "Team25")
+@Disabled
 public class LameingoBeaconTest extends Robot
 {
     DcMotor left;

@@ -1,6 +1,7 @@
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import team25core.MonitorMotorTask;
@@ -13,6 +14,7 @@ import team25core.RobotTask;
  */
 
 @Autonomous(name = "TEST Motor", group = "AutoTest")
+@Disabled
 public class LameingoMotorTest extends Robot {
 
     private DcMotor motor;
