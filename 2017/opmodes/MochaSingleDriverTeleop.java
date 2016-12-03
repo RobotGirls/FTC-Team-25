@@ -28,8 +28,6 @@ public class MochaSingleDriverTeleop extends Robot {
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
-    private DcMotor shooterLeft;
-    private DcMotor shooterRight;
     private DcMotor sbod;
     private Servo beacon;
 
