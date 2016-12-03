@@ -6,6 +6,7 @@ package team25core;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class RunToEncoderValueTask extends RobotTask {
@@ -76,12 +77,12 @@ public class RunToEncoderValueTask extends RobotTask {
         this.encoderValue = encoderValue;
     }
 
-    public RunToEncoderValueTask(Robot robot, DcMotor master, Set<DcMotor> slaves, int encoderValue, double power)
+    public RunToEncoderValueTask(Robot robot, DcMotor master, int encoderValue, double power)
     {
         super(robot);
         this.master = master;
         this.master = master;
-        this.slaves = slaves;
+        this.slaves = new HashSet<DcMotor>();
         this.encoderValue = encoderValue;
         this.power = power;
     }
@@ -101,6 +102,7 @@ public class RunToEncoderValueTask extends RobotTask {
         for (DcMotor slave : slaves) {
             slave.setPower(0.0);
         }
+
         robot.removeTask(this);
     }
 

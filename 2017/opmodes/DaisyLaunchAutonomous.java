@@ -6,7 +6,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
+import team25core.DeadmanMotorTask;
 import team25core.FourWheelDirectDriveDeadReckon;
+import team25core.GamepadTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
@@ -17,7 +19,6 @@ import team25core.SingleShotTimerTask;
  */
 
 @Autonomous(name = "Daisy: Launch Autononomous", group = "Team25")
-@Disabled
 public class DaisyLaunchAutonomous extends Robot
 {
     private DcMotor frontLeft;
@@ -34,7 +35,6 @@ public class DaisyLaunchAutonomous extends Robot
     private final double STRAIGHT_SPEED = DaisyConfiguration.STRAIGHT_SPEED;
     private final double TURN_SPEED = DaisyConfiguration.TURN_SPEED;
     private final int LAUNCH_POSITION = DaisyConfiguration.LAUNCH_POSITION;
-    private final int STARTING_LAUNCH_POSITION = DaisyConfiguration.STARTING_LAUNCH_POSITION;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -54,9 +54,16 @@ public class DaisyLaunchAutonomous extends Robot
         launcher = hardwareMap.dcMotor.get("launcher");
 
         path = new FourWheelDirectDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontRight, rearRight, frontLeft, rearLeft);
+        path.addSegment(DeadReckon.SegmentType.STRAIGHT, 0, STRAIGHT_SPEED);
+        path.addSegment(DeadReckon.SegmentType.TURN, 0, TURN_SPEED);
         deadReckonTask = new DeadReckonTask(this, path);
 
-        runToPositionTask = new RunToEncoderValueTask(this, launcher, null, LAUNCH_POSITION, 1.0);
+        runToPositionTask = new RunToEncoderValueTask(this, launcher, LAUNCH_POSITION, 1.0);
+
+        launcher.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        addTask(new DeadmanMotorTask(this, launcher, 0.1, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_Y));
+        addTask(new DeadmanMotorTask(this, launcher, -0.1, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_A));
 
         stt = new SingleShotTimerTask(this, 1000);
     }

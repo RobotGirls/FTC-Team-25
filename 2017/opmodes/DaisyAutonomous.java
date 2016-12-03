@@ -87,9 +87,9 @@ public class DaisyAutonomous extends Robot
                 frontLeft, frontRight, rearLeft, rearRight);
 
         if (pathChoice == AutonomousPath.CORNER_PARK) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 52, STRAIGHT_SPEED);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 58, STRAIGHT_SPEED);
             path.addSegment(DeadReckon.SegmentType.TURN, 120, TURN_SPEED);
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 75, STRAIGHT_SPEED);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 85, STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.CENTER_PARK) {
             path.addSegment(DeadReckon.SegmentType.STRAIGHT, 60,  STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.CAP_BALL) {
