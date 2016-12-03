@@ -91,7 +91,7 @@ public class LameingoLineDetectionTest extends Robot
         approachNearBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 10, STRAIGHT_SPEED);
 
         // Optical Distance Sensor setup.
-        opticalDistanceSensor = hardwareMap.opticalDistanceSensor.get("ods");
+        opticalDistanceSensor = hardwareMap.opticalDistanceSensor.get("frontLight");
         ods = new MRLightSensor(opticalDistanceSensor);
         lightCriteria = new OpticalDistanceSensorCriteria(ods, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
 

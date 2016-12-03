@@ -41,6 +41,7 @@ import team25core.DeadReckonTask;
 import team25core.GamepadTask;
 import team25core.LightSensorCriteria;
 import team25core.MRLightSensor;
+import team25core.OpticalDistanceSensorCriteria;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -67,7 +68,7 @@ public class LameingoAutonomous extends Robot
 
     private TwoWheelGearedDriveDeadReckon approachNearBeacon;
     private TwoWheelGearedDriveDeadReckon approachFarBeacon;
-    LightSensorCriteria lightCriteria;
+    OpticalDistanceSensorCriteria lightCriteria;
 
     public enum Alliance {
         RED,
@@ -88,7 +89,7 @@ public class LameingoAutonomous extends Robot
         }
     }
 
-    public void selectAlliance(Alliance color)
+    private void selectAlliance(Alliance color)
     {
        if (color == Alliance.BLUE) {
            // do blue setup.
@@ -117,15 +118,16 @@ public class LameingoAutonomous extends Robot
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         approachNearBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 10, STRAIGHT_SPEED);
-        approachNearBeacon.addSegment(DeadReckon.SegmentType.TURN,     0,  TURN_SPEED * TURN_MULTIPLER);
+        approachNearBeacon.addSegment(DeadReckon.SegmentType.TURN,      0,  TURN_SPEED * TURN_MULTIPLER);
 
         // Optical Distance Sensor setup.
         opticalDistanceSensor = hardwareMap.opticalDistanceSensor.get("ods");
         ods = new MRLightSensor(opticalDistanceSensor);
-        lightCriteria = new LightSensorCriteria(ods, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
+        lightCriteria = new OpticalDistanceSensorCriteria(ods, LameingoConfiguration.ODS_MIN, LameingoConfiguration.ODS_MAX); // Confirm w/Craig switching to double; 1.3 and 4.5ish.
 
         // Telemetry setup.
         ptt = new PersistentTelemetryTask(this);
+        this.addTask(ptt);
         ptt.addData("Press (x) to select", "BLUE alliance!");
         ptt.addData("Press (b) to select", "RED alliance!");
 
