@@ -61,6 +61,7 @@ public class DaisyTeleop extends Robot
     {
         drive = new FourWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
         this.addTask(drive);
+        this.addTask(ptt);
 
         // Gamepad 2: Mechanism Controller
         // (lt bumper)           (rt bumper)
