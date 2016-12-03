@@ -4,7 +4,7 @@ package team25core;/*
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public abstract class PeriodicTimerTask extends RobotTask {
+public class PeriodicTimerTask extends RobotTask {
 
     public enum EventKind {
         EXPIRED,
@@ -57,6 +57,7 @@ public abstract class PeriodicTimerTask extends RobotTask {
     public boolean timeslice()
     {
         if (timer.time() > timeout) {
+            timer.reset();
             robot.queueEvent(new PeriodicTimerEvent(this, EventKind.EXPIRED));
         }
         return false;
