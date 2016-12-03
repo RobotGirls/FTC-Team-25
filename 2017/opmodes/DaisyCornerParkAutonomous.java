@@ -48,8 +48,8 @@ public class DaisyCornerParkAutonomous extends Robot {
 
         cornerParkPath = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
         cornerParkPath.addSegment(DeadReckon.SegmentType.STRAIGHT, 52, STRAIGHT_SPEED);
-        cornerParkPath.addSegment(DeadReckon.SegmentType.TURN, 120, TURN_SPEED);
-        cornerParkPath.addSegment(DeadReckon.SegmentType.STRAIGHT, 32, STRAIGHT_SPEED);
+        cornerParkPath.addSegment(DeadReckon.SegmentType.TURN, 130, TURN_SPEED);
+        cornerParkPath.addSegment(DeadReckon.SegmentType.STRAIGHT, 25, STRAIGHT_SPEED);
 
         cornerParkTask = new DeadReckonTask(this, cornerParkPath);
     }

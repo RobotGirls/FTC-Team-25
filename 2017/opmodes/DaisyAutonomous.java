@@ -50,28 +50,27 @@ public class DaisyAutonomous extends Robot
         if (e instanceof GamepadTask.GamepadEvent) {
             GamepadTask.GamepadEvent event = (GamepadTask.GamepadEvent) e;
 
-            switch (event.kind) {
-                case BUTTON_X_DOWN:
-                    selectAlliance(Alliance.BLUE);
-                    ptt.addData("ALLIANCE", "Blue");
-                case BUTTON_B_DOWN:
-                    selectAlliance(Alliance.RED);
-                    ptt.addData("ALLIANCE", "Red");
-                case LEFT_BUMPER_DOWN:
-                    pathChoice = AutonomousPath.CORNER_PARK;
-                    ptt.addData("AUTONOMOUS", "Corner Park");
-                case LEFT_TRIGGER_DOWN:
-                    pathChoice = AutonomousPath.LAUNCH;
-                    ptt.addData("AUTONOMOUS", "Launch");
-                case RIGHT_BUMPER_DOWN:
-                    pathChoice = AutonomousPath.CAP_BALL;
-                    ptt.addData("AUTONOMOUS", "Cap Ball");
-                case RIGHT_TRIGGER_DOWN:
-                    pathChoice = AutonomousPath.CENTER_PARK;
-                    ptt.addData("AUTONOMOUS", "Center Park");
-                }
+            if (event.kind == GamepadTask.EventKind.BUTTON_X_DOWN) {
+                selectAlliance(Alliance.BLUE);
+                ptt.addData("ALLIANCE", "Blue");
+            } else if (event.kind == GamepadTask.EventKind.BUTTON_B_DOWN) {
+                selectAlliance(Alliance.RED);
+                ptt.addData("ALLIANCE", "Red");
+            } else if (event.kind == GamepadTask.EventKind.LEFT_BUMPER_DOWN) {
+                pathChoice = AutonomousPath.CORNER_PARK;
+                ptt.addData("AUTONOMOUS", "Corner Park");
+            } else if (event.kind == GamepadTask.EventKind.LEFT_TRIGGER_DOWN) {
+                pathChoice = AutonomousPath.LAUNCH;
+                ptt.addData("AUTONOMOUS", "Launch");
+            } else if (event.kind == GamepadTask.EventKind.RIGHT_BUMPER_DOWN) {
+                pathChoice = AutonomousPath.CAP_BALL;
+                ptt.addData("AUTONOMOUS", "Cap Ball");
+            } else if (event.kind == GamepadTask.EventKind.RIGHT_TRIGGER_DOWN) {
+                pathChoice = AutonomousPath.CENTER_PARK;
+                ptt.addData("AUTONOMOUS", "Center Park");
             }
         }
+    }
 
     private void selectAlliance(Alliance color)
     {
@@ -87,16 +86,15 @@ public class DaisyAutonomous extends Robot
         FourWheelGearedDriveDeadReckon path = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE,
                 frontLeft, frontRight, rearLeft, rearRight);
 
-        switch (pathChoice) {
-            case CORNER_PARK:
-                path.addSegment(DeadReckon.SegmentType.STRAIGHT, 52,  STRAIGHT_SPEED);
-                path.addSegment(DeadReckon.SegmentType.TURN,     120, TURN_SPEED);
-                path.addSegment(DeadReckon.SegmentType.STRAIGHT, 32,  STRAIGHT_SPEED);
-            case CENTER_PARK:
-                path.addSegment(DeadReckon.SegmentType.STRAIGHT, 66,  STRAIGHT_SPEED);
-            case CAP_BALL:
-                path.addSegment(DeadReckon.SegmentType.STRAIGHT, 62,  STRAIGHT_SPEED);
-            case LAUNCH:
+        if (pathChoice == AutonomousPath.CORNER_PARK) {
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 52, STRAIGHT_SPEED);
+            path.addSegment(DeadReckon.SegmentType.TURN, 120, TURN_SPEED);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 75, STRAIGHT_SPEED);
+        } else if (pathChoice == AutonomousPath.CENTER_PARK) {
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 60,  STRAIGHT_SPEED);
+        } else if (pathChoice == AutonomousPath.CAP_BALL) {
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 60,  STRAIGHT_SPEED);
+        } else if (pathChoice == AutonomousPath.LAUNCH) {
                 // something, eventually.
         }
 
