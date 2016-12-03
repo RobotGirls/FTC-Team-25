@@ -24,7 +24,6 @@ public class RobbieTeleop extends Robot {
 
     private final static int LED_CHANNEL = 0;
 
-    private DcMotorController mc;
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor backLeft;
@@ -32,6 +31,7 @@ public class RobbieTeleop extends Robot {
     private DcMotor shooterLeft;
     private DcMotor shooterRight;
     private DcMotor sbod;
+    private Servo beacon;
 
     private PersistentTelemetryTask ptt;
 
@@ -59,35 +59,22 @@ public class RobbieTeleop extends Robot {
         // Hook.
         sbod = hardwareMap.dcMotor.get("brush");
 
+        // Servo.
+        beacon = hardwareMap.servo.get("beacon");
+
         ptt = new PersistentTelemetryTask(this);
         addTask(ptt);
     }
 
     @Override
     public void handleEvent(RobotEvent e) {
-        if (e instanceof GamepadTask.GamepadEvent) {
-            GamepadTask.GamepadEvent event = (GamepadTask.GamepadEvent) e;
-
-            switch (event.kind) {
-                case BUTTON_X_DOWN:
-                    // Blue.
-                    ptt.addData("DRIVER TWO: ", "missing");
-                case BUTTON_B_DOWN:
-                    // Red.
-                    ptt.addData("DRIVER TWO: ", "present");
-                    break;
-            }
-
-        }
     }
 
     @Override
     public void start() {
         super.start();
 
-        //if (!driverTwoEnabled) {
-
-            /* DRIVER ONE */
+        /* DRIVER ONE */
         // Four motor drive.
         final FourWheelDriveTask drive = new FourWheelDriveTask(this, frontLeft, frontRight, backLeft, backRight);
         this.addTask(drive);
@@ -98,6 +85,11 @@ public class RobbieTeleop extends Robot {
         DeadmanMotorTask dispense = new DeadmanMotorTask(this, sbod, -0.7, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.RIGHT_TRIGGER);
         addTask(dispense);
 
+        DeadmanMotorTask collectSlow = new DeadmanMotorTask(this, sbod, 0.35, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.LEFT_BUMPER);
+        addTask(collectSlow);
+        DeadmanMotorTask dispenseSlow = new DeadmanMotorTask(this, sbod, -0.35, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.LEFT_TRIGGER);
+        addTask(dispenseSlow);
+
         // Shooters
         DeadmanMotorTask shootFastLeft = new DeadmanMotorTask(this, shooterLeft, 0.9, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_X);
         addTask(shootFastLeft);
@@ -107,10 +99,26 @@ public class RobbieTeleop extends Robot {
         addTask(shootLeft);
         DeadmanMotorTask shootRight = new DeadmanMotorTask(this, shooterRight, -0.65, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
         addTask(shootRight);
-        DeadmanMotorTask shootSlowLeft = new DeadmanMotorTask(this, shooterLeft, 0.5, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
+        DeadmanMotorTask shootSlowLeft = new DeadmanMotorTask(this, shooterLeft, 0.575, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
         addTask(shootSlowLeft);
-        DeadmanMotorTask shootSlowRight = new DeadmanMotorTask(this, shooterRight, -0.5, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
+        DeadmanMotorTask shootSlowRight = new DeadmanMotorTask(this, shooterRight, -0.575, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
         addTask(shootSlowRight);
+/*
+        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
+            public void handleEvent(RobotEvent e) {
+                GamepadEvent event = (GamepadEvent) e;
 
+                if (event.kind == EventKind.LEFT_TRIGGER_DOWN) {
+                    beacon.setPosition(1.0);
+                } else if (event.kind == EventKind.LEFT_TRIGGER_UP) {
+                    beacon.setPosition(0.5);
+                } else if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
+                    beacon.setPosition(1.0);
+                } else if (event.kind == EventKind.LEFT_BUMPER_UP) {
+                    beacon.setPosition(0);
+                }
+            }
+        }); */
     }
+
 }
