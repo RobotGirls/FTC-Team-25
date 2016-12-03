@@ -96,7 +96,7 @@ public class DaisyTeleop extends Robot
                 if (event.kind == EventKind.BUTTON_A_DOWN) {
                    // Toggles slowness of motors.
                     if (!slow) {
-                       drive.slowDown(true);
+                       drive.slowDown(0.125);
                        slow = true;
                         ptt.addData("Slow: ","true");
                    } else {

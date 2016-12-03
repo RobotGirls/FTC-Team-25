@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import opmodes.DaisyConfiguration;
@@ -14,9 +15,9 @@ import team25core.RobotEvent;
  * Created by elizabeth on 11/29/16.
  */
 @Autonomous(name="Daisy: Center Park", group="Team25")
+@Disabled
 public class DaisyCenterParkAutonomous extends Robot
 {
-
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor rearLeft;
@@ -29,9 +30,6 @@ public class DaisyCenterParkAutonomous extends Robot
     private final int TICKS_PER_INCH = DaisyConfiguration.TICKS_PER_INCH;
     private final int TICKS_PER_DEGREE = DaisyConfiguration.TICKS_PER_DEGREE;
     private final double STRAIGHT_SPEED = DaisyConfiguration.STRAIGHT_SPEED;
-
-
-
 
     @Override
     public void handleEvent(RobotEvent e)

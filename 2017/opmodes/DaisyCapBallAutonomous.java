@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import team25core.DeadReckon;
@@ -13,6 +14,7 @@ import team25core.RobotEvent;
  * Created by elizabeth on 11/29/16.
  */
 @Autonomous(name="Daisy: Cap Ball Knock", group="Team25")
+@Disabled
 public class DaisyCapBallAutonomous extends Robot
 {
     private DcMotor frontLeft;
@@ -20,16 +22,12 @@ public class DaisyCapBallAutonomous extends Robot
     private DcMotor rearLeft;
     private DcMotor rearRight;
 
-
     private DeadReckonTask cbTask;
-
     private FourWheelGearedDriveDeadReckon cbPath;
 
     private final int TICKS_PER_INCH = DaisyConfiguration.TICKS_PER_INCH;
     private final int TICKS_PER_DEGREE = DaisyConfiguration.TICKS_PER_DEGREE;
     private final double STRAIGHT_SPEED = DaisyConfiguration.STRAIGHT_SPEED;
-
-
 
     @Override
     public void handleEvent(RobotEvent e)

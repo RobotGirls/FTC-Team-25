@@ -9,19 +9,12 @@ public class DaisyConfiguration
     // Autonomous constants.
     public static final int TICKS_PER_INCH = 60;
     public static final int TICKS_PER_DEGREE = 14;
-<<<<<<< HEAD
-    public final static double STRAIGHT_SPEED = 0.8;
-    public final static double TURN_SPEED = 0.4;
+    public final static double STRAIGHT_SPEED = 0.6;
+    public final static double TURN_SPEED = 0.3;
     public final static double ODS_MIN = 0;
     public final static double ODS_MAX = 0.8;
     public final static int LAUNCH_POSITION = 3;
     public final static int STARTING_LAUNCH_POSITION = 0;
-=======
-    public final static double STRAIGHT_SPEED = 0.6;
-    public final static double TURN_SPEED = 0.3;
-    public final static double ODS_MIN = 1;
-    public final static double ODS_MAX = 5;
->>>>>>> 1b45f61763431cc7e93a8b0bd62ca982af840a18
 
     // Teleop constants. Maybe I'll use these, maybe not...
     public final static double FLOWER_POWER = 1.0;

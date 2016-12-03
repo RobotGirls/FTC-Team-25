@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import team25core.DeadReckon;
@@ -13,6 +14,7 @@ import team25core.RobotEvent;
  * Created by elizabeth on 12/1/16.
  */
 @Autonomous(name="Daisy: Corner Park", group="Team25")
+@Disabled
 public class DaisyCornerParkAutonomous extends Robot {
 
     private DcMotor frontLeft;
