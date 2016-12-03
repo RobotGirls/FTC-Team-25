@@ -50,68 +50,59 @@ public class DaisyAutonomous extends Robot
         if (e instanceof GamepadTask.GamepadEvent) {
             GamepadTask.GamepadEvent event = (GamepadTask.GamepadEvent) e;
 
-            if (event.kind == GamepadTask.EventKind.BUTTON_X_DOWN) {
-                selectAlliance(Alliance.BLUE);
-            } else if (event.kind == GamepadTask.EventKind.BUTTON_B_DOWN) {
-                selectAlliance(Alliance.RED);
-            } else if (event.kind == GamepadTask.EventKind.LEFT_BUMPER_DOWN) {
-                // Do corner park.
-                pathChoice = AutonomousPath.CORNER_PARK;
-                ptt.addData("AUTONOMOUS", "Corner Park");
-            } else if (event.kind == GamepadTask.EventKind.LEFT_TRIGGER_DOWN) {
-               // Do launch.
-                pathChoice = AutonomousPath.LAUNCH;
-                ptt.addData("AUTONOMOUS", "Launch");
-            } else if (event.kind == GamepadTask.EventKind.RIGHT_BUMPER_DOWN) {
-               // Do cap ball.
-                pathChoice = AutonomousPath.CAP_BALL;
-                ptt.addData("AUTONOMOUS", "Cap Ball");
-            } else if (event.kind == GamepadTask.EventKind.RIGHT_TRIGGER_DOWN) {
-               // Do center park.
-                pathChoice = AutonomousPath.CENTER_PARK;
-                ptt.addData("AUTONOMOUS", "Center Park");
+            switch (event.kind) {
+                case BUTTON_X_DOWN:
+                    selectAlliance(Alliance.BLUE);
+                    ptt.addData("ALLIANCE", "Blue");
+                case BUTTON_B_DOWN:
+                    selectAlliance(Alliance.RED);
+                    ptt.addData("ALLIANCE", "Red");
+                case LEFT_BUMPER_DOWN:
+                    pathChoice = AutonomousPath.CORNER_PARK;
+                    ptt.addData("AUTONOMOUS", "Corner Park");
+                case LEFT_TRIGGER_DOWN:
+                    pathChoice = AutonomousPath.LAUNCH;
+                    ptt.addData("AUTONOMOUS", "Launch");
+                case RIGHT_BUMPER_DOWN:
+                    pathChoice = AutonomousPath.CAP_BALL;
+                    ptt.addData("AUTONOMOUS", "Cap Ball");
+                case RIGHT_TRIGGER_DOWN:
+                    pathChoice = AutonomousPath.CENTER_PARK;
+                    ptt.addData("AUTONOMOUS", "Center Park");
+                }
             }
+        }
+
+    private void selectAlliance(Alliance color)
+    {
+        if (color == Alliance.BLUE) {
+            // Do blue setup.
+        } else {
+            // Do red setup.
         }
     }
 
-    private void selectAlliance(Alliance color)
-{
-    if (color == Alliance.BLUE) {
-        // Do blue setup.
-        ptt.addData("ALLIANCE", "Blue");
-    } else {
-        // Do red setup.
-        ptt.addData("ALLIANCE", "Red");
-    }
-}
-
-    private FourWheelGearedDriveDeadReckon cornerParkSetup()
+    private FourWheelGearedDriveDeadReckon pathSetup(AutonomousPath pathChoice)
     {
-        FourWheelGearedDriveDeadReckon cornerParkPath = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE,
+        FourWheelGearedDriveDeadReckon path = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE,
                 frontLeft, frontRight, rearLeft, rearRight);
-        cornerParkPath.addSegment(DeadReckon.SegmentType.STRAIGHT, 52, STRAIGHT_SPEED);
-        cornerParkPath.addSegment(DeadReckon.SegmentType.TURN, 120, TURN_SPEED);
-        cornerParkPath.addSegment(DeadReckon.SegmentType.STRAIGHT, 32, STRAIGHT_SPEED);
 
-        return cornerParkPath;
+        switch (pathChoice) {
+            case CORNER_PARK:
+                path.addSegment(DeadReckon.SegmentType.STRAIGHT, 52,  STRAIGHT_SPEED);
+                path.addSegment(DeadReckon.SegmentType.TURN,     120, TURN_SPEED);
+                path.addSegment(DeadReckon.SegmentType.STRAIGHT, 32,  STRAIGHT_SPEED);
+            case CENTER_PARK:
+                path.addSegment(DeadReckon.SegmentType.STRAIGHT, 66,  STRAIGHT_SPEED);
+            case CAP_BALL:
+                path.addSegment(DeadReckon.SegmentType.STRAIGHT, 62,  STRAIGHT_SPEED);
+            case LAUNCH:
+                // something, eventually.
+        }
+
+        return path;
     }
 
-    private FourWheelGearedDriveDeadReckon centerParkSetup()
-    {
-       FourWheelGearedDriveDeadReckon centerParkPath = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE,
-               frontLeft, frontRight, rearLeft, rearRight);
-        centerParkPath.addSegment(DeadReckon.SegmentType.STRAIGHT, 66, STRAIGHT_SPEED);
-
-        return centerParkPath;
-    }
-   private FourWheelGearedDriveDeadReckon capBallSetup()
-   {
-      FourWheelGearedDriveDeadReckon cbPath = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft,
-              frontRight,rearLeft, rearRight);
-       cbPath.addSegment(DeadReckon.SegmentType.STRAIGHT, 62, STRAIGHT_SPEED);
-
-       return cbPath;
-   }
 
     @Override
     public void init()
@@ -121,25 +112,15 @@ public class DaisyAutonomous extends Robot
         rearLeft = hardwareMap.dcMotor.get("rearLeft");
         rearRight = hardwareMap.dcMotor.get("rearRight");
 
-        if (pathChoice == AutonomousPath.CORNER_PARK) {
-            deadReckonPath = cornerParkSetup();
-        } else if (pathChoice == AutonomousPath.CENTER_PARK) {
-            deadReckonPath = centerParkSetup();
-        } else if (pathChoice == AutonomousPath.CAP_BALL) {
-           deadReckonPath = capBallSetup();
-        } else {
-           // launchSetup();
-        }
-
         // Telemetry setup.
         ptt = new PersistentTelemetryTask(this);
         this.addTask(ptt);
-        ptt.addData("Press (x) to select", "BLUE alliance!");
-        ptt.addData("Press (b) to select", "RED alliance!");
-        ptt.addData("Press (Left Bumper) to select", "Corner Park");
-        ptt.addData("Press (Right Trigger) to select", "Center Park");
-        ptt.addData("Press (Right Bumper) to select", "Cap Ball");
-        ptt.addData("Press (Left Trigger) to select", "Launch");
+        ptt.addData("Press (x) to select", "Blue alliance!");
+        ptt.addData("Press (b) to select", "Red alliance!");
+        ptt.addData("Press (Left Bumper) to select", "Corner Park!");
+        ptt.addData("Press (Right Trigger) to select", "Center Park!");
+        ptt.addData("Press (Right Bumper) to select", "Cap Ball!");
+        ptt.addData("Press (Left Trigger) to select", "Launch!");
 
         // Alliance selection.
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));
@@ -148,6 +129,7 @@ public class DaisyAutonomous extends Robot
     @Override
     public void start()
     {
+        deadReckonPath = pathSetup(pathChoice);
         deadReckonTask = new DeadReckonTask(this, deadReckonPath);
         addTask(deadReckonTask);
     }
