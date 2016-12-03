@@ -103,8 +103,8 @@ public class RobbieTeleop extends Robot {
         addTask(shootSlowLeft);
         DeadmanMotorTask shootSlowRight = new DeadmanMotorTask(this, shooterRight, -0.575, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
         addTask(shootSlowRight);
-/*
-        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
+
+        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
             public void handleEvent(RobotEvent e) {
                 GamepadEvent event = (GamepadEvent) e;
 
@@ -118,7 +118,7 @@ public class RobbieTeleop extends Robot {
                     beacon.setPosition(0);
                 }
             }
-        }); */
+        });
     }
 
 }
