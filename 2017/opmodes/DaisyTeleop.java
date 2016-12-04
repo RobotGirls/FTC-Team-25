@@ -48,6 +48,7 @@ public class DaisyTeleop extends Robot
     private DcMotor launcher;
     private Servo leftPusher;
     private Servo rightPusher;
+    private Servo odsSwinger;
 
     private FourWheelDriveTask drive;
     private PersistentTelemetryTask ptt;
@@ -103,9 +104,11 @@ public class DaisyTeleop extends Robot
         launcher    = hardwareMap.dcMotor.get("launcher");
         leftPusher  = hardwareMap.servo.get("leftPusher");
         rightPusher = hardwareMap.servo.get("rightPusher");
+        odsSwinger = hardwareMap.servo.get("odsSwinger");
 
         leftPusher.setPosition(leftPosition);
         rightPusher.setPosition(rightPosition);
+        odsSwinger.setPosition(0.7);
 
         runToPositionTask = new RunToEncoderValueTask(this, launcher, LAUNCH_POSITION, 1.0);
 
