@@ -6,6 +6,7 @@ package opmodes;
  */
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
@@ -20,6 +21,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 
 @TeleOp(name="THANKSGIVING", group = "5218")
+@Disabled
 public class RobbieTeleop extends Robot {
 
     private final static int LED_CHANNEL = 0;

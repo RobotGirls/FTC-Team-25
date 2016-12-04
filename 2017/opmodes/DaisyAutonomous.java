@@ -30,6 +30,7 @@ public class DaisyAutonomous extends Robot
     private final int TICKS_PER_DEGREE = DaisyConfiguration.TICKS_PER_DEGREE;
     private final double STRAIGHT_SPEED = DaisyConfiguration.STRAIGHT_SPEED;
     private final double TURN_SPEED = DaisyConfiguration.TURN_SPEED;
+    private int turnMultiplier = 1;
 
     private AutonomousPath pathChoice = AutonomousPath.CAP_BALL;
 
@@ -77,8 +78,10 @@ public class DaisyAutonomous extends Robot
     {
         if (color == Alliance.BLUE) {
             // Do blue setup.
+            turnMultiplier = -1;
         } else {
             // Do red setup.
+            turnMultiplier = 1;
         }
     }
 
@@ -88,38 +91,37 @@ public class DaisyAutonomous extends Robot
                 frontLeft, frontRight, rearLeft, rearRight);
 
         if (pathChoice == AutonomousPath.CORNER_PARK) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 58, STRAIGHT_SPEED);
-            path.addSegment(DeadReckon.SegmentType.TURN, 120, TURN_SPEED);
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 85, STRAIGHT_SPEED);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  58, STRAIGHT_SPEED);
+            path.addSegment(DeadReckon.SegmentType.TURN,     120, TURN_SPEED * turnMultiplier);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  85, STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.CENTER_PARK) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 60,  STRAIGHT_SPEED);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  60, STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.CAP_BALL) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 60,  STRAIGHT_SPEED);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  60, STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.LAUNCH) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 0, STRAIGHT_SPEED);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT,   0, STRAIGHT_SPEED);
         }
 
         return path;
     }
 
-
     @Override
     public void init()
     {
-        frontLeft = hardwareMap.dcMotor.get("frontLeft");
+        frontLeft  = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
-        rearLeft = hardwareMap.dcMotor.get("rearLeft");
-        rearRight = hardwareMap.dcMotor.get("rearRight");
+        rearLeft   = hardwareMap.dcMotor.get("rearLeft");
+        rearRight  = hardwareMap.dcMotor.get("rearRight");
 
         // Telemetry setup.
         ptt = new PersistentTelemetryTask(this);
         this.addTask(ptt);
-        ptt.addData("Press (x) to select", "Blue alliance!");
-        ptt.addData("Press (b) to select", "Red alliance!");
-        ptt.addData("Press (Left Bumper) to select", "Corner Park!");
-        ptt.addData("Press (Right Trigger) to select", "Center Park!");
-        ptt.addData("Press (Right Bumper) to select", "Cap Ball!");
-        ptt.addData("Press (Left Trigger) to select", "Launch!");
+        ptt.addData("Press (X) to select", "Blue alliance!");
+        ptt.addData("Press (B) to select", "Red alliance!");
+        ptt.addData("Press (LEFT BUMPER) to select", "Corner Park!");
+        ptt.addData("Press (RIGHT TRIGGER) to select", "Center Park!");
+        ptt.addData("Press (RIGHT BUMPER) to select", "Cap Ball!");
+        ptt.addData("Press (LEFT TRIGGER) to select", "Launch!");
 
         // Alliance selection.
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));

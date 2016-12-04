@@ -29,10 +29,6 @@ public class DaisyLaunchAutonomous extends Robot
     private DcMotor conveyor;
     private DeadReckonTask deadReckonTask;
     private RunToEncoderValueTask runToPositionTask;
-    private DeadmanMotorTask runLauncherBackTask;
-    private DeadmanMotorTask runLauncherForwardTask;
-    private DeadmanMotorTask runConveyorForwardTask;
-    private DeadmanMotorTask runConveyorBackTask;
     private SingleShotTimerTask stt;
     private boolean launched;
     private FourWheelDirectDriveDeadReckon path;
@@ -56,7 +52,6 @@ public class DaisyLaunchAutonomous extends Robot
                     addTask(stt);
                     launched = true;
                 } else {
-                    // add dead reckon task here
                     path = new FourWheelDirectDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontRight,
                             rearRight, frontLeft, rearLeft);
                     path.addSegment(DeadReckon.SegmentType.STRAIGHT, 58, STRAIGHT_SPEED);
@@ -64,7 +59,6 @@ public class DaisyLaunchAutonomous extends Robot
                     path.addSegment(DeadReckon.SegmentType.STRAIGHT, 80, STRAIGHT_SPEED);
                     deadReckonTask = new DeadReckonTask(this, path);
                     addTask(deadReckonTask);
-
                 }
             }
         }
@@ -93,18 +87,6 @@ public class DaisyLaunchAutonomous extends Robot
         launcher.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        /*
-        runLauncherForwardTask = new DeadmanMotorTask(this, launcher, 0.1, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
-        runLauncherBackTask = new DeadmanMotorTask(this, launcher, -0.1, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_A);
-        runConveyorForwardTask = new DeadmanMotorTask(this, conveyor, 0.1, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_X);
-        runConveyorBackTask = new DeadmanMotorTask(this, conveyor, -0.1, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_B);
-
-        addTask(runLauncherForwardTask);
-        addTask(runLauncherBackTask);
-        addTask(runConveyorForwardTask);
-        addTask(runConveyorBackTask);
-        */
-
         stt = new SingleShotTimerTask(this, 2000);
         launched = false;
     }
@@ -112,18 +94,6 @@ public class DaisyLaunchAutonomous extends Robot
     @Override
     public void start()
     {
-        /*
-        runLauncherForwardTask = new DeadmanMotorTask(this, launcher, 0.0, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
-        runLauncherBackTask = new DeadmanMotorTask(this, launcher, -0.0, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_A);
-        runConveyorForwardTask = new DeadmanMotorTask(this, conveyor, 0.0, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_X);
-        runConveyorBackTask = new DeadmanMotorTask(this, conveyor, -0.0, GamepadTask.GamepadNumber.GAMEPAD_1, DeadmanMotorTask.DeadmanButton.BUTTON_B);
-
-        addTask(runLauncherForwardTask);
-        addTask(runLauncherBackTask);
-        addTask(runConveyorForwardTask);
-        addTask(runConveyorBackTask);
-        */
-
         addTask(runToPositionTask);
     }
 }
