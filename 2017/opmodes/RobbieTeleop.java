@@ -21,7 +21,6 @@ import team25core.Robot;
 import team25core.RobotEvent;
 
 @TeleOp(name="THANKSGIVING", group = "5218")
-@Disabled
 public class RobbieTeleop extends Robot {
 
     private final static int LED_CHANNEL = 0;
