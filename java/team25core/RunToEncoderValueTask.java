@@ -24,7 +24,7 @@ public class RunToEncoderValueTask extends RobotTask {
 
     public class RunToEncoderValueEvent extends RobotEvent {
 
-        EventKind kind;
+        public EventKind kind;
 
         public RunToEncoderValueEvent(RobotTask task, EventKind kind)
         {

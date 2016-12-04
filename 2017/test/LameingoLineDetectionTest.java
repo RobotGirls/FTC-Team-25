@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
@@ -48,6 +49,7 @@ import team25core.RobotEvent;
 import team25core.TwoWheelGearedDriveDeadReckon;
 
 @Autonomous(name="Lameingo: Line Detection", group="AutoTeam25")
+@Disabled
 public class LameingoLineDetectionTest extends Robot
 {
     private DcMotor frontRight;

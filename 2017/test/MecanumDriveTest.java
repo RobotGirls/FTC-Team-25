@@ -1,5 +1,6 @@
 package test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -12,6 +13,7 @@ import team25core.RobotEvent;
  */
 
 @TeleOp(name = "Daisy: Mecanum Wheel Test", group = "Team25")
+@Disabled
 public class MecanumDriveTest extends Robot
 {
     DcMotor frontLeft;

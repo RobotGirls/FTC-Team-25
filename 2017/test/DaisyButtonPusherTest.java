@@ -1,5 +1,6 @@
 package test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -12,6 +13,7 @@ import team25core.RobotEvent;
  */
 
 @TeleOp (name = "Daisy: Button Pusher Test", group = "Team 25")
+@Disabled
 public class DaisyButtonPusherTest extends Robot
 {
     private Servo leftBP;
