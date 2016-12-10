@@ -117,6 +117,12 @@ public class RobbieTeleop extends Robot {
                     beacon.setPosition(1.0);
                 } else if (event.kind == EventKind.LEFT_BUMPER_UP) {
                     beacon.setPosition(0);
+                } else if (event.kind == EventKind.BUTTON_B_DOWN) {
+                    drive.slowDown(true);
+                    drive.slowDown(0.25);
+                } else if (event.kind == EventKind.BUTTON_A_DOWN) {
+                    drive.slowDown(true);
+                    drive.slowDown(1.0);
                 }
             }
         });
