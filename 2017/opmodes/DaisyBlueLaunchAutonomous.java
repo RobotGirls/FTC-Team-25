@@ -1,14 +1,11 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
-import team25core.DeadmanMotorTask;
 import team25core.FourWheelDirectDriveDeadReckon;
-import team25core.GamepadTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
@@ -18,8 +15,8 @@ import team25core.SingleShotTimerTask;
  * FTC Team 25: Created by Katelyn Biesiadecki on 12/2/2016.
  */
 
-@Autonomous(name = "Daisy: Red Launch Autonomous", group = "Team25")
-public class DaisyLaunchAutonomous extends Robot
+@Autonomous(name = "Daisy: Blue Launch Autonomous", group = "Team25")
+public class DaisyBlueLaunchAutonomous extends Robot
 {
     private DcMotor frontLeft;
     private DcMotor frontRight;
@@ -54,8 +51,8 @@ public class DaisyLaunchAutonomous extends Robot
                 } else {
                     path = new FourWheelDirectDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontRight,
                             rearRight, frontLeft, rearLeft);
-                    path.addSegment(DeadReckon.SegmentType.STRAIGHT, 63, STRAIGHT_SPEED);
-                    path.addSegment(DeadReckon.SegmentType.TURN, 155, TURN_SPEED);
+                    path.addSegment(DeadReckon.SegmentType.STRAIGHT,63, STRAIGHT_SPEED);
+                    path.addSegment(DeadReckon.SegmentType.TURN, 155, -TURN_SPEED);
                     path.addSegment(DeadReckon.SegmentType.STRAIGHT, 80, STRAIGHT_SPEED);
                     deadReckonTask = new DeadReckonTask(this, path);
                     addTask(deadReckonTask);
