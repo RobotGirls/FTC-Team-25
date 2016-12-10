@@ -6,8 +6,7 @@ package opmodes;
 
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class GeneralBeaconArms
-{
+public class GeneralBeaconArms {
     Servo right;
     Servo left;
     double leftDeployPos;
@@ -17,8 +16,7 @@ public class GeneralBeaconArms
     boolean sensorOnLeft;
 
     public GeneralBeaconArms(Servo left, Servo right, double leftDeployPos, double rightDeployPos,
-                             double leftStowPos, double rightStowPos, boolean isSensorOnLeft)
-    {
+                             double leftStowPos, double rightStowPos, boolean isSensorOnLeft) {
         this.left = left;
         this.right = right;
         this.leftDeployPos = leftDeployPos;
@@ -28,23 +26,20 @@ public class GeneralBeaconArms
         this.sensorOnLeft = isSensorOnLeft;
     }
 
-    // Alternatively, you could pass in your alliance color (as a boolean isRed or something)
+    // Alternatively, you could pass in your alliance color
     // to the constructor and pass a color to deploy()... not sure which is better. For now, this:
-    public void deploy(boolean sensedMyAlliance)
-    {
+    public void deploy(boolean sensedMyAlliance) {
         // If your alliance color is sensed (e.g. red alliance, red is sensed) and
         // your sensor is on the left, deploy the left arm, and so on.
-        if ((sensedMyAlliance && sensorOnLeft) || (!sensedMyAlliance && !sensorOnLeft)) {
+
+        if (sensedMyAlliance == sensorOnLeft) {
+            // if ((sensedMyAlliance && sensorOnLeft) || (!sensedMyAlliance && !sensorOnLeft)) {
+            // the above statement is logically equivalent to sensed..== sensorOnleft
             deployLeft();
             stowRight();
-        } else if (sensedMyAlliance && !sensorOnLeft) {
-            deployRight();
-            stowLeft();
-        } else if (!sensedMyAlliance && sensorOnLeft) {
-            deployRight();
-            stowLeft();
         } else {
-            stowAll();
+            deployRight();
+            stowLeft();
         }
     }
 

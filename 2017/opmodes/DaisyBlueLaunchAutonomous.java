@@ -51,7 +51,7 @@ public class DaisyBlueLaunchAutonomous extends Robot
                 } else {
                     path = new FourWheelDirectDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontRight,
                             rearRight, frontLeft, rearLeft);
-                    path.addSegment(DeadReckon.SegmentType.STRAIGHT,63, STRAIGHT_SPEED);
+                    path.addSegment(DeadReckon.SegmentType.STRAIGHT, 63, STRAIGHT_SPEED);
                     path.addSegment(DeadReckon.SegmentType.TURN, 155, -TURN_SPEED);
                     path.addSegment(DeadReckon.SegmentType.STRAIGHT, 80, STRAIGHT_SPEED);
                     deadReckonTask = new DeadReckonTask(this, path);
