@@ -14,10 +14,8 @@ import team25core.SingleShotTimerTask;
 /**
  * Created by Lizzie on 11/19/2016.
  */
-@Autonomous(name = "Particle Vertex Autonomous", group = "AutoTest")
-public class ParticleVertexAutonomous extends Robot {
-    private static final int TICKS_PER_DEGREE = 22;
-    private static final int TICKS_PER_INCH = 79;
+@Autonomous(name = "Mocha Particle Corner Autonomous", group = "AutoTest")
+public class MochaParticleAutonomous extends Robot {
 
     private DcMotorController mc;
     private DcMotor frontLeft;
