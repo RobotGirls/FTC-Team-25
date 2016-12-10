@@ -17,7 +17,7 @@ import team25core.SingleShotTimerTask;
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/5/2016.
  */
 @Autonomous(name = "Daisy: Autonomous", group = "Team25")
-public class DaisyLaunchAutonomous extends Robot
+public class DaisyBeaconAutonomous extends Robot
 {
     private DcMotor frontLeft;
     private DcMotor frontRight;
@@ -25,21 +25,24 @@ public class DaisyLaunchAutonomous extends Robot
     private DcMotor rearRight;
     private DcMotor launcher;
     private DcMotor conveyor;
-    private DeadReckonTask deadReckonTask;
-    private RunToEncoderValueTask runToPositionTask;
-    private SingleShotTimerTask stt;
-    private boolean launched;
+    private DeadReckonTask deadReckonParkTask;
     private PersistentTelemetryTask ptt;
-    private FourWheelGearedDriveDeadReckon path;
+    private FourWheelGearedDriveDeadReckon parkPath;
+    private FourWheelGearedDriveDeadReckon beaconPath;
     private final int TICKS_PER_INCH = DaisyConfiguration.TICKS_PER_INCH;
     private final int TICKS_PER_DEGREE = DaisyConfiguration.TICKS_PER_DEGREE;
     private final double STRAIGHT_SPEED = DaisyConfiguration.STRAIGHT_SPEED;
     private final double TURN_SPEED = DaisyConfiguration.TURN_SPEED;
     private final int LAUNCH_POSITION = DaisyConfiguration.LAUNCH_POSITION;
     private int turnMultiplier = 1;
+    private boolean launched;
+    private RunToEncoderValueTask runToPositionTask;
+    private SingleShotTimerTask stt;
+    private DeadReckonTask deadReckonBeaconTask;
 
-    private AutonomousPath pathChoice = AutonomousPath.CAP_BALL;
+    private AutonomousPath pathChoice = AutonomousPath.STAY;
     private AutonomousAction actionChoice = AutonomousAction.LAUNCH_2;
+    private AutonomousBeacon beaconChoice = AutonomousBeacon.BEACON_1;
 
     public enum Alliance {
         RED,
@@ -49,13 +52,15 @@ public class DaisyLaunchAutonomous extends Robot
     public enum AutonomousPath {
         CORNER_PARK,
         CENTER_PARK,
-        CAP_BALL,
-        LAUNCH,
+        STAY,
     }
 
     public enum AutonomousAction {
         LAUNCH_1,
         LAUNCH_2,
+    }
+
+    public enum AutonomousBeacon {
         BEACON_1,
         BEACON_2,
     }
@@ -83,6 +88,12 @@ public class DaisyLaunchAutonomous extends Robot
             } else if (event.kind == GamepadTask.EventKind.RIGHT_BUMPER_DOWN) {
                 actionChoice = AutonomousAction.LAUNCH_2;
                 ptt.addData("AUTONOMOUS", "Launch 2 Balls");
+            } else if (event.kind == GamepadTask.EventKind.BUTTON_A_DOWN) {
+                beaconChoice = AutonomousBeacon.BEACON_1;
+                ptt.addData("BEACON", "Claim 1 Beacon");
+            } else if (event.kind == GamepadTask.EventKind.BUTTON_Y_DOWN) {
+                beaconChoice = AutonomousBeacon.BEACON_2;
+                ptt.addData("BEACON", "Claim 2 Beacons");
             }
         }
 
@@ -92,12 +103,12 @@ public class DaisyLaunchAutonomous extends Robot
         } else if (e instanceof RunToEncoderValueTask.RunToEncoderValueEvent) {
             RunToEncoderValueTask.RunToEncoderValueEvent event = (RunToEncoderValueTask.RunToEncoderValueEvent) e;
             if (event.kind == RunToEncoderValueTask.EventKind.DONE) {
-                if (!launched) {
+                if (!launched && actionChoice == AutonomousAction.LAUNCH_2) {
                     conveyor.setPower(0.5);
                     addTask(stt);
                     launched = true;
                 } else {
-                    addTask(deadReckonTask);
+                    addTask(deadReckonBeaconTask);
                 }
             }
         }
@@ -120,19 +131,32 @@ public class DaisyLaunchAutonomous extends Robot
                 frontLeft, frontRight, rearLeft, rearRight);
 
         if (pathChoice == AutonomousPath.CORNER_PARK) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  63, STRAIGHT_SPEED);
-            path.addSegment(DeadReckon.SegmentType.TURN,     155, TURN_SPEED * turnMultiplier);
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  80, STRAIGHT_SPEED);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  58, STRAIGHT_SPEED);
+            path.addSegment(DeadReckon.SegmentType.TURN,     120, TURN_SPEED * turnMultiplier);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  85, STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.CENTER_PARK) {
             path.addSegment(DeadReckon.SegmentType.STRAIGHT,  60, STRAIGHT_SPEED);
-        } else if (pathChoice == AutonomousPath.CAP_BALL) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  60, STRAIGHT_SPEED);
-        } else if (pathChoice == AutonomousPath.LAUNCH) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,   0, STRAIGHT_SPEED);
         }
 
         return path;
     }
+
+    private FourWheelGearedDriveDeadReckon pathSetup(AutonomousBeacon beaconChoice)
+    {
+        FourWheelGearedDriveDeadReckon path = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE,
+                frontLeft, frontRight, rearLeft, rearRight);
+
+        if (beaconChoice == AutonomousBeacon.BEACON_1) {
+            path.addSegment(DeadReckon.SegmentType.TURN, 45, TURN_SPEED * turnMultiplier);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 64, STRAIGHT_SPEED);
+        } else if (beaconChoice == AutonomousBeacon.BEACON_2) {
+            path.addSegment(DeadReckon.SegmentType.TURN, 45, TURN_SPEED * turnMultiplier);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT, 64, STRAIGHT_SPEED);
+        }
+
+        return path;
+    }
+
 
     @Override
     public void init()
@@ -145,6 +169,7 @@ public class DaisyLaunchAutonomous extends Robot
         conveyor = hardwareMap.dcMotor.get("conveyor");
 
         runToPositionTask = new RunToEncoderValueTask(this, launcher, LAUNCH_POSITION, 1.0);
+        launched = false;
 
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -158,18 +183,18 @@ public class DaisyLaunchAutonomous extends Robot
         launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         stt = new SingleShotTimerTask(this, 2000);
-        launched = false;
 
         // Telemetry setup.
         ptt = new PersistentTelemetryTask(this);
         this.addTask(ptt);
         ptt.addData("Press (X) to select", "Blue alliance!");
         ptt.addData("Press (B) to select", "Red alliance!");
+        ptt.addData("Press (A) to select", "Claim 1 Beacon!");
+        ptt.addData("Press (Y) to select", "Claim 2 Beacons!");
         ptt.addData("Press (LEFT TRIGGER) to select", "Corner Park!");
         ptt.addData("Press (RIGHT TRIGGER) to select", "Center Park!");
         ptt.addData("Press (LEFT BUMPER) to select", "Launch 1 Ball!");
         ptt.addData("Press (RIGHT BUMPER) to select", "Launch 2 Balls!");
-
 
         // Alliance selection.
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));
@@ -178,10 +203,9 @@ public class DaisyLaunchAutonomous extends Robot
     @Override
     public void start()
     {
-        path = pathSetup(pathChoice);
-        deadReckonTask = new DeadReckonTask(this, path);
-
+        parkPath = pathSetup(pathChoice);
+        beaconPath = pathSetup(beaconChoice);
+        deadReckonParkTask = new DeadReckonTask(this, parkPath);
         addTask(runToPositionTask);
-        //addTask(deadReckonTask);
     }
 }
