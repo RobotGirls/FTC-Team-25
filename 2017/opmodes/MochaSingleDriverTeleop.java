@@ -47,10 +47,10 @@ public class MochaSingleDriverTeleop extends Robot {
         // Class factory.
         // ClassFactory.createEasyMotorController(this, leftTread, rightTread);
 
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Hook.
         sbod = hardwareMap.dcMotor.get("brush");
