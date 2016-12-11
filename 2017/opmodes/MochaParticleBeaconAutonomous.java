@@ -17,10 +17,14 @@ import team25core.SingleShotTimerTask;
 /**
  * Created by Lizzie on 11/19/2016.
  */
-@Autonomous(name = "Mocha Particle Beacon Autonomous", group = "AutoTest")
-public class MochaParticleBeaconAutonomous extends Robot {
+@Autonomous(name = "(S) Vertex (G) Particle Beacon", group = "5218")
+public class MochaParticleBeaconAutonomous extends Robot
+{
+    private final int TICKS_PER_INCH = MochaCalibration.TICKS_PER_INCH;
+    private final int TICKS_PER_DEGREE = MochaCalibration.TICKS_PER_DEGREE;
 
     private DcMotorController mc;
+
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor backLeft;
@@ -28,39 +32,62 @@ public class MochaParticleBeaconAutonomous extends Robot {
     private DcMotor shooterLeft;
     private DcMotor shooterRight;
     private DcMotor sbod;
+
     private int paddleCount;
 
-    private FourWheelDirectDriveDeadReckon positionBeacon;
-    private DeadReckonTask positionBeaconTask;
-    private RunToEncoderValueTask scoreCenterDeadReckonTask;
+    private RunToEncoderValueTask scoreCenterEncoderTask;
     private PeriodicTimerTask ptt;
 
+    private FourWheelDirectDriveDeadReckon positionForParticle;
+    private FourWheelDirectDriveDeadReckon moveToBeacon;
+    private FourWheelDirectDriveDeadReckon targetingLine;
 
     @Override
     public void handleEvent(RobotEvent e)
     {
-        if (paddleCount >= 10) {
-            ptt.stop();
-            stopShooter();
-            addTask(positionBeaconTask);
-        }
+        if (e instanceof RunToEncoderValueTask.RunToEncoderValueEvent) {
+            RunToEncoderValueTask.RunToEncoderValueEvent event = (RunToEncoderValueTask.RunToEncoderValueEvent) e;
 
+            if (event.kind == RunToEncoderValueTask.EventKind.DONE) {
+                if (paddleCount > 2) {
+                    // ptt.stop();
+                    RobotLog.i("163 Stopping the shooter");
+                    stopShooter();
+
+                    // TODO: Move to beacon dead reckon
+                    addTask(new DeadReckonTask(this, moveToBeacon) {
+                        @Override
+                        public void handleEvent(RobotEvent e) {
+                            RobotLog.i("163 Shooter is done, moving to beacon one");
+
+                            DeadReckonEvent event = (DeadReckonEvent)e;
+                            handleMovedToBeaconEvent(event);
+                        }
+                    });
+                } else {
+                    addTask(scoreCenterEncoderTask);
+                    paddleCount++;
+                }
+            }
+        }
+        /*
         if (e instanceof PeriodicTimerTask.PeriodicTimerEvent) {
             RobotLog.i("163 Period timer task expired, %d", paddleCount);
             paddleCount++;
-            addTask(scoreCenterDeadReckonTask);
         }
-
+        */
     }
 
     @Override
     public void init()
     {
         paddleCount = 0;
+
         frontLeft = hardwareMap.dcMotor.get("motorFL");
         frontRight = hardwareMap.dcMotor.get("motorFR");
         backLeft = hardwareMap.dcMotor.get("motorBL");
         backRight = hardwareMap.dcMotor.get("motorBR");
+
         shooterLeft = hardwareMap.dcMotor.get("shooterLeft");
         shooterRight = hardwareMap.dcMotor.get("shooterRight");
 
@@ -70,51 +97,97 @@ public class MochaParticleBeaconAutonomous extends Robot {
 
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        scoreCenterDeadReckonTask = new RunToEncoderValueTask(this, sbod, 1, .8);
-        ptt = new PeriodicTimerTask(this, 300);
+        scoreCenterEncoderTask = new RunToEncoderValueTask(this, sbod, 50, 0.8);
+        // ptt = new PeriodicTimerTask(this, 500);
 
-        positionBeacon = new FourWheelDirectDriveDeadReckon
-                (this, MochaCalibration.TICKS_PER_INCH, MochaCalibration.TICKS_PER_DEGREE, frontRight, backRight, frontLeft, backLeft);
-        positionBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 6, -.75);
-        positionBeacon.addSegment(DeadReckon.SegmentType.TURN, 45, -.3);
-        positionBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 47, -.75);
-        positionBeacon.addSegment(DeadReckon.SegmentType.TURN, 45, .3);
-        positionBeaconTask = new DeadReckonTask(this, positionBeacon);
+        positionForParticle = new FourWheelDirectDriveDeadReckon
+                (this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontRight, backRight, frontLeft, backLeft);
+        positionForParticle.addSegment(DeadReckon.SegmentType.STRAIGHT, 6, -0.65);
 
+        moveToBeacon = new FourWheelDirectDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontRight, backRight, frontLeft, backLeft);
+        moveToBeacon.addSegment(DeadReckon.SegmentType.TURN, 45, -0.3);
+        moveToBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 47, -0.65);
+        moveToBeacon.addSegment(DeadReckon.SegmentType.TURN, 45, 0.3);
+
+        targetingLine = new FourWheelDirectDriveDeadReckon
+                (this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontRight, backRight, frontLeft, backLeft);
+        targetingLine.addSegment(DeadReckon.SegmentType.STRAIGHT, 25, 0.65);
     }
 
     protected void startShooter()
     {
-        shooterLeft.setPower(.3);
-        shooterRight.setPower(-.3);
+        shooterLeft.setPower(0.45);
+        shooterRight.setPower(-0.45);
     }
 
     protected void stopShooter()
     {
         shooterLeft.setPower(0);
         shooterRight.setPower(0);
+
+        scoreCenterEncoderTask.stop();
     }
 
     @Override
     public void start()
     {
-        startShooter();
-        this.addTask(new SingleShotTimerTask(this, 3000) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                robot.addTask(ptt);
-                robot.addTask(scoreCenterDeadReckonTask);
+        addTask(new DeadReckonTask(this, positionForParticle) {
+            public void handleEvent(RobotEvent e)
+            {
+                DeadReckonEvent event = (DeadReckonEvent)e;
+                switch(event.kind) {
+                    case PATH_DONE:
+                        startShooter();
+                        addTask(new SingleShotTimerTask(robot, 2510) {
+                            @Override
+                            public void handleEvent(RobotEvent e)
+                            {
+                                // robot.addTask(ptt);
+                                robot.addTask(scoreCenterEncoderTask);
+                            }
+                        });
+                        break;
+                    default:
+                        RobotLog.e("163 Unknown event kind");
+                        break;
+                }
             }
         });
+    }
+
+    protected void handleMovedToBeaconEvent(DeadReckonTask.DeadReckonEvent e)
+    {
+        switch (e.kind) {
+            case PATH_DONE:
+                addTask(new DeadReckonTask(this, targetingLine) {
+                    @Override
+                    public void handleEvent(RobotEvent e) {
+                        RobotLog.i("163 Targeting the white line");
+
+                        DeadReckonEvent event = (DeadReckonEvent) e;
+                        handleFoundWhiteLine(event);
+                    }
+                });
+                break;
+            default:
+                break;
+        }
+    }
+
+    protected void handleFoundWhiteLine(DeadReckonTask.DeadReckonEvent e)
+    {
+        switch (e.kind) {
+            case PATH_DONE:
+                RobotLog.i("163 Robot finished moving to the white line");
+                break;
+        }
     }
 }
