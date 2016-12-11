@@ -14,7 +14,7 @@ import team25core.SingleShotTimerTask;
 /**
  * Created by Lizzie on 11/19/2016.
  */
-@Autonomous(name = "Mocha Particle Corner Autonomous", group = "AutoTest")
+@Autonomous(name = "(S) Corner (G) Particle", group = "5218")
 public class MochaParticleAutonomous extends Robot {
 
     private DcMotorController mc;
@@ -99,9 +99,5 @@ public class MochaParticleAutonomous extends Robot {
                 robot.addTask(scoreCenterDeadReckonTask);
             }
         });
-
-
     }
-
-
 }
