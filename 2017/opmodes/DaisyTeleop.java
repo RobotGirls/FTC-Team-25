@@ -3,10 +3,12 @@ package opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import team25core.FourWheelDriveTask;
 import team25core.GamepadTask;
+import team25core.MecanumWheelDriveTask;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -50,7 +52,7 @@ public class DaisyTeleop extends Robot
     private Servo rightPusher;
     private Servo odsSwinger;
 
-    private FourWheelDriveTask drive;
+    private MecanumWheelDriveTask drive;
     private PersistentTelemetryTask ptt;
     private RunToEncoderValueTask runToPositionTask;
 
@@ -110,6 +112,11 @@ public class DaisyTeleop extends Robot
         rightPusher.setPosition(rightPosition);
         odsSwinger.setPosition(0.7);
 
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
         runToPositionTask = new RunToEncoderValueTask(this, launcher, LAUNCH_POSITION, 1.0);
 
         slow = false;
@@ -122,7 +129,7 @@ public class DaisyTeleop extends Robot
     @Override
     public void start()
     {
-        drive = new FourWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
+        drive = new MecanumWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
         this.addTask(drive);
         this.addTask(ptt);
 
@@ -163,11 +170,11 @@ public class DaisyTeleop extends Robot
                     if (!slow) {
                        drive.slowDown(0.35);
                        slow = true;
-                        ptt.addData("Slow: ","true");
+                        ptt.addData("Slow","true");
                    } else {
                        drive.slowDown(false);
                        slow = false;
-                        ptt.addData("Slow: ","false");
+                        ptt.addData("Slow","false");
                    }
                 }
             }

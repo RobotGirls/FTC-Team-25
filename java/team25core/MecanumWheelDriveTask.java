@@ -20,6 +20,7 @@ public class MecanumWheelDriveTask extends RobotTask {
     public double fl;
     public double rr;
     public double rl;
+    public double slowMultiplier = 1;
 
     public MecanumWheelDriveTask(Robot robot, DcMotor frontLeft, DcMotor frontRight, DcMotor rearLeft, DcMotor rearRight)
     {
@@ -32,24 +33,41 @@ public class MecanumWheelDriveTask extends RobotTask {
         this.robot = robot;
     }
 
-    private void getJoystick()
-    {
+    private void getJoystick() {
         Gamepad gamepad;
         gamepad = robot.gamepad1;
 
+<<<<<<< HEAD
         // If joysticks are pointed left (negative joystick values), counter rotate wheels.
         // Threshold for joystick values in the x may vary.
+=======
+        // If joysticks are pointed left, counter rotate wheels.
+        // -1.0 assumes left temporarily.
+        // threshold for joystick values in the x may vary.
+>>>>>>> daisy
 
         if (gamepad.left_stick_x > 0.5 && gamepad.right_stick_x > 0.5) {
             fl = -gamepad.left_stick_x;
-            rl = fl * -1;
+            rl = gamepad.left_stick_x;
             fr = -gamepad.right_stick_x;
-            rr = fr * -1;
+            rr = gamepad.right_stick_x;
         } else if (gamepad.left_stick_x < -0.5 && gamepad.right_stick_x < -0.5) {
-            fl = gamepad.left_stick_x;
-            rl = -gamepad.left_stick_x;
-            fr = gamepad.right_stick_x;
-            rr = -gamepad.right_stick_x;
+            fl = -gamepad.left_stick_x;
+            rl = gamepad.left_stick_x;
+            fr = -gamepad.right_stick_x;
+            rr = gamepad.right_stick_x;
+        } else if (gamepad.right_trigger > 0.5) {
+            fr = -1.0;
+            rl = 1.0;
+        } else if (gamepad.left_trigger > 0.5) {
+            fl = 1.0;
+            rr = -1.0;
+        } else if (gamepad.left_bumper) {
+            fr = 1.0;
+            rl = -1.0;
+        } else if (gamepad.right_bumper) {
+            rr = 1.0;
+            fl = -1.0;
         } else {
             fl = gamepad.left_stick_y;
             rl = gamepad.left_stick_y;
@@ -64,6 +82,20 @@ public class MecanumWheelDriveTask extends RobotTask {
         // Nothing.
     }
 
+    public void slowDown(boolean slow)
+    {
+        if (slow) {
+            slowMultiplier = 0.5;
+        } else {
+            slowMultiplier = 1;
+        }
+    }
+
+    public void slowDown(double mult)
+    {
+        slowMultiplier = mult;
+    }
+
     @Override
     public void stop()
     {
@@ -75,10 +107,10 @@ public class MecanumWheelDriveTask extends RobotTask {
     {
         getJoystick();
 
-        frontLeft.setPower(fl);
-        rearLeft.setPower(rl);
-        frontRight.setPower(fr);
-        rearRight.setPower(rr);
+        frontLeft.setPower(fl * slowMultiplier);
+        rearLeft.setPower(rl * slowMultiplier);
+        frontRight.setPower(fr * slowMultiplier);
+        rearRight.setPower(rr * slowMultiplier);
         return false;
     }
 

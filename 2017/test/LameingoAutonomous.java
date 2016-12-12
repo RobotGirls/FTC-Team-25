@@ -60,7 +60,6 @@ public class LameingoAutonomous extends Robot
     private MRLightSensor frontLight;
     private MRLightSensor backLight;
 
-
     private DeadReckonTask nearBeaconTask;
     private DeadReckonTask lineDetectTurnTask;
     private DeadReckonTask farBeaconTask;
@@ -140,7 +139,6 @@ public class LameingoAutonomous extends Robot
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         lineDetectTurnPath.addSegment(DeadReckon.SegmentType.TURN, 60,  TURN_SPEED);
 
-
         // Optical Distance Sensor (front) setup.
         frontOds = hardwareMap.opticalDistanceSensor.get("frontLight");
         frontLight = new MRLightSensor(frontOds);
@@ -161,34 +159,34 @@ public class LameingoAutonomous extends Robot
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));
     }
 
+    private void doTurnOnLine() {
+        this.addTask(new DeadReckonTask(this, lineDetectTurnPath, lightCriteria) {
+            @Override
+            public void handleEvent(RobotEvent e)
+            {
+                DeadReckonEvent drEvent = (DeadReckonEvent) e;
+
+                if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
+                    robot.addTask(new DeadReckonTask(robot, beaconAlignTurn, backLightCriteria));
+                }
+            }
+        });
+    }
+
     @Override
     public void start()
     {
         this.addTask(new DeadReckonTask(this, approachNearBeacon, backLightCriteria) {
             @Override
-            public void handleEvent(RobotEvent e) {
+            public void handleEvent(RobotEvent e)
+            {
                 if (e instanceof DeadReckonTask.DeadReckonEvent) {
                     DeadReckonTask.DeadReckonEvent drEvent = (DeadReckonTask.DeadReckonEvent) e;
 
                     if (drEvent.kind == DeadReckonTask.EventKind.SENSOR_SATISFIED) {
                         doTurnOnLine();
-
                     }
                 }
-            }
-
-            private void doTurnOnLine() {
-                robot.addTask(new DeadReckonTask(robot, lineDetectTurnPath, lightCriteria) {
-                    @Override
-                    public void handleEvent(RobotEvent e)
-                    {
-                        DeadReckonEvent drEvent = (DeadReckonEvent) e;
-
-                        if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
-                            robot.addTask(new DeadReckonTask(robot, beaconAlignTurn, backLightCriteria));
-                        }
-                    }
-                });
             }
         });
     }
