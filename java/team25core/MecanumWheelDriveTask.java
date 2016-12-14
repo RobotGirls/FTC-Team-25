@@ -37,14 +37,8 @@ public class MecanumWheelDriveTask extends RobotTask {
         Gamepad gamepad;
         gamepad = robot.gamepad1;
 
-<<<<<<< HEAD
         // If joysticks are pointed left (negative joystick values), counter rotate wheels.
         // Threshold for joystick values in the x may vary.
-=======
-        // If joysticks are pointed left, counter rotate wheels.
-        // -1.0 assumes left temporarily.
-        // threshold for joystick values in the x may vary.
->>>>>>> daisy
 
         if (gamepad.left_stick_x > 0.5 && gamepad.right_stick_x > 0.5) {
             fl = -gamepad.left_stick_x;

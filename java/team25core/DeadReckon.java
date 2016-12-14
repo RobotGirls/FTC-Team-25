@@ -17,7 +17,9 @@ public abstract class DeadReckon {
 
     public enum SegmentType {
         STRAIGHT,
-        TURN
+        TURN,
+        SIDEWAYS,
+        DIAGONAL
     }
 
     public enum SegmentState {
@@ -73,6 +75,7 @@ public abstract class DeadReckon {
     protected abstract void encodersOn();
     protected abstract void motorStraight(double speed);
     protected abstract void motorTurn(double speed);
+    protected abstract void motorSideways(double speed);
     protected abstract void motorStop();
 
     protected abstract boolean isBusy();

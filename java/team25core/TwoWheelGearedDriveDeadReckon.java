@@ -95,6 +95,12 @@ public class TwoWheelGearedDriveDeadReckon extends DeadReckon {
     }
 
     @Override
+    protected void motorSideways(double speed)
+    {
+        // Unsupported operation.
+    }
+
+    @Override
     protected void motorStop()
     {
         if (mmt != null) {

@@ -77,6 +77,12 @@ public class FourWheelDirectDriveDeadReckon extends DeadReckon {
     }
 
     @Override
+    protected void motorSideways(double speed)
+    {
+        // Unsupported operation.
+    }
+
+    @Override
     protected void motorStop()
     {
         frontLeft.setPower(0.0);
