@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDriveDeadReckon;
+import team25core.GamepadTask;
 import team25core.PeriodicTimerTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -45,37 +46,12 @@ public class MochaParticleBeaconAutonomous extends Robot
     @Override
     public void handleEvent(RobotEvent e)
     {
-        if (e instanceof RunToEncoderValueTask.RunToEncoderValueEvent) {
+        if (e instanceof GamepadTask.GamepadEvent) {
+            // TODO: Combine autonomous programs
+        } else if (e instanceof RunToEncoderValueTask.RunToEncoderValueEvent) {
             RunToEncoderValueTask.RunToEncoderValueEvent event = (RunToEncoderValueTask.RunToEncoderValueEvent) e;
-
-            if (event.kind == RunToEncoderValueTask.EventKind.DONE) {
-                if (paddleCount > 2) {
-                    // ptt.stop();
-                    RobotLog.i("163 Stopping the shooter");
-                    stopShooter();
-
-                    // TODO: Move to beacon dead reckon
-                    addTask(new DeadReckonTask(this, moveToBeacon) {
-                        @Override
-                        public void handleEvent(RobotEvent e) {
-                            RobotLog.i("163 Shooter is done, moving to beacon one");
-
-                            DeadReckonEvent event = (DeadReckonEvent)e;
-                            handleMovedToBeaconEvent(event);
-                        }
-                    });
-                } else {
-                    addTask(scoreCenterEncoderTask);
-                    paddleCount++;
-                }
-            }
+            handlePaddleEncoderDoneEvent(event);
         }
-        /*
-        if (e instanceof PeriodicTimerTask.PeriodicTimerEvent) {
-            RobotLog.i("163 Period timer task expired, %d", paddleCount);
-            paddleCount++;
-        }
-        */
     }
 
     @Override
@@ -139,6 +115,10 @@ public class MochaParticleBeaconAutonomous extends Robot
     @Override
     public void start()
     {
+        initialMove();
+    }
+
+    protected void initialMove() {
         addTask(new DeadReckonTask(this, positionForParticle) {
             public void handleEvent(RobotEvent e)
             {
@@ -161,6 +141,32 @@ public class MochaParticleBeaconAutonomous extends Robot
                 }
             }
         });
+    }
+
+    protected void handlePaddleEncoderDoneEvent(RunToEncoderValueTask.RunToEncoderValueEvent e)
+    {
+        switch (e.kind) {
+            case DONE:
+                if (paddleCount >= 5) {
+                    // ptt.stop();
+                    RobotLog.i("163 Stopping the shooter");
+                    stopShooter();
+
+                    addTask(new DeadReckonTask(this, moveToBeacon) {
+                        @Override
+                        public void handleEvent(RobotEvent e) {
+                            RobotLog.i("163 Shooter is done, moving to beacon one");
+
+                            DeadReckonEvent event = (DeadReckonEvent) e;
+                            handleMovedToBeaconEvent(event);
+                        }
+                    });
+                } else {
+                        RobotLog.i("163 Paddle count expired, iteration %d");
+                    addTask(scoreCenterEncoderTask);
+                    paddleCount++;
+                }
+            }
     }
 
     protected void handleMovedToBeaconEvent(DeadReckonTask.DeadReckonEvent e)
