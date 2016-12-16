@@ -1,11 +1,8 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
-import com.qualcomm.robotcore.hardware.HardwareDevice;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.DeadReckon;
@@ -16,17 +13,12 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
-import team25core.SingleWheelDirectDriveDeadReckon;
-import team25core.Team25DcMotor;
 
 /**
  * Created by Lizzie on 11/19/2016.
  */
-@Autonomous(name = "Particle Park Vertex Autonomous", group = "AutoTest")
-@Disabled
-public class ParticleVortexAutonomous extends Robot {
-    private static final int TICKS_PER_DEGREE = 22;
-    private static final int TICKS_PER_INCH = 79;
+@Autonomous(name = "Mocha Particle Cap Ball Autonomous", group = "AutoTest")
+public class MochaParticleCapBallAutonomous extends Robot {
 
     private DcMotorController mc;
     private DcMotor frontLeft;
@@ -85,21 +77,20 @@ public class ParticleVortexAutonomous extends Robot {
         backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        scoreCenterDeadReckonTask = new RunToEncoderValueTask(this, sbod, 1, .7);
-        ptt = new PeriodicTimerTask(this, 350);
+        scoreCenterDeadReckonTask = new RunToEncoderValueTask(this, sbod, 1, .8);
+        ptt = new PeriodicTimerTask(this, 300);
 
         pushCapDeadReckon = new FourWheelDirectDriveDeadReckon
-                (this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontRight, backRight, frontLeft, backLeft);
-        pushCapDeadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 58, .75);
-        pushCapDeadReckon.addSegment(DeadReckon.SegmentType.TURN, 120, .75);
-        pushCapDeadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 85, .75);
+                (this, MochaCalibration.TICKS_PER_INCH, MochaCalibration.TICKS_PER_DEGREE, frontRight, backRight, frontLeft, backLeft);
+        pushCapDeadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 68, -.75);
         pushCapDeadReckonTask = new DeadReckonTask(this, pushCapDeadReckon);
     }
 
     protected void startShooter()
+
     {
-        shooterLeft.setPower(.3);
-        shooterRight.setPower(-.3);
+        shooterLeft.setPower(.575);
+        shooterRight.setPower(-.575);
     }
 
     protected void stopShooter()
