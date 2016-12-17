@@ -20,8 +20,8 @@ import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 
-@TeleOp(name="THANKSGIVING", group = "5218")
-public class RobbieTeleop extends Robot {
+@TeleOp(name="5218 Mocha", group = "5218")
+public class MochaTeleop extends Robot {
 
     private final static int LED_CHANNEL = 0;
 
@@ -49,13 +49,18 @@ public class RobbieTeleop extends Robot {
         // Class factory.
         // ClassFactory.createEasyMotorController(this, leftTread, rightTread);
 
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         shooterLeft = hardwareMap.dcMotor.get("shooterLeft");
         shooterRight = hardwareMap.dcMotor.get("shooterRight");
+
+        shooterLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooterLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooterRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooterRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Hook.
         sbod = hardwareMap.dcMotor.get("brush");
@@ -69,6 +74,7 @@ public class RobbieTeleop extends Robot {
 
     @Override
     public void handleEvent(RobotEvent e) {
+
     }
 
     @Override
@@ -92,17 +98,17 @@ public class RobbieTeleop extends Robot {
         addTask(dispenseSlow);
 
         // Shooters
-        DeadmanMotorTask shootFastLeft = new DeadmanMotorTask(this, shooterLeft, 0.9, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_X);
+        DeadmanMotorTask shootFastLeft = new DeadmanMotorTask(this, shooterLeft, 0.3, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_X);
         addTask(shootFastLeft);
-        DeadmanMotorTask shootFastRight = new DeadmanMotorTask(this, shooterRight, -0.9, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_X);
+        DeadmanMotorTask shootFastRight = new DeadmanMotorTask(this, shooterRight, -0.3, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_X);
         addTask(shootFastRight);
-        DeadmanMotorTask shootLeft = new DeadmanMotorTask(this, shooterLeft, 0.65, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
+        DeadmanMotorTask shootLeft = new DeadmanMotorTask(this, shooterLeft, 0.2, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
         addTask(shootLeft);
-        DeadmanMotorTask shootRight = new DeadmanMotorTask(this, shooterRight, -0.65, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
+        DeadmanMotorTask shootRight = new DeadmanMotorTask(this, shooterRight, -0.2, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
         addTask(shootRight);
-        DeadmanMotorTask shootSlowLeft = new DeadmanMotorTask(this, shooterLeft, 0.575, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
+        DeadmanMotorTask shootSlowLeft = new DeadmanMotorTask(this, shooterLeft, 0.15, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
         addTask(shootSlowLeft);
-        DeadmanMotorTask shootSlowRight = new DeadmanMotorTask(this, shooterRight, -0.575, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
+        DeadmanMotorTask shootSlowRight = new DeadmanMotorTask(this, shooterRight, -0.15, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
         addTask(shootSlowRight);
 
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
@@ -111,11 +117,7 @@ public class RobbieTeleop extends Robot {
 
                 if (event.kind == EventKind.LEFT_TRIGGER_DOWN) {
                     beacon.setPosition(1.0);
-                } else if (event.kind == EventKind.LEFT_TRIGGER_UP) {
-                    beacon.setPosition(0.5);
                 } else if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
-                    beacon.setPosition(1.0);
-                } else if (event.kind == EventKind.LEFT_BUMPER_UP) {
                     beacon.setPosition(0);
                 } else if (event.kind == EventKind.BUTTON_B_DOWN) {
                     drive.slowDown(true);
