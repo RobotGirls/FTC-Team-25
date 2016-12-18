@@ -123,6 +123,9 @@ public abstract class DeadReckon {
     {
         if (getCurrentSegment().type == SegmentType.STRAIGHT) {
             this.target = Math.abs((int)(getCurrentSegment().distance * encoderTicksPerInch));
+        } else if (getCurrentSegment().type == SegmentType.SIDEWAYS) {
+            // Eventually, we may have a encoder ticks per (sideways) inch... but for now, this:
+            this.target = Math.abs((int)(getCurrentSegment().distance * encoderTicksPerInch));
         } else {
             this.target = Math.abs((int)(getCurrentSegment().distance * encoderTicksPerDegree));
         }
