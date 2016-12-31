@@ -1,27 +1,21 @@
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import java.util.ServiceConfigurationError;
-
-import team25core.ColorSensorTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 
 /**
- * Created by Izzie on 2/10/2016.
+ * Created by Elizabeth on 12/27/2016.
  */
-@Autonomous(name = "Color Test", group="AutoTeam25")
-@Disabled
+@Autonomous(name = "Color Test 2", group="AutoTeam25")
 
-public class ColorTest extends Robot {
+public class ColorTest2 extends Robot {
 
-    private DeviceInterfaceModule cdim;
+    private DeviceInterfaceModule core;
     private ColorSensor color;
 
     @Override
@@ -31,11 +25,11 @@ public class ColorTest extends Robot {
 
     @Override
     public void init() {
-        cdim = hardwareMap.deviceInterfaceModule.get("interface");
+        core = hardwareMap.deviceInterfaceModule.get("cdim");
         color = hardwareMap.colorSensor.get("color");
 
-        cdim.setDigitalChannelMode(0, DigitalChannelController.Mode.OUTPUT);
-        cdim.setDigitalChannelState(0, false);
+        core.setDigitalChannelMode(0, DigitalChannelController.Mode.OUTPUT);
+        core.setDigitalChannelState(0, false);
     }
 
     @Override
