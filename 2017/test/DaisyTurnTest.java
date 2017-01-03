@@ -80,10 +80,8 @@ public class DaisyTurnTest extends Robot {
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         deadReckon = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        //frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        //rearLeft.setDirection(DcMotorSimple.Direction.FORWARD);
 
         deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, TURN_SPEED);
     }

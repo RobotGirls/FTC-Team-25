@@ -16,7 +16,6 @@ import team25core.RobotEvent;
  */
 
 @Autonomous(name = "Daisy: Mecanum Autonomous Test", group = "Team 25")
-@Disabled
 public class MecanumDeadReckonTest extends Robot
 {
     DcMotor frontLeft;
