@@ -33,11 +33,10 @@ public class DaisyBeaconAutonomous extends Robot
     private DcMotor conveyor;
     private Servo leftPusher;
     private Servo rightPusher;
+    private Servo swinger;
     private ColorSensor colorSensor;
     private OpticalDistanceSensor frontOds;
-    private OpticalDistanceSensor backOds;
     private MRLightSensor frontLight;
-    private MRLightSensor backLight;
     private DeviceInterfaceModule cdim;
     private DeadReckonTask deadReckonParkTask;
     private BeaconHelper helper;
@@ -45,6 +44,7 @@ public class DaisyBeaconAutonomous extends Robot
     private PersistentTelemetryTask ptt;
     private MecanumGearedDriveDeadReckon parkPath;
     private MecanumGearedDriveDeadReckon approachBeacon;
+    private MecanumGearedDriveDeadReckon approachNext;
     private MecanumGearedDriveDeadReckon lineDetect;
     private MecanumGearedDriveDeadReckon pushBeacon;
     private final int TICKS_PER_INCH = DaisyConfiguration.TICKS_PER_INCH;
@@ -141,16 +141,35 @@ public class DaisyBeaconAutonomous extends Robot
             launched = true;
         } else {
             // Begin to approach the beacon.
+            approachBeacon(approachBeacon, true);
 
-            this.addTask(new DeadReckonTask(this, approachBeacon) {
+        }
+    }
+
+    private void approachBeacon(MecanumGearedDriveDeadReckon path, boolean goToNext)
+    {
+        if (goToNext) {
+            this.addTask(new DeadReckonTask(this, path) {
                 @Override
-                public void handleEvent(RobotEvent e)
-                {
+                public void handleEvent(RobotEvent e) {
                     if (e instanceof DeadReckonTask.DeadReckonEvent) {
                         DeadReckonTask.DeadReckonEvent drEvent = (DeadReckonTask.DeadReckonEvent) e;
 
                         if (drEvent.kind == EventKind.PATH_DONE) {
                             detectLine();
+                        }
+                    }
+                }
+            });
+        } else {
+            this.addTask(new DeadReckonTask(this, path) {
+                @Override
+                public void handleEvent(RobotEvent e) {
+                    if (e instanceof DeadReckonTask.DeadReckonEvent) {
+                        DeadReckonTask.DeadReckonEvent drEvent = (DeadReckonTask.DeadReckonEvent) e;
+
+                        if (drEvent.kind == EventKind.PATH_DONE) {
+                           // park...
                         }
                     }
                 }
@@ -168,10 +187,24 @@ public class DaisyBeaconAutonomous extends Robot
 
                     if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
                         goPushBeacon();
+                        goToNextBeacon();
                     }
                 }
             }
         });
+    }
+
+    private void goToNextBeacon()
+    {
+        if (beaconChoice == AutonomousBeacon.BEACON_2) {
+            this.addTask(new SingleShotTimerTask(this, 4000) {
+                @Override
+                public void handleEvent(RobotEvent e)
+                {
+                    approachBeacon(approachNext, false);
+                }
+            });
+        }
     }
 
     private void goPushBeacon()
@@ -222,18 +255,21 @@ public class DaisyBeaconAutonomous extends Robot
     private void pathSetup(AutonomousBeacon beaconChoice)
     {
         if (beaconChoice == AutonomousBeacon.BEACON_1) {
-            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, STRAIGHT_SPEED);
+            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8, STRAIGHT_SPEED);
             approachBeacon.addSegment(DeadReckon.SegmentType.TURN, 90, -TURN_SPEED);
-            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 75, STRAIGHT_SPEED);
-            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 48, -STRAIGHT_SPEED);
+            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 73, STRAIGHT_SPEED);
+            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 46, -STRAIGHT_SPEED);
             lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 20, 0.1);
-            pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 9, -0.2);
+            pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7 , -0.2);
         } else if (beaconChoice == AutonomousBeacon.BEACON_2) {
-            approachBeacon.addSegment(DeadReckon.SegmentType.TURN, 45, TURN_SPEED * turnMultiplier);
-            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 64, STRAIGHT_SPEED);
-            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 5, STRAIGHT_SPEED);
-
-            // There should be another path later on for the second beacon, but one step at a time.
+            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8, STRAIGHT_SPEED);
+            approachBeacon.addSegment(DeadReckon.SegmentType.TURN, 90, -TURN_SPEED);
+            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 73, STRAIGHT_SPEED);
+            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 46, -STRAIGHT_SPEED);
+            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 20, 0.1);
+            pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, -0.2);
+            approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, -0.2);
+            approachNext.addSegment(DeadReckon.SegmentType.SIDEWAYS, 10, 0.8);
         }
     }
 
@@ -249,22 +285,25 @@ public class DaisyBeaconAutonomous extends Robot
         conveyor = hardwareMap.dcMotor.get("conveyor");
         leftPusher = hardwareMap.servo.get("leftPusher");
         rightPusher = hardwareMap.servo.get("rightPusher");
+        swinger = hardwareMap.servo.get("odsSwinger");
         colorSensor = hardwareMap.colorSensor.get("color");
         cdim = hardwareMap.deviceInterfaceModule.get("cdim");
 
         leftPusher.setPosition(LEFT_STOW_POS);
         rightPusher.setPosition(RIGHT_STOW_POS);
+        swinger.setPosition(0.7);
 
         // Optical Distance Sensor (front) setup.
         frontOds = hardwareMap.opticalDistanceSensor.get("frontLight");
         frontLight = new MRLightSensor(frontOds);
         frontLightCriteria = new OpticalDistanceSensorCriteria(frontLight, DaisyConfiguration.ODS_MIN, DaisyConfiguration.ODS_MAX);
 
-        // Line detect path setup.
+        // Path setup.
         lineDetect = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
         pushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
         approachBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
         parkPath = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        approachNext = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
 
         // Launch setup.
         runToPositionTask = new RunToEncoderValueTask(this, launcher, LAUNCH_POSITION, 1.0);

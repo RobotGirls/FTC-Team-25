@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import team25core.DeadReckon;
@@ -16,6 +17,7 @@ import team25core.SingleShotTimerTask;
  */
 
 @Autonomous(name = "Daisy: Blue Launch Autonomous", group = "Team25")
+@Disabled
 public class DaisyBlueLaunchAutonomous extends Robot
 {
     private DcMotor frontLeft;

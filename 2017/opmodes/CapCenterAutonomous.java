@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import team25core.DeadReckon;
@@ -13,6 +14,7 @@ import team25core.RobotEvent;
  * Created by Lizzie on 11/19/2016.
  */
 @Autonomous(name = "EASY 2 autonomous", group = "AutoTest")
+@Disabled
 
 public class CapCenterAutonomous extends Robot{
 

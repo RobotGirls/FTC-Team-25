@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
@@ -22,6 +23,7 @@ import team25core.Team25DcMotor;
  * Created by Lizzie on 11/19/2016.
  */
 @Autonomous(name = "Particle Corner Autonomous", group = "AutoTest")
+@Disabled
 public class CornerParticleAutonomous extends Robot {
     private static final int TICKS_PER_DEGREE = 22;
     private static final int TICKS_PER_INCH = 79;

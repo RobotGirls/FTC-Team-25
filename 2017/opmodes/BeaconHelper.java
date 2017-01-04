@@ -6,8 +6,10 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 
 import team25core.ColorSensorTask;
+import team25core.DeadReckonTask;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.SingleShotTimerTask;
 
 /**
  * FTC Team 25: Created by Katelyn Biesiadecki on 12/7/2016.
@@ -65,7 +67,6 @@ public class BeaconHelper
                 }
 
                 robot.removeTask(senseColorTask);
-                // add single shot timer task to wait for n seconds (wait for beacon to be pressed)
             }
         });
     }
