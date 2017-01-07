@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -43,6 +44,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 
 @Autonomous(name="Daisy: Turn Test", group="AutoTeam25")
+@Disabled
 public class DaisyTurnTest extends Robot {
 
     private DcMotor frontRight;

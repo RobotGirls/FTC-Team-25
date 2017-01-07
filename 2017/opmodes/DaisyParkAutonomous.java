@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import team25core.DeadReckon;
@@ -16,6 +17,7 @@ import team25core.RobotEvent;
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/5/2016.
  */
 @Autonomous(name = "Daisy: Park Autonomous", group = "Team25")
+@Disabled
 public class DaisyParkAutonomous extends Robot
 {
     private DcMotor frontLeft;

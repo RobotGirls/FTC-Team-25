@@ -25,7 +25,8 @@ import team25core.SingleShotTimerTask;
 /**
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/5/2016.
  */
-@Autonomous(name = "Daisy: Beacon Autonomous", group = "Team25")
+@Autonomous(name = "Daisy: Range Beacon Autonomous", group = "Team25")
+
 public class DaisyRangeBeaconAutonomous extends Robot
 {
     private DcMotor frontLeft;

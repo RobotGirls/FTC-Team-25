@@ -19,6 +19,7 @@ import team25core.SingleShotTimerTask;
  */
 
 @Autonomous(name = "Daisy: Red Launch Autonomous", group = "Team25")
+@Disabled
 public class DaisyRedLaunchAutonomous extends Robot
 {
     private DcMotor frontLeft;

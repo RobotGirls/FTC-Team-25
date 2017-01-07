@@ -21,6 +21,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 
 @TeleOp(name="Baby Mocha", group = "5218")
+@Disabled
 public class MochaSingleDriverTeleop extends Robot {
 
     private final static int LED_CHANNEL = 0;

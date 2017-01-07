@@ -16,7 +16,7 @@ import team25core.RobotEvent;
 /**
  * Created by Izzie on 2/10/2016.
  */
-@Autonomous(name = "Color Test", group="AutoTeam25")
+@Autonomous(name = "Color Test 2", group="AutoTeam25")
 @Disabled
 
 public class ColorTest extends Robot {

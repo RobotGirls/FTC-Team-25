@@ -21,6 +21,7 @@ import team25core.TwoWheelGearedDriveDeadReckon;
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/29/2016.
  */
 @Autonomous(name = "Lameingo: Red Beacon Test", group = "Team25")
+@Disabled
 public class LameingoBeaconTest extends Robot
 {
     DcMotor left;

@@ -53,7 +53,7 @@ public class CapCenterAutonomous extends Robot{
         parkCenterDeadReckon.addSegment(DeadReckon.SegmentType.TURN, 45, -.35);
         parkCenterDeadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 11, .75);
 
-        pushCapBallTask = new DeadReckonTask(this, pushCapBallDeadReckon);
+    //    pushCapBallTask = new DeadReckonTask(this, pushCapBallDeadReckon);
         parkCenterTask = new DeadReckonTask(this, parkCenterDeadReckon);
     }
 

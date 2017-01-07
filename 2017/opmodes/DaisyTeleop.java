@@ -108,8 +108,8 @@ public class DaisyTeleop extends Robot
         rightPusher = hardwareMap.servo.get("rightPusher");
         odsSwinger  = hardwareMap.servo.get("odsSwinger");
 
-        leftPusher.setPosition(leftPosition);
-        rightPusher.setPosition(rightPosition);
+        leftPusher.setPosition(DaisyConfiguration.LEFT_STOW_POS);
+        rightPusher.setPosition(DaisyConfiguration.RIGHT_STOW_POS);
         odsSwinger.setPosition(0.7);
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);

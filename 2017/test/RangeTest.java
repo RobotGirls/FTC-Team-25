@@ -1,6 +1,7 @@
 package test;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -16,6 +17,9 @@ import team25core.RobotEvent;
 /**
  * Created by elizabeth on 1/5/17.
  */
+
+@Autonomous(name = "Daisy: Range Test", group = "Team25")
+
 public class RangeTest extends Robot {
 
     public DistanceSensor rangeSensor;
@@ -27,26 +31,24 @@ public class RangeTest extends Robot {
     private DcMotor rearRight;
 
     @Override
-    public void init()
-    {
+    public void init() {
         rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
         rangeSensorCriteria = new RangeSensorCriteria(rangeSensor, 5);
+
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
         rearLeft = hardwareMap.dcMotor.get("rearLeft");
         rearRight = hardwareMap.dcMotor.get("rearRight");
 
-        MecanumGearedDriveDeadReckon path = new MecanumGearedDriveDeadReckon(this, DaisyConfiguration.TICKS_PER_INCH, DaisyConfiguration.TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        path.addSegment(DeadReckon.SegmentType.STRAIGHT, 20, DaisyConfiguration.STRAIGHT_SPEED);
+        path = new MecanumGearedDriveDeadReckon(this, DaisyConfiguration.TICKS_PER_INCH, DaisyConfiguration.TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        path.addSegment(DeadReckon.SegmentType.STRAIGHT, 20, -DaisyConfiguration.STRAIGHT_SPEED);
     }
 
     @Override
-    public void start()
-    {
+    public void start() {
         addTask(new DeadReckonTask(this, path, rangeSensorCriteria) {
             @Override
-            public void handleEvent(RobotEvent e)
-            {
+            public void handleEvent(RobotEvent e) {
                 DeadReckonEvent event = (DeadReckonEvent) e;
                 if (event.kind == EventKind.SENSOR_SATISFIED) {
                     RobotLog.i("Max distance reached", "stopping path");
@@ -56,8 +58,8 @@ public class RangeTest extends Robot {
     }
 
     @Override
-    public void handleEvent(RobotEvent e)
-    {
+    public void handleEvent(RobotEvent e) {
+
 
     }
 }
