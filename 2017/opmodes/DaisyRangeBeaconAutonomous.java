@@ -6,12 +6,15 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.GamepadTask;
+import team25core.GyroTask;
 import team25core.MRLightSensor;
 import team25core.MecanumGearedDriveDeadReckon;
 import team25core.OpticalDistanceSensorCriteria;
@@ -42,6 +45,7 @@ public class DaisyRangeBeaconAutonomous extends Robot
     private OpticalDistanceSensor frontOds;
     private MRLightSensor frontLight;
     private DistanceSensor rangeSensor;
+    private GyroSensor gyroSensor;
     private DeviceInterfaceModule cdim;
     private DeadReckonTask deadReckonParkTask;
     private BeaconHelper helper;
@@ -95,7 +99,97 @@ public class DaisyRangeBeaconAutonomous extends Robot
     }
 
     @Override
-    public void handleEvent(RobotEvent e) {
+    public void init()
+    {
+        // Hardware mapping.
+        frontLeft  = hardwareMap.dcMotor.get("frontLeft");
+        frontRight = hardwareMap.dcMotor.get("frontRight");
+        rearLeft   = hardwareMap.dcMotor.get("rearLeft");
+        rearRight  = hardwareMap.dcMotor.get("rearRight");
+        launcher = hardwareMap.dcMotor.get("launcher");
+        conveyor = hardwareMap.dcMotor.get("conveyor");
+        leftPusher = hardwareMap.servo.get("leftPusher");
+        rightPusher = hardwareMap.servo.get("rightPusher");
+        swinger = hardwareMap.servo.get("odsSwinger");
+        colorSensor = hardwareMap.colorSensor.get("color");
+        rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
+        gyroSensor = hardwareMap.gyroSensor.get("gyro");
+        cdim = hardwareMap.deviceInterfaceModule.get("cdim");
+
+
+        leftPusher.setPosition(LEFT_STOW_POS);
+        rightPusher.setPosition(RIGHT_STOW_POS);
+        swinger.setPosition(0.7);
+
+        // Optical Distance Sensor (front) setup.
+        frontOds = hardwareMap.opticalDistanceSensor.get("frontLight");
+        frontLight = new MRLightSensor(frontOds);
+        frontLightCriteria = new OpticalDistanceSensorCriteria(frontLight, DaisyConfiguration.ODS_MIN, DaisyConfiguration.ODS_MAX);
+
+        // Range Sensor setup.
+        rangeSensorCriteria = new RangeSensorCriteria(rangeSensor, 10);
+
+        // Path setup.
+        lineDetect = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        pushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        approachBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        parkPath = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        approachNext = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+
+        // Launch setup.
+        runToPositionTask = new RunToEncoderValueTask(this, launcher, LAUNCH_POSITION, 1.0);
+        launched = false;
+
+        // Reset encoders.
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launcher.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Single shot timer task for reloading launcher.
+        stt = new SingleShotTimerTask(this, 2000);
+
+        // Button pushers setup.
+        buttonPushers = new GeneralBeaconArms(leftPusher, rightPusher, LEFT_DEPLOY_POS,
+                RIGHT_DEPLOY_POS, LEFT_STOW_POS, RIGHT_STOW_POS, false);
+
+        // Telemetry setup.
+        ptt = new PersistentTelemetryTask(this);
+        this.addTask(ptt);
+        ptt.addData("Press (X) to select", "Blue alliance!");
+        ptt.addData("Press (B) to select", "Red alliance!");
+        ptt.addData("Press (A) to select", "Claim 1 Beacon!");
+        ptt.addData("Press (Y) to select", "Claim 2 Beacons!");
+        ptt.addData("Press (LEFT TRIGGER) to select", "Corner Park!");
+        ptt.addData("Press (RIGHT TRIGGER) to select", "Center Park!");
+        ptt.addData("Press (LEFT BUMPER) to select", "Launch 1 Ball!");
+        ptt.addData("Press (RIGHT BUMPER) to select", "Launch 2 Balls!");
+
+        // Alliance selection.
+        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));
+
+        // Gyro calibration.
+        gyroSensor.calibrate();
+    }
+
+    @Override
+    public void start()
+    {
+        pathSetup(pathChoice);
+        pathSetup(beaconChoice);
+        deadReckonParkTask = new DeadReckonTask(this, parkPath);
+        addTask(runToPositionTask);
+    }
+
+    @Override
+    public void handleEvent(RobotEvent e)
+    {
         if (e instanceof GamepadTask.GamepadEvent) {
             GamepadTask.GamepadEvent event = (GamepadTask.GamepadEvent) e;
 
@@ -145,9 +239,11 @@ public class DaisyRangeBeaconAutonomous extends Robot
             conveyor.setPower(0.5);
             addTask(stt);
             launched = true;
+            RobotLog.i("141 Reloading launcher.");
         } else {
             // Begin to approach the beacon.
             approachBeacon(approachBeacon, true);
+            RobotLog.i("141 Approaching 1st beacon.");
 
         }
     }
@@ -163,6 +259,7 @@ public class DaisyRangeBeaconAutonomous extends Robot
 
                         if (drEvent.kind == EventKind.PATH_DONE) {
                             detectLine();
+                            RobotLog.i("141 Detecting white line.");
                         }
                     }
                 }
@@ -192,8 +289,10 @@ public class DaisyRangeBeaconAutonomous extends Robot
                     DeadReckonEvent drEvent = (DeadReckonEvent) e;
 
                     if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
+                        ptt.addData("Gyro Heading", gyroSensor.getHeading());
                         goPushBeacon();
                         goToNextBeacon();
+                        RobotLog.i("141 Pushing first beacon.");
                     }
                 }
             }
@@ -208,6 +307,7 @@ public class DaisyRangeBeaconAutonomous extends Robot
                 public void handleEvent(RobotEvent e)
                 {
                     approachBeacon(approachNext, false);
+                    RobotLog.i("141 Approaching next beacon.");
                 }
             });
         }
@@ -244,6 +344,7 @@ public class DaisyRangeBeaconAutonomous extends Robot
             turnMultiplier = 1;
             alliance = Alliance.RED;
             helper = new BeaconHelper(this, BeaconHelper.Alliance.RED, buttonPushers, colorSensor, cdim);
+
         }
     }
 
@@ -265,104 +366,20 @@ public class DaisyRangeBeaconAutonomous extends Robot
         if (beaconChoice == AutonomousBeacon.BEACON_1) {
             approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8, STRAIGHT_SPEED);
             approachBeacon.addSegment(DeadReckon.SegmentType.TURN, 90, -TURN_SPEED);
-            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 73, STRAIGHT_SPEED);
+            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 65, STRAIGHT_SPEED);
             approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 46, -STRAIGHT_SPEED);
-            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 20, 0.1);
-            pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7 , -0.2);
+            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.1);
+            pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 20 , -0.2);
         } else if (beaconChoice == AutonomousBeacon.BEACON_2) {
             approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8, STRAIGHT_SPEED);
             approachBeacon.addSegment(DeadReckon.SegmentType.TURN, 90, -TURN_SPEED);
-            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 73, STRAIGHT_SPEED);
+            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 65, STRAIGHT_SPEED);
             approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 46, -STRAIGHT_SPEED);
-            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 20, 0.1);
-            pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, -0.2);
+            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.1);
+            pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 20, -0.2);
             approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, -0.2);
             approachNext.addSegment(DeadReckon.SegmentType.SIDEWAYS, 10, 0.8);
         }
     }
 
-    @Override
-    public void init()
-    {
-        // Hardware mapping.
-        frontLeft  = hardwareMap.dcMotor.get("frontLeft");
-        frontRight = hardwareMap.dcMotor.get("frontRight");
-        rearLeft   = hardwareMap.dcMotor.get("rearLeft");
-        rearRight  = hardwareMap.dcMotor.get("rearRight");
-        launcher = hardwareMap.dcMotor.get("launcher");
-        conveyor = hardwareMap.dcMotor.get("conveyor");
-        leftPusher = hardwareMap.servo.get("leftPusher");
-        rightPusher = hardwareMap.servo.get("rightPusher");
-        swinger = hardwareMap.servo.get("odsSwinger");
-        colorSensor = hardwareMap.colorSensor.get("color");
-        rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
-        cdim = hardwareMap.deviceInterfaceModule.get("cdim");
-
-
-        leftPusher.setPosition(LEFT_STOW_POS);
-        rightPusher.setPosition(RIGHT_STOW_POS);
-        swinger.setPosition(0.7);
-
-        // Optical Distance Sensor (front) setup.
-        frontOds = hardwareMap.opticalDistanceSensor.get("frontLight");
-        frontLight = new MRLightSensor(frontOds);
-        frontLightCriteria = new OpticalDistanceSensorCriteria(frontLight, DaisyConfiguration.ODS_MIN, DaisyConfiguration.ODS_MAX);
-
-        // Range Sensor setup.
-        rangeSensorCriteria = new RangeSensorCriteria(rangeSensor, 5);
-
-        // Path setup.
-        lineDetect = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        pushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        approachBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        parkPath = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        approachNext = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-
-        // Launch setup.
-        runToPositionTask = new RunToEncoderValueTask(this, launcher, LAUNCH_POSITION, 1.0);
-        launched = false;
-
-        // Reset encoders.
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        launcher.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        // Single shot timer task for reloading launcher.
-        stt = new SingleShotTimerTask(this, 2000);
-
-        // Button pushers setup.
-        buttonPushers = new GeneralBeaconArms(leftPusher, rightPusher, LEFT_DEPLOY_POS,
-                RIGHT_DEPLOY_POS, LEFT_STOW_POS, RIGHT_STOW_POS, false);
-
-        // Telemetry setup.
-        ptt = new PersistentTelemetryTask(this);
-        this.addTask(ptt);
-        ptt.addData("Press (X) to select", "Blue alliance!");
-        ptt.addData("Press (B) to select", "Red alliance!");
-        ptt.addData("Press (A) to select", "Claim 1 Beacon!");
-        ptt.addData("Press (Y) to select", "Claim 2 Beacons!");
-        ptt.addData("Press (LEFT TRIGGER) to select", "Corner Park!");
-        ptt.addData("Press (RIGHT TRIGGER) to select", "Center Park!");
-        ptt.addData("Press (LEFT BUMPER) to select", "Launch 1 Ball!");
-        ptt.addData("Press (RIGHT BUMPER) to select", "Launch 2 Balls!");
-
-        // Alliance selection.
-        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));
-    }
-
-    @Override
-    public void start()
-    {
-        pathSetup(pathChoice);
-        pathSetup(beaconChoice);
-        deadReckonParkTask = new DeadReckonTask(this, parkPath);
-        addTask(runToPositionTask);
-    }
-}
+   }

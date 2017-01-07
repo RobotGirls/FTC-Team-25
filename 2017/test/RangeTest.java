@@ -33,7 +33,7 @@ public class RangeTest extends Robot {
     @Override
     public void init() {
         rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
-        rangeSensorCriteria = new RangeSensorCriteria(rangeSensor, 5);
+        rangeSensorCriteria = new RangeSensorCriteria(rangeSensor, 15);
 
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
@@ -41,7 +41,7 @@ public class RangeTest extends Robot {
         rearRight = hardwareMap.dcMotor.get("rearRight");
 
         path = new MecanumGearedDriveDeadReckon(this, DaisyConfiguration.TICKS_PER_INCH, DaisyConfiguration.TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        path.addSegment(DeadReckon.SegmentType.STRAIGHT, 20, -DaisyConfiguration.STRAIGHT_SPEED);
+        path.addSegment(DeadReckon.SegmentType.STRAIGHT, 40, -0.4);
     }
 
     @Override

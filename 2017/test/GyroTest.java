@@ -1,6 +1,7 @@
 
 package test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
@@ -12,10 +13,11 @@ import team25core.RobotEvent;
 /**
  * Created by katie on 11/14/15.
  */
+@Autonomous(name = "Gyro Test", group = "Team 25")
 public class GyroTest extends Robot {
     GyroSensor sensor;
-    DcMotor leftMotor;
-    DcMotor rightMotor;
+    DcMotor frontLeft;
+    DcMotor frontRight;
 
     @Override
     public void handleEvent(RobotEvent e){
@@ -27,33 +29,33 @@ public class GyroTest extends Robot {
         sensor = hardwareMap.gyroSensor.get("gyroSensor");
         sensor.calibrate();
 
-        leftMotor = hardwareMap.dcMotor.get("leftMotor");
-        rightMotor = hardwareMap.dcMotor.get("rightMotor");
+        frontLeft = hardwareMap.dcMotor.get("frontLeft");
+        frontRight = hardwareMap.dcMotor.get("frontRight");
 
-        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
 
     @Override
     public void start() {
         /*
-        leftMotor.setPower(-0.3);
-        rightMotor.setPower(0.3);
+        frontLeft.setPower(-0.3);
+        frontRight.setPower(0.3);
 
         addTask(new GyroTask(this, sensor, -180, true) {
             public void handleEvent(RobotEvent e) {
                 GyroEvent event = (GyroEvent) e;
 
                 if (event.kind == EventKind.HIT_TARGET || event.kind == EventKind.PAST_TARGET) {
-                    leftMotor.setPower(0);
-                    rightMotor.setPower(0);
+                    frontLeft.setPower(0);
+                    frontRight.setPower(0);
                 } else if (event.kind == EventKind.THRESHOLD_80) {
-                    leftMotor.setPower(-0.1);
-                    rightMotor.setPower(0.1);
+                    frontLeft.setPower(-0.1);
+                    frontRight.setPower(0.1);
                 } else if (event.kind == EventKind.THRESHOLD_90) {
-                    leftMotor.setPower(-0.10);
-                    rightMotor.setPower(0.10);
+                    frontLeft.setPower(-0.10);
+                    frontRight.setPower(0.10);
                 }
             }
         });

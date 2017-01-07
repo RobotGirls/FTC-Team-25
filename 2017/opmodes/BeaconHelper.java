@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothClass;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.ColorSensorTask;
 import team25core.DeadReckonTask;
@@ -55,14 +56,17 @@ public class BeaconHelper
                 if (alliance == Alliance.RED) {
                     if (event.kind == ColorSensorTask.EventKind.RED) {
                         pushers.deploy(true);
+                        RobotLog.i("141 Detecting red");
                     } else if (event.kind == ColorSensorTask.EventKind.BLUE) {
                         pushers.deploy(false);
                     }
                 } else if (alliance == Alliance.BLUE) {
                     if (event.kind == ColorSensorTask.EventKind.BLUE) {
                         pushers.deploy(true);
+                        RobotLog.i("141 Detecting blue");
                     } else if (event.kind == ColorSensorTask.EventKind.RED) {
                         pushers.deploy(false);
+
                     }
                 }
 
