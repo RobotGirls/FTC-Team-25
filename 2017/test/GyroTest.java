@@ -61,8 +61,10 @@ public class GyroTest extends Robot {
         });
         */
 
+        frontLeft.setPower(1.0);
+        frontRight.setPower(1.0);
         // Display: gyro.
-        GyroTask displayGyro = new GyroTask(this, sensor, 360, true);
+        GyroTask displayGyro = new GyroTask(this, sensor, 90, true);
         this.addTask(displayGyro);
     }
 }

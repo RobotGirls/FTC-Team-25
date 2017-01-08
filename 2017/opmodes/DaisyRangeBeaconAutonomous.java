@@ -66,7 +66,9 @@ public class DaisyRangeBeaconAutonomous extends Robot
     private final double RIGHT_DEPLOY_POS = DaisyConfiguration.RIGHT_DEPLOY_POS;
     private final double RIGHT_STOW_POS = DaisyConfiguration.RIGHT_STOW_POS;
     private int turnMultiplier = 1;
+    private int gyroMultiplier = 1;
     private boolean launched;
+    private boolean enableGyroTest;
     private RunToEncoderValueTask runToPositionTask;
     private SingleShotTimerTask stt;
     OpticalDistanceSensorCriteria frontLightCriteria;
@@ -113,7 +115,7 @@ public class DaisyRangeBeaconAutonomous extends Robot
         swinger = hardwareMap.servo.get("odsSwinger");
         colorSensor = hardwareMap.colorSensor.get("color");
         rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
-        gyroSensor = hardwareMap.gyroSensor.get("gyro");
+        gyroSensor = hardwareMap.gyroSensor.get("gyroSensor");
         cdim = hardwareMap.deviceInterfaceModule.get("cdim");
 
 
@@ -171,11 +173,26 @@ public class DaisyRangeBeaconAutonomous extends Robot
         ptt.addData("Press (LEFT BUMPER) to select", "Launch 1 Ball!");
         ptt.addData("Press (RIGHT BUMPER) to select", "Launch 2 Balls!");
 
-        // Alliance selection.
+        // Alliance and autonomous choice selection.
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));
+        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2)
+        {
+            @Override
+            public void handleEvent(RobotEvent e)
+            {
+                GamepadEvent event = (GamepadEvent) e;
+                if (event.kind == EventKind.BUTTON_A_DOWN) {
+                    enableGyroTest = true;
+                } else if (event.kind == EventKind.BUTTON_B_DOWN) {
+                    enableGyroTest = false;
+                }
+            }
+        });
 
-        // Gyro calibration.
+     /*   // Gyro calibration.
+        enableGyroTest = false;
         gyroSensor.calibrate();
+        gyroSensor.resetZAxisIntegrator(); */
     }
 
     @Override
@@ -188,8 +205,7 @@ public class DaisyRangeBeaconAutonomous extends Robot
     }
 
     @Override
-    public void handleEvent(RobotEvent e)
-    {
+    public void handleEvent(RobotEvent e) {
         if (e instanceof GamepadTask.GamepadEvent) {
             GamepadTask.GamepadEvent event = (GamepadTask.GamepadEvent) e;
 
@@ -229,9 +245,36 @@ public class DaisyRangeBeaconAutonomous extends Robot
             if (event.kind == RunToEncoderValueTask.EventKind.DONE) {
                 handleEncoderEvent();
             }
-        }
+        } // else if (e instanceof GyroTask.GyroEvent) {
+            //handleGyroEvent(e);
+
+        //}
     }
 
+   /* private void handleGyroEvent(RobotEvent e)
+    {
+        GyroTask.GyroEvent event = (GyroTask.GyroEvent) e;
+        if (event.kind == GyroTask.EventKind.HIT_TARGET) {
+            RobotLog.i("141 Hit 90 degrees");
+
+            frontLeft.setPower(0);
+            rearLeft.setPower(0);
+            frontRight.setPower(0);
+            rearRight.setPower(0);
+            goPushBeacon();
+            goToNextBeacon();
+
+            // Call beacon pushing functions.
+        } else if (event.kind == GyroTask.EventKind.PAST_TARGET) {
+            frontLeft.setPower(-0.2 * gyroMultiplier);
+            rearLeft.setPower(-0.2 * gyroMultiplier);
+            frontRight.setPower(0.2 * gyroMultiplier);
+            rearRight.setPower(0.2 * gyroMultiplier);
+            gyroMultiplier *= -1;
+            addTask(new GyroTask(this, gyroSensor, 90, true));
+        }
+    }
+*/
     private void handleEncoderEvent()
     {
         if (!launched && actionChoice == AutonomousAction.LAUNCH_2) {
@@ -289,15 +332,41 @@ public class DaisyRangeBeaconAutonomous extends Robot
                     DeadReckonEvent drEvent = (DeadReckonEvent) e;
 
                     if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
+                        this.stop();
                         ptt.addData("Gyro Heading", gyroSensor.getHeading());
-                        goPushBeacon();
-                        goToNextBeacon();
-                        RobotLog.i("141 Pushing first beacon.");
+                            this.robot.addTask(new SingleShotTimerTask(this.robot, 700) {
+                                @Override
+                                public void handleEvent(RobotEvent e) {
+                                    adjustWithGyro();
+                                }
+                            });
+                            goPushBeacon();
+                            goToNextBeacon();
+                            RobotLog.i("141 Pushing first beacon.");
+                        }
+
                     }
                 }
-            }
         });
     }
+
+  /*  private void adjustWithGyro()
+    {
+        double error = Math.abs(90 - gyroSensor.getHeading());
+        RobotLog.i("141 Error %f", error);
+        if (error >= 3) {
+            RobotLog.i("141 Setting power to turn");
+            frontLeft.setPower(0.5);
+            rearLeft.setPower(0.5);
+            frontRight.setPower(-0.5);
+            rearRight.setPower(-0.5);
+            addTask(new GyroTask(this, gyroSensor, 90, true));
+        } else {
+            //goPushBeacon();
+            //goToNextBeacon();
+
+        }
+    } */
 
     private void goToNextBeacon()
     {
