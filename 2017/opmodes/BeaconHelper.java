@@ -44,7 +44,7 @@ public class BeaconHelper
     public void doBeaconWork()
     {
         //  Kick off beacon work.
-
+        RobotLog.i("141 Ready to sense color");
         robot.addTask(new ColorSensorTask(robot, color, cdim, false, true, 0) {
             @Override
             public void handleEvent(RobotEvent e) {
