@@ -24,6 +24,7 @@ public class BeaconHelper
     private ColorSensorTask senseColorTask;
     private ColorSensor color;
     private DeviceInterfaceModule cdim;
+    private boolean deployed = false;
 
     public enum Alliance {
         RED,
@@ -68,6 +69,27 @@ public class BeaconHelper
                         pushers.deploy(false);
 
                     }
+
+                    /* if (!deployed) {
+                        robot.addTask(new SingleShotTimerTask(robot, 3000) {
+                            @Override
+                            public void handleEvent(RobotEvent e)
+                            {
+                                pushers.stowAll();
+                            }
+                        });
+
+                        robot.addTask(new SingleShotTimerTask(robot, 8000) {
+
+                            @Override
+                            public void handleEvent(RobotEvent e)
+                            {
+                                doBeaconWork();
+                                deployed = true;
+                            }
+                        });
+                    } */
+
                 }
 
                 robot.removeTask(senseColorTask);

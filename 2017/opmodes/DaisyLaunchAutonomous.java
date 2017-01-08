@@ -75,7 +75,7 @@ public class DaisyLaunchAutonomous extends Robot
                 pathChoice = AutonomousPath.CORNER_PARK;
                 ptt.addData("AUTONOMOUS", "Corner Park");
             } else if (event.kind == GamepadTask.EventKind.RIGHT_TRIGGER_DOWN) {
-                pathChoice = AutonomousPath.CENTER_PARK;
+                pathChoice = AutonomousPath.LAUNCH;
                 ptt.addData("AUTONOMOUS", "Center Park");
             } else if (event.kind == GamepadTask.EventKind.LEFT_BUMPER_DOWN) {
                 actionChoice = AutonomousAction.LAUNCH_1;
@@ -121,7 +121,7 @@ public class DaisyLaunchAutonomous extends Robot
 
         if (pathChoice == AutonomousPath.CORNER_PARK) {
             path.addSegment(DeadReckon.SegmentType.STRAIGHT,  63, STRAIGHT_SPEED);
-            path.addSegment(DeadReckon.SegmentType.TURN,     155, TURN_SPEED * turnMultiplier);
+            path.addSegment(DeadReckon.SegmentType.TURN,     140, TURN_SPEED * turnMultiplier);
             path.addSegment(DeadReckon.SegmentType.STRAIGHT,  80, STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.CENTER_PARK) {
             path.addSegment(DeadReckon.SegmentType.STRAIGHT,  60, STRAIGHT_SPEED);
@@ -166,7 +166,7 @@ public class DaisyLaunchAutonomous extends Robot
         ptt.addData("Press (X) to select", "Blue alliance!");
         ptt.addData("Press (B) to select", "Red alliance!");
         ptt.addData("Press (LEFT TRIGGER) to select", "Corner Park!");
-        ptt.addData("Press (RIGHT TRIGGER) to select", "Center Park!");
+        ptt.addData("Press (RIGHT TRIGGER) to select", "Just launch!");
         ptt.addData("Press (LEFT BUMPER) to select", "Launch 1 Ball!");
         ptt.addData("Press (RIGHT BUMPER) to select", "Launch 2 Balls!");
 

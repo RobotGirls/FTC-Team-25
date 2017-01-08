@@ -119,7 +119,6 @@ public class DaisyRangeBeaconAutonomous extends Robot
         gyroSensor = hardwareMap.gyroSensor.get("gyroSensor");
         cdim = hardwareMap.deviceInterfaceModule.get("cdim");
 
-
         leftPusher.setPosition(LEFT_STOW_POS);
         rightPusher.setPosition(RIGHT_STOW_POS);
         swinger.setPosition(0.7);
@@ -388,7 +387,7 @@ public class DaisyRangeBeaconAutonomous extends Robot
     private void goToNextBeacon()
     {
         if (beaconChoice == AutonomousBeacon.BEACON_2 && goToNext) {
-            this.addTask(new SingleShotTimerTask(this, 4000) {
+            this.addTask(new SingleShotTimerTask(this, 7000) {
                 @Override
                 public void handleEvent(RobotEvent e)
                 {
@@ -451,21 +450,22 @@ public class DaisyRangeBeaconAutonomous extends Robot
     {
         if (beaconChoice == AutonomousBeacon.BEACON_1) {
             approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8, STRAIGHT_SPEED);
-            approachBeacon.addSegment(DeadReckon.SegmentType.TURN, 96, -TURN_SPEED);
-            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 60, STRAIGHT_SPEED);
-            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 46, -STRAIGHT_SPEED);
-            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.1);
+            approachBeacon.addSegment(DeadReckon.SegmentType.TURN, 90, -TURN_SPEED * turnMultiplier);
+            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 60, STRAIGHT_SPEED * turnMultiplier);
+            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 55, -STRAIGHT_SPEED);
+            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.1 * turnMultiplier);
             pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 30 , -0.2);
+
         } else if (beaconChoice == AutonomousBeacon.BEACON_2) {
             approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8, STRAIGHT_SPEED);
-            approachBeacon.addSegment(DeadReckon.SegmentType.TURN, 96, -TURN_SPEED);
-            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 60, STRAIGHT_SPEED);
-            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 46, -STRAIGHT_SPEED);
-            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.1);
+            approachBeacon.addSegment(DeadReckon.SegmentType.TURN, 90, -TURN_SPEED * turnMultiplier);
+            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 60, STRAIGHT_SPEED * turnMultiplier);
+            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 55, -STRAIGHT_SPEED);
+            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.1 * turnMultiplier);
             pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 30, -0.2);
             approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, 0.2);
-            approachNext.addSegment(DeadReckon.SegmentType.TURN, 5, -0.2);
-            approachNext.addSegment(DeadReckon.SegmentType.SIDEWAYS, 67, 0.8);
+            approachNext.addSegment(DeadReckon.SegmentType.TURN, 5, -0.2 * turnMultiplier);
+            approachNext.addSegment(DeadReckon.SegmentType.SIDEWAYS, 67, 0.8 * turnMultiplier);
         }
     }
 
