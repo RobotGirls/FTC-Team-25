@@ -37,6 +37,7 @@ public class GyroTask extends RobotTask {
     }
 
     protected int targetHeading = 0;
+    protected int pt = 5;
     protected GyroSensor sensor;
     protected boolean showHeading = false;
 
@@ -47,7 +48,7 @@ public class GyroTask extends RobotTask {
     public GyroTask(Robot robot, GyroSensor sensor, int targetHeading, boolean showHeading)
     {
         super(robot);
-        this.targetHeading = targetHeading;
+        this.targetHeading = targetHeading;  // Think cardinal: negative is ccw, positive is cw.
         this.sensor = sensor;
         this.showHeading = showHeading;
     }
@@ -57,14 +58,17 @@ public class GyroTask extends RobotTask {
         // sensor.resetZAxisIntegrator();
 
         if (targetHeading > 0) {
+            // Clockwise rotation.
             ((ModernRoboticsI2cGyro)sensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARDINAL);
         } else {
+            // Counter-clockwise rotation.
             ((ModernRoboticsI2cGyro)sensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARTESIAN);
         }
     }
 
     @Override
-    public void stop() {
+    public void stop()
+    {
         robot.removeTask(this);
     }
 
@@ -83,11 +87,27 @@ public class GyroTask extends RobotTask {
         GyroEvent errorUpdate = new GyroEvent(this, EventKind.ERROR_UPDATE, error);
         robot.queueEvent(errorUpdate);
 
+        if (targetHeading > 0) {
+            // Clockwise rotation.
+            if (error > 5) {
+                GyroEvent pastTarget = new GyroEvent(this, EventKind.PAST_TARGET);
+                robot.queueEvent(pastTarget);
+                return true;
+            }
+        } else {
+            // Counter-clockwise rotation.
+            if (error > 5) {
+                GyroEvent pastTarget = new GyroEvent(this, EventKind.PAST_TARGET);
+                robot.queueEvent(pastTarget);
+                return true;
+            }
+        }
+
         if (error == 0) {
             GyroEvent hitTarget = new GyroEvent(this, EventKind.HIT_TARGET);
             robot.queueEvent(hitTarget);
             return true;
-        } else if (error <= (absTarget * 0.80) && t_80 == null) {
+        }/*else if (error <= (absTarget * 0.80) && t_80 == null) {
             t_80 = new GyroEvent(this, EventKind.THRESHOLD_80);
             robot.queueEvent(t_80);
             return false;
@@ -99,12 +119,19 @@ public class GyroTask extends RobotTask {
             t_95 = new GyroEvent(this, EventKind.THRESHOLD_95);
             robot.queueEvent(t_95);
             return false;
-        } else if (error > 345) {
+        } else if (error >= pt) {
+            if (error > 180) {
+                pt = 5;
+            } else {
+                pt = 355;
+            }
             GyroEvent pastTarget = new GyroEvent(this, EventKind.PAST_TARGET);
             robot.queueEvent(pastTarget);
             return true;
-        } else {
+        }*/ else {
             return false;
         }
+
+
     }
 }

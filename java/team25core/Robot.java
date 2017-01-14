@@ -42,6 +42,13 @@ public abstract class Robot extends OpMode {
         return tasks.contains(task);
     }
 
+    public void dumpTask()
+    {
+        for (RobotTask t:tasks) {
+            RobotLog.i(t.toString());
+        }
+    }
+
     public void init()
     {
         // TODO: ??

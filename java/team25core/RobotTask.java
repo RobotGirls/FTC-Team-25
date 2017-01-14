@@ -5,6 +5,8 @@ package team25core;
  */
 
 
+import com.qualcomm.robotcore.util.RobotLog;
+
 public abstract class RobotTask {
 
     protected Robot robot;
@@ -18,6 +20,11 @@ public abstract class RobotTask {
 
     public abstract void start();
     public abstract void stop();
+
+    public String toString()
+    {
+        return this.getClass().getName();
+    }
 
     public void setEventListener(RobotEventListener listener)
     {
