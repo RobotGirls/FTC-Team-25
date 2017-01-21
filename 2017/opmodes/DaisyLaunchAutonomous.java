@@ -76,13 +76,13 @@ public class DaisyLaunchAutonomous extends Robot
                 ptt.addData("AUTONOMOUS", "Corner Park");
             } else if (event.kind == GamepadTask.EventKind.RIGHT_TRIGGER_DOWN) {
                 pathChoice = AutonomousPath.LAUNCH;
-                ptt.addData("AUTONOMOUS", "Center Park");
+                ptt.addData("LAUNCH", "Stay");
             } else if (event.kind == GamepadTask.EventKind.LEFT_BUMPER_DOWN) {
                 actionChoice = AutonomousAction.LAUNCH_1;
-                ptt.addData("AUTONOMOUS", "Launch 1 Ball");
+                ptt.addData("LAUNCH", "Launch 1 Ball");
             } else if (event.kind == GamepadTask.EventKind.RIGHT_BUMPER_DOWN) {
                 actionChoice = AutonomousAction.LAUNCH_2;
-                ptt.addData("AUTONOMOUS", "Launch 2 Balls");
+                ptt.addData("LAUNCH", "Launch 2 Balls");
             }
         }
 

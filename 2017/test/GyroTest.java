@@ -18,6 +18,8 @@ public class GyroTest extends Robot {
     GyroSensor sensor;
     DcMotor frontLeft;
     DcMotor frontRight;
+    DcMotor rearLeft;
+    DcMotor rearRight;
 
     @Override
     public void handleEvent(RobotEvent e){
@@ -31,6 +33,8 @@ public class GyroTest extends Robot {
 
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
+        rearLeft = hardwareMap.dcMotor.get("rearLeft");
+        rearRight = hardwareMap.dcMotor.get("rearRight");
 
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -62,7 +66,10 @@ public class GyroTest extends Robot {
         */
 
         frontLeft.setPower(1.0);
+        rearLeft.setPower(1.0);
         frontRight.setPower(1.0);
+        rearRight.setPower(1.0);
+
         // Display: gyro.
         GyroTask displayGyro = new GyroTask(this, sensor, 90, true);
         this.addTask(displayGyro);

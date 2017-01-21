@@ -6,7 +6,13 @@ package opmodes;
 
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class GeneralBeaconArms {
+import team25core.Robot;
+import team25core.RobotEvent;
+import team25core.SingleShotTimerTask;
+
+public class GeneralBeaconArms
+{
+    Robot robot;
     Servo right;
     Servo left;
     double leftDeployPos;
@@ -24,6 +30,18 @@ public class GeneralBeaconArms {
         this.leftStowPos = leftStowPos;
         this.rightStowPos = rightStowPos;
         this.sensorOnLeft = isSensorOnLeft;
+    }
+
+    public GeneralBeaconArms(Robot robot, Servo left, Servo right, double leftDeployPos, double rightDeployPos,
+                             double leftStowPos, double rightStowPos, boolean isSensorOnLeft) {
+        this.left = left;
+        this.right = right;
+        this.leftDeployPos = leftDeployPos;
+        this.rightDeployPos = rightDeployPos;
+        this.leftStowPos = leftStowPos;
+        this.rightStowPos = rightStowPos;
+        this.sensorOnLeft = isSensorOnLeft;
+        this.robot = robot;
     }
 
     // Alternatively, you could pass in your alliance color
@@ -46,6 +64,13 @@ public class GeneralBeaconArms {
     public void deployLeft()
     {
         left.setPosition(leftDeployPos);
+        robot.addTask(new SingleShotTimerTask(robot, 2000) {
+           @Override
+            public void handleEvent(RobotEvent e)
+           {
+
+           }
+        });
     }
 
     public void deployRight()

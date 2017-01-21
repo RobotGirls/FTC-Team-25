@@ -45,7 +45,7 @@ public class BeaconHelper
     public void doBeaconWork()
     {
         //  Kick off beacon work.
-        RobotLog.i("141 Ready to sense color");
+        RobotLog.i("141 Ready to sense color.");
         robot.addTask(new ColorSensorTask(robot, color, cdim, false, true, 0) {
             @Override
             public void handleEvent(RobotEvent e) {
@@ -57,42 +57,34 @@ public class BeaconHelper
                 if (alliance == Alliance.RED) {
                     if (event.kind == ColorSensorTask.EventKind.RED) {
                         pushers.deploy(true);
-                        RobotLog.i("141 Detecting red");
+                        RobotLog.i("141 Detecting red.");
                     } else if (event.kind == ColorSensorTask.EventKind.BLUE) {
                         pushers.deploy(false);
                     }
                 } else if (alliance == Alliance.BLUE) {
                     if (event.kind == ColorSensorTask.EventKind.BLUE) {
                         pushers.deploy(true);
-                        RobotLog.i("141 Detecting blue");
+                        RobotLog.i("141 Detecting blue.");
                     } else if (event.kind == ColorSensorTask.EventKind.RED) {
                         pushers.deploy(false);
-
                     }
-
-                    /* if (!deployed) {
-                        robot.addTask(new SingleShotTimerTask(robot, 3000) {
-                            @Override
-                            public void handleEvent(RobotEvent e)
-                            {
-                                pushers.stowAll();
-                            }
-                        });
-
-                        robot.addTask(new SingleShotTimerTask(robot, 8000) {
-
-                            @Override
-                            public void handleEvent(RobotEvent e)
-                            {
-                                doBeaconWork();
-                                deployed = true;
-                            }
-                        });
-                    } */
-
                 }
 
+                waitAndStow();
+
                 robot.removeTask(senseColorTask);
+            }
+        });
+    }
+
+    private void waitAndStow()
+    {
+        robot.addTask(new SingleShotTimerTask(robot, 3000) {
+            @Override
+            public void handleEvent(RobotEvent e)
+            {
+                RobotLog.i("141 Stowing all pushers.");
+                pushers.stowAll();
             }
         });
     }
