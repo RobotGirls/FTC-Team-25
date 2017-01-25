@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import team25core.DeadmanMotorTask;
@@ -13,6 +14,7 @@ import team25core.RobotEvent;
  */
 
 @Autonomous(name = "Daisy: Setup for Autonomous", group = "Team25")
+@Disabled
 public class DaisySetupTeleop extends Robot
 {
     /*

@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
@@ -23,6 +24,7 @@ import team25core.SingleShotTimerTask;
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/5/2016.
  */
 @Autonomous(name = "Daisy: Beacon Autonomous", group = "Team25")
+@Disabled
 public class DaisyBeaconAutonomous extends Robot
 {
     private DcMotor frontLeft;

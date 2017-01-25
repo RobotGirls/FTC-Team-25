@@ -2,6 +2,7 @@ package test;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -19,6 +20,7 @@ import team25core.RobotEvent;
  */
 
 @Autonomous(name = "Daisy: Range Test", group = "Team25")
+@Disabled
 
 public class RangeTest extends Robot {
 

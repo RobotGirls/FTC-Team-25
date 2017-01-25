@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.GyroSensor;
+import com.qualcomm.robotcore.hardware.I2cController;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -56,7 +57,9 @@ public class DaisyRangeBeaconAutonomous extends Robot
     private MecanumGearedDriveDeadReckon approachBeacon;
     private MecanumGearedDriveDeadReckon approachNext;
     private MecanumGearedDriveDeadReckon lineDetect;
-    private MecanumGearedDriveDeadReckon pushBeacon;
+    private MecanumGearedDriveDeadReckon secondLineDetect;
+    //private MecanumGearedDriveDeadReckon pushBeacon;
+    //private MecanumGearedDriveDeadReckon secondPushBeacon;
     private MecanumGearedDriveDeadReckon adjustTurn;
     private final int TICKS_PER_INCH = Daisy.TICKS_PER_INCH;
     private final int TICKS_PER_DEGREE = Daisy.TICKS_PER_DEGREE;
@@ -69,6 +72,7 @@ public class DaisyRangeBeaconAutonomous extends Robot
     private final double RIGHT_STOW_POS = Daisy.RIGHT_STOW_POS;
     private int turnMultiplier = 1;
     private int gyroMultiplier = 1;
+    private int target;
     private boolean launched;
     private boolean enableGyroTest;
     private boolean goToNext;
@@ -76,6 +80,11 @@ public class DaisyRangeBeaconAutonomous extends Robot
     private SingleShotTimerTask stt;
     OpticalDistanceSensorCriteria frontLightCriteria;
     RangeSensorCriteria rangeSensorCriteria;
+
+    I2cController.I2cPortReadyCallback colorSensorCallback;
+    I2cController.I2cPortReadyCallback rangeSensorCallback;
+    private int colorPort = 0;
+    private int rangePort = 2;
 
     private Alliance alliance = Alliance.RED;
     private AutonomousPath pathChoice = AutonomousPath.STAY;
@@ -94,6 +103,7 @@ public class DaisyRangeBeaconAutonomous extends Robot
     }
 
     public enum AutonomousAction {
+        LAUNCH_0,
         LAUNCH_1,
         LAUNCH_2,
     }
@@ -121,6 +131,10 @@ public class DaisyRangeBeaconAutonomous extends Robot
         gyroSensor = hardwareMap.gyroSensor.get("gyroSensor");
         cdim = hardwareMap.deviceInterfaceModule.get("cdim");
 
+        // Callback.
+        this.colorSensorCallback = cdim.getI2cPortReadyCallback(colorPort);
+        this.rangeSensorCallback = cdim.getI2cPortReadyCallback(rangePort);
+
         // Initialize pushers.
         leftPusher.setPosition(LEFT_STOW_POS);
         rightPusher.setPosition(RIGHT_STOW_POS);
@@ -132,11 +146,13 @@ public class DaisyRangeBeaconAutonomous extends Robot
         frontLightCriteria = new OpticalDistanceSensorCriteria(frontLight, Daisy.ODS_MIN, Daisy.ODS_MAX);
 
         // Range Sensor setup.
-        rangeSensorCriteria = new RangeSensorCriteria(rangeSensor, 9);
+        rangeSensorCriteria = new RangeSensorCriteria(rangeSensor, 8);
 
         // Path setup.
         lineDetect = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        pushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        secondLineDetect = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        //pushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        //secondPushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
         approachBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
         parkPath = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
         approachNext = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
@@ -172,8 +188,8 @@ public class DaisyRangeBeaconAutonomous extends Robot
         ptt.addData("Press (B) to select", "Red alliance!");
         ptt.addData("Press (A) to select", "Claim 1 Beacon!");
         ptt.addData("Press (Y) to select", "Claim 2 Beacons!");
-        ptt.addData("Press (LEFT TRIGGER) to select", "Corner Park!");
         ptt.addData("Press (RIGHT TRIGGER) to select", "Center Park!");
+        ptt.addData("Press (LEFT TRIGGER) to select", "Launch 0 Balls!");
         ptt.addData("Press (LEFT BUMPER) to select", "Launch 1 Ball!");
         ptt.addData("Press (RIGHT BUMPER) to select", "Launch 2 Balls!");
 
@@ -194,7 +210,13 @@ public class DaisyRangeBeaconAutonomous extends Robot
         deadReckonParkTask = new DeadReckonTask(this, parkPath);
 
         // Launch first particle.
-        addTask(runToPositionTask);
+       if (actionChoice != AutonomousAction.LAUNCH_0) {
+           addTask(runToPositionTask);
+       } else {
+           approachBeacon(approachBeacon, lineDetect);
+           RobotLog.i("141 Approaching first beacon.");
+       }
+
     }
 
     @Override
@@ -210,8 +232,8 @@ public class DaisyRangeBeaconAutonomous extends Robot
                 selectAlliance(Alliance.RED);
                 ptt.addData("ALLIANCE", "Red");
             } else if (event.kind == GamepadTask.EventKind.LEFT_TRIGGER_DOWN) {
-                pathChoice = AutonomousPath.CORNER_PARK;
-                ptt.addData("PARK", "Corner Park");
+                actionChoice = AutonomousAction.LAUNCH_0;
+                ptt.addData("LAUNCH", "Launch 0 Balls");
             } else if (event.kind == GamepadTask.EventKind.RIGHT_TRIGGER_DOWN) {
                 pathChoice = AutonomousPath.CENTER_PARK;
                 ptt.addData("PARK", "Center Park");
@@ -243,10 +265,6 @@ public class DaisyRangeBeaconAutonomous extends Robot
             conveyor.setPower(0);
             addTask(runToPositionTask);
         }
-
-        else if (e instanceof GyroTask.GyroEvent) {
-            checkAlignment(e);
-        }
     }
 
     private void handleEncoderEvent()
@@ -259,13 +277,13 @@ public class DaisyRangeBeaconAutonomous extends Robot
             RobotLog.i("141 Reloading launcher.");
         } else {
             // Begin to approach the beacon.
-            approachBeacon(approachBeacon);
+            approachBeacon(approachBeacon, lineDetect);
             RobotLog.i("141 Approaching first beacon.");
 
         }
     }
 
-    private void approachBeacon(MecanumGearedDriveDeadReckon path)
+    private void approachBeacon(MecanumGearedDriveDeadReckon path, final MecanumGearedDriveDeadReckon detectLinePath)
     {
         this.addTask(new DeadReckonTask(this, path) {
             @Override
@@ -275,17 +293,20 @@ public class DaisyRangeBeaconAutonomous extends Robot
 
                     if (drEvent.kind == EventKind.PATH_DONE) {
                         RobotLog.i("141 Approached beacon.");
-                        detectLine();
+                        detectLine(detectLinePath);
                     }
                 }
             }
         });
     }
 
-    private void detectLine()
+    private void detectLine(MecanumGearedDriveDeadReckon path)
     {
         RobotLog.i("141 Attempting to detect white line.");
-        this.addTask(new DeadReckonTask(this, lineDetect, frontLightCriteria) {
+        cdim.deregisterForPortReadyCallback(colorPort);
+        cdim.deregisterForPortReadyCallback(rangePort);
+
+        this.addTask(new DeadReckonTask(this, path, frontLightCriteria) {
             @Override
             public void handleEvent(RobotEvent e)
             {
@@ -303,44 +324,24 @@ public class DaisyRangeBeaconAutonomous extends Robot
                         }
                     });
                     RobotLog.i("141 Detected white line.");
-                } else {
+                } else if (drEvent.kind == EventKind.PATH_DONE) {
+                    RobotLog.i("141 Line detect path done.");
+
                     // Missed white line, try again.
                 }
             }
         });
     }
 
-    private void checkAlignment(RobotEvent e)
-    {
-        GyroTask.GyroEvent event = (GyroTask.GyroEvent) e;
-        if (event.kind == GyroTask.EventKind.HIT_TARGET) {
-            RobotLog.i("141 Hit 90 degrees and aligned.");
-            frontLeft.setPower(0);
-            rearLeft.setPower(0);
-            frontRight.setPower(0);
-            rearRight.setPower(0);
-            goPushBeacon();
-            goToNextBeacon();
-        } else if (event.kind == GyroTask.EventKind.PAST_TARGET) {
-            RobotLog.i("141 Past 90 degrees; re-aligning.");
-            frontLeft.setPower(-0.1 * gyroMultiplier);
-            rearLeft.setPower(-0.1 * gyroMultiplier);
-            frontRight.setPower(0.1 * gyroMultiplier);
-            rearRight.setPower(0.1 * gyroMultiplier);
-            gyroMultiplier *= -1;
-            addTask(new GyroTask(this, gyroSensor, 90, true));
-        }
-    }
-
     private void adjustWithGyro()
     {
-        double error = 90 - gyroSensor.getHeading();
+        double error = target - gyroSensor.getHeading();
         RobotLog.i("141 Gyro heading %d", gyroSensor.getHeading());
         RobotLog.i("141 Beacon angle error of %f degrees", error);
 
-        if (error >= 7) {
+        if (error >= 2) {
             RobotLog.i("141 Adjusting angle by turning.");
-            adjustTurn.addSegment(DeadReckon.SegmentType.TURN, error, -0.05);
+            adjustTurn.addSegment(DeadReckon.SegmentType.TURN, error, -0.1 * turnMultiplier);
 
             this.addTask(new DeadReckonTask(this, adjustTurn) {
                 @Override
@@ -352,9 +353,9 @@ public class DaisyRangeBeaconAutonomous extends Robot
                     }
                 }
             });
-        } else if (error <= -7) {
+        } else if (error <= -2) {
             RobotLog.i("141 Adjusting angle by turning.");
-            adjustTurn.addSegment(DeadReckon.SegmentType.TURN, error, 0.05);
+            adjustTurn.addSegment(DeadReckon.SegmentType.TURN, error, 0.1 * turnMultiplier);
 
             this.addTask(new DeadReckonTask(this, adjustTurn) {
                 @Override
@@ -367,6 +368,9 @@ public class DaisyRangeBeaconAutonomous extends Robot
             });
         } else {
             RobotLog.i("141 Aligned and pushing.");
+            cdim.registerForI2cPortReadyCallback(colorSensorCallback, colorPort);
+            cdim.registerForI2cPortReadyCallback(rangeSensorCallback, rangePort);
+
             goPushBeacon();
             goToNextBeacon();
         }
@@ -375,6 +379,9 @@ public class DaisyRangeBeaconAutonomous extends Robot
     private void goPushBeacon()
     {
         RobotLog.i("141 Inside goPushBeacon()");
+        MecanumGearedDriveDeadReckon pushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 30, -0.2);
+
         this.addTask(new DeadReckonTask(this, pushBeacon, rangeSensorCriteria) {
             @Override
             public void handleEvent(RobotEvent e) {
@@ -402,7 +409,7 @@ public class DaisyRangeBeaconAutonomous extends Robot
                 @Override
                 public void handleEvent(RobotEvent e)
                 {
-                    approachBeacon(approachNext);
+                    approachBeacon(approachNext, secondLineDetect);
                     RobotLog.i("141 Approaching second beacon.");
                 }
             });
@@ -419,12 +426,14 @@ public class DaisyRangeBeaconAutonomous extends Robot
             alliance = Alliance.BLUE;
             helper = new BeaconHelper(this, BeaconHelper.Alliance.BLUE, buttonPushers, colorSensor, cdim);
             ((ModernRoboticsI2cGyro)gyroSensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARTESIAN);
+            target = 90;
         } else {
             // Do red setup.
             turnMultiplier = 1;
             alliance = Alliance.RED;
             helper = new BeaconHelper(this, BeaconHelper.Alliance.RED, buttonPushers, colorSensor, cdim);
             ((ModernRoboticsI2cGyro)gyroSensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARDINAL);
+            target = 270;
         }
     }
 
@@ -444,19 +453,18 @@ public class DaisyRangeBeaconAutonomous extends Robot
         if (beaconChoice == AutonomousBeacon.BEACON_1) {
             approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT,  8, STRAIGHT_SPEED);
             approachBeacon.addSegment(DeadReckon.SegmentType.TURN,     90, -TURN_SPEED * turnMultiplier);
-            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 60, STRAIGHT_SPEED * turnMultiplier);
-            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 55, -STRAIGHT_SPEED);
-            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.1 * turnMultiplier);
-            pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 30 , -0.2);
+            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 55, STRAIGHT_SPEED * turnMultiplier);
+            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 50, -STRAIGHT_SPEED);
+            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.2 * turnMultiplier);
         } else if (beaconChoice == AutonomousBeacon.BEACON_2) {
             approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8, STRAIGHT_SPEED);
             approachBeacon.addSegment(DeadReckon.SegmentType.TURN, 90, -TURN_SPEED * turnMultiplier);
-            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 60, STRAIGHT_SPEED * turnMultiplier);
-            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 55, -STRAIGHT_SPEED);
-            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.1 * turnMultiplier);
-            pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 30, -0.2);
-            approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, 0.2);
-            approachNext.addSegment(DeadReckon.SegmentType.TURN, 5, -0.2 * turnMultiplier);
+            approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 55, STRAIGHT_SPEED * turnMultiplier);
+            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 50, -STRAIGHT_SPEED);
+            lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.2 * turnMultiplier);
+            secondLineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.2 * turnMultiplier);
+            approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT, 13, 0.2);
+            //approachNext.addSegment(DeadReckon.SegmentType.TURN, 5, -0.2 * turnMultiplier);
             approachNext.addSegment(DeadReckon.SegmentType.SIDEWAYS, 67, 0.8 * turnMultiplier);
 
             goToNext = true;
