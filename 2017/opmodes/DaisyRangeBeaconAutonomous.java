@@ -72,6 +72,7 @@ public class DaisyRangeBeaconAutonomous extends Robot
     private final double RIGHT_STOW_POS = DaisyConfiguration.RIGHT_STOW_POS;
     private int turnMultiplier = 1;
     private int gyroMultiplier = 1;
+    private int target;
     private boolean launched;
     private boolean enableGyroTest;
     private boolean goToNext;
@@ -145,7 +146,7 @@ public class DaisyRangeBeaconAutonomous extends Robot
         frontLightCriteria = new OpticalDistanceSensorCriteria(frontLight, DaisyConfiguration.ODS_MIN, DaisyConfiguration.ODS_MAX);
 
         // Range Sensor setup.
-        rangeSensorCriteria = new RangeSensorCriteria(rangeSensor, 10);
+        rangeSensorCriteria = new RangeSensorCriteria(rangeSensor, 8);
 
         // Path setup.
         lineDetect = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
@@ -264,10 +265,6 @@ public class DaisyRangeBeaconAutonomous extends Robot
             conveyor.setPower(0);
             addTask(runToPositionTask);
         }
-
-        else if (e instanceof GyroTask.GyroEvent) {
-            checkAlignment(e);
-        }
     }
 
     private void handleEncoderEvent()
@@ -336,37 +333,11 @@ public class DaisyRangeBeaconAutonomous extends Robot
         });
     }
 
-    private void checkAlignment(RobotEvent e)
-    {
-        GyroTask.GyroEvent event = (GyroTask.GyroEvent) e;
-        if (event.kind == GyroTask.EventKind.HIT_TARGET) {
-            RobotLog.i("141 Hit 90 degrees and aligned.");
-            frontLeft.setPower(0);
-            rearLeft.setPower(0);
-            frontRight.setPower(0);
-            rearRight.setPower(0);
-            goPushBeacon();
-            goToNextBeacon();
-        } else if (event.kind == GyroTask.EventKind.PAST_TARGET) {
-            RobotLog.i("141 Past 90 degrees; re-aligning.");
-            frontLeft.setPower(-0.1 * gyroMultiplier);
-            rearLeft.setPower(-0.1 * gyroMultiplier);
-            frontRight.setPower(0.1 * gyroMultiplier);
-            rearRight.setPower(0.1 * gyroMultiplier);
-            gyroMultiplier *= -1;
-            addTask(new GyroTask(this, gyroSensor, 90, true));
-        }
-    }
-
     private void adjustWithGyro()
     {
-        double error = 90 - gyroSensor.getHeading();
+        double error = target - gyroSensor.getHeading();
         RobotLog.i("141 Gyro heading %d", gyroSensor.getHeading());
         RobotLog.i("141 Beacon angle error of %f degrees", error);
-
-       /* if (alliance == Alliance.BLUE) {
-            error *= -1;
-        } */
 
         if (error >= 2) {
             RobotLog.i("141 Adjusting angle by turning.");
@@ -455,12 +426,14 @@ public class DaisyRangeBeaconAutonomous extends Robot
             alliance = Alliance.BLUE;
             helper = new BeaconHelper(this, BeaconHelper.Alliance.BLUE, buttonPushers, colorSensor, cdim);
             ((ModernRoboticsI2cGyro)gyroSensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARTESIAN);
+            target = 90;
         } else {
             // Do red setup.
             turnMultiplier = 1;
             alliance = Alliance.RED;
             helper = new BeaconHelper(this, BeaconHelper.Alliance.RED, buttonPushers, colorSensor, cdim);
             ((ModernRoboticsI2cGyro)gyroSensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARDINAL);
+            target = 270;
         }
     }
 
@@ -481,13 +454,13 @@ public class DaisyRangeBeaconAutonomous extends Robot
             approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT,  8, STRAIGHT_SPEED);
             approachBeacon.addSegment(DeadReckon.SegmentType.TURN,     90, -TURN_SPEED * turnMultiplier);
             approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 55, STRAIGHT_SPEED * turnMultiplier);
-            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 55, -STRAIGHT_SPEED);
+            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 50, -STRAIGHT_SPEED);
             lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.2 * turnMultiplier);
         } else if (beaconChoice == AutonomousBeacon.BEACON_2) {
             approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8, STRAIGHT_SPEED);
             approachBeacon.addSegment(DeadReckon.SegmentType.TURN, 90, -TURN_SPEED * turnMultiplier);
             approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 55, STRAIGHT_SPEED * turnMultiplier);
-            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 55, -STRAIGHT_SPEED);
+            approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 50, -STRAIGHT_SPEED);
             lineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.2 * turnMultiplier);
             secondLineDetect.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, 0.2 * turnMultiplier);
             approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT, 13, 0.2);
