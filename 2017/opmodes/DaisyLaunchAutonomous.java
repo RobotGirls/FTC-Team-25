@@ -31,11 +31,11 @@ public class DaisyLaunchAutonomous extends Robot
     private boolean launched;
     private PersistentTelemetryTask ptt;
     private FourWheelGearedDriveDeadReckon path;
-    private final int TICKS_PER_INCH = DaisyConfiguration.TICKS_PER_INCH;
-    private final int TICKS_PER_DEGREE = DaisyConfiguration.TICKS_PER_DEGREE;
-    private final double STRAIGHT_SPEED = DaisyConfiguration.STRAIGHT_SPEED;
-    private final double TURN_SPEED = DaisyConfiguration.TURN_SPEED;
-    private final int LAUNCH_POSITION = DaisyConfiguration.LAUNCH_POSITION;
+    private final int TICKS_PER_INCH = Daisy.TICKS_PER_INCH;
+    private final int TICKS_PER_DEGREE = Daisy.TICKS_PER_DEGREE;
+    private final double STRAIGHT_SPEED = Daisy.STRAIGHT_SPEED;
+    private final double TURN_SPEED = Daisy.TURN_SPEED;
+    private final int LAUNCH_POSITION = Daisy.LAUNCH_POSITION;
     private int turnMultiplier = 1;
 
     private AutonomousPath pathChoice = AutonomousPath.CAP_BALL;

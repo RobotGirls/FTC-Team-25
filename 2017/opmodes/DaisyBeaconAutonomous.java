@@ -40,22 +40,22 @@ public class DaisyBeaconAutonomous extends Robot
     private DeviceInterfaceModule cdim;
     private DeadReckonTask deadReckonParkTask;
     private BeaconHelper helper;
-    private GeneralBeaconArms buttonPushers;
+    private ContinuousBeaconArms buttonPushers;
     private PersistentTelemetryTask ptt;
     private MecanumGearedDriveDeadReckon parkPath;
     private MecanumGearedDriveDeadReckon approachBeacon;
     private MecanumGearedDriveDeadReckon approachNext;
     private MecanumGearedDriveDeadReckon lineDetect;
     private MecanumGearedDriveDeadReckon pushBeacon;
-    private final int TICKS_PER_INCH = DaisyConfiguration.TICKS_PER_INCH;
-    private final int TICKS_PER_DEGREE = DaisyConfiguration.TICKS_PER_DEGREE;
-    private final double STRAIGHT_SPEED = DaisyConfiguration.STRAIGHT_SPEED;
-    private final double TURN_SPEED = DaisyConfiguration.TURN_SPEED;
-    private final int LAUNCH_POSITION = DaisyConfiguration.LAUNCH_POSITION;
-    private final double LEFT_DEPLOY_POS = DaisyConfiguration.LEFT_DEPLOY_POS;
-    private final double LEFT_STOW_POS = DaisyConfiguration.LEFT_STOW_POS;
-    private final double RIGHT_DEPLOY_POS = DaisyConfiguration.RIGHT_DEPLOY_POS;
-    private final double RIGHT_STOW_POS = DaisyConfiguration.RIGHT_STOW_POS;
+    private final int TICKS_PER_INCH = Daisy.TICKS_PER_INCH;
+    private final int TICKS_PER_DEGREE = Daisy.TICKS_PER_DEGREE;
+    private final double STRAIGHT_SPEED = Daisy.STRAIGHT_SPEED;
+    private final double TURN_SPEED = Daisy.TURN_SPEED;
+    private final int LAUNCH_POSITION = Daisy.LAUNCH_POSITION;
+    private final double LEFT_DEPLOY_POS = Daisy.LEFT_DEPLOY_POS;
+    private final double LEFT_STOW_POS = Daisy.LEFT_STOW_POS;
+    private final double RIGHT_DEPLOY_POS = Daisy.RIGHT_DEPLOY_POS;
+    private final double RIGHT_STOW_POS = Daisy.RIGHT_STOW_POS;
     private int turnMultiplier = 1;
     private boolean launched;
     private RunToEncoderValueTask runToPositionTask;
@@ -296,7 +296,7 @@ public class DaisyBeaconAutonomous extends Robot
         // Optical Distance Sensor (front) setup.
         frontOds = hardwareMap.opticalDistanceSensor.get("frontLight");
         frontLight = new MRLightSensor(frontOds);
-        frontLightCriteria = new OpticalDistanceSensorCriteria(frontLight, DaisyConfiguration.ODS_MIN, DaisyConfiguration.ODS_MAX);
+        frontLightCriteria = new OpticalDistanceSensorCriteria(frontLight, Daisy.ODS_MIN, Daisy.ODS_MAX);
 
         // Path setup.
         lineDetect = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
@@ -325,8 +325,7 @@ public class DaisyBeaconAutonomous extends Robot
         stt = new SingleShotTimerTask(this, 2000);
 
         // Button pushers setup.
-        buttonPushers = new GeneralBeaconArms(leftPusher, rightPusher, LEFT_DEPLOY_POS,
-                RIGHT_DEPLOY_POS, LEFT_STOW_POS, RIGHT_STOW_POS, false);
+        buttonPushers = new ContinuousBeaconArms(this, leftPusher, rightPusher, false);
 
         // Telemetry setup.
         ptt = new PersistentTelemetryTask(this);

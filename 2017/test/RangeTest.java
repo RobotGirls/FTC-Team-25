@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import opmodes.DaisyConfiguration;
+import opmodes.Daisy;
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.MecanumGearedDriveDeadReckon;
@@ -40,7 +40,7 @@ public class RangeTest extends Robot {
         rearLeft = hardwareMap.dcMotor.get("rearLeft");
         rearRight = hardwareMap.dcMotor.get("rearRight");
 
-        path = new MecanumGearedDriveDeadReckon(this, DaisyConfiguration.TICKS_PER_INCH, DaisyConfiguration.TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        path = new MecanumGearedDriveDeadReckon(this, Daisy.TICKS_PER_INCH, Daisy.TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
         path.addSegment(DeadReckon.SegmentType.STRAIGHT, 40, -0.4);
     }
 

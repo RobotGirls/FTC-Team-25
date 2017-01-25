@@ -32,11 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import opmodes.DaisyConfiguration;
+import opmodes.Daisy;
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.FourWheelGearedDriveDeadReckon;
@@ -51,10 +49,10 @@ public class DaisyTurnTest extends Robot {
     private DcMotor rearLeft;
     private DcMotor rearRight;
     private DeadReckonTask deadReckonTask;
-    private final static double STRAIGHT_SPEED = DaisyConfiguration.STRAIGHT_SPEED;
-    private final static double TURN_SPEED = DaisyConfiguration.TURN_SPEED;
-    private final static int TICKS_PER_INCH = DaisyConfiguration.TICKS_PER_INCH;
-    private final static int TICKS_PER_DEGREE = DaisyConfiguration.TICKS_PER_DEGREE;
+    private final static double STRAIGHT_SPEED = Daisy.STRAIGHT_SPEED;
+    private final static double TURN_SPEED = Daisy.TURN_SPEED;
+    private final static int TICKS_PER_INCH = Daisy.TICKS_PER_INCH;
+    private final static int TICKS_PER_DEGREE = Daisy.TICKS_PER_DEGREE;
     private FourWheelGearedDriveDeadReckon deadReckon;
 
     @Override

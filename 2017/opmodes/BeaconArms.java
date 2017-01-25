@@ -10,7 +10,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
 
-public class GeneralBeaconArms
+public class BeaconArms
 {
     Robot robot;
     Servo right;
@@ -21,19 +21,8 @@ public class GeneralBeaconArms
     double rightStowPos;
     boolean sensorOnLeft;
 
-    public GeneralBeaconArms(Servo left, Servo right, double leftDeployPos, double rightDeployPos,
-                             double leftStowPos, double rightStowPos, boolean isSensorOnLeft) {
-        this.left = left;
-        this.right = right;
-        this.leftDeployPos = leftDeployPos;
-        this.rightDeployPos = rightDeployPos;
-        this.leftStowPos = leftStowPos;
-        this.rightStowPos = rightStowPos;
-        this.sensorOnLeft = isSensorOnLeft;
-    }
-
-    public GeneralBeaconArms(Robot robot, Servo left, Servo right, double leftDeployPos, double rightDeployPos,
-                             double leftStowPos, double rightStowPos, boolean isSensorOnLeft) {
+    public BeaconArms(Robot robot, Servo left, Servo right, double leftDeployPos, double rightDeployPos,
+                      double leftStowPos, double rightStowPos, boolean isSensorOnLeft) {
         this.left = left;
         this.right = right;
         this.leftDeployPos = leftDeployPos;

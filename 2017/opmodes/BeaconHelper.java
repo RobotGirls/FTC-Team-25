@@ -1,13 +1,10 @@
 package opmodes;
 
-import android.bluetooth.BluetoothClass;
-
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.ColorSensorTask;
-import team25core.DeadReckonTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
@@ -20,21 +17,18 @@ public class BeaconHelper
 {
     private Robot robot;
     private Alliance alliance;
-    private GeneralBeaconArms pushers;
+    private ContinuousBeaconArms pushers;
     private ColorSensorTask senseColorTask;
     private ColorSensor color;
     private DeviceInterfaceModule cdim;
-    private boolean deployed = false;
 
     public enum Alliance {
         RED,
         BLUE
     }
 
-    public BeaconHelper(Robot robot, Alliance alliance, GeneralBeaconArms pushers, ColorSensor color, DeviceInterfaceModule cdim)
+    public BeaconHelper(Robot robot, Alliance alliance, ContinuousBeaconArms pushers, ColorSensor color, DeviceInterfaceModule cdim)
     {
-        // Who knows, maybe this will have some more parameters at some point.
-        // Until then, this.
         this.robot = robot;
         this.alliance = alliance;
         this.pushers = pushers;
@@ -51,7 +45,7 @@ public class BeaconHelper
             public void handleEvent(RobotEvent e) {
                 ColorSensorTask.ColorSensorEvent event = (ColorSensorTask.ColorSensorEvent) e;
 
-                // The GeneralBeaconArms class (pushers) will determine which pusher to deploy,
+                // The BeaconArms class (pushers) will determine which pusher to deploy,
                 // depending on whether or not you've sensed your alliance (e.g. red alliance,
                 // sensed red).
                 if (alliance == Alliance.RED) {

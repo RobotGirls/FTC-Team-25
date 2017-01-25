@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import opmodes.DaisyConfiguration;
+import opmodes.Daisy;
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.MecanumGearedDriveDeadReckon;
@@ -23,8 +23,8 @@ public class MecanumDeadReckonTest extends Robot
     DcMotor frontRight;
     DcMotor rearLeft;
     DcMotor rearRight;
-    final int TICKS_PER_INCH = DaisyConfiguration.TICKS_PER_INCH;
-    final int TICKS_PER_DEGREE = DaisyConfiguration.TICKS_PER_DEGREE;
+    final int TICKS_PER_INCH = Daisy.TICKS_PER_INCH;
+    final int TICKS_PER_DEGREE = Daisy.TICKS_PER_DEGREE;
     MecanumGearedDriveDeadReckon path;
 
     @Override

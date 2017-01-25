@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
-import team25core.FourWheelDirectDriveDeadReckon;
 import team25core.FourWheelGearedDriveDeadReckon;
 import team25core.GamepadTask;
 import team25core.PersistentTelemetryTask;
@@ -28,10 +27,10 @@ public class DaisyParkAutonomous extends Robot
     private DeadReckonTask deadReckonTask;
     private PersistentTelemetryTask ptt;
     private FourWheelGearedDriveDeadReckon deadReckonPath;
-    private final int TICKS_PER_INCH = DaisyConfiguration.TICKS_PER_INCH;
-    private final int TICKS_PER_DEGREE = DaisyConfiguration.TICKS_PER_DEGREE;
-    private final double STRAIGHT_SPEED = DaisyConfiguration.STRAIGHT_SPEED;
-    private final double TURN_SPEED = DaisyConfiguration.TURN_SPEED;
+    private final int TICKS_PER_INCH = Daisy.TICKS_PER_INCH;
+    private final int TICKS_PER_DEGREE = Daisy.TICKS_PER_DEGREE;
+    private final double STRAIGHT_SPEED = Daisy.STRAIGHT_SPEED;
+    private final double TURN_SPEED = Daisy.TURN_SPEED;
     private int turnMultiplier = 1;
 
     private AutonomousPath pathChoice = AutonomousPath.CAP_BALL;

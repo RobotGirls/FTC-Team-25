@@ -4,7 +4,7 @@ package opmodes;
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/12/2016.
  */
 
-public class DaisyConfiguration
+public class Daisy
 {
     // Autonomous constants.
     public static final int TICKS_PER_INCH = 60;

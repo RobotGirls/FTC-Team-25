@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
-import team25core.GyroTask;
 import team25core.MecanumGearedDriveDeadReckon;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
@@ -51,7 +50,7 @@ public class DeadReckonGyroAlignmentTest extends Robot
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        adjustTurn = new MecanumGearedDriveDeadReckon(this, DaisyConfiguration.TICKS_PER_INCH, DaisyConfiguration.TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        adjustTurn = new MecanumGearedDriveDeadReckon(this, Daisy.TICKS_PER_INCH, Daisy.TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
 
         // Telemetry.
         ptt = new PersistentTelemetryTask(this);

@@ -9,9 +9,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
 
-import opmodes.GeneralBeaconArms;
+import opmodes.BeaconArms;
 import team25core.ColorSensorTask;
-import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -32,7 +31,7 @@ public class LameingoBeaconTest extends Robot
     SensorMRRangeSensor range;
     TwoWheelGearedDriveDeadReckon pushPath;
     DeadReckonTask pushTask;
-    GeneralBeaconArms buttonPushers;
+    BeaconArms buttonPushers;
     Servo leftPusher;
     Servo rightPusher;
 
@@ -77,7 +76,7 @@ public class LameingoBeaconTest extends Robot
         pushPath = new TwoWheelGearedDriveDeadReckon(this, LameingoConfiguration.TICKS_PER_INCH,
                LameingoConfiguration.TICKS_PER_DEGREE, left, right);
         pushTask = new DeadReckonTask(this, pushPath);
-        buttonPushers = new GeneralBeaconArms(leftPusher, rightPusher,LameingoConfiguration.LEFT_DEPLOY_POS,
+        buttonPushers = new BeaconArms(leftPusher, rightPusher,LameingoConfiguration.LEFT_DEPLOY_POS,
                 LameingoConfiguration.RIGHT_DEPLOY_POS, LameingoConfiguration.LEFT_STOW_POS,
                 LameingoConfiguration.RIGHT_STOW_POS, true);
     }
