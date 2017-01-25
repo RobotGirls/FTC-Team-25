@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -18,7 +19,7 @@ import team25core.SingleShotTimerTask;
  * FTC Team 25: Created by Katelyn Biesiadecki on 1/12/2017.
  */
 @Autonomous(name = "Daisy: Dead Reckon Gyro Alignment Test", group = "Team25")
-//@Disabled
+@Disabled
 public class DeadReckonGyroAlignmentTest extends Robot
 {
     private DcMotor frontLeft;

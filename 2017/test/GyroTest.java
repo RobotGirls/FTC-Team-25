@@ -13,7 +13,7 @@ import team25core.RobotEvent;
 /**
  * Created by katie on 11/14/15.
  */
-@Autonomous(name = "Gyro Test", group = "Team 25")
+@Autonomous(name = "GYRO Test", group = "Team 25")
 public class GyroTest extends Robot {
     GyroSensor sensor;
     DcMotor frontLeft;

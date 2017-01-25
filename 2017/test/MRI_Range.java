@@ -23,6 +23,7 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 
 @TeleOp(name = "ASfRange Sensor Test", group = "MRI")
+@Disabled
 public class MRI_Range extends OpMode
 {
 

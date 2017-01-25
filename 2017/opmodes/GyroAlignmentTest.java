@@ -23,7 +23,7 @@ import team25core.SingleShotTimerTask;
  * FTC Team 25: Created by Katelyn Biesiadecki on 1/12/2017.
  */
 @Autonomous(name = "Daisy: Gyro Alignment Test", group = "Team25")
-//@Disabled
+@Disabled
 public class GyroAlignmentTest extends Robot {
     private DcMotor frontLeft;
     private DcMotor frontRight;

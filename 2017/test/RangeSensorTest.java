@@ -22,7 +22,7 @@ import team25core.RobotEvent;
  * Created by elizabeth on 1/5/17.
  */
 
-@Autonomous(name = "Range Sensor Test", group = "Team25")
+@Autonomous(name = "RANGE Test", group = "Team25")
 
 public class RangeSensorTest extends OpMode {
 

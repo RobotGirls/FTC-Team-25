@@ -14,6 +14,7 @@ import team25core.RobotEvent;
  */
 
 @TeleOp(name = "Daisy: Mecanum Wheel Test", group = "Team25")
+@Disabled
 public class MecanumDriveTest extends Robot
 {
     DcMotor frontLeft;
