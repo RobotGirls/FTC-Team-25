@@ -14,6 +14,10 @@ public class Daisy
     public final static double ODS_MIN = 0.5;
     public final static double ODS_MAX = 2.6;
     public final static int LAUNCH_POSITION = 1500;
+    public final static int RANGE_PORT = 2;
+    public final static int COLOR_PORT = 0;
+
+    // These no longer have any use...
     public final static double LEFT_DEPLOY_POS = 1;
     public final static double RIGHT_DEPLOY_POS = 0;
     public final static double LEFT_STOW_POS = 0;

@@ -72,7 +72,7 @@ public class GyroAlignmentTest extends Robot {
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        adjustTurn = new MecanumGearedDriveDeadReckon(this, DaisyConfiguration.TICKS_PER_INCH, DaisyConfiguration.TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        adjustTurn = new MecanumGearedDriveDeadReckon(this, Daisy.TICKS_PER_INCH, Daisy.TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
         // Telemetry.
         ptt = new PersistentTelemetryTask(this);
 

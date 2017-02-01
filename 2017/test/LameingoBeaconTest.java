@@ -76,7 +76,7 @@ public class LameingoBeaconTest extends Robot
         pushPath = new TwoWheelGearedDriveDeadReckon(this, LameingoConfiguration.TICKS_PER_INCH,
                LameingoConfiguration.TICKS_PER_DEGREE, left, right);
         pushTask = new DeadReckonTask(this, pushPath);
-        buttonPushers = new BeaconArms(leftPusher, rightPusher,LameingoConfiguration.LEFT_DEPLOY_POS,
+        buttonPushers = new BeaconArms(this, leftPusher, rightPusher,LameingoConfiguration.LEFT_DEPLOY_POS,
                 LameingoConfiguration.RIGHT_DEPLOY_POS, LameingoConfiguration.LEFT_STOW_POS,
                 LameingoConfiguration.RIGHT_STOW_POS, true);
     }

@@ -23,8 +23,8 @@ public class DaisyTeleop extends Robot
 
     GAMEPAD 1: DRIVETRAIN CONTROLLER
     --------------------------------------------------------------------------------------------
-      (L trigger)        (R trigger)    |
-      (L bumper)         (R bumper)     |
+      (L trigger)        (R trigger)    |  (LT) bward left diagonal    (RT) bward right diagonal
+      (L bumper)         (R bumper)     |  (LB) fward left diagonal    (RB) fward right diagonal
                             (y)         |
       arrow pad          (x)   (b)      |
                             (a)         |  (a) toggle slowness

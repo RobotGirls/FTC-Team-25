@@ -24,7 +24,7 @@ public class VuforiaNavigationExample extends Robot
     @Override
     public void init()
     {
-        nttt = new NavigateToTargetTask(this, 300000);
+        nttt = new NavigateToTargetTask(this, 300000, gamepad1);
         frontLeft   = hardwareMap.dcMotor.get("rearRight");
         frontRight  = hardwareMap.dcMotor.get("rearLeft");
         rearLeft    = hardwareMap.dcMotor.get("frontRight");
