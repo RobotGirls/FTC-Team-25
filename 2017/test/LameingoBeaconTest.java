@@ -4,12 +4,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
 
-import opmodes.GeneralBeaconArms;
-import team25core.DeadReckon;
+import opmodes.BeaconArms;
+import team25core.ColorSensorTask;
 import team25core.DeadReckonTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -18,38 +19,64 @@ import team25core.TwoWheelGearedDriveDeadReckon;
 /**
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/29/2016.
  */
-@Autonomous(name = "Lameingo: Beacon Test", group = "Team25")
+@Autonomous(name = "Lameingo: Red Beacon Test", group = "Team25")
 @Disabled
 public class LameingoBeaconTest extends Robot
 {
     DcMotor left;
     DcMotor right;
     ColorSensor color;
+    DeviceInterfaceModule cdim;
+    ColorSensorTask senseColorTask;
     SensorMRRangeSensor range;
     TwoWheelGearedDriveDeadReckon pushPath;
     DeadReckonTask pushTask;
-    GeneralBeaconArms buttonPushers;
+    BeaconArms buttonPushers;
     Servo leftPusher;
     Servo rightPusher;
-
 
     @Override
     public void handleEvent(RobotEvent e)
     {
-        DeadReckonTask.DeadReckonEvent event = (DeadReckonTask.DeadReckonEvent) e;
-        if (event.kind == DeadReckonTask.EventKind.PATH_DONE) {
-           // if red
-           buttonPushers.deploy(true);
+        if (e instanceof DeadReckonTask.DeadReckonEvent) {
+            DeadReckonTask.DeadReckonEvent event = (DeadReckonTask.DeadReckonEvent) e;
+
+            if (event.kind == DeadReckonTask.EventKind.PATH_DONE) { // eventually, this will likely become "sensor satisfied".
+                //  kick off beacon work.
+                senseColorTask = new ColorSensorTask(this, color, cdim, false, true, 0);
+                addTask(senseColorTask);
+            }
+        } else if (e instanceof ColorSensorTask.ColorSensorEvent) {
+            ColorSensorTask.ColorSensorEvent event = (ColorSensorTask.ColorSensorEvent) e;
+
+            if (event.kind == ColorSensorTask.EventKind.RED) {
+                buttonPushers.deploy(true);
+                removeTask(senseColorTask);
+                // add single shot timer task to wait for n seconds (wait for beacon to be pressed)
+            } else if (event.kind == ColorSensorTask.EventKind.BLUE) {
+                buttonPushers.deploy(false);
+                removeTask(senseColorTask);
+                // add single shot timer task to wait for n seconds (wait for beacon to be pressed)
+            }
         }
     }
 
     @Override
     public void init()
     {
+        left = hardwareMap.dcMotor.get("leftMotor");
+        right = hardwareMap.dcMotor.get("rightMotor");
+        color = hardwareMap.colorSensor.get("color");
+        cdim = hardwareMap.deviceInterfaceModule.get("interface");
+        leftPusher = hardwareMap.servo.get("leftPusher");
+        rightPusher = hardwareMap.servo.get("rightPusher");
+
+        leftPusher.setPosition(LameingoConfiguration.LEFT_STOW_POS);
+        rightPusher.setPosition(LameingoConfiguration.RIGHT_STOW_POS);
         pushPath = new TwoWheelGearedDriveDeadReckon(this, LameingoConfiguration.TICKS_PER_INCH,
                LameingoConfiguration.TICKS_PER_DEGREE, left, right);
         pushTask = new DeadReckonTask(this, pushPath);
-        buttonPushers = new GeneralBeaconArms(leftPusher, rightPusher,LameingoConfiguration.LEFT_DEPLOY_POS,
+        buttonPushers = new BeaconArms(this, leftPusher, rightPusher,LameingoConfiguration.LEFT_DEPLOY_POS,
                 LameingoConfiguration.RIGHT_DEPLOY_POS, LameingoConfiguration.LEFT_STOW_POS,
                 LameingoConfiguration.RIGHT_STOW_POS, true);
     }

@@ -19,7 +19,6 @@ public class ServoTest extends OpMode
     }
 
     @Override
-    public void loop() {
-    servo.setPosition(0.5);
+    public void loop() {servo.setPosition(0.5);
     }
 }

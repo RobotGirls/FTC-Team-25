@@ -14,13 +14,9 @@ public class LameingoConfiguration
     public final static double ODS_MIN = 0;
     public final static double ODS_MAX = 0.8;
 
-    /*
-    public GeneralBeaconArms(Servo left, Servo right, double leftDeployPos, double rightDeployPos,
-                             double leftStowPos, double rightStowPos, boolean isSensorOnLeft)
-                             */
     public final static double LEFT_DEPLOY_POS = 1;
-    public final static double RIGHT_DEPLOY_POS = 1;
-    public final static double RIGHT_STOW_POS = 0;
+    public final static double RIGHT_DEPLOY_POS = 0;
+    public final static double RIGHT_STOW_POS = 1;
     public final static double LEFT_STOW_POS = 0;
 
 }

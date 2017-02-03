@@ -1,12 +1,12 @@
 package opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import team25core.FourWheelDriveTask;
 import team25core.GamepadTask;
+import team25core.MecanumWheelDriveTask;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -23,8 +23,8 @@ public class DaisyTeleop extends Robot
 
     GAMEPAD 1: DRIVETRAIN CONTROLLER
     --------------------------------------------------------------------------------------------
-      (L trigger)        (R trigger)    |
-      (L bumper)         (R bumper)     |
+      (L trigger)        (R trigger)    |  (LT) bward left diagonal    (RT) bward right diagonal
+      (L bumper)         (R bumper)     |  (LB) fward left diagonal    (RB) fward right diagonal
                             (y)         |
       arrow pad          (x)   (b)      |
                             (a)         |  (a) toggle slowness
@@ -48,15 +48,14 @@ public class DaisyTeleop extends Robot
     private DcMotor launcher;
     private Servo leftPusher;
     private Servo rightPusher;
+    private ContinuousBeaconArms pushers;
     private Servo odsSwinger;
 
-    private FourWheelDriveTask drive;
+    private MecanumWheelDriveTask drive;
     private PersistentTelemetryTask ptt;
     private RunToEncoderValueTask runToPositionTask;
 
-    private final int LAUNCH_POSITION = DaisyConfiguration.LAUNCH_POSITION;
-    private double leftPosition  = 0;
-    private double rightPosition = 0;
+    private final int LAUNCH_POSITION = Daisy.LAUNCH_POSITION;
 
     private boolean slow;
     private boolean leftPusherOut;
@@ -71,25 +70,23 @@ public class DaisyTeleop extends Robot
     private void toggleLeftPusher()
     {
         if (!leftPusherOut) {
-            leftPosition = 1.0;
+            pushers.deployLeft();
             leftPusherOut = true;
         } else {
-            leftPosition = 0;
+            pushers.stowLeft();
             leftPusherOut = false;
         }
-        leftPusher.setPosition(leftPosition);
     }
 
     private void toggleRightPusher()
     {
         if (!rightPusherOut) {
-            rightPosition = 1.0;
+            pushers.deployRight();
             rightPusherOut = true;
         } else {
-            rightPosition = 0;
+            pushers.stowRight();
             rightPusherOut = false;
         }
-        rightPusher.setPosition(rightPosition);
     }
 
     @Override
@@ -106,9 +103,16 @@ public class DaisyTeleop extends Robot
         rightPusher = hardwareMap.servo.get("rightPusher");
         odsSwinger  = hardwareMap.servo.get("odsSwinger");
 
-        leftPusher.setPosition(leftPosition);
-        rightPusher.setPosition(rightPosition);
+        leftPusher.setPosition(0.5);
+        rightPusher.setPosition(0.5);
+        pushers = new ContinuousBeaconArms(this, leftPusher, rightPusher, true);
+
         odsSwinger.setPosition(0.7);
+
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         runToPositionTask = new RunToEncoderValueTask(this, launcher, LAUNCH_POSITION, 1.0);
 
@@ -122,7 +126,7 @@ public class DaisyTeleop extends Robot
     @Override
     public void start()
     {
-        drive = new FourWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
+        drive = new MecanumWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
         this.addTask(drive);
         this.addTask(ptt);
 
@@ -161,13 +165,13 @@ public class DaisyTeleop extends Robot
                 if (event.kind == EventKind.BUTTON_A_DOWN) {
                    // Toggles slowness of motors.
                     if (!slow) {
-                       drive.slowDown(0.35);
+                       drive.slowDown(0.45);
                        slow = true;
-                        ptt.addData("Slow: ","true");
+                        ptt.addData("Slow","true");
                    } else {
                        drive.slowDown(false);
                        slow = false;
-                        ptt.addData("Slow: ","false");
+                        ptt.addData("Slow","false");
                    }
                 }
             }
