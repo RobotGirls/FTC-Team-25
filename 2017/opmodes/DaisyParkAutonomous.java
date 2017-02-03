@@ -1,11 +1,11 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
-import team25core.FourWheelDirectDriveDeadReckon;
 import team25core.FourWheelGearedDriveDeadReckon;
 import team25core.GamepadTask;
 import team25core.PersistentTelemetryTask;
@@ -15,8 +15,9 @@ import team25core.RobotEvent;
 /**
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/5/2016.
  */
-@Autonomous(name = "Daisy: Autonomous", group = "Team25")
-public class DaisyAutonomous extends Robot
+@Autonomous(name = "Daisy: Park Autonomous", group = "Team25")
+@Disabled
+public class DaisyParkAutonomous extends Robot
 {
     private DcMotor frontLeft;
     private DcMotor frontRight;
@@ -26,10 +27,10 @@ public class DaisyAutonomous extends Robot
     private DeadReckonTask deadReckonTask;
     private PersistentTelemetryTask ptt;
     private FourWheelGearedDriveDeadReckon deadReckonPath;
-    private final int TICKS_PER_INCH = DaisyConfiguration.TICKS_PER_INCH;
-    private final int TICKS_PER_DEGREE = DaisyConfiguration.TICKS_PER_DEGREE;
-    private final double STRAIGHT_SPEED = DaisyConfiguration.STRAIGHT_SPEED;
-    private final double TURN_SPEED = DaisyConfiguration.TURN_SPEED;
+    private final int TICKS_PER_INCH = Daisy.TICKS_PER_INCH;
+    private final int TICKS_PER_DEGREE = Daisy.TICKS_PER_DEGREE;
+    private final double STRAIGHT_SPEED = Daisy.STRAIGHT_SPEED;
+    private final double TURN_SPEED = Daisy.TURN_SPEED;
     private int turnMultiplier = 1;
 
     private AutonomousPath pathChoice = AutonomousPath.CAP_BALL;
@@ -58,15 +59,9 @@ public class DaisyAutonomous extends Robot
             } else if (event.kind == GamepadTask.EventKind.BUTTON_B_DOWN) {
                 selectAlliance(Alliance.RED);
                 ptt.addData("ALLIANCE", "Red");
-            } else if (event.kind == GamepadTask.EventKind.LEFT_BUMPER_DOWN) {
+            } else if (event.kind == GamepadTask.EventKind.LEFT_TRIGGER_DOWN) {
                 pathChoice = AutonomousPath.CORNER_PARK;
                 ptt.addData("AUTONOMOUS", "Corner Park");
-            } else if (event.kind == GamepadTask.EventKind.LEFT_TRIGGER_DOWN) {
-                pathChoice = AutonomousPath.LAUNCH;
-                ptt.addData("AUTONOMOUS", "Launch");
-            } else if (event.kind == GamepadTask.EventKind.RIGHT_BUMPER_DOWN) {
-                pathChoice = AutonomousPath.CAP_BALL;
-                ptt.addData("AUTONOMOUS", "Cap Ball");
             } else if (event.kind == GamepadTask.EventKind.RIGHT_TRIGGER_DOWN) {
                 pathChoice = AutonomousPath.CENTER_PARK;
                 ptt.addData("AUTONOMOUS", "Center Park");
@@ -118,10 +113,8 @@ public class DaisyAutonomous extends Robot
         this.addTask(ptt);
         ptt.addData("Press (X) to select", "Blue alliance!");
         ptt.addData("Press (B) to select", "Red alliance!");
-        ptt.addData("Press (LEFT BUMPER) to select", "Corner Park!");
+        ptt.addData("Press (LEFT TRIGGER) to select", "Corner Park!");
         ptt.addData("Press (RIGHT TRIGGER) to select", "Center Park!");
-        ptt.addData("Press (RIGHT BUMPER) to select", "Cap Ball!");
-        ptt.addData("Press (LEFT TRIGGER) to select", "Launch!");
 
         // Alliance selection.
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));

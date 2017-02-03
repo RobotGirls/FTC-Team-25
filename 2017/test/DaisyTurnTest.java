@@ -32,10 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import opmodes.DaisyConfiguration;
+import opmodes.Daisy;
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.FourWheelGearedDriveDeadReckon;
@@ -43,6 +43,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 
 @Autonomous(name="Daisy: Turn Test", group="AutoTeam25")
+@Disabled
 public class DaisyTurnTest extends Robot {
 
     private DcMotor frontRight;
@@ -50,10 +51,10 @@ public class DaisyTurnTest extends Robot {
     private DcMotor rearLeft;
     private DcMotor rearRight;
     private DeadReckonTask deadReckonTask;
-    private final static double STRAIGHT_SPEED = DaisyConfiguration.STRAIGHT_SPEED;
-    private final static double TURN_SPEED = DaisyConfiguration.TURN_SPEED;
-    private final static int TICKS_PER_INCH = DaisyConfiguration.TICKS_PER_INCH;
-    private final static int TICKS_PER_DEGREE = DaisyConfiguration.TICKS_PER_DEGREE;
+    private final static double STRAIGHT_SPEED = Daisy.STRAIGHT_SPEED;
+    private final static double TURN_SPEED = Daisy.TURN_SPEED;
+    private final static int TICKS_PER_INCH = Daisy.TICKS_PER_INCH;
+    private final static int TICKS_PER_DEGREE = Daisy.TICKS_PER_DEGREE;
     private FourWheelGearedDriveDeadReckon deadReckon;
 
     @Override
@@ -80,10 +81,8 @@ public class DaisyTurnTest extends Robot {
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         deadReckon = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        //frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        //rearLeft.setDirection(DcMotorSimple.Direction.FORWARD);
 
         deadReckon.addSegment(DeadReckon.SegmentType.TURN, 90, TURN_SPEED);
     }
