@@ -44,7 +44,6 @@ import team25core.Robot;
 import team25core.RobotEvent;
 
 @Autonomous(name="Daisy: Straight Test", group="AutoTeam25")
-@Disabled
 public class DaisyStraightTest extends Robot {
 
     private DcMotor frontRight;

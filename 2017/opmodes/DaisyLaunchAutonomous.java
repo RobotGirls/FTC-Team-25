@@ -3,6 +3,7 @@ package opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
@@ -26,6 +27,7 @@ public class DaisyLaunchAutonomous extends Robot
     private DcMotor rearRight;
     private DcMotor launcher;
     private DcMotor conveyor;
+    private Servo capServo;
     private DeadReckonTask deadReckonTask;
     private RunToEncoderValueTask runToPositionTask;
     private SingleShotTimerTask stt;
@@ -121,13 +123,11 @@ public class DaisyLaunchAutonomous extends Robot
                 frontLeft, frontRight, rearLeft, rearRight);
 
         if (pathChoice == AutonomousPath.CORNER_PARK) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  63, STRAIGHT_SPEED);
-            path.addSegment(DeadReckon.SegmentType.TURN,     140, TURN_SPEED * turnMultiplier);
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  80, STRAIGHT_SPEED);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  77, STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.CENTER_PARK) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  60, STRAIGHT_SPEED);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  77, STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.CAP_BALL) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  60, STRAIGHT_SPEED);
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  77, STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.LAUNCH) {
             path.addSegment(DeadReckon.SegmentType.STRAIGHT,   0, STRAIGHT_SPEED);
         }
@@ -142,8 +142,11 @@ public class DaisyLaunchAutonomous extends Robot
         frontRight = hardwareMap.dcMotor.get("frontRight");
         rearLeft   = hardwareMap.dcMotor.get("rearLeft");
         rearRight  = hardwareMap.dcMotor.get("rearRight");
-        launcher = hardwareMap.dcMotor.get("launcher");
-        conveyor = hardwareMap.dcMotor.get("conveyor");
+        launcher   = hardwareMap.dcMotor.get("launcher");
+        conveyor   = hardwareMap.dcMotor.get("conveyor");
+        capServo   = hardwareMap.servo.get("capServo");
+
+        capServo.setPosition(1.0);
 
         runToPositionTask = new RunToEncoderValueTask(this, launcher, LAUNCH_POSITION, 1.0);
 
@@ -166,7 +169,7 @@ public class DaisyLaunchAutonomous extends Robot
         this.addTask(ptt);
         ptt.addData("Press (X) to select", "Blue alliance!");
         ptt.addData("Press (B) to select", "Red alliance!");
-        ptt.addData("Press (LEFT TRIGGER) to select", "Corner Park!");
+        ptt.addData("Press (LEFT TRIGGER) to select", "Center Park!");
         ptt.addData("Press (RIGHT TRIGGER) to select", "Just launch!");
         ptt.addData("Press (LEFT BUMPER) to select", "Launch 1 Ball!");
         ptt.addData("Press (RIGHT BUMPER) to select", "Launch 2 Balls!");

@@ -73,7 +73,7 @@ public class BeaconHelper
 
     private void waitAndStow()
     {
-        robot.addTask(new SingleShotTimerTask(robot, 3000) {
+        robot.addTask(new SingleShotTimerTask(robot, 5000) {
             @Override
             public void handleEvent(RobotEvent e)
             {

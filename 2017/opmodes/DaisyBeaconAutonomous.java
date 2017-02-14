@@ -43,6 +43,7 @@ public class DaisyBeaconAutonomous extends Robot
     private Servo leftPusher;
     private Servo rightPusher;
     private Servo swinger;
+    private Servo capServo;
     private ColorSensor colorSensor;
     private OpticalDistanceSensor frontOds;
     private MRLightSensor frontLight;
@@ -65,7 +66,7 @@ public class DaisyBeaconAutonomous extends Robot
     private int turnMultiplier = 1;
     private int launchSelection = 0;
     private int beaconSelection = 0;
-    private int target;
+    private int target = 90;
     private boolean launched;
     private boolean goToNext;
     private RunToEncoderValueTask launchParticleTask;
@@ -119,6 +120,7 @@ public class DaisyBeaconAutonomous extends Robot
         leftPusher  = hardwareMap.servo.get("leftPusher");
         rightPusher = hardwareMap.servo.get("rightPusher");
         swinger     = hardwareMap.servo.get("odsSwinger");
+        capServo    = hardwareMap.servo.get("capServo");
         colorSensor = hardwareMap.colorSensor.get("color");
         rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
         gyroSensor  = hardwareMap.gyroSensor.get("gyroSensor");
@@ -132,6 +134,7 @@ public class DaisyBeaconAutonomous extends Robot
         leftPusher.setPosition(0.5);
         rightPusher.setPosition(0.5);
         swinger.setPosition(0.7);
+        capServo.setPosition(0.8);
 
         // Optical Distance Sensor (front) setup.
         frontOds = hardwareMap.opticalDistanceSensor.get("frontLight");
@@ -139,7 +142,7 @@ public class DaisyBeaconAutonomous extends Robot
         frontLightCriteria = new OpticalDistanceSensorCriteria(frontLight, Daisy.ODS_MIN, Daisy.ODS_MAX);
 
         // Range Sensor setup.
-        rangeSensorCriteria = new RangeSensorCriteria(rangeSensor, 8);
+        rangeSensorCriteria = new RangeSensorCriteria(rangeSensor, 10);
 
         // Path setup.
         approachBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
@@ -183,7 +186,7 @@ public class DaisyBeaconAutonomous extends Robot
         // Gyro calibration.
         gyroSensor.calibrate();
     }
-
+    /*
     @Override
     public void init_loop()
     {
@@ -193,6 +196,8 @@ public class DaisyBeaconAutonomous extends Robot
             ptt.addData("GYRO", "Ready");
         }
     }
+    */
+
     @Override
     public void start()
     {
@@ -229,6 +234,7 @@ public class DaisyBeaconAutonomous extends Robot
                     break;
                 case RIGHT_BUMPER_DOWN:
                     filterBeaconSelection();
+                    break;
                 case BUTTON_Y_DOWN:
                     ptt.addData("Press (X) to select", "Blue alliance!");
                     ptt.addData("Press (B) to select", "Red alliance!");
@@ -362,16 +368,39 @@ public class DaisyBeaconAutonomous extends Robot
             cdim.registerForI2cPortReadyCallback(colorSensorCallback, COLOR_PORT);
             cdim.registerForI2cPortReadyCallback(rangeSensorCallback, RANGE_PORT);
 
-            goPushBeacon();
-            goToNextBeacon();
+            findWhiteLineAgain();
+            //goPushBeacon();
+            //goToNextBeacon();
         }
+    }
+
+    private void findWhiteLineAgain()
+    {
+        MecanumGearedDriveDeadReckon detectLine = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        detectLine.addSegment(DeadReckon.SegmentType.SIDEWAYS, 6, -0.3);
+        this.addTask(new DeadReckonTask(this, detectLine, frontLightCriteria) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent drEvent = (DeadReckonEvent) e;
+                if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
+                    goPushBeacon();
+                    goToNextBeacon();
+                } else {
+                    // dewe
+                    RobotLog.e("141 Detect line path expired");
+                    goPushBeacon();
+                    goToNextBeacon();
+
+                }
+            }
+        });
     }
 
     private void goPushBeacon()
     {
         RobotLog.i("141 Moving forward to push beacon.");
         MecanumGearedDriveDeadReckon pushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 30, -0.2);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 30, -0.15);
 
         this.addTask(new DeadReckonTask(this, pushBeacon, rangeSensorCriteria) {
             @Override
@@ -450,14 +479,12 @@ public class DaisyBeaconAutonomous extends Robot
             alliance = Alliance.BLUE;
             helper = new BeaconHelper(this, BeaconHelper.Alliance.BLUE, buttonPushers, colorSensor, cdim);
             ((ModernRoboticsI2cGyro)gyroSensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARTESIAN);
-            target = 90;
         } else {
             // Do red setup.
             turnMultiplier = 1;
             alliance = Alliance.RED;
             helper = new BeaconHelper(this, BeaconHelper.Alliance.RED, buttonPushers, colorSensor, cdim);
             ((ModernRoboticsI2cGyro)gyroSensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARDINAL);
-            target = 270;
         }
     }
 
@@ -482,7 +509,7 @@ public class DaisyBeaconAutonomous extends Robot
                 approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT,  8, STRAIGHT_SPEED);
                 approachBeacon.addSegment(DeadReckon.SegmentType.TURN,     90, -TURN_SPEED * turnMultiplier);
                 approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 55, STRAIGHT_SPEED * turnMultiplier);
-                approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 50, -STRAIGHT_SPEED);
+                approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 43, -STRAIGHT_SPEED);
                 break;
             case BEACON_2:
                 approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT,  8, STRAIGHT_SPEED);

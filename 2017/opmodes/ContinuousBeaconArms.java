@@ -38,7 +38,7 @@ public class ContinuousBeaconArms
     public void deployLeft()
     {
         left.setPosition(1.0);
-        robot.addTask(new SingleShotTimerTask(robot, 2000) {
+        robot.addTask(new SingleShotTimerTask(robot, 3000) {
            @Override
             public void handleEvent(RobotEvent e)
            {
@@ -50,7 +50,7 @@ public class ContinuousBeaconArms
     public void deployRight()
     {
         right.setPosition(1.0);
-        robot.addTask(new SingleShotTimerTask(robot, 2000) {
+        robot.addTask(new SingleShotTimerTask(robot, 3000) {
             @Override
             public void handleEvent(RobotEvent e)
             {
@@ -61,8 +61,8 @@ public class ContinuousBeaconArms
 
     public void stowLeft()
     {
-        left.setPosition(-1.0);
-        robot.addTask(new SingleShotTimerTask(robot, 2000) {
+        left.setPosition(0.0);
+        robot.addTask(new SingleShotTimerTask(robot, 3000) {
             @Override
             public void handleEvent(RobotEvent e)
             {
@@ -73,8 +73,8 @@ public class ContinuousBeaconArms
 
     public void stowRight()
     {
-        right.setPosition(-1.0);
-        robot.addTask(new SingleShotTimerTask(robot, 2000) {
+        right.setPosition(0.0);
+        robot.addTask(new SingleShotTimerTask(robot, 3000) {
             @Override
             public void handleEvent(RobotEvent e)
             {

@@ -65,37 +65,6 @@ public class DaisyAutoSetup extends Robot
         gyroSensor.calibrate();
         ptt = new PersistentTelemetryTask(this);
         this.addTask(ptt);
-
-        this.addTask(new ColorSensorTask(this, colorSensor, cdim, true, false, 0) {
-            @Override
-            public void handleEvent(RobotEvent e)
-            {
-                ColorSensorEvent event = (ColorSensorEvent) e;
-                if (event.kind == EventKind.PURPLE) {
-                    ptt.addData("COLOR STATUS", "Not working");
-                }
-            }
-        });
-    }
-
-    @Override
-    public void init_loop()
-    {
-        if (gyroSensor.isCalibrating()) {
-            ptt.addData("GYRO STATUS", "Calibrating");
-        } else {
-            ptt.addData("GYRO STATUS", "Ready");
-        }
-
-        double distance = rangeSensor.getDistance(DistanceUnit.CM);
-        double light    = frontOds.getRawLightDetected();
-        double heading  = gyroSensor.getHeading();
-        double color    = colorSensor.red();
-
-        ptt.addData("RANGE", String.valueOf(distance));
-        ptt.addData("ODS",   String.valueOf(light));
-        ptt.addData("GYRO",  String.valueOf(heading));
-        ptt.addData("COLOR", String.valueOf(color));
     }
 
     @Override
@@ -105,5 +74,19 @@ public class DaisyAutoSetup extends Robot
         addTask(runLauncherBackTask);
         addTask(runConveyorForwardTask);
         addTask(runConveyorBackTask);
+    }
+
+    @Override
+    public void loop()
+    {
+        double distance = rangeSensor.getDistance(DistanceUnit.CM);
+        double light    = frontOds.getRawLightDetected();
+        double heading  = gyroSensor.getHeading();
+        double color    = colorSensor.red();
+
+        ptt.addData("RANGE", String.valueOf(distance));
+        ptt.addData("ODS",   String.valueOf(light));
+        ptt.addData("GYRO",  String.valueOf(heading));
+        ptt.addData("COLOR (R)", String.valueOf(color));
     }
 }
