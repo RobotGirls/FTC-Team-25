@@ -66,7 +66,7 @@ public class DaisyAutoSetup extends Robot
         ptt = new PersistentTelemetryTask(this);
         this.addTask(ptt);
 
-        this.addTask(new ColorSensorTask(this, colorSensor, cdim, true, false, 0) {
+        ColorSensorTask colorSensorTask = new ColorSensorTask(this, colorSensor, cdim, true, 0) {
             @Override
             public void handleEvent(RobotEvent e)
             {
@@ -75,7 +75,12 @@ public class DaisyAutoSetup extends Robot
                     ptt.addData("COLOR STATUS", "Not working");
                 }
             }
-        });
+        };
+        /**
+         * FIXME: You need a class where you are keeping all your constants.
+         */
+        colorSensorTask.setModeCompare(278);
+        addTask(colorSensorTask);
     }
 
     @Override

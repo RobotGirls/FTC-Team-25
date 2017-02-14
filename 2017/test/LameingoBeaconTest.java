@@ -43,7 +43,11 @@ public class LameingoBeaconTest extends Robot
 
             if (event.kind == DeadReckonTask.EventKind.PATH_DONE) { // eventually, this will likely become "sensor satisfied".
                 //  kick off beacon work.
-                senseColorTask = new ColorSensorTask(this, color, cdim, false, true, 0);
+                senseColorTask = new ColorSensorTask(this, color, cdim, false, 0);
+                /**
+                 * FIXME: You need a class where you are keeping all your constants.
+                 */
+                senseColorTask.setModeCompare(278);
                 addTask(senseColorTask);
             }
         } else if (e instanceof ColorSensorTask.ColorSensorEvent) {
