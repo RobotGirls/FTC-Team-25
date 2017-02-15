@@ -19,6 +19,7 @@ import team25core.GamepadTask;
 import team25core.GyroTask;
 import team25core.MRLightSensor;
 import team25core.MecanumGearedDriveDeadReckon;
+import team25core.NavigateToTargetTask;
 import team25core.OpticalDistanceSensorCriteria;
 import team25core.PersistentTelemetryTask;
 import team25core.RangeSensorCriteria;
@@ -284,13 +285,42 @@ public class DaisyBeaconAutonomous extends Robot
 
                     if (drEvent.kind == EventKind.PATH_DONE) {
                         RobotLog.i("141 Approached beacon.");
-                        detectLine();
+                        navigateToTarget();
+                        //detectLine();
                     }
                 }
             }
         });
     }
 
+    /*
+     * Navigates to the target, one axis at a time, using Vuforia magic.
+     */
+    private void navigateToTarget()
+    {
+        RobotLog.i("141 Navigating to target.");
+        // FIXME: Remove gamepad1 from parameter list, because potential penalties are not fun...
+        this.addTask(new NavigateToTargetTask(this, 1000000, gamepad1) {
+            @Override
+            public void handleEvent(RobotEvent e)
+            {
+                NavigateToTargetEvent event = (NavigateToTargetEvent) e;
+                switch (event.kind) {
+                    case FOUND_TARGET:
+                        // do stuff
+                        break;
+                    case TIMEOUT:
+                        //cry
+                        break;
+                }
+            }
+        });
+    }
+
+    /*
+     * NOTE: Currently, detectLine() should not be in use. However, I'm leaving it just in case
+     *       we decide to get even closer to the beacon before using Vuforia target finding.
+     */
     private void detectLine()
     {
         RobotLog.i("141 Attempting to detect white line.");
@@ -312,14 +342,6 @@ public class DaisyBeaconAutonomous extends Robot
                 if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
                     RobotLog.i("141 Detected white line.");
                     this.stop();
-                    RobotLog.i("141 Gyro Heading %d", gyroSensor.getHeading());
-                    this.robot.addTask(new SingleShotTimerTask(this.robot, 700) {
-                        @Override
-                        public void handleEvent(RobotEvent e)
-                        {
-                            adjustWithGyro();
-                        }
-                    });
                 } else if (drEvent.kind == EventKind.PATH_DONE) {
                     RobotLog.i("141 White line not found.");
                     // Missed white line, try again.
@@ -328,72 +350,18 @@ public class DaisyBeaconAutonomous extends Robot
         });
     }
 
-    private void adjustWithGyro()
+    /*
+     * NOTE: Might remove?
+     */
+    private void alignedAndPushing()
     {
-        double error = target - gyroSensor.getHeading();
-        RobotLog.i("141 Gyro heading %d", gyroSensor.getHeading());
-        RobotLog.i("141 Beacon angle error of %f degrees", error);
+        RobotLog.i("141 Aligned and pushing.");
 
-        if (error >= 2) {
-            RobotLog.i("141 Adjusting angle by turning.");
-            adjustTurn.addSegment(DeadReckon.SegmentType.TURN, error, -0.1 * turnMultiplier);
-
-            this.addTask(new DeadReckonTask(this, adjustTurn) {
-                @Override
-                public void handleEvent(RobotEvent e) {
-                    DeadReckonEvent event = (DeadReckonEvent) e;
-                    if (event.kind == EventKind.PATH_DONE) {
-                        RobotLog.i("141 Path done, checking alignment");
-                        adjustWithGyro();
-                    }
-                }
-            });
-        } else if (error <= -2) {
-            RobotLog.i("141 Adjusting angle by turning.");
-            adjustTurn.addSegment(DeadReckon.SegmentType.TURN, error, 0.1 * turnMultiplier);
-
-            this.addTask(new DeadReckonTask(this, adjustTurn) {
-                @Override
-                public void handleEvent(RobotEvent e) {
-                    DeadReckonEvent event = (DeadReckonEvent) e;
-                    if (event.kind == EventKind.PATH_DONE) {
-                        adjustWithGyro();
-                    }
-                }
-            });
-        } else {
-            RobotLog.i("141 Aligned and pushing.");
-
-            // Re-registering color sensor and range sensor.
-            cdim.registerForI2cPortReadyCallback(colorSensorCallback, COLOR_PORT);
-            cdim.registerForI2cPortReadyCallback(rangeSensorCallback, RANGE_PORT);
-
-            findWhiteLineAgain();
-            //goPushBeacon();
-            //goToNextBeacon();
-        }
-    }
-
-    private void findWhiteLineAgain()
-    {
-        MecanumGearedDriveDeadReckon detectLine = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        detectLine.addSegment(DeadReckon.SegmentType.SIDEWAYS, 6, -0.3);
-        this.addTask(new DeadReckonTask(this, detectLine, frontLightCriteria) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent drEvent = (DeadReckonEvent) e;
-                if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
-                    goPushBeacon();
-                    goToNextBeacon();
-                } else {
-                    // dewe
-                    RobotLog.e("141 Detect line path expired");
-                    goPushBeacon();
-                    goToNextBeacon();
-
-                }
-            }
-        });
+        // Re-registering color sensor and range sensor.
+        cdim.registerForI2cPortReadyCallback(colorSensorCallback, COLOR_PORT);
+        cdim.registerForI2cPortReadyCallback(rangeSensorCallback, RANGE_PORT);
+        goPushBeacon();
+        goToNextBeacon();
     }
 
     private void goPushBeacon()

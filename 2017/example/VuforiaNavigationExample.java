@@ -11,7 +11,7 @@ import team25core.RobotEvent;
 /**
  * FTC Team 25: Created by Katelyn Biesiadecki on 1/14/2017.
  */
-@Autonomous(name = "Vuforia ", group = "Team 25")
+@Autonomous(name = "VUFORIA TARGET FINDING", group = "Team 25")
 public class VuforiaNavigationExample extends Robot
 {
     NavigateToTargetTask nttt;
@@ -19,7 +19,6 @@ public class VuforiaNavigationExample extends Robot
     DcMotor frontRight;
     DcMotor rearLeft;
     DcMotor rearRight;
-
 
     @Override
     public void init()
