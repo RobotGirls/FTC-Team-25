@@ -40,7 +40,7 @@ public class BeaconHelper
     {
         //  Kick off beacon work.
         RobotLog.i("141 Ready to sense color.");
-        robot.addTask(new ColorSensorTask(robot, color, cdim, false, true, 0) {
+        ColorSensorTask colorSensorTask = new ColorSensorTask(robot, color, cdim, false, 0) {
             @Override
             public void handleEvent(RobotEvent e) {
                 ColorSensorTask.ColorSensorEvent event = (ColorSensorTask.ColorSensorEvent) e;
@@ -68,7 +68,12 @@ public class BeaconHelper
 
                 robot.removeTask(senseColorTask);
             }
-        });
+        };
+        /**
+         * FIXME: You need a class where you are keeping all your constants.
+         */
+        colorSensorTask.setModeCompare(278);
+        robot.addTask(colorSensorTask);
     }
 
     private void waitAndStow()

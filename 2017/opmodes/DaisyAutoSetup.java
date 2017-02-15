@@ -65,6 +65,19 @@ public class DaisyAutoSetup extends Robot
         gyroSensor.calibrate();
         ptt = new PersistentTelemetryTask(this);
         this.addTask(ptt);
+
+        ColorSensorTask colorSensorTask = new ColorSensorTask(this, colorSensor, cdim, true, 0) {
+            @Override
+            public void handleEvent(RobotEvent e)
+            {
+                ColorSensorEvent event = (ColorSensorEvent) e;
+                if (event.kind == EventKind.PURPLE) {
+                    ptt.addData("COLOR STATUS", "Not working");
+                }
+            }
+        };
+        colorSensorTask.setModeCompare(Daisy.COLOR_THRESHOLD);
+        addTask(colorSensorTask);
     }
 
     @Override
