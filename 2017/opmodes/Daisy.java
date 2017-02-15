@@ -16,6 +16,7 @@ public class Daisy
     public final static int LAUNCH_POSITION = 1500;
     public final static int RANGE_PORT = 2;
     public final static int COLOR_PORT = 0;
+    public final static int COLOR_THRESHOLD = 278;
 
     // These no longer have any use...
     public final static double LEFT_DEPLOY_POS = 1;
