@@ -73,10 +73,10 @@ public class DaisyTeleop extends Robot
     private void toggleLeftPusher()
     {
         if (!leftPusherOut) {
-            pushers.deployLeft();
+            leftPusher.setPosition(Daisy.LEFT_DEPLOY_POS);
             leftPusherOut = true;
         } else {
-            pushers.stowLeft();
+            leftPusher.setPosition(Daisy.LEFT_STOW_POS);
             leftPusherOut = false;
         }
     }
@@ -84,10 +84,10 @@ public class DaisyTeleop extends Robot
     private void toggleRightPusher()
     {
         if (!rightPusherOut) {
-            pushers.deployRight();
+            rightPusher.setPosition(Daisy.RIGHT_DEPLOY_POS);
             rightPusherOut = true;
         } else {
-            pushers.stowRight();
+            rightPusher.setPosition(Daisy.RIGHT_STOW_POS);
             rightPusherOut = false;
         }
     }
@@ -197,6 +197,6 @@ public class DaisyTeleop extends Robot
     @Override
     public void stop()
     {
-
+        // Nothing.
     }
 }
