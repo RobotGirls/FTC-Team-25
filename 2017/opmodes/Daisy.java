@@ -25,8 +25,10 @@ public class Daisy
     public final static int COLOR_PORT = 1;
     public final static int COLOR_THRESHOLD = 278;
     public final static int COLOR_MS_DELAY = 700;
-    public final static int RED_THRESHOLD = 1660;
-    public final static int BLUE_THRESHOLD = 2000;
+    // public final static int RED_THRESHOLD = 1660;
+    // public final static int BLUE_THRESHOLD = 2000;
+    public final static int RED_THRESHOLD = 1000;
+    public final static int BLUE_THRESHOLD = 1200;
 
     // Vuforia constants.
     public final static VuforiaLocalizer.CameraDirection CAMERA_CHOICE = VuforiaLocalizer.CameraDirection.FRONT;
@@ -34,11 +36,18 @@ public class Daisy
     public final static int CAMERA_FORWARD_DISPLACEMENT  = 0;     // Camera is 110 mm in front of robot center
     public final static int CAMERA_VERTICAL_DISPLACEMENT = 127;   // Camera is 200 mm above ground
     public final static int CAMERA_LEFT_DISPLACEMENT     = 64;    // Camera is ON the robots center line
+    public final static int CAMERA_BLUE_LEFT_DISPLACEMENT = 110;    // Camera is ON the robots center line
     public final static OpenGLMatrix PHONE_LOCATION_ON_ROBOT = OpenGLMatrix
             .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
             .multiplied(Orientation.getRotationMatrix(
                     AxesReference.EXTRINSIC, AxesOrder.YZX,
                     AngleUnit.DEGREES, CAMERA_CHOICE == VuforiaLocalizer.CameraDirection.FRONT ? 90 : -90, 0, 0));
+    public final static OpenGLMatrix BLUE_PHONE_LOCATION_ON_ROBOT = OpenGLMatrix
+            .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_BLUE_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
+            .multiplied(Orientation.getRotationMatrix(
+                    AxesReference.EXTRINSIC, AxesOrder.YZX,
+                    AngleUnit.DEGREES, CAMERA_CHOICE == VuforiaLocalizer.CameraDirection.FRONT ? 90 : -90, 0, 0));
+
 
     // These no longer have any use...
     public final static double LEFT_DEPLOY_POS = 1;
