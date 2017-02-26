@@ -1,5 +1,6 @@
 package opmodes;
 
+import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.I2cController;
+import com.qualcomm.robotcore.hardware.I2cDeviceImpl;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -18,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
+import team25core.AMSColorSensorImproved;
 import team25core.DeadReckon;
 import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
@@ -39,7 +42,6 @@ import team25core.SingleShotTimerTask;
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/5/2016.
  */
 @Autonomous(name = "Daisy: Beacon Autonomous", group = "Team25")
-
 public class DaisyBeaconAutonomous extends Robot
 {
     enum TargetState {
@@ -60,7 +62,8 @@ public class DaisyBeaconAutonomous extends Robot
     private Servo rightPusher;
     private Servo swinger;
     private Servo capServo;
-    private ColorSensor colorSensor;
+    //private ColorSensor colorSensor;
+    private AMSColorSensorImproved colorSensor;
     private OpticalDistanceSensor frontOds;
     private MRLightSensor frontLight;
     private DistanceSensor rangeSensor;
@@ -149,10 +152,11 @@ public class DaisyBeaconAutonomous extends Robot
         rightPusher = hardwareMap.servo.get("rightPusher");
         swinger     = hardwareMap.servo.get("odsSwinger");
         capServo    = hardwareMap.servo.get("capServo");
-        colorSensor = hardwareMap.colorSensor.get("color");
+        //colorSensor = hardwareMap.colorSensor.get("color");
+        cdim        = hardwareMap.deviceInterfaceModule.get("cdim");
+        colorSensor = AMSColorSensorImproved.create(AMSColorSensor.Parameters.createForAdaFruit(), new I2cDeviceImpl(cdim, 0));
         rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
         gyroSensor  = hardwareMap.gyroSensor.get("gyroSensor");
-        cdim        = hardwareMap.deviceInterfaceModule.get("cdim");
 
         drivetrain  = new FourWheelDirectDrivetrain(TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
 
@@ -170,9 +174,6 @@ public class DaisyBeaconAutonomous extends Robot
         frontOds = hardwareMap.opticalDistanceSensor.get("frontLight");
         frontLight = new MRLightSensor(frontOds);
         frontLightCriteria = new OpticalDistanceSensorCriteria(frontLight, Daisy.ODS_MIN, Daisy.ODS_MAX);
-
-        // Range Sensor setup.
-        rangeSensorCriteria = new RangeSensorCriteria(rangeSensor, 10);
 
         // Path setup.
         approachBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
@@ -217,7 +218,6 @@ public class DaisyBeaconAutonomous extends Robot
         gyroSensor.calibrate();
 
         // Vuforia setup.
-
         nav = new RobotNavigation(this, drivetrain);
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
         parameters.vuforiaLicenseKey = Daisy.KEY;
@@ -434,25 +434,23 @@ public class DaisyBeaconAutonomous extends Robot
         // Re-registering color sensor and range sensor.
         cdim.registerForI2cPortReadyCallback(colorSensorCallback, COLOR_PORT);
         cdim.registerForI2cPortReadyCallback(rangeSensorCallback, RANGE_PORT);
-        goPushBeacon();
         goToNextBeacon();
     }
 
-    private void goPushBeacon()
-    {
+    public void goPushBeacon() {
         RobotLog.i("141 Moving forward to push beacon.");
-        MecanumGearedDriveDeadReckon pushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 30, -0.15);
+        final MecanumGearedDriveDeadReckon pushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 4, -0.1);
 
-        this.addTask(new DeadReckonTask(this, pushBeacon, rangeSensorCriteria) {
+        this.addTask(new DeadReckonTask(this, pushBeacon) {
             @Override
             public void handleEvent(RobotEvent e) {
                 if (e instanceof DeadReckonEvent) {
                     DeadReckonEvent drEvent = (DeadReckonEvent) e;
 
-                    if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
-                        RobotLog.i("141 Range criteria satisfied; attempting beacon work.");
-                        goToNextBeacon();
+                    if (drEvent.kind == EventKind.PATH_DONE) {
+                        RobotLog.i("141 Smashed beacon path done; attempting beacon work.");
+                        //goToNextBeacon();
                     } else {
                         RobotLog.i("141 Push beacon path done before range criteria satisfied.");
                         // back up and try again.
@@ -461,8 +459,7 @@ public class DaisyBeaconAutonomous extends Robot
             }
         });
     }
-
-    private void goToNextBeacon()
+    public void goToNextBeacon()
     {
         if (beaconChoice == AutonomousBeacon.BEACON_2 && goToNext) {
             approachBeacon(approachNext);
@@ -513,7 +510,7 @@ public class DaisyBeaconAutonomous extends Robot
             secondTarget = NavigateToTargetTask.Targets.BLUE_FAR;
             turnMultiplier = -1;
             alliance = Alliance.BLUE;
-            helper = new BeaconHelper(this, BeaconHelper.Alliance.BLUE, buttonPushers, colorSensor, cdim);
+            helper = new BeaconHelper(this, this, BeaconHelper.Alliance.BLUE, buttonPushers, colorSensor, cdim);
             ((ModernRoboticsI2cGyro)gyroSensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARTESIAN);
         } else {
             // Do red setup.
@@ -522,7 +519,7 @@ public class DaisyBeaconAutonomous extends Robot
             secondTarget = NavigateToTargetTask.Targets.RED_FAR;
             turnMultiplier = 1;
             alliance = Alliance.RED;
-            helper = new BeaconHelper(this, BeaconHelper.Alliance.RED, buttonPushers, colorSensor, cdim);
+            helper = new BeaconHelper(this, this, BeaconHelper.Alliance.RED, buttonPushers, colorSensor, cdim);
             ((ModernRoboticsI2cGyro)gyroSensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARDINAL);
         }
     }

@@ -2,9 +2,13 @@ package opmodes;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
+import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.ColorSensorTask;
+import team25core.DeadReckon;
+import team25core.DeadReckonTask;
+import team25core.MecanumGearedDriveDeadReckon;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
@@ -17,21 +21,34 @@ public class BeaconHelper
 {
     private Robot robot;
     private Alliance alliance;
-    private ContinuousBeaconArms pushers;
+    private BeaconArms pushers;
+    private ContinuousBeaconArms continuousPushers;
     private ColorSensorTask senseColorTask;
     private ColorSensor color;
     private DeviceInterfaceModule cdim;
+    private MecanumGearedDriveDeadReckon pushBeacon;
+    private DaisyBeaconAutonomous dba;
 
     public enum Alliance {
         RED,
         BLUE
     }
 
-    public BeaconHelper(Robot robot, Alliance alliance, ContinuousBeaconArms pushers, ColorSensor color, DeviceInterfaceModule cdim)
+    public BeaconHelper(DaisyBeaconAutonomous dba, Robot robot, Alliance alliance, BeaconArms pushers, ColorSensor color, DeviceInterfaceModule cdim)
     {
         this.robot = robot;
         this.alliance = alliance;
         this.pushers = pushers;
+        this.color = color;
+        this.cdim = cdim;
+        this.dba = dba;
+    }
+
+    public BeaconHelper(Robot robot, Alliance alliance, ContinuousBeaconArms pushers, ColorSensor color, DeviceInterfaceModule cdim)
+    {
+        this.robot = robot;
+        this.alliance = alliance;
+        this.continuousPushers = continuousPushers;
         this.color = color;
         this.cdim = cdim;
     }
@@ -48,23 +65,15 @@ public class BeaconHelper
                 // The BeaconArms class (pushers) will determine which pusher to deploy,
                 // depending on whether or not you've sensed your alliance (e.g. red alliance,
                 // sensed red).
-                if (alliance == Alliance.RED) {
-                    if (event.kind == ColorSensorTask.EventKind.RED) {
-                        pushers.deploy(true);
-                        RobotLog.i("141 Detecting red.");
-                    } else if (event.kind == ColorSensorTask.EventKind.BLUE) {
-                        pushers.deploy(false);
-                    }
-                } else if (alliance == Alliance.BLUE) {
-                    if (event.kind == ColorSensorTask.EventKind.BLUE) {
-                        pushers.deploy(true);
-                        RobotLog.i("141 Detecting blue.");
-                    } else if (event.kind == ColorSensorTask.EventKind.RED) {
-                        pushers.deploy(false);
-                    }
+
+                if (event.kind == ColorSensorTask.EventKind.YES) {
+                    pushers.deploy(true);
+                } else if (event.kind == ColorSensorTask.EventKind.NO) {
+                    pushers.deploy(false);
                 }
 
                 waitAndStow();
+                dba.goPushBeacon();
 
                 robot.removeTask(senseColorTask);
             }
@@ -72,7 +81,18 @@ public class BeaconHelper
         /**
          * FIXME: You need a class where you are keeping all your constants.
          */
-        colorSensorTask.setModeCompare(278);
+        if (alliance == Alliance.RED) {
+            colorSensorTask.setModeSingle(ColorSensorTask.TargetColor.RED, Daisy.RED_THRESHOLD);
+        } else {
+            colorSensorTask.setModeSingle(ColorSensorTask.TargetColor.BLUE, Daisy.BLUE_THRESHOLD);
+        }
+
+        colorSensorTask.setMsDelay(Daisy.COLOR_MS_DELAY);
+        colorSensorTask.setReflectColor(true, robot.hardwareMap);
+
+        cdim.setDigitalChannelMode(Daisy.COLOR_PORT, DigitalChannelController.Mode.OUTPUT);
+        cdim.setDigitalChannelState(Daisy.COLOR_PORT, false);
+
         robot.addTask(colorSensorTask);
     }
 

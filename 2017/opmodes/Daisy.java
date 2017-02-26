@@ -22,8 +22,11 @@ public class Daisy
     public final static double ODS_MAX = 2.6;
     public final static int LAUNCH_POSITION = 1500;
     public final static int RANGE_PORT = 2;
-    public final static int COLOR_PORT = 0;
+    public final static int COLOR_PORT = 1;
     public final static int COLOR_THRESHOLD = 278;
+    public final static int COLOR_MS_DELAY = 700;
+    public final static int RED_THRESHOLD = 1660;
+    public final static int BLUE_THRESHOLD = 2000;
 
     // Vuforia constants.
     public final static VuforiaLocalizer.CameraDirection CAMERA_CHOICE = VuforiaLocalizer.CameraDirection.FRONT;
