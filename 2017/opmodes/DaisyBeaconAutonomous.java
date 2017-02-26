@@ -237,7 +237,7 @@ public class DaisyBeaconAutonomous extends Robot
 
         OpenGLMatrix phoneLocationOnRobot = Daisy.PHONE_LOCATION_ON_ROBOT;
 
-        nttt = new NavigateToTargetTask(this, drivetrain, NavigateToTargetTask.Targets.RED_NEAR, 1000000, gamepad1);
+        nttt = new NavigateToTargetTask(this, drivetrain, NavigateToTargetTask.Targets.RED_NEAR, 1000000, gamepad1, NavigateToTargetTask.Alliance.RED);
         nttt.init(targets, parameters, phoneLocationOnRobot);
 
         /*
@@ -443,7 +443,7 @@ public class DaisyBeaconAutonomous extends Robot
     public void goPushBeacon() {
         RobotLog.i("141 Moving forward to push beacon.");
         final MecanumGearedDriveDeadReckon pushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 6, -0.1);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, -0.1);
 
         this.addTask(new DeadReckonTask(this, pushBeacon) {
             @Override
@@ -527,6 +527,8 @@ public class DaisyBeaconAutonomous extends Robot
             turnMultiplier = -1;
             alliance = Alliance.BLUE;
             drivetrain.setAlliance(Alliance.BLUE);
+            nttt.setAlliance(NavigateToTargetTask.Alliance.BLUE);
+            nav.setMaxLateralOffset(2);
             helper = new BeaconHelper(this, this, BeaconHelper.Alliance.BLUE, buttonPushers, colorSensor, cdim);
             ((ModernRoboticsI2cGyro)gyroSensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARTESIAN);
         } else {
@@ -537,6 +539,8 @@ public class DaisyBeaconAutonomous extends Robot
             turnMultiplier = 1;
             alliance = Alliance.RED;
             drivetrain.setAlliance(Alliance.RED);
+            nttt.setAlliance(NavigateToTargetTask.Alliance.RED);
+            nav.setMaxLateralOffset(4);
             helper = new BeaconHelper(this, this, BeaconHelper.Alliance.RED, buttonPushers, colorSensor, cdim);
             ((ModernRoboticsI2cGyro)gyroSensor).setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARDINAL);
         }
@@ -562,22 +566,40 @@ public class DaisyBeaconAutonomous extends Robot
             case BEACON_1:
                 approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT,  8, STRAIGHT_SPEED);
                 approachBeacon.addSegment(DeadReckon.SegmentType.TURN,     90, -TURN_SPEED * turnMultiplier);
-                approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 55, STRAIGHT_SPEED * turnMultiplier);
+                /*approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 55, STRAIGHT_SPEED * turnMultiplier);
                 if (alliance == Alliance.RED) {
                     approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 43, -STRAIGHT_SPEED);
                 } else {
                     approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 50, -STRAIGHT_SPEED);
+                }*/
+
+                if (alliance == Alliance.RED) {
+                    approachBeacon.addSegment(DeadReckon.SegmentType.BACK_LEFT_DIAGONAL,  60, STRAIGHT_SPEED);
+                    approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 25, STRAIGHT_SPEED * turnMultiplier);
+                } else {
+                    approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 55, STRAIGHT_SPEED * turnMultiplier);
+                    approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 50, -STRAIGHT_SPEED);
+                    approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 50, STRAIGHT_SPEED * turnMultiplier);
                 }
-                approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 50, STRAIGHT_SPEED * turnMultiplier);
+
                 break;
             case BEACON_2:
                 approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT,  8, STRAIGHT_SPEED);
                 approachBeacon.addSegment(DeadReckon.SegmentType.TURN,     90, -TURN_SPEED * turnMultiplier);
-                approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 55, STRAIGHT_SPEED * turnMultiplier);
-                approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 43, -STRAIGHT_SPEED);
-                approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 50, STRAIGHT_SPEED * turnMultiplier);
-                approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT,   13, 0.2);
-                approachNext.addSegment(DeadReckon.SegmentType.SIDEWAYS,   67, 0.8 * turnMultiplier);
+                //approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 55, STRAIGHT_SPEED * turnMultiplier);
+                //approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 43, -STRAIGHT_SPEED);
+                if (alliance == Alliance.RED) {
+                    approachBeacon.addSegment(DeadReckon.SegmentType.BACK_LEFT_DIAGONAL, 60, STRAIGHT_SPEED);
+                    approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 25, STRAIGHT_SPEED * turnMultiplier);
+                } else {
+                    approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 55, STRAIGHT_SPEED * turnMultiplier);
+                    approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 50, -STRAIGHT_SPEED);
+                    approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 50, STRAIGHT_SPEED * turnMultiplier);
+                }
+
+                //approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 50, STRAIGHT_SPEED * turnMultiplier);
+                approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT,   20, 0.2);
+                approachNext.addSegment(DeadReckon.SegmentType.SIDEWAYS,   100, 0.8 * turnMultiplier);
                 goToNext = true;
                 break;
         }

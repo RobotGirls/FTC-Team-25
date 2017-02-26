@@ -12,7 +12,6 @@ import team25core.PersistentTelemetryTask;
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/19/2016.
  */
 @Autonomous(name = "Encoder Test", group="Team25")
-@Disabled
 public class FourEncodersTest extends OpMode{
 
     private DcMotor frontLeft;
