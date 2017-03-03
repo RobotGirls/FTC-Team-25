@@ -66,12 +66,26 @@ public class BeaconHelper
                 // depending on whether or not you've sensed your alliance (e.g. red alliance,
                 // sensed red).
 
+                /*
                 if (event.kind == ColorSensorTask.EventKind.YES) {
                     pushers.deploy(true);
                 } else if (event.kind == ColorSensorTask.EventKind.NO) {
                     pushers.deploy(false);
-                }
+                }*/
 
+                if (alliance == Alliance.RED) {
+                    if (event.kind == EventKind.RED) {
+                       pushers.deploy(true);
+                    } else {
+                        pushers.deploy(false);
+                    }
+                } else {
+                    if (event.kind == EventKind.BLUE) {
+                        pushers.deploy(true);
+                    } else {
+                        pushers.deploy(false);
+                    }
+                }
                 waitAndStow();
                 dba.goPushBeacon();
 
@@ -81,12 +95,15 @@ public class BeaconHelper
         /**
          * FIXME: You need a class where you are keeping all your constants.
          */
+
         if (alliance == Alliance.RED) {
             colorSensorTask.setModeSingle(ColorSensorTask.TargetColor.RED, Daisy.RED_THRESHOLD);
         } else {
             colorSensorTask.setModeSingle(ColorSensorTask.TargetColor.BLUE, Daisy.BLUE_THRESHOLD);
         }
 
+
+        colorSensorTask.setModeCompare(Daisy.RED_THRESHOLD);
         colorSensorTask.setMsDelay(Daisy.COLOR_MS_DELAY);
         colorSensorTask.setReflectColor(true, robot.hardwareMap);
 

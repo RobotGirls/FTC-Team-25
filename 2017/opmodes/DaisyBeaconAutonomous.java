@@ -211,13 +211,25 @@ public class DaisyBeaconAutonomous extends Robot
     {
         pathSetup(beaconChoice);
 
+        this.addTask(new DynamicSpeedTask(this, 100, drivetrain) {
+            @Override
+            public void handleEvent(RobotEvent e)
+            {
+                DynamicSpeedEvent event = (DynamicSpeedEvent) e;
+                if (event.kind == EventKind.DONE) {
+                   detectLine();
+                }
+            }
+        });
+
+        /*
         // Launch first particle.
        if (actionChoice != AutonomousAction.LAUNCH_0) {
            addTask(launchParticleTask);
        } else {
            approachBeacon(approachBeacon);
            RobotLog.i("141 Approaching first beacon.");
-       }
+       }*/
     }
 
     @Override
@@ -242,6 +254,7 @@ public class DaisyBeaconAutonomous extends Robot
                     filterBeaconSelection();
                     break;
                 case BUTTON_Y_DOWN:
+                    ptt.addData("Alignment", "Set the robot at an angle");
                     ptt.addData("Press (X) to select", "Blue alliance!");
                     ptt.addData("Press (B) to select", "Red alliance!");
                     ptt.addData("Press (LEFT BUMPER) to select", "Launch!");
@@ -370,6 +383,8 @@ public class DaisyBeaconAutonomous extends Robot
 
                 if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
                     RobotLog.i("141 Detected white line.");
+                    nttt.setFindMethod(NavigateToTargetTask.FindMethod.ROTATE_LEFT);
+                    nttt.findTarget();
                     this.stop();
                 } else if (drEvent.kind == EventKind.PATH_DONE) {
                     RobotLog.i("141 White line not found.");
@@ -483,18 +498,10 @@ public class DaisyBeaconAutonomous extends Robot
     {
         switch(beaconChoice) {
             case BEACON_1:
-                approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT,  8, STRAIGHT_SPEED);
-                approachBeacon.addSegment(DeadReckon.SegmentType.TURN,     90, -TURN_SPEED * turnMultiplier);
-                approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 55, STRAIGHT_SPEED * turnMultiplier);
-                approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 40, STRAIGHT_SPEED * turnMultiplier);
-                break;
+                approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 200, -STRAIGHT_SPEED);
             case BEACON_2:
-                approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT,  8, STRAIGHT_SPEED);
-                approachBeacon.addSegment(DeadReckon.SegmentType.TURN,     90, -TURN_SPEED * turnMultiplier);
-                approachBeacon.addSegment(DeadReckon.SegmentType.SIDEWAYS, 55, STRAIGHT_SPEED * turnMultiplier);
-                approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 43, -STRAIGHT_SPEED);
-                approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT,   20, 0.2);
-                approachNext.addSegment(DeadReckon.SegmentType.SIDEWAYS,   100, 0.8 * turnMultiplier);
+                approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT,  20, 0.2);
+                approachNext.addSegment(DeadReckon.SegmentType.SIDEWAYS, 100, -0.8 * turnMultiplier);
                 goToNext = true;
                 break;
         }
