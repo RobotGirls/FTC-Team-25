@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import team25core.GamepadTask;
 import team25core.MecanumWheelDriveTask;
+import team25core.OneWheelDriveTask;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -46,14 +47,16 @@ public class DaisyTeleop extends Robot
     private DcMotor flowerPower;
     private DcMotor conveyor;
     private DcMotor launcher;
+    private DcMotor capBall;
+    private Servo capServo;
     private Servo leftPusher;
     private Servo rightPusher;
     private ContinuousBeaconArms pushers;
     private Servo odsSwinger;
 
     private MecanumWheelDriveTask drive;
+    private OneWheelDriveTask controlCapBall;
     private PersistentTelemetryTask ptt;
-    private RunToEncoderValueTask runToPositionTask;
 
     private final int LAUNCH_POSITION = Daisy.LAUNCH_POSITION;
 
@@ -70,10 +73,10 @@ public class DaisyTeleop extends Robot
     private void toggleLeftPusher()
     {
         if (!leftPusherOut) {
-            pushers.deployLeft();
+            leftPusher.setPosition(Daisy.LEFT_DEPLOY_POS);
             leftPusherOut = true;
         } else {
-            pushers.stowLeft();
+            leftPusher.setPosition(Daisy.LEFT_STOW_POS);
             leftPusherOut = false;
         }
     }
@@ -81,10 +84,10 @@ public class DaisyTeleop extends Robot
     private void toggleRightPusher()
     {
         if (!rightPusherOut) {
-            pushers.deployRight();
+            rightPusher.setPosition(Daisy.RIGHT_DEPLOY_POS);
             rightPusherOut = true;
         } else {
-            pushers.stowRight();
+            rightPusher.setPosition(Daisy.RIGHT_STOW_POS);
             rightPusherOut = false;
         }
     }
@@ -99,22 +102,23 @@ public class DaisyTeleop extends Robot
         flowerPower = hardwareMap.dcMotor.get("flowerPower");
         conveyor    = hardwareMap.dcMotor.get("conveyor");
         launcher    = hardwareMap.dcMotor.get("launcher");
+        capBall     = hardwareMap.dcMotor.get("capBall");
         leftPusher  = hardwareMap.servo.get("leftPusher");
         rightPusher = hardwareMap.servo.get("rightPusher");
         odsSwinger  = hardwareMap.servo.get("odsSwinger");
+        capServo    = hardwareMap.servo.get("capServo");
 
         leftPusher.setPosition(0.5);
         rightPusher.setPosition(0.5);
         pushers = new ContinuousBeaconArms(this, leftPusher, rightPusher, true);
 
         odsSwinger.setPosition(0.7);
+        capServo.setPosition(1.0);
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        runToPositionTask = new RunToEncoderValueTask(this, launcher, LAUNCH_POSITION, 1.0);
 
         slow = false;
         rightPusherOut = false;
@@ -127,7 +131,9 @@ public class DaisyTeleop extends Robot
     public void start()
     {
         drive = new MecanumWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
+        controlCapBall = new OneWheelDriveTask(this, capBall, true);
         this.addTask(drive);
+        this.addTask(controlCapBall);
         this.addTask(ptt);
 
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
@@ -145,7 +151,9 @@ public class DaisyTeleop extends Robot
                 } else if (event.kind == EventKind.RIGHT_BUMPER_DOWN) {
                     launcher.setPower(-1.0);
                 } else if (event.kind == EventKind.BUTTON_Y_DOWN) {
-                    addTask(runToPositionTask);
+                    capBall.setPower(1.0);
+                } else if (event.kind == EventKind.BUTTON_X_DOWN) {
+                    capBall.setPower(-1.0);
                 } else if (event.kind == EventKind.LEFT_TRIGGER_DOWN) {
                     toggleLeftPusher();
                 } else if (event.kind == EventKind.RIGHT_TRIGGER_DOWN) {
@@ -154,6 +162,7 @@ public class DaisyTeleop extends Robot
                     flowerPower.setPower(0.0);
                     conveyor.setPower(0.0);
                     launcher.setPower(0.0);
+                    capBall.setPower(0.0);
                 }
             }
         });
@@ -165,14 +174,21 @@ public class DaisyTeleop extends Robot
                 if (event.kind == EventKind.BUTTON_A_DOWN) {
                    // Toggles slowness of motors.
                     if (!slow) {
-                       drive.slowDown(0.45);
-                       slow = true;
+                        drive.slowDown(0.45);
+                        slow = true;
                         ptt.addData("Slow","true");
                    } else {
-                       drive.slowDown(false);
-                       slow = false;
+                        drive.slowDown(false);
+                        slow = false;
                         ptt.addData("Slow","false");
                    }
+                } else if (event.kind == EventKind.BUTTON_Y_DOWN) {
+                    capServo.setPosition(0.8);  // Values may change.
+                } else if (event.kind == EventKind.BUTTON_X_DOWN) {
+                    // change direction
+                    drive.changeDirection();
+                } else if (event.kind == EventKind.BUTTON_B_DOWN) {
+                    capServo.setPosition(0.0);  // Values may change.
                 }
             }
         });
@@ -181,6 +197,6 @@ public class DaisyTeleop extends Robot
     @Override
     public void stop()
     {
-
+        // Nothing.
     }
 }

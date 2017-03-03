@@ -18,12 +18,12 @@ import team25core.NavigateToTargetTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 
+/**
+ * FTC Team 25: Created by Katelyn Biesiadecki on 1/14/2017.
+ */
 @Autonomous(name = "VuforiaTargetTracking", group = "AutoTest")
 public class VuforiaTargetTrackingExample extends Robot {
 
-    /**
-    * FTC Team 25: Created by Katelyn Biesiadecki on 1/14/2017.
-    */
     NavigateToTargetTask nttt;
     FourWheelDirectDrivetrain drivetrain;
     DcMotor frontLeft;
@@ -99,7 +99,7 @@ public class VuforiaTargetTrackingExample extends Robot {
                         AxesReference.EXTRINSIC, AxesOrder.YZX,
                         AngleUnit.DEGREES, CAMERA_CHOICE == VuforiaLocalizer.CameraDirection.FRONT ? 90 : -90, 0, 0));
 
-        nttt = new NavigateToTargetTask(this, drivetrain, NavigateToTargetTask.Targets.RED_NEAR, 300000, gamepad1);
+        nttt = new NavigateToTargetTask(this, drivetrain, NavigateToTargetTask.Targets.RED_NEAR, 300000, gamepad1, NavigateToTargetTask.Alliance.RED);
         nttt.init(targets, parameters, phoneLocationOnRobot);
         addTask(nttt);
 

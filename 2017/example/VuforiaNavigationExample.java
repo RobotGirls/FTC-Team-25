@@ -4,6 +4,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+
+import opmodes.Daisy;
+import team25core.FourWheelDirectDrivetrain;
 import team25core.NavigateToTargetTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -11,7 +15,7 @@ import team25core.RobotEvent;
 /**
  * FTC Team 25: Created by Katelyn Biesiadecki on 1/14/2017.
  */
-@Autonomous(name = "Vuforia ", group = "Team 25")
+@Autonomous(name = "Daisy: Vuforia Target Finding", group = "Team 25")
 public class VuforiaNavigationExample extends Robot
 {
     NavigateToTargetTask nttt;
@@ -19,17 +23,17 @@ public class VuforiaNavigationExample extends Robot
     DcMotor frontRight;
     DcMotor rearLeft;
     DcMotor rearRight;
-
+    FourWheelDirectDrivetrain drivetrain;
 
     @Override
     public void init()
     {
-        nttt = new NavigateToTargetTask(this, 300000, gamepad1);
         frontLeft   = hardwareMap.dcMotor.get("rearRight");
         frontRight  = hardwareMap.dcMotor.get("rearLeft");
         rearLeft    = hardwareMap.dcMotor.get("frontRight");
         rearRight   = hardwareMap.dcMotor.get("frontLeft");
-        nttt.init(frontLeft, frontRight, rearLeft, rearRight);
+        drivetrain = new FourWheelDirectDrivetrain(Daisy.TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
+        nttt = new NavigateToTargetTask(this, drivetrain, NavigateToTargetTask.Targets.RED_NEAR, 300000, gamepad1, NavigateToTargetTask.Alliance.RED);
         super.init();
     }
 
