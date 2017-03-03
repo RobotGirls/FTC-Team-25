@@ -61,6 +61,7 @@ public class DaisyBeaconAutonomous extends Robot
     private BeaconHelper helper;
     private BeaconArms buttonPushers;
     private PersistentTelemetryTask ptt;
+    private Alliance alliance;
 
     private MecanumGearedDriveDeadReckon approachBeacon;
     private MecanumGearedDriveDeadReckon approachNext;
@@ -353,6 +354,11 @@ public class DaisyBeaconAutonomous extends Robot
                 break;
         }
 
+        if (alliance == Alliance.RED) {
+            nttt.setFindMethod(NavigateToTargetTask.FindMethod.ROTATE_LEFT);
+        } else {
+            nttt.setFindMethod(NavigateToTargetTask.FindMethod.ROTATE_RIGHT);
+        }
         drivetrain.resetEncoders();
         drivetrain.encodersOn();
         this.addTask(nttt);
@@ -383,9 +389,7 @@ public class DaisyBeaconAutonomous extends Robot
 
                 if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
                     RobotLog.i("141 Detected white line.");
-                    nttt.setFindMethod(NavigateToTargetTask.FindMethod.ROTATE_LEFT);
-                    nttt.findTarget();
-                    this.stop();
+                    navigateToTarget(vuforiaTarget);
                 } else if (drEvent.kind == EventKind.PATH_DONE) {
                     RobotLog.i("141 White line not found.");
                     // Missed white line, try again.
@@ -474,8 +478,9 @@ public class DaisyBeaconAutonomous extends Robot
         if (color == Alliance.BLUE) {
             // Do blue setup.
             RobotLog.i("141 Doing blue setup.");
-            vuforiaTarget = NavigateToTargetTask.Targets.BLUE_NEAR;
-            secondTarget = NavigateToTargetTask.Targets.BLUE_FAR;
+            alliance = Alliance.BLUE;
+            vuforiaTarget = NavigateToTargetTask.Targets.BLUE_FAR;
+            secondTarget = NavigateToTargetTask.Targets.BLUE_NEAR;
             turnMultiplier = -1;
             drivetrain.setAlliance(Alliance.BLUE);
             nttt.setAlliance(NavigateToTargetTask.Alliance.BLUE);
@@ -484,8 +489,9 @@ public class DaisyBeaconAutonomous extends Robot
         } else {
             // Do red setup.
             RobotLog.i("141 Doing red setup.");
-            vuforiaTarget = NavigateToTargetTask.Targets.RED_NEAR;
-            secondTarget = NavigateToTargetTask.Targets.RED_FAR;
+            alliance = Alliance.RED;
+            vuforiaTarget = NavigateToTargetTask.Targets.RED_FAR;
+            secondTarget = NavigateToTargetTask.Targets.RED_NEAR;
             turnMultiplier = 1;
             drivetrain.setAlliance(Alliance.RED);
             nttt.setAlliance(NavigateToTargetTask.Alliance.RED);
