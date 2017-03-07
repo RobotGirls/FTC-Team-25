@@ -16,10 +16,10 @@ public class Daisy
     // Autonomous constants.
     public static final int TICKS_PER_INCH = 60;
     public static final int TICKS_PER_DEGREE = 19;
-    public final static double STRAIGHT_SPEED = 0.6;
-    public final static double TURN_SPEED = 0.3;
+    public final static double STRAIGHT_SPEED = 0.9;
+    public final static double TURN_SPEED = 0.6;
     public final static double ODS_MIN = 0.5;
-    public final static double ODS_MAX = 2.6;
+    public final static double ODS_MAX = 4;
     public final static int LAUNCH_POSITION = 1500;
     public final static int RANGE_PORT = 2;
     public final static int COLOR_PORT = 1;

@@ -1,6 +1,7 @@
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
@@ -12,7 +13,7 @@ import team25core.RobotEvent;
  * Created by Elizabeth on 12/27/2016.
  */
 @Autonomous(name = "COLOR Test", group="AutoTeam25")
-
+@Disabled
 public class ColorTest2 extends Robot {
 
     private DeviceInterfaceModule core;

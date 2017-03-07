@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -54,7 +55,7 @@ public class DaisyVuforiaOrientation extends Robot
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         drivetrain = new FourWheelDirectDrivetrain(Daisy.TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
-        nttt = new NavigateToTargetTask(this, drivetrain, NavigateToTargetTask.Targets.RED_NEAR, 1000000, gamepad1, NavigateToTargetTask.Alliance.RED);
+        nttt = new NavigateToTargetTask(this, drivetrain, NavigateToTargetTask.Targets.RED_FAR, 1000000, gamepad1, NavigateToTargetTask.Alliance.RED);
 
         // *rap break*
         // yo yo yo
