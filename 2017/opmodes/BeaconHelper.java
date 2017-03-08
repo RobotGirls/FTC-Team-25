@@ -75,14 +75,18 @@ public class BeaconHelper
 
                 if (alliance == Alliance.RED) {
                     if (event.kind == EventKind.RED) {
+                        RobotLog.i("141 Sensed RED");
                        pushers.deploy(true);
                     } else {
+                        RobotLog.i("141 Sensed RED");
                         pushers.deploy(false);
                     }
                 } else {
                     if (event.kind == EventKind.BLUE) {
+                        RobotLog.i("141 Sensed BLUE");
                         pushers.deploy(true);
                     } else {
+                        RobotLog.i("141 Sensed BLUE");
                         pushers.deploy(false);
                     }
                 }
@@ -97,9 +101,9 @@ public class BeaconHelper
          */
 
         if (alliance == Alliance.RED) {
-            colorSensorTask.setModeSingle(ColorSensorTask.TargetColor.RED, Daisy.RED_THRESHOLD);
+            colorSensorTask.setModeCompare(Daisy.RED_THRESHOLD);
         } else {
-            colorSensorTask.setModeSingle(ColorSensorTask.TargetColor.BLUE, Daisy.BLUE_THRESHOLD);
+            colorSensorTask.setModeCompare(Daisy.BLUE_THRESHOLD);
         }
 
 
