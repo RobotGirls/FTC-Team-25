@@ -20,6 +20,7 @@ import team25core.TwoWheelDirectDrivetrain;
  * FTC Team 25: Created by Katelyn Biesiadecki on 1/14/2017.
  */
 @Autonomous(name = "Daisy: Vuforia (it's this one)", group = "Team 25")
+@Disabled
 public class DaisyVuforiaOrientation extends Robot
 {
     enum TargetState {

@@ -17,6 +17,7 @@ import team25core.TwoWheelGearedDriveDeadReckon;
  */
 
 @TeleOp(name="Lameingo: Teleop", group="Team25")
+@Disabled
 public class LameingoTeleop extends Robot {
     DcMotor left;
     DcMotor right;

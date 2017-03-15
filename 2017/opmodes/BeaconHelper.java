@@ -78,7 +78,7 @@ public class BeaconHelper
                         RobotLog.i("141 Sensed RED");
                        pushers.deploy(true);
                     } else {
-                        RobotLog.i("141 Sensed RED");
+                        RobotLog.i("141 Sensed BLUE");
                         pushers.deploy(false);
                     }
                 } else {
@@ -86,7 +86,7 @@ public class BeaconHelper
                         RobotLog.i("141 Sensed BLUE");
                         pushers.deploy(true);
                     } else {
-                        RobotLog.i("141 Sensed BLUE");
+                        RobotLog.i("141 Sensed RED");
                         pushers.deploy(false);
                     }
                 }

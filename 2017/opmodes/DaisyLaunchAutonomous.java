@@ -40,6 +40,7 @@ public class DaisyLaunchAutonomous extends Robot
     private final double TURN_SPEED = Daisy.TURN_SPEED;
     private final int LAUNCH_POSITION = Daisy.LAUNCH_POSITION;
     private int turnMultiplier = 1;
+    private int launchSelection = 0;
 
     private AutonomousPath pathChoice = AutonomousPath.CAP_BALL;
     private AutonomousAction actionChoice = AutonomousAction.LAUNCH_2;
@@ -75,14 +76,13 @@ public class DaisyLaunchAutonomous extends Robot
                 selectAlliance(Alliance.RED);
                 ptt.addData("ALLIANCE", "Red");
             } else if (event.kind == GamepadTask.EventKind.LEFT_TRIGGER_DOWN) {
-                pathChoice = AutonomousPath.CORNER_PARK;
-                ptt.addData("AUTONOMOUS", "Corner Park");
+                pathChoice = AutonomousPath.CENTER_PARK;
+                ptt.addData("AUTONOMOUS", "Center Park");
             } else if (event.kind == GamepadTask.EventKind.RIGHT_TRIGGER_DOWN) {
                 pathChoice = AutonomousPath.LAUNCH;
-                ptt.addData("LAUNCH", "Stay");
+                ptt.addData("PARK", "Stay");
             } else if (event.kind == GamepadTask.EventKind.LEFT_BUMPER_DOWN) {
-                actionChoice = AutonomousAction.LAUNCH_1;
-                ptt.addData("LAUNCH", "Launch 1 Ball");
+                filterLaunchSelection();
             } else if (event.kind == GamepadTask.EventKind.RIGHT_BUMPER_DOWN) {
                 actionChoice = AutonomousAction.LAUNCH_2;
                 ptt.addData("LAUNCH", "Launch 2 Balls");
@@ -100,9 +100,22 @@ public class DaisyLaunchAutonomous extends Robot
                     addTask(stt);
                     launched = true;
                 } else {
-                    addTask(deadReckonTask);
+                    //addTask(deadReckonTask);
                 }
             }
+        }
+    }
+
+    private void filterLaunchSelection()
+    {
+        if (launchSelection == 0) {
+            actionChoice = AutonomousAction.LAUNCH_1;
+            ptt.addData("LAUNCH", "Launch 1 Balls");
+            launchSelection = 1;
+        } else {
+            actionChoice = AutonomousAction.LAUNCH_2;
+            ptt.addData("LAUNCH", "Launch 2 Balls");
+            launchSelection = 0;
         }
     }
 
@@ -167,12 +180,14 @@ public class DaisyLaunchAutonomous extends Robot
         // Telemetry setup.
         ptt = new PersistentTelemetryTask(this);
         this.addTask(ptt);
+
+        /*
         ptt.addData("Press (X) to select", "Blue alliance!");
         ptt.addData("Press (B) to select", "Red alliance!");
         ptt.addData("Press (LEFT TRIGGER) to select", "Center Park!");
         ptt.addData("Press (RIGHT TRIGGER) to select", "Just launch!");
-        ptt.addData("Press (LEFT BUMPER) to select", "Launch 1 Ball!");
-        ptt.addData("Press (RIGHT BUMPER) to select", "Launch 2 Balls!");
+        ptt.addData("Press (LEFT BUMPER) to select", "Launch!");
+        */
 
 
         // Alliance selection.

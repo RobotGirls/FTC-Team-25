@@ -1,6 +1,7 @@
 package example;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -25,6 +26,7 @@ import team25core.TwoWheelDirectDrivetrain;
  * FTC Team 25: Created by Katelyn Biesiadecki on 1/14/2017.
  */
 @Autonomous(name = "LAMEINGO RETURNS: VUFORIA ORIENTATION", group = "Team 25")
+@Disabled
 public class VuforiaOrientationExample extends Robot
 {
     enum TargetState {

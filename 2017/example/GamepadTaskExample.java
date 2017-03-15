@@ -1,5 +1,6 @@
 package example;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -8,6 +9,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 
 @TeleOp(name = "Gamepad Task Example", group = "Team25")
+@Disabled
 public class GamepadTaskExample extends Robot
 {
         private Servo leftArm;

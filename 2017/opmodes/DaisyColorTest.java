@@ -15,7 +15,7 @@ import team25core.RobotEvent;
 /**
  * FTC Team 25: Created by Katelyn Biesiadecki on 2/25/2017.
  */
-@Autonomous(name = "IMPROVED COLOR TEST", group = "Team 25")
+@Autonomous(name = " COLOR Test", group = "Team 25")
 public class DaisyColorTest extends Robot
 {
     DeviceInterfaceModule cdim;

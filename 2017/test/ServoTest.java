@@ -15,7 +15,7 @@ public class ServoTest extends OpMode
     private Servo servo;
     @Override
     public void init() {
-    servo=hardwareMap.servo.get("servo");
+    servo=hardwareMap.servo.get("rightPusher");
     }
 
     @Override

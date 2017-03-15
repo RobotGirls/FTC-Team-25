@@ -105,7 +105,7 @@ public class DaisyBeaconAutonomous extends Robot
     }
 
     public enum AutonomousPath {
-        CORNER_PARK,
+        CENTER_PARK,
         STAY,
     }
 
@@ -156,6 +156,7 @@ public class DaisyBeaconAutonomous extends Robot
         approachBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
         approachNext = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
         backOff = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        park = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
 
         // Launch setup.
         launchParticleTask = new RunToEncoderValueTask(this, launcher, LAUNCH_POSITION, 1.0);
@@ -352,6 +353,9 @@ public class DaisyBeaconAutonomous extends Robot
      */
     private void navigateToTarget(NavigateToTargetTask.Targets target)
     {
+        leftPusher.setPosition(Daisy.LEFT_DEPLOY_POS);
+        rightPusher.setPosition(Daisy.RIGHT_STOW_POS);
+
         RobotLog.i("141 Navigating to target.");
         drivetrain.setNoncanonicalMotorDirection();
         switch (target) {
@@ -385,6 +389,7 @@ public class DaisyBeaconAutonomous extends Robot
      *       we decide to get even closer to the beacon before using Vuforia target finding.
      * UPDATE: Haha, now we're using it again!
      */
+
     private void detectLine()
     {
         RobotLog.i("141 Attempting to detect white line.");
@@ -416,7 +421,11 @@ public class DaisyBeaconAutonomous extends Robot
     public void goPushBeacon() {
         RobotLog.i("141 Moving forward to push beacon.");
         MecanumGearedDriveDeadReckon pushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 15, 0.2);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 15, 0.6);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, -1.0);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, 1.0);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, -1.0);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, 1.0);
 
         drivetrain.setNoncanonicalMotorDirection();
         this.addTask(new DeadReckonTask(this, pushBeacon, rangeCriteria) {
@@ -455,8 +464,9 @@ public class DaisyBeaconAutonomous extends Robot
 
             RobotLog.i("141 Approaching second beacon.");
             goToNext = false;
-        } else {
-            backOffBuster();
+        } else if (beaconChoice == AutonomousBeacon.BEACON_2 && parkChoice == AutonomousPath.CENTER_PARK){
+            this.addTask(new DeadReckonTask(this, park));
+            //backOffBuster();
         }
     }
 
@@ -497,8 +507,8 @@ public class DaisyBeaconAutonomous extends Robot
     private void filterParkSelection()
     {
         if (parkSelection == 0) {
-            parkChoice = AutonomousPath.CORNER_PARK;
-            ptt.addData("PARK", "Corner Park");
+            parkChoice = AutonomousPath.CENTER_PARK;
+            ptt.addData("PARK", "Center Park");
             parkSelection = 1;
         } else {
             parkChoice = AutonomousPath.STAY;
@@ -544,9 +554,14 @@ public class DaisyBeaconAutonomous extends Robot
                 break;
             case BEACON_2:
                 approachBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 73, STRAIGHT_SPEED);
-                approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT,  16, 0.8);
-                approachNext.addSegment(DeadReckon.SegmentType.SIDEWAYS,  85, 0.8 * turnMultiplier);
-
+                if (alliance == Alliance.BLUE) {
+                    approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT,  16, 0.8);
+                } else {
+                    approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT,  26, 0.8);
+                }
+                approachNext.addSegment(DeadReckon.SegmentType.SIDEWAYS,  93, 0.8 * turnMultiplier);
+                park.addSegment(DeadReckon.SegmentType.TURN, 30, 1.0 * turnMultiplier);
+                park.addSegment(DeadReckon.SegmentType.STRAIGHT, 85, -1.0);
                 goToNext = true;
                 break;
         }
