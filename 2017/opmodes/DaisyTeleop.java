@@ -1,16 +1,31 @@
 package opmodes;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+
+import team25core.DeadReckon;
+import team25core.DeadReckonTask;
+import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
+import team25core.MecanumGearedDriveDeadReckon;
 import team25core.MecanumWheelDriveTask;
+import team25core.NavigateToTargetTask;
 import team25core.OneWheelDriveTask;
 import team25core.PersistentTelemetryTask;
+import team25core.RangeSensorCriteria;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.RobotNavigation;
 import team25core.RunToEncoderValueTask;
 
 /**
@@ -34,7 +49,7 @@ public class DaisyTeleop extends Robot
     --------------------------------------------------------------------------------------------
       (L trigger)        (R trigger)    | (LT) toggle L pusher out     (RT) toggle R pusher out
       (L bumper)         (R bumper)     | (LB) rotate flea forward     (RB) rotate flea backward
-                            (y)         |  (y) launch particle
+                            (y)         |  (y) claim beacon
       arrow pad          (x)   (b)      |  (b) flower power (accept)
                             (a)         |  (a) flower power (reject)
 
@@ -53,6 +68,10 @@ public class DaisyTeleop extends Robot
     private Servo rightPusher;
     private ContinuousBeaconArms pushers;
     private Servo odsSwinger;
+    private DistanceSensor range;
+
+    private FourWheelDirectDrivetrain drivetrain;
+    private RangeSensorCriteria rangeCriteria;
 
     private MecanumWheelDriveTask drive;
     private OneWheelDriveTask controlCapBall;
@@ -64,10 +83,54 @@ public class DaisyTeleop extends Robot
     private boolean leftPusherOut;
     private boolean rightPusherOut;
 
+    private RobotNavigation nav;
+    private NavigateToTargetTask nttt;
+    private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = Daisy.CAMERA_CHOICE;
+    private NavigateToTargetTask.Targets vuforiaTarget;
+
     @Override
     public void handleEvent(RobotEvent e)
     {
-        // Nothing.
+        // Once robot is at the target, push beacon.
+        if (e instanceof NavigateToTargetTask.NavigateToTargetEvent) {
+            NavigateToTargetTask.NavigateToTargetEvent event = (NavigateToTargetTask.NavigateToTargetEvent) e;
+            switch (event.kind) {
+                case AT_TARGET:
+                    MecanumGearedDriveDeadReckon pushBeacon = new MecanumGearedDriveDeadReckon(this, Daisy.TICKS_PER_INCH, Daisy.TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+                    pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 5, 0.6);
+                    pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 5, -0.6);
+
+                    drivetrain.setNoncanonicalMotorDirection();
+                    this.addTask(new DeadReckonTask(this, pushBeacon, rangeCriteria) {
+                        @Override
+                        public void handleEvent(RobotEvent e)
+                        {
+                            DeadReckonEvent event = (DeadReckonEvent) e;
+                            if (event.kind == EventKind.PATH_DONE) {
+                                drivetrain.resetEncoders();
+                                drivetrain.encodersOn();
+                                frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+                                rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+                                frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+                                rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
+                                drive.suspendTask(false);
+                                robot.addTask(drive);
+                            } else if (event.kind == EventKind.SENSOR_SATISFIED) {
+                                drivetrain.resetEncoders();
+                                drivetrain.encodersOn();
+                                frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+                                rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+                                frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+                                rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
+                                drive.suspendTask(false);
+                                robot.addTask(drive);
+                            }
+                        }
+                    });
+                    ptt.addData("TARGET", "Found");
+                    break;
+            }
+        }
     }
 
     private void toggleLeftPusher()
@@ -107,24 +170,56 @@ public class DaisyTeleop extends Robot
         rightPusher = hardwareMap.servo.get("rightPusher");
         odsSwinger  = hardwareMap.servo.get("odsSwinger");
         capServo    = hardwareMap.servo.get("capServo");
+        range       = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
 
         leftPusher.setPosition(0.5);
         rightPusher.setPosition(0.5);
         pushers = new ContinuousBeaconArms(this, leftPusher, rightPusher, true);
 
         odsSwinger.setPosition(0.7);
-        capServo.setPosition(1.0);
-
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        capServo.setPosition(0.8);
 
         slow = false;
         rightPusherOut = false;
         leftPusherOut = false;
 
         ptt = new PersistentTelemetryTask(this);
+
+        // Range sensor setup.
+        rangeCriteria = new RangeSensorCriteria(range, 16);
+
+        // Reset encoders.
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        drivetrain = new FourWheelDirectDrivetrain(Daisy.TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
+        drivetrain.setCanonicalMotorDirection();
+
+        // Vuforia setup.
+        nav = new RobotNavigation(this, drivetrain);
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        parameters.vuforiaLicenseKey = Daisy.KEY;
+        parameters.cameraDirection = CAMERA_CHOICE;
+        parameters.useExtendedTracking = false;
+
+        VuforiaLocalizer vuforia = ClassFactory.createVuforiaLocalizer(parameters);
+
+        VuforiaTrackables targets = vuforia.loadTrackablesFromAsset("FTC_2016-17");
+        targets.get(0).setName("Blue Near");
+        targets.get(1).setName("Red Far");
+        targets.get(2).setName("Blue Far");
+        targets.get(3).setName("Red Near");
+
+        OpenGLMatrix phoneLocationOnRobot = Daisy.PHONE_LOCATION_ON_ROBOT;
+
+        nttt = new NavigateToTargetTask(this, drivetrain, 1000000, gamepad1, NavigateToTargetTask.Alliance.RED);
+        nttt.init(targets, parameters, phoneLocationOnRobot);
     }
 
     @Override
@@ -151,9 +246,18 @@ public class DaisyTeleop extends Robot
                 } else if (event.kind == EventKind.RIGHT_BUMPER_DOWN) {
                     launcher.setPower(-1.0);
                 } else if (event.kind == EventKind.BUTTON_Y_DOWN) {
-                    capBall.setPower(1.0);
+                    drive.suspendTask(true);
+                    navigateToTarget();
                 } else if (event.kind == EventKind.BUTTON_X_DOWN) {
-                    capBall.setPower(-1.0);
+                    robot.removeTask(nttt);   // Abort automatic target navigation.
+                    drivetrain.resetEncoders();
+                    drivetrain.encodersOn();
+                    frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+                    rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+                    frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+                    rearRight.setDirection(DcMotorSimple.Direction.REVERSE);
+                    drive.suspendTask(false);
+                    robot.addTask(drive);
                 } else if (event.kind == EventKind.LEFT_TRIGGER_DOWN) {
                     toggleLeftPusher();
                 } else if (event.kind == EventKind.RIGHT_TRIGGER_DOWN) {
@@ -176,11 +280,11 @@ public class DaisyTeleop extends Robot
                     if (!slow) {
                         drive.slowDown(0.3);
                         slow = true;
-                        ptt.addData("Slow","true");
+                        ptt.addData("SLOW","true");
                    } else {
                         drive.slowDown(false);
                         slow = false;
-                        ptt.addData("Slow","false");
+                        ptt.addData("SLOW","false");
                    }
                 } else if (event.kind == EventKind.BUTTON_Y_DOWN) {
                     capServo.setPosition(0.8);  // Values may change.
@@ -192,6 +296,19 @@ public class DaisyTeleop extends Robot
                 }
             }
         });
+    }
+
+    private void navigateToTarget()
+    {
+        leftPusher.setPosition(Daisy.LEFT_DEPLOY_POS);
+        rightPusher.setPosition(Daisy.RIGHT_STOW_POS);
+        drivetrain.setNoncanonicalMotorDirection();
+        drivetrain.resetEncoders();
+        drivetrain.encodersOn();
+        nttt.reset();
+        this.addTask(nttt);
+        nttt.findTarget();
+        this.removeTask(drive);
     }
 
     @Override
