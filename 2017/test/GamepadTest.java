@@ -1,5 +1,6 @@
 package test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,6 +11,7 @@ import static android.R.attr.name;
  */
 
 @TeleOp(name = "Gamepad Test", group = "Team 25")
+@Disabled
 public class GamepadTest extends OpMode
 {
 

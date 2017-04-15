@@ -1,5 +1,6 @@
 package example;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.GyroSensor;
@@ -11,6 +12,7 @@ import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
 
 @TeleOp(name = "Gyro Task Example", group = "Team25")
+@Disabled
 public class GyroTaskExample extends Robot
 {
     private DcMotor left;

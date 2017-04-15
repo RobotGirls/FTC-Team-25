@@ -1,6 +1,7 @@
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -23,6 +24,7 @@ import team25core.TwoWheelDirectDrivetrain;
  */
 
 @Autonomous(name = "TEST Target Stationary", group = "AutoTest")
+@Disabled
 public class LameingoTargetStationaryTest extends Robot {
 
     enum TargetState {

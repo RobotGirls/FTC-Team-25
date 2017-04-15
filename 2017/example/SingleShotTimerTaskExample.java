@@ -1,5 +1,6 @@
 package example;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -9,6 +10,7 @@ import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
 
 @TeleOp(name = "Single Shot Timer Task Example", group = "Team25")
+@Disabled
 public class SingleShotTimerTaskExample extends Robot
 {
     private Servo arm;

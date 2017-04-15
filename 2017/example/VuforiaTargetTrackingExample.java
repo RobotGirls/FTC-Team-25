@@ -1,6 +1,7 @@
 package example;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -22,6 +23,7 @@ import team25core.RobotEvent;
  * FTC Team 25: Created by Katelyn Biesiadecki on 1/14/2017.
  */
 @Autonomous(name = "VuforiaTargetTracking", group = "AutoTest")
+@Disabled
 public class VuforiaTargetTrackingExample extends Robot {
 
     NavigateToTargetTask nttt;
