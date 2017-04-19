@@ -220,33 +220,16 @@ public class DaisyBeaconAutonomous extends Robot
 
         drivetrain.setNoncanonicalMotorDirection();
 
-        /* this.addTask(new DynamicSpeedTask(this, 100, drivetrain) {
-            @Override
-            public void handleEvent(RobotEvent e)
-            {
-                DynamicSpeedEvent event = (DynamicSpeedEvent) e;
-                if (event.kind == EventKind.DONE) {
-                   detectLine();
-                }
-            }
-        }); */
-
-        // Launch first particle.
-       /*if (actionChoice != AutonomousAction.LAUNCH_0) {
-           addTask(launchParticleTask);
-       } else {*/
-
-           this.addTask(new DeadReckonTask(this, approachBeacon) {
-               @Override
-               public void handleEvent(RobotEvent e) {
-                   DeadReckonEvent event = (DeadReckonEvent) e;
-                   if (event.kind == EventKind.PATH_DONE) {
-                       RobotLog.i("141 Path done");
-                       navigateToTarget(vuforiaTarget);
-                   }
+       this.addTask(new DeadReckonTask(this, approachBeacon) {
+           @Override
+           public void handleEvent(RobotEvent e) {
+               DeadReckonEvent event = (DeadReckonEvent) e;
+               if (event.kind == EventKind.PATH_DONE) {
+                   RobotLog.i("141 Path done");
+                   navigateToTarget(vuforiaTarget);
                }
-           });
-
+           }
+       });
     }
 
     @Override
@@ -422,9 +405,9 @@ public class DaisyBeaconAutonomous extends Robot
         RobotLog.i("141 Moving forward to push beacon.");
         MecanumGearedDriveDeadReckon pushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
         pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 15, 0.6);
-        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, -1.0);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, -0.5);
         pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, 1.0);
-        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, -1.0);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, -0.5);
         pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, 1.0);
 
         drivetrain.setNoncanonicalMotorDirection();
