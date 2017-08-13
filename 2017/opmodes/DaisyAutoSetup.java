@@ -24,6 +24,7 @@ import team25core.RobotEvent;
  */
 
 @Autonomous(name = "Daisy: Setup for Autonomous", group = "Team25")
+@Disabled
 public class DaisyAutoSetup extends Robot
 {
 

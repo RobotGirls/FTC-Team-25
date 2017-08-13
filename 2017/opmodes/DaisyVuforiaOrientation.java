@@ -19,8 +19,7 @@ import team25core.TwoWheelDirectDrivetrain;
 /**
  * FTC Team 25: Created by Katelyn Biesiadecki on 1/14/2017.
  */
-@Autonomous(name = "Daisy: Vuforia (it's this one)", group = "Team 25")
-@Disabled
+@Autonomous(name = "TEST Vuforia", group = "Team 25")
 public class DaisyVuforiaOrientation extends Robot
 {
     enum TargetState {
@@ -91,7 +90,7 @@ public class DaisyVuforiaOrientation extends Robot
     public void start()
     {
         this.addTask(nttt);
-        nttt.findTarget();
+        //nttt.findTarget();
     }
 
     @Override

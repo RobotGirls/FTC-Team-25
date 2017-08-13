@@ -13,11 +13,9 @@ import team25core.RobotEvent;
  * FTC Team 25: Created by Elizabeth Wu on 3/4/17.
  */
 
-@Autonomous(name = "SIDEWAYS Test", group = "Team 25")
-@Disabled
+@Autonomous(name = "TEST Sideways", group = "Team 25")
 public class DaisySidewaysTest extends Robot
 {
-
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor rearLeft;
@@ -47,13 +45,13 @@ public class DaisySidewaysTest extends Robot
                 GamepadEvent event = (GamepadEvent) e;
 
                 if (event.kind == EventKind.BUTTON_A_DOWN) {
-                    drivetrain.strafeLeft(0.3);
+                    drivetrain.strafeLeft(0.7);
                 } else if (event.kind == EventKind.BUTTON_B_DOWN) {
-                    drivetrain.strafeRight(0.3);
+                    drivetrain.strafeRight(0.7);
                 } else if (event.kind == EventKind.BUTTON_X_DOWN) {
-                    drivetrain.strafeLeft(0.5);
+                    drivetrain.strafeLeft(0.4);
                 } else if (event.kind == EventKind.BUTTON_Y_DOWN) {
-                    drivetrain.strafeRight(0.5);
+                    drivetrain.strafeRight(0.4);
                 } else {
                     drivetrain.stop();
                     drivetrain.logEncoderCounts();

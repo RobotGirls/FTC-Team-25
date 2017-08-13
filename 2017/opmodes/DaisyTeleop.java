@@ -32,7 +32,7 @@ import team25core.RunToEncoderValueTask;
  * FTC Team 25: Created by Katelyn Biesiadecki on 10/22/2016.
  */
 
-@TeleOp(name = "Daisy Teleop", group = "Team25")
+@TeleOp(name = "DAISY Teleop", group = "Team25")
 public class DaisyTeleop extends Robot
 {
     /*
