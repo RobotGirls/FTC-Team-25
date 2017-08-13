@@ -18,7 +18,7 @@ import team25core.SingleShotTimerTask;
 /**
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/5/2016.
  */
-@Autonomous(name = "Daisy: Launch Autonomous", group = "Team25")
+@Autonomous(name = "DAISY Launch", group = "Team25")
 public class DaisyLaunchAutonomous extends Robot
 {
     private DcMotor frontLeft;
@@ -40,10 +40,9 @@ public class DaisyLaunchAutonomous extends Robot
     private final double TURN_SPEED = Daisy.TURN_SPEED;
     private final int LAUNCH_POSITION = Daisy.LAUNCH_POSITION;
     private int turnMultiplier = 1;
-    private int launchSelection = 0;
+    private int parkSelection = 0;
 
     private AutonomousPath pathChoice = AutonomousPath.CAP_BALL;
-    private AutonomousAction actionChoice = AutonomousAction.LAUNCH_2;
 
     public enum Alliance {
         RED,
@@ -55,6 +54,7 @@ public class DaisyLaunchAutonomous extends Robot
         CENTER_PARK,
         CAP_BALL,
         LAUNCH,
+        STAY,
     }
 
     public enum AutonomousAction {
@@ -69,23 +69,8 @@ public class DaisyLaunchAutonomous extends Robot
         if (e instanceof GamepadTask.GamepadEvent) {
             GamepadTask.GamepadEvent event = (GamepadTask.GamepadEvent) e;
 
-            if (event.kind == GamepadTask.EventKind.BUTTON_X_DOWN) {
-                selectAlliance(Alliance.BLUE);
-                ptt.addData("ALLIANCE", "Blue");
-            } else if (event.kind == GamepadTask.EventKind.BUTTON_B_DOWN) {
-                selectAlliance(Alliance.RED);
-                ptt.addData("ALLIANCE", "Red");
-            } else if (event.kind == GamepadTask.EventKind.LEFT_TRIGGER_DOWN) {
-                pathChoice = AutonomousPath.CENTER_PARK;
-                ptt.addData("AUTONOMOUS", "Center Park");
-            } else if (event.kind == GamepadTask.EventKind.RIGHT_TRIGGER_DOWN) {
-                pathChoice = AutonomousPath.LAUNCH;
-                ptt.addData("PARK", "Stay");
-            } else if (event.kind == GamepadTask.EventKind.LEFT_BUMPER_DOWN) {
-                filterLaunchSelection();
-            } else if (event.kind == GamepadTask.EventKind.RIGHT_BUMPER_DOWN) {
-                actionChoice = AutonomousAction.LAUNCH_2;
-                ptt.addData("LAUNCH", "Launch 2 Balls");
+            if (event.kind == GamepadTask.EventKind.LEFT_BUMPER_DOWN) {
+                filterParkSelection();
             }
         }
 
@@ -100,22 +85,22 @@ public class DaisyLaunchAutonomous extends Robot
                     addTask(stt);
                     launched = true;
                 } else {
-                    //addTask(deadReckonTask);
+                    addTask(deadReckonTask);
                 }
             }
         }
     }
 
-    private void filterLaunchSelection()
+    private void filterParkSelection()
     {
-        if (launchSelection == 0) {
-            actionChoice = AutonomousAction.LAUNCH_1;
-            ptt.addData("LAUNCH", "Launch 1 Balls");
-            launchSelection = 1;
+        if (parkSelection == 0) {
+            pathChoice = AutonomousPath.CENTER_PARK;
+            ptt.addData("PARK", "Center Park");
+            parkSelection = 1;
         } else {
-            actionChoice = AutonomousAction.LAUNCH_2;
-            ptt.addData("LAUNCH", "Launch 2 Balls");
-            launchSelection = 0;
+            pathChoice = AutonomousPath.STAY;
+            ptt.addData("PARK", "Stay");
+            parkSelection = 0;
         }
     }
 
@@ -135,13 +120,9 @@ public class DaisyLaunchAutonomous extends Robot
         FourWheelGearedDriveDeadReckon path = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE,
                 frontLeft, frontRight, rearLeft, rearRight);
 
-        if (pathChoice == AutonomousPath.CORNER_PARK) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  77, STRAIGHT_SPEED);
-        } else if (pathChoice == AutonomousPath.CENTER_PARK) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  77, STRAIGHT_SPEED);
-        } else if (pathChoice == AutonomousPath.CAP_BALL) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  77, STRAIGHT_SPEED);
-        } else if (pathChoice == AutonomousPath.LAUNCH) {
+        if (pathChoice == AutonomousPath.CENTER_PARK) {
+            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  87, STRAIGHT_SPEED);
+        } else if (pathChoice == AutonomousPath.STAY) {
             path.addSegment(DeadReckon.SegmentType.STRAIGHT,   0, STRAIGHT_SPEED);
         }
 
@@ -174,12 +155,14 @@ public class DaisyLaunchAutonomous extends Robot
         launcher.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        stt = new SingleShotTimerTask(this, 2000);
+        stt = new SingleShotTimerTask(this, 1000);
         launched = false;
 
         // Telemetry setup.
         ptt = new PersistentTelemetryTask(this);
         this.addTask(ptt);
+
+        ptt.addData("Press (LEFT BUMPER) to select", "Park!");
 
         /*
         ptt.addData("Press (X) to select", "Blue alliance!");

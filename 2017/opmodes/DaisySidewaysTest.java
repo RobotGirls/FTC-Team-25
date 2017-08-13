@@ -13,7 +13,7 @@ import team25core.RobotEvent;
  * FTC Team 25: Created by Elizabeth Wu on 3/4/17.
  */
 
-@Autonomous(name = "Sideways Test", group = "Team 25")
+@Autonomous(name = "TEST Sideways", group = "Team 25")
 public class DaisySidewaysTest extends Robot
 {
     private DcMotor frontLeft;

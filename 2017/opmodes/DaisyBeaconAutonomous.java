@@ -42,7 +42,7 @@ import team25core.SingleShotTimerTask;
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/5/2016.
  */
 
-@Autonomous(name = "Daisy: Beacon Autonomous", group = "Team25")
+@Autonomous(name = "DAISY Beacon", group = "Team25")
 public class DaisyBeaconAutonomous extends Robot
 {
     private DcMotor frontLeft;
@@ -140,7 +140,7 @@ public class DaisyBeaconAutonomous extends Robot
         drivetrain  = new FourWheelDirectDrivetrain(TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
 
         // Range sensor setup.
-        rangeCriteria = new RangeSensorCriteria(range, 16);
+        rangeCriteria = new RangeSensorCriteria(range, 15);
 
         // Initialize pushers.
         leftPusher.setPosition(Daisy.LEFT_STOW_POS);
@@ -404,11 +404,11 @@ public class DaisyBeaconAutonomous extends Robot
     public void goPushBeacon() {
         RobotLog.i("141 Moving forward to push beacon.");
         MecanumGearedDriveDeadReckon pushBeacon = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 15, 0.6);
-        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, -0.5);
-        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, 1.0);
-        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, -0.5);
-        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 7, 1.0);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 16, 0.6);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8, -0.5);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8, 1.0);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8, -0.5);
+        pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 8, 1.0);
 
         drivetrain.setNoncanonicalMotorDirection();
         this.addTask(new DeadReckonTask(this, pushBeacon, rangeCriteria) {
@@ -540,10 +540,11 @@ public class DaisyBeaconAutonomous extends Robot
                 if (alliance == Alliance.BLUE) {
                     approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT,  16, 0.8);
                 } else {
-                    approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT,  26, 0.8);
+                    approachNext.addSegment(DeadReckon.SegmentType.STRAIGHT,  20, 0.8);
                 }
                 approachNext.addSegment(DeadReckon.SegmentType.SIDEWAYS,  93, 0.8 * turnMultiplier);
-                park.addSegment(DeadReckon.SegmentType.TURN, 30, 1.0 * turnMultiplier);
+                park.addSegment(DeadReckon.SegmentType.STRAIGHT, 5, -1.0);
+                park.addSegment(DeadReckon.SegmentType.TURN, 35, 1.0 * turnMultiplier);
                 park.addSegment(DeadReckon.SegmentType.STRAIGHT, 85, -1.0);
                 goToNext = true;
                 break;
