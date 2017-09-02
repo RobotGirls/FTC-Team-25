@@ -30,7 +30,7 @@ public class DaisyColorTest extends Robot
     @Override
     public void init() {
         cdim = hardwareMap.deviceInterfaceModule.get("cdim");
-        colorSensor = AMSColorSensorImproved.create(AMSColorSensor.Parameters.createForAdaFruit(), new I2cDeviceImpl(cdim, Daisy.COLOR_PORT));
+        // colorSensor = AMSColorSensorImproved.create(AMSColorSensor.Parameters.createForAdaFruit(), new I2cDeviceImpl(cdim, Daisy.COLOR_PORT));
         this.telemetry.addData("RED", colorSensor.red());
         this.telemetry.addData("BLUE", colorSensor.blue());
 
