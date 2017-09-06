@@ -11,10 +11,11 @@ import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSenso
 
 import opmodes.BeaconArms;
 import team25core.ColorSensorTask;
+import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.Robot;
 import team25core.RobotEvent;
-import team25core.TwoWheelGearedDriveDeadReckon;
+import team25core.TwoWheelDirectDrivetrain;
 
 /**
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/29/2016.
@@ -29,11 +30,12 @@ public class LameingoBeaconTest extends Robot
     DeviceInterfaceModule cdim;
     ColorSensorTask senseColorTask;
     SensorMRRangeSensor range;
-    TwoWheelGearedDriveDeadReckon pushPath;
+    DeadReckonPath pushPath;
     DeadReckonTask pushTask;
     BeaconArms buttonPushers;
     Servo leftPusher;
     Servo rightPusher;
+    TwoWheelDirectDrivetrain drivetrain;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -75,11 +77,12 @@ public class LameingoBeaconTest extends Robot
         leftPusher = hardwareMap.servo.get("leftPusher");
         rightPusher = hardwareMap.servo.get("rightPusher");
 
+        drivetrain = new TwoWheelDirectDrivetrain(LameingoConfiguration.TICKS_PER_INCH, right, left);
+
         leftPusher.setPosition(LameingoConfiguration.LEFT_STOW_POS);
         rightPusher.setPosition(LameingoConfiguration.RIGHT_STOW_POS);
-        pushPath = new TwoWheelGearedDriveDeadReckon(this, LameingoConfiguration.TICKS_PER_INCH,
-               LameingoConfiguration.TICKS_PER_DEGREE, left, right);
-        pushTask = new DeadReckonTask(this, pushPath);
+        pushPath = new DeadReckonPath();
+        pushTask = new DeadReckonTask(this, pushPath, drivetrain);
         buttonPushers = new BeaconArms(this, leftPusher, rightPusher,LameingoConfiguration.LEFT_DEPLOY_POS,
                 LameingoConfiguration.RIGHT_DEPLOY_POS, LameingoConfiguration.LEFT_STOW_POS,
                 LameingoConfiguration.RIGHT_STOW_POS, true);

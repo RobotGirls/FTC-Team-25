@@ -155,9 +155,9 @@ public class LameingoTargetStationaryTest extends Robot {
             if (nav.targetsAreVisible()) {
                 state = TargetState.INITIAL_APPROACH;
             } else if (nav.getRelativeBearing() > 0) {
-                drive.turnRight(0.10);
+                drive.turn(0.10);
             } else {
-                drive.turnLeft(0.10);
+                drive.turn(-0.10);
             }
             break;
         case INITIAL_APPROACH:
@@ -177,9 +177,9 @@ public class LameingoTargetStationaryTest extends Robot {
             if ((nav.getRobotBearing() < 3) && (nav.getRobotBearing() > -3)) {
                 state = TargetState.ALIGNED;
             } else if (nav.getRobotBearing() > 0) {
-                drive.turnRight(0.10);
+                drive.turn(0.10);
             } else {
-                drive.turnLeft(0.10);
+                drive.turn(-0.10);
             }
             break;
         case ALIGNED:

@@ -45,13 +45,13 @@ public class DaisySidewaysTest extends Robot
                 GamepadEvent event = (GamepadEvent) e;
 
                 if (event.kind == EventKind.BUTTON_A_DOWN) {
-                    drivetrain.strafeLeft(0.7);
+                    drivetrain.strafe(-0.7);
                 } else if (event.kind == EventKind.BUTTON_B_DOWN) {
-                    drivetrain.strafeRight(0.7);
+                    drivetrain.strafe(0.7);
                 } else if (event.kind == EventKind.BUTTON_X_DOWN) {
-                    drivetrain.strafeLeft(0.4);
+                    drivetrain.strafe(-0.4);
                 } else if (event.kind == EventKind.BUTTON_Y_DOWN) {
-                    drivetrain.strafeRight(0.4);
+                    drivetrain.strafe(0.4);
                 } else {
                     drivetrain.stop();
                     drivetrain.logEncoderCounts();

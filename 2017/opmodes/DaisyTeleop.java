@@ -6,18 +6,17 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
-import team25core.DeadReckon;
+import team25core.Alliance;
+import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
-import team25core.MecanumGearedDriveDeadReckon;
 import team25core.MecanumWheelDriveTask;
 import team25core.NavigateToTargetTask;
 import team25core.OneWheelDriveTask;
@@ -26,7 +25,6 @@ import team25core.RangeSensorCriteria;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RobotNavigation;
-import team25core.RunToEncoderValueTask;
 
 /**
  * FTC Team 25: Created by Katelyn Biesiadecki on 10/22/2016.
@@ -96,12 +94,12 @@ public class DaisyTeleop extends Robot
             NavigateToTargetTask.NavigateToTargetEvent event = (NavigateToTargetTask.NavigateToTargetEvent) e;
             switch (event.kind) {
                 case AT_TARGET:
-                    MecanumGearedDriveDeadReckon pushBeacon = new MecanumGearedDriveDeadReckon(this, Daisy.TICKS_PER_INCH, Daisy.TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-                    pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 5, 0.6);
-                    pushBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 5, -0.6);
+                    DeadReckonPath pushBeacon = new DeadReckonPath();
+                    pushBeacon.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, 0.6);
+                    pushBeacon.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -0.6);
 
                     drivetrain.setNoncanonicalMotorDirection();
-                    this.addTask(new DeadReckonTask(this, pushBeacon, rangeCriteria) {
+                    this.addTask(new DeadReckonTask(this, pushBeacon, drivetrain, rangeCriteria) {
                         @Override
                         public void handleEvent(RobotEvent e)
                         {
@@ -218,7 +216,7 @@ public class DaisyTeleop extends Robot
 
         OpenGLMatrix phoneLocationOnRobot = Daisy.PHONE_LOCATION_ON_ROBOT;
 
-        nttt = new NavigateToTargetTask(this, drivetrain, 1000000, gamepad1, NavigateToTargetTask.Alliance.RED);
+        nttt = new NavigateToTargetTask(this, drivetrain, 1000000, gamepad1, Alliance.RED);
         nttt.init(targets, parameters, phoneLocationOnRobot);
     }
 

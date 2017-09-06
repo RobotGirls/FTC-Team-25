@@ -36,11 +36,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import team25core.DeadReckon;
+import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.Robot;
 import team25core.RobotEvent;
-import team25core.TwoWheelGearedDriveDeadReckon;
+import team25core.TwoWheelDirectDrivetrain;
 
 @Autonomous(name="Lameingo: Straight Test", group="AutoTeam25")
 @Disabled
@@ -53,7 +53,8 @@ public class LameingoDeadReckonStraightTest extends Robot {
     private final static double TURN_SPEED = LameingoConfiguration.TURN_SPEED;
     private final static int TICKS_PER_INCH = LameingoConfiguration.TICKS_PER_INCH;
     private final static int TICKS_PER_DEGREE = LameingoConfiguration.TICKS_PER_DEGREE;
-    private TwoWheelGearedDriveDeadReckon deadReckon;
+    private DeadReckonPath deadReckon;
+    private TwoWheelDirectDrivetrain drivetrain;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -72,16 +73,18 @@ public class LameingoDeadReckonStraightTest extends Robot {
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        deadReckon = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight);
+        drivetrain = new TwoWheelDirectDrivetrain(LameingoConfiguration.TICKS_PER_INCH, frontRight, frontLeft);
+
+        deadReckon = new DeadReckonPath();
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 10, STRAIGHT_SPEED);
+        deadReckon.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, STRAIGHT_SPEED);
     }
 
     @Override
     public void start()
     {
-        deadReckonTask = new DeadReckonTask(this, deadReckon);
+        deadReckonTask = new DeadReckonTask(this, deadReckon, drivetrain);
         addTask(deadReckonTask);
 
     }

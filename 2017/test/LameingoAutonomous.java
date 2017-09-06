@@ -37,16 +37,15 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 
-import team25core.DeadReckon;
+import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.GamepadTask;
-import team25core.LightSensorCriteria;
 import team25core.MRLightSensor;
 import team25core.OpticalDistanceSensorCriteria;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
-import team25core.TwoWheelGearedDriveDeadReckon;
+import team25core.TwoWheelDirectDrivetrain;
 
 @Autonomous(name="Lameingo: Autonomous", group="AutoTeam25")
 @Disabled
@@ -72,10 +71,12 @@ public class LameingoAutonomous extends Robot
     private final static int TICKS_PER_DEGREE = LameingoConfiguration.TICKS_PER_DEGREE;
     private static int TURN_MULTIPLER = 1;
 
-    private TwoWheelGearedDriveDeadReckon approachNearBeacon;
-    private TwoWheelGearedDriveDeadReckon approachFarBeacon;
-    private TwoWheelGearedDriveDeadReckon lineDetectTurnPath;
-    private TwoWheelGearedDriveDeadReckon beaconAlignTurn;
+    private DeadReckonPath approachNearBeacon;
+    private DeadReckonPath approachFarBeacon;
+    private DeadReckonPath lineDetectTurnPath;
+    private DeadReckonPath beaconAlignTurn;
+
+    private TwoWheelDirectDrivetrain drivetrain;
 
     OpticalDistanceSensorCriteria lightCriteria;
     OpticalDistanceSensorCriteria backLightCriteria;
@@ -126,18 +127,20 @@ public class LameingoAutonomous extends Robot
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        drivetrain = new TwoWheelDirectDrivetrain(LameingoConfiguration.TICKS_PER_INCH, frontRight, frontLeft);
+
         // Path setup.
-        approachNearBeacon = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight);
+        approachNearBeacon = new DeadReckonPath();
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        approachNearBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 40, STRAIGHT_SPEED);
+        approachNearBeacon.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 40, STRAIGHT_SPEED);
 
         // Line detect turn path setup.
-        lineDetectTurnPath = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight);
+        lineDetectTurnPath = new DeadReckonPath();
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        lineDetectTurnPath.addSegment(DeadReckon.SegmentType.TURN, 60,  TURN_SPEED);
+        lineDetectTurnPath.addSegment(DeadReckonPath.SegmentType.TURN, 60,  TURN_SPEED);
 
         // Optical Distance Sensor (front) setup.
         frontOds = hardwareMap.opticalDistanceSensor.get("frontLight");
@@ -160,14 +163,14 @@ public class LameingoAutonomous extends Robot
     }
 
     private void doTurnOnLine() {
-        this.addTask(new DeadReckonTask(this, lineDetectTurnPath, lightCriteria) {
+        this.addTask(new DeadReckonTask(this, lineDetectTurnPath, drivetrain, lightCriteria) {
             @Override
             public void handleEvent(RobotEvent e)
             {
                 DeadReckonEvent drEvent = (DeadReckonEvent) e;
 
                 if (drEvent.kind == EventKind.SENSOR_SATISFIED) {
-                    robot.addTask(new DeadReckonTask(robot, beaconAlignTurn, backLightCriteria));
+                    robot.addTask(new DeadReckonTask(robot, beaconAlignTurn, drivetrain, backLightCriteria));
                 }
             }
         });
@@ -176,7 +179,7 @@ public class LameingoAutonomous extends Robot
     @Override
     public void start()
     {
-        this.addTask(new DeadReckonTask(this, approachNearBeacon, backLightCriteria) {
+        this.addTask(new DeadReckonTask(this, approachNearBeacon, drivetrain, backLightCriteria) {
             @Override
             public void handleEvent(RobotEvent e)
             {

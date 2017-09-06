@@ -6,9 +6,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.ColorSensorTask;
-import team25core.DeadReckon;
-import team25core.DeadReckonTask;
-import team25core.MecanumGearedDriveDeadReckon;
+import team25core.DeadReckonPath;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
@@ -26,7 +24,7 @@ public class BeaconHelper
     private ColorSensorTask senseColorTask;
     private ColorSensor color;
     private DeviceInterfaceModule cdim;
-    private MecanumGearedDriveDeadReckon pushBeacon;
+    private DeadReckonPath pushBeacon;
     private DaisyBeaconAutonomous dba;
 
     public enum Alliance {
