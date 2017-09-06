@@ -9,8 +9,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import team25core.GamepadTask;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.TankDriveTask;
+import team25core.TwoWheelDirectDrivetrain;
 import team25core.TwoWheelDriveTask;
-import team25core.TwoWheelGearedDriveDeadReckon;
 
 /**
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/12/2016.
@@ -19,11 +20,12 @@ import team25core.TwoWheelGearedDriveDeadReckon;
 @TeleOp(name="Lameingo: Teleop", group="Team25")
 @Disabled
 public class LameingoTeleop extends Robot {
+
     DcMotor left;
     DcMotor right;
     Servo leftPusher;
     Servo rightPusher;
-    TwoWheelDriveTask drive;
+    TwoWheelDirectDrivetrain drivetrain;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -52,15 +54,13 @@ public class LameingoTeleop extends Robot {
         leftPusher = hardwareMap.servo.get("leftPusher");
         rightPusher = hardwareMap.servo.get("rightPusher");
 
-        right.setDirection(DcMotorSimple.Direction.REVERSE);
-        left.setDirection(DcMotorSimple.Direction.FORWARD);
-        drive = new TwoWheelDriveTask(this, right, left);
+        drivetrain = new TwoWheelDirectDrivetrain(LameingoConfiguration.TICKS_PER_INCH, right, left);
     }
 
     @Override
     public void start()
     {
-       this.addTask(drive);
+        this.addTask(new TankDriveTask(this, drivetrain));
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));
     }
 

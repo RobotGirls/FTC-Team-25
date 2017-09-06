@@ -14,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
+import team25core.Alliance;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.NavigateToTargetTask;
 import team25core.Robot;
@@ -101,7 +102,7 @@ public class VuforiaTargetTrackingExample extends Robot {
                         AxesReference.EXTRINSIC, AxesOrder.YZX,
                         AngleUnit.DEGREES, CAMERA_CHOICE == VuforiaLocalizer.CameraDirection.FRONT ? 90 : -90, 0, 0));
 
-        nttt = new NavigateToTargetTask(this, drivetrain, NavigateToTargetTask.Targets.RED_NEAR, 300000, gamepad1, NavigateToTargetTask.Alliance.RED);
+        nttt = new NavigateToTargetTask(this, drivetrain, NavigateToTargetTask.Targets.RED_NEAR, 300000, gamepad1, Alliance.RED);
         nttt.init(targets, parameters, phoneLocationOnRobot);
         addTask(nttt);
 

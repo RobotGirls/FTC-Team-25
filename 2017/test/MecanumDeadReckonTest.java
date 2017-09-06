@@ -5,9 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import opmodes.Daisy;
-import team25core.DeadReckon;
+import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
-import team25core.MecanumGearedDriveDeadReckon;
+import team25core.MechanumGearedDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 
@@ -25,7 +25,8 @@ public class MecanumDeadReckonTest extends Robot
     DcMotor rearRight;
     final int TICKS_PER_INCH = Daisy.TICKS_PER_INCH;
     final int TICKS_PER_DEGREE = Daisy.TICKS_PER_DEGREE;
-    MecanumGearedDriveDeadReckon path;
+    DeadReckonPath path;
+    MechanumGearedDrivetrain drivetrain;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -41,13 +42,15 @@ public class MecanumDeadReckonTest extends Robot
         rearLeft = hardwareMap.dcMotor.get("rearLeft");
         rearRight = hardwareMap.dcMotor.get("rearRight");
 
-        path = new MecanumGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        path.addSegment(DeadReckon.SegmentType.SIDEWAYS, 5, 1.0);
+        drivetrain = new MechanumGearedDrivetrain(TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
+
+        path = new DeadReckonPath();
+        path.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, 1.0);
     }
 
     @Override
     public void start()
     {
-        this.addTask(new DeadReckonTask(this, path));
+        this.addTask(new DeadReckonTask(this, path, drivetrain));
     }
 }

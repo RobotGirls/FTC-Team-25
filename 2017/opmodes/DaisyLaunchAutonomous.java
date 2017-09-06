@@ -1,14 +1,13 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import team25core.DeadReckon;
+import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
-import team25core.FourWheelGearedDriveDeadReckon;
 import team25core.GamepadTask;
+import team25core.MechanumGearedDrivetrain;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -33,7 +32,7 @@ public class DaisyLaunchAutonomous extends Robot
     private SingleShotTimerTask stt;
     private boolean launched;
     private PersistentTelemetryTask ptt;
-    private FourWheelGearedDriveDeadReckon path;
+    private DeadReckonPath path;
     private final int TICKS_PER_INCH = Daisy.TICKS_PER_INCH;
     private final int TICKS_PER_DEGREE = Daisy.TICKS_PER_DEGREE;
     private final double STRAIGHT_SPEED = Daisy.STRAIGHT_SPEED;
@@ -41,6 +40,7 @@ public class DaisyLaunchAutonomous extends Robot
     private final int LAUNCH_POSITION = Daisy.LAUNCH_POSITION;
     private int turnMultiplier = 1;
     private int parkSelection = 0;
+    private MechanumGearedDrivetrain drivetrain;
 
     private AutonomousPath pathChoice = AutonomousPath.CAP_BALL;
 
@@ -115,15 +115,14 @@ public class DaisyLaunchAutonomous extends Robot
         }
     }
 
-    private FourWheelGearedDriveDeadReckon pathSetup(AutonomousPath pathChoice)
+    private DeadReckonPath pathSetup(AutonomousPath pathChoice)
     {
-        FourWheelGearedDriveDeadReckon path = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE,
-                frontLeft, frontRight, rearLeft, rearRight);
+        DeadReckonPath path = new DeadReckonPath();
 
         if (pathChoice == AutonomousPath.CENTER_PARK) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  87, STRAIGHT_SPEED);
+            path.addSegment(DeadReckonPath.SegmentType.STRAIGHT,  87, STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.STAY) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,   0, STRAIGHT_SPEED);
+            path.addSegment(DeadReckonPath.SegmentType.STRAIGHT,   0, STRAIGHT_SPEED);
         }
 
         return path;
@@ -155,6 +154,8 @@ public class DaisyLaunchAutonomous extends Robot
         launcher.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        drivetrain = new MechanumGearedDrivetrain(Daisy.TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
+
         stt = new SingleShotTimerTask(this, 1000);
         launched = false;
 
@@ -181,7 +182,7 @@ public class DaisyLaunchAutonomous extends Robot
     public void start()
     {
         path = pathSetup(pathChoice);
-        deadReckonTask = new DeadReckonTask(this, path);
+        deadReckonTask = new DeadReckonTask(this, path, drivetrain);
 
         addTask(runToPositionTask);
         //addTask(deadReckonTask);

@@ -4,10 +4,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import team25core.DeadReckon;
+import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
-import team25core.FourWheelGearedDriveDeadReckon;
 import team25core.GamepadTask;
+import team25core.MechanumGearedDrivetrain;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -26,12 +26,13 @@ public class DaisyParkAutonomous extends Robot
     private DcMotor launcher;
     private DeadReckonTask deadReckonTask;
     private PersistentTelemetryTask ptt;
-    private FourWheelGearedDriveDeadReckon deadReckonPath;
+    private DeadReckonPath deadReckonPath;
     private final int TICKS_PER_INCH = Daisy.TICKS_PER_INCH;
     private final int TICKS_PER_DEGREE = Daisy.TICKS_PER_DEGREE;
     private final double STRAIGHT_SPEED = Daisy.STRAIGHT_SPEED;
     private final double TURN_SPEED = Daisy.TURN_SPEED;
     private int turnMultiplier = 1;
+    private MechanumGearedDrivetrain drivetrain;
 
     private AutonomousPath pathChoice = AutonomousPath.CAP_BALL;
 
@@ -80,21 +81,20 @@ public class DaisyParkAutonomous extends Robot
         }
     }
 
-    private FourWheelGearedDriveDeadReckon pathSetup(AutonomousPath pathChoice)
+    private DeadReckonPath pathSetup(AutonomousPath pathChoice)
     {
-        FourWheelGearedDriveDeadReckon path = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE,
-                frontLeft, frontRight, rearLeft, rearRight);
+        DeadReckonPath path = new DeadReckonPath();
 
         if (pathChoice == AutonomousPath.CORNER_PARK) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  58, STRAIGHT_SPEED);
-            path.addSegment(DeadReckon.SegmentType.TURN,     120, TURN_SPEED * turnMultiplier);
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  85, STRAIGHT_SPEED);
+            path.addSegment(DeadReckonPath.SegmentType.STRAIGHT,  58, STRAIGHT_SPEED);
+            path.addSegment(DeadReckonPath.SegmentType.TURN,     120, TURN_SPEED * turnMultiplier);
+            path.addSegment(DeadReckonPath.SegmentType.STRAIGHT,  85, STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.CENTER_PARK) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  60, STRAIGHT_SPEED);
+            path.addSegment(DeadReckonPath.SegmentType.STRAIGHT,  60, STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.CAP_BALL) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,  60, STRAIGHT_SPEED);
+            path.addSegment(DeadReckonPath.SegmentType.STRAIGHT,  60, STRAIGHT_SPEED);
         } else if (pathChoice == AutonomousPath.LAUNCH) {
-            path.addSegment(DeadReckon.SegmentType.STRAIGHT,   0, STRAIGHT_SPEED);
+            path.addSegment(DeadReckonPath.SegmentType.STRAIGHT,   0, STRAIGHT_SPEED);
         }
 
         return path;
@@ -107,6 +107,8 @@ public class DaisyParkAutonomous extends Robot
         frontRight = hardwareMap.dcMotor.get("frontRight");
         rearLeft   = hardwareMap.dcMotor.get("rearLeft");
         rearRight  = hardwareMap.dcMotor.get("rearRight");
+
+        drivetrain = new MechanumGearedDrivetrain(Daisy.TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
 
         // Telemetry setup.
         ptt = new PersistentTelemetryTask(this);
@@ -124,7 +126,7 @@ public class DaisyParkAutonomous extends Robot
     public void start()
     {
         deadReckonPath = pathSetup(pathChoice);
-        deadReckonTask = new DeadReckonTask(this, deadReckonPath);
+        deadReckonTask = new DeadReckonTask(this, deadReckonPath, drivetrain);
         addTask(deadReckonTask);
     }
 }

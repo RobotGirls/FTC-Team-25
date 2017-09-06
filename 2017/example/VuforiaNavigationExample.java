@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 
 import opmodes.Daisy;
+import team25core.Alliance;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.NavigateToTargetTask;
 import team25core.Robot;
@@ -35,7 +36,7 @@ public class VuforiaNavigationExample extends Robot
         rearLeft    = hardwareMap.dcMotor.get("frontRight");
         rearRight   = hardwareMap.dcMotor.get("frontLeft");
         drivetrain = new FourWheelDirectDrivetrain(Daisy.TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
-        nttt = new NavigateToTargetTask(this, drivetrain, NavigateToTargetTask.Targets.RED_NEAR, 300000, gamepad1, NavigateToTargetTask.Alliance.RED);
+        nttt = new NavigateToTargetTask(this, drivetrain, NavigateToTargetTask.Targets.RED_NEAR, 300000, gamepad1, Alliance.RED);
         super.init();
     }
 

@@ -37,16 +37,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 
-import team25core.DeadReckon;
+import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
-import team25core.GamepadTask;
-import team25core.LightSensorCriteria;
 import team25core.MRLightSensor;
 import team25core.OpticalDistanceSensorCriteria;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
 import team25core.RobotEvent;
-import team25core.TwoWheelGearedDriveDeadReckon;
+import team25core.TwoWheelDirectDrivetrain;
 
 @Autonomous(name="Lameingo: Line Detection", group="AutoTeam25")
 @Disabled
@@ -60,13 +58,14 @@ public class LameingoLineDetectionTest extends Robot
 
     private DeadReckonTask nearBeaconTask;
     private PersistentTelemetryTask ptt;
+    private TwoWheelDirectDrivetrain drivetrain;
 
     private final static double STRAIGHT_SPEED = LameingoConfiguration.STRAIGHT_SPEED;
     private final static double TURN_SPEED = LameingoConfiguration.TURN_SPEED;
     private final static int TICKS_PER_INCH = LameingoConfiguration.TICKS_PER_INCH;
     private final static int TICKS_PER_DEGREE = LameingoConfiguration.TICKS_PER_DEGREE;
 
-    private TwoWheelGearedDriveDeadReckon approachNearBeacon;
+    private DeadReckonPath approachNearBeacon;
     OpticalDistanceSensorCriteria lightCriteria;
 
     @Override
@@ -86,11 +85,13 @@ public class LameingoLineDetectionTest extends Robot
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        drivetrain = new TwoWheelDirectDrivetrain(LameingoConfiguration.TICKS_PER_INCH, frontRight, frontLeft);
+
         // Path setup.
-        approachNearBeacon = new TwoWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight);
+        approachNearBeacon = new DeadReckonPath();
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        approachNearBeacon.addSegment(DeadReckon.SegmentType.STRAIGHT, 40, STRAIGHT_SPEED);
+        approachNearBeacon.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 40, STRAIGHT_SPEED);
 
         // Optical Distance Sensor setup.
         opticalDistanceSensor = hardwareMap.opticalDistanceSensor.get("frontLight");
@@ -104,7 +105,7 @@ public class LameingoLineDetectionTest extends Robot
     @Override
     public void start()
     {
-        nearBeaconTask = new DeadReckonTask(this, approachNearBeacon, lightCriteria);
+        nearBeaconTask = new DeadReckonTask(this, approachNearBeacon, drivetrain, lightCriteria);
         addTask(nearBeaconTask);
     }
 

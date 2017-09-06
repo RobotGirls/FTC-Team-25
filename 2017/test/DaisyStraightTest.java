@@ -37,9 +37,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import opmodes.Daisy;
-import team25core.DeadReckon;
+import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
-import team25core.FourWheelGearedDriveDeadReckon;
+import team25core.MechanumGearedDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 
@@ -57,7 +57,8 @@ public class DaisyStraightTest extends Robot {
     private final static double TURN_SPEED = Daisy.TURN_SPEED;
     private final static int TICKS_PER_INCH = Daisy.TICKS_PER_INCH;
     private final static int TICKS_PER_DEGREE = Daisy.TICKS_PER_DEGREE;
-    private FourWheelGearedDriveDeadReckon deadReckon;
+    private DeadReckonPath deadReckon;
+    private MechanumGearedDrivetrain drivetrain;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -82,18 +83,20 @@ public class DaisyStraightTest extends Robot {
         rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        deadReckon = new FourWheelGearedDriveDeadReckon(this, TICKS_PER_INCH, TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        deadReckon = new DeadReckonPath();
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        deadReckon.addSegment(DeadReckon.SegmentType.STRAIGHT, 10, STRAIGHT_SPEED);
+        deadReckon.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, STRAIGHT_SPEED);
+
+        drivetrain = new MechanumGearedDrivetrain(Daisy.TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
     }
 
     @Override
     public void start()
     {
-        deadReckonTask = new DeadReckonTask(this, deadReckon);
+        deadReckonTask = new DeadReckonTask(this, deadReckon, drivetrain);
         addTask(deadReckonTask);
 
     }

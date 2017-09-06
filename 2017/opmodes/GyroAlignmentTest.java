@@ -4,15 +4,14 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.I2cController;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import team25core.DeadReckon;
+import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
+import team25core.FourWheelDirectDrivetrain;
 import team25core.GyroTask;
-import team25core.MecanumGearedDriveDeadReckon;
 import team25core.MonitorGyroTask;
 import team25core.PersistentTelemetryTask;
 import team25core.Robot;
@@ -33,8 +32,9 @@ public class GyroAlignmentTest extends Robot {
     private int gyroMultiplier = 1;
     private PersistentTelemetryTask ptt;
     private MonitorGyroTask gyroMonitor;
-    private MecanumGearedDriveDeadReckon adjustTurn;
+    private DeadReckonPath adjustTurn;
     private DeviceInterfaceModule cdim;
+    private FourWheelDirectDrivetrain drivetrain;
 
     I2cController.I2cPortReadyCallback colorSensorCallback;
     I2cController.I2cPortReadyCallback rangeSensorCallback;
@@ -72,7 +72,9 @@ public class GyroAlignmentTest extends Robot {
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        adjustTurn = new MecanumGearedDriveDeadReckon(this, Daisy.TICKS_PER_INCH, Daisy.TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
+        drivetrain = new FourWheelDirectDrivetrain(76, frontRight, rearRight, frontLeft, rearLeft);
+
+        adjustTurn = new DeadReckonPath();
         // Telemetry.
         ptt = new PersistentTelemetryTask(this);
 
@@ -133,9 +135,9 @@ public class GyroAlignmentTest extends Robot {
 
         if (error >= 2) {
             RobotLog.i("141 Adjusting angle by turning.");
-            adjustTurn.addSegment(DeadReckon.SegmentType.TURN, error, -0.1);
+            adjustTurn.addSegment(DeadReckonPath.SegmentType.TURN, error, -0.1);
 
-            this.addTask(new DeadReckonTask(this, adjustTurn) {
+            this.addTask(new DeadReckonTask(this, adjustTurn, drivetrain) {
                 @Override
                 public void handleEvent(RobotEvent e) {
                     DeadReckonEvent event = (DeadReckonEvent) e;
@@ -147,9 +149,9 @@ public class GyroAlignmentTest extends Robot {
             });
         } else if (error <= -2) {
             RobotLog.i("141 Adjusting angle by turning.");
-            adjustTurn.addSegment(DeadReckon.SegmentType.TURN, error, 0.1);
+            adjustTurn.addSegment(DeadReckonPath.SegmentType.TURN, error, 0.1);
 
-            this.addTask(new DeadReckonTask(this, adjustTurn) {
+            this.addTask(new DeadReckonTask(this, adjustTurn, drivetrain) {
                 @Override
                 public void handleEvent(RobotEvent e) {
                     DeadReckonEvent event = (DeadReckonEvent) e;

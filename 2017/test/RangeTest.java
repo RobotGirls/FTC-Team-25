@@ -7,10 +7,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import opmodes.Daisy;
-import team25core.DeadReckon;
+import opmodes.DaisyCalibration;
+import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
-import team25core.MecanumGearedDriveDeadReckon;
+import team25core.FourWheelDirectDrivetrain;
 import team25core.RangeSensorCriteria;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -26,11 +26,12 @@ public class RangeTest extends Robot {
 
     public DistanceSensor rangeSensor;
     public RangeSensorCriteria rangeSensorCriteria;
-    private MecanumGearedDriveDeadReckon path;
+    private DeadReckonPath path;
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor rearLeft;
     private DcMotor rearRight;
+    private FourWheelDirectDrivetrain drivetrain;
 
     @Override
     public void init() {
@@ -42,13 +43,15 @@ public class RangeTest extends Robot {
         rearLeft = hardwareMap.dcMotor.get("rearLeft");
         rearRight = hardwareMap.dcMotor.get("rearRight");
 
-        path = new MecanumGearedDriveDeadReckon(this, Daisy.TICKS_PER_INCH, Daisy.TICKS_PER_DEGREE, frontLeft, frontRight, rearLeft, rearRight);
-        path.addSegment(DeadReckon.SegmentType.STRAIGHT, 40, -0.4);
+        drivetrain = new FourWheelDirectDrivetrain(DaisyCalibration.TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
+
+        path = new DeadReckonPath();
+        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 40, -0.4);
     }
 
     @Override
     public void start() {
-        addTask(new DeadReckonTask(this, path, rangeSensorCriteria) {
+        addTask(new DeadReckonTask(this, path, drivetrain, rangeSensorCriteria) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent event = (DeadReckonEvent) e;
