@@ -43,7 +43,7 @@ public class RangeTest extends Robot {
         rearLeft = hardwareMap.dcMotor.get("rearLeft");
         rearRight = hardwareMap.dcMotor.get("rearRight");
 
-        drivetrain = new FourWheelDirectDrivetrain(DaisyCalibration.TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
+        drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
 
         path = new DeadReckonPath();
         path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 40, -0.4);

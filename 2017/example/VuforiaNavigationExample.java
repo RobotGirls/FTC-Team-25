@@ -35,7 +35,7 @@ public class VuforiaNavigationExample extends Robot
         frontRight  = hardwareMap.dcMotor.get("rearLeft");
         rearLeft    = hardwareMap.dcMotor.get("frontRight");
         rearRight   = hardwareMap.dcMotor.get("frontLeft");
-        drivetrain = new FourWheelDirectDrivetrain(Daisy.TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
+        drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
         nttt = new NavigateToTargetTask(this, drivetrain, NavigateToTargetTask.Targets.RED_NEAR, 300000, gamepad1, Alliance.RED);
         super.init();
     }
