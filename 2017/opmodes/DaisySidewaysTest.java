@@ -30,7 +30,7 @@ public class DaisySidewaysTest extends Robot
         frontRight  = hardwareMap.dcMotor.get("frontRight");
         rearLeft    = hardwareMap.dcMotor.get("rearLeft");
         rearRight   = hardwareMap.dcMotor.get("rearRight");
-        drivetrain  = new FourWheelDirectDrivetrain(Daisy.TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
+        drivetrain  = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
         drivetrain.resetEncoders();
         drivetrain.encodersOn();
         drivetrain.setNoncanonicalMotorDirection();

@@ -82,7 +82,7 @@ public class DaisyTurnTest extends Robot {
         rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        drivetrain = new FourWheelDirectDrivetrain(DaisyCalibration.TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
+        drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
         deadReckon = new DeadReckonPath();
         //frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         //rearLeft.setDirection(DcMotorSimple.Direction.FORWARD);

@@ -1,9 +1,12 @@
 package example;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.RobotLog;
 
-import team25core.FourWheelDirectDrivetrain;
+import team25core.DeadReckonPath;
 import team25core.Robot;
+import team25core.DeadReckonTask;
+import team25core.FourWheelDirectDrivetrain;
 import team25core.RobotEvent;
 import team25core.TankDriveTask;
 
@@ -40,7 +43,7 @@ TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-public class FourWheelDriveTaskExample extends Robot {
+public class DeadReckonExample extends Robot {
 
     private DcMotor frontLeft;
     private DcMotor frontRight;
@@ -49,12 +52,18 @@ public class FourWheelDriveTaskExample extends Robot {
 
     private FourWheelDirectDrivetrain drivetrain;
 
-    private static final int TICKS_PER_INCH = 79;
-
+    /**
+     * The default event handler for the robot.
+     */
     @Override
     public void handleEvent(RobotEvent e)
     {
-       // Nothing to do here...
+        /**
+         * Every time we complete a segment drop a note in the robot log.
+         */
+        if (e instanceof DeadReckonTask.DeadReckonEvent) {
+            RobotLog.i("Completed path segment %d", ((DeadReckonTask.DeadReckonEvent)e).segment_num);
+        }
     }
 
     @Override
@@ -71,7 +80,22 @@ public class FourWheelDriveTaskExample extends Robot {
     @Override
     public void start()
     {
-        this.addTask(new TankDriveTask(this, drivetrain));
+        DeadReckonPath path = new DeadReckonPath();
+
+        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 1.0);
+        path.addSegment(DeadReckonPath.SegmentType.TURN, 90, 1.0);
+        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 1.0);
+        path.addSegment(DeadReckonPath.SegmentType.TURN, 90, 1.0);
+        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 1.0);
+        path.addSegment(DeadReckonPath.SegmentType.TURN, 90, 1.0);
+        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 1.0);
+        path.addSegment(DeadReckonPath.SegmentType.TURN, 90, 1.0);
+
+        /**
+         * Alternatively, this could be an anonymous class declaration that implements
+         * handleEvent() for task specific event handlers.
+         */
+        this.addTask(new DeadReckonTask(this, path, drivetrain));
     }
 
 }

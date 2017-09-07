@@ -72,7 +72,7 @@ public class GyroAlignmentTest extends Robot {
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        drivetrain = new FourWheelDirectDrivetrain(76, frontRight, rearRight, frontLeft, rearLeft);
+        drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
 
         adjustTurn = new DeadReckonPath();
         // Telemetry.

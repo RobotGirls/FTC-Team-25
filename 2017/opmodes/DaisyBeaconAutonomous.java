@@ -126,7 +126,7 @@ public class DaisyBeaconAutonomous extends Robot
         cdim        = hardwareMap.deviceInterfaceModule.get("cdim");
         range       = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range");
         // colorSensor = AMSColorSensorImproved.create(AMSColorSensor.Parameters.createForAdaFruit(), new I2cDeviceImpl(cdim, COLOR_PORT));
-        drivetrain  = new FourWheelDirectDrivetrain(TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
+        drivetrain  = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
 
         // Range sensor setup.
         rangeCriteria = new RangeSensorCriteria(range, 15);

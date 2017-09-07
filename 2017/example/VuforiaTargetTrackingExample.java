@@ -46,7 +46,7 @@ public class VuforiaTargetTrackingExample extends Robot {
         frontRight  = hardwareMap.dcMotor.get("rearLeft");
         rearLeft    = hardwareMap.dcMotor.get("frontRight");
         rearRight   = hardwareMap.dcMotor.get("frontLeft");
-        drivetrain = new FourWheelDirectDrivetrain(0, frontRight, rearRight, frontLeft, rearLeft);
+        drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
 
         // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);  // Use this line to see camera display
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();                             // OR... Use this line to improve performance
