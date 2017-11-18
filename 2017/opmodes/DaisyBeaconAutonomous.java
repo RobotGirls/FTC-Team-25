@@ -2,6 +2,7 @@ package opmodes;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -37,6 +38,7 @@ import team25core.SingleShotTimerTask;
  */
 
 @Autonomous(name = "DAISY Beacon", group = "Team25")
+@Disabled
 public class DaisyBeaconAutonomous extends Robot
 {
     private DcMotor frontLeft;
