@@ -52,8 +52,8 @@ public class VioletJewelAutonomous extends Robot {
 
 
 
-    private final int TICKS_PER_INCH = VioletEConstants.TICKS_PER_INCH;
-    private final int TICKS_PER_DEGREE = VioletEConstants.TICKS_PER_DEGREE;
+    private final int TICKS_PER_INCH = VioletConstants.TICKS_PER_INCH;
+    private final int TICKS_PER_DEGREE = VioletConstants.TICKS_PER_DEGREE;
     private int turnMultiplier = -1;
     private int moveMultiplier = -1;
     private int color = 0;
@@ -220,21 +220,21 @@ public class VioletJewelAutonomous extends Robot {
                 if (alliance == Alliance.RED) {
                     if (event.kind == EventKind.RED) {
                         RobotLog.i("506 Sensed RED");
-                        pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -VioletEConstants.STRAIGHT_SPEED);
+                        pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -VioletConstants.STRAIGHT_SPEED);
                         side = Side.LEFT;
                     } else {
                         RobotLog.i("506 Sensed BLUE");
-                        pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, VioletEConstants.STRAIGHT_SPEED);
+                        pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, VioletConstants.STRAIGHT_SPEED);
                         side = Side.RIGHT;
                     }
                 } else {
                     if (event.kind == EventKind.BLUE) {
                         RobotLog.i("506 Sensed BLUE");
-                        pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -VioletEConstants.STRAIGHT_SPEED);
+                        pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -VioletConstants.STRAIGHT_SPEED);
                         side = Side.LEFT;
                     } else {
                         RobotLog.i("506 Sensed RED");
-                        pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, VioletEConstants.STRAIGHT_SPEED);
+                        pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, VioletConstants.STRAIGHT_SPEED);
                         side = Side.RIGHT;
                     }
                 }
@@ -318,32 +318,32 @@ public class VioletJewelAutonomous extends Robot {
 
             switch(combo) {
                 case BLUE_FAR_RIGHT:
-                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 30, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
-                    park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
+                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 30, VioletConstants.STRAIGHT_SPEED * turnMultiplier);
+                    park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, VioletConstants.STRAIGHT_SPEED * turnMultiplier);
                     break;
                 case RED_FAR_RIGHT:
-                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 30, VioletEConstants.STRAIGHT_SPEED);
-                    park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, VioletEConstants.STRAIGHT_SPEED);
+                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 30, VioletConstants.STRAIGHT_SPEED);
+                    park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, VioletConstants.STRAIGHT_SPEED);
                     break;
                 case BLUE_NEAR_RIGHT:
-                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
+                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, VioletConstants.STRAIGHT_SPEED * turnMultiplier);
                     break;
                 case RED_NEAR_RIGHT:
-                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, VioletEConstants.STRAIGHT_SPEED);
+                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, VioletConstants.STRAIGHT_SPEED);
                     break;
                 case BLUE_FAR_LEFT:
-                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
-                    park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
+                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, VioletConstants.STRAIGHT_SPEED * turnMultiplier);
+                    park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, VioletConstants.STRAIGHT_SPEED * turnMultiplier);
                     break;
                 case RED_FAR_LEFT:
-                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, VioletEConstants.STRAIGHT_SPEED);
-                    park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
+                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, VioletConstants.STRAIGHT_SPEED);
+                    park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, VioletConstants.STRAIGHT_SPEED * turnMultiplier);
                     break;
                 case BLUE_NEAR_LEFT:
-                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
+                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, VioletConstants.STRAIGHT_SPEED * turnMultiplier);
                     break;
                 case RED_NEAR_LEFT:
-                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, VioletEConstants.STRAIGHT_SPEED);
+                    park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, VioletConstants.STRAIGHT_SPEED);
                     break;
             }
     }
