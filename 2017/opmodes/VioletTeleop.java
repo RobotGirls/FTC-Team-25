@@ -48,7 +48,7 @@ import team25core.RunToEncoderValueTask;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
 /**
- * FTC Team 25: Created by Elizabeth Wu on 11/1/17.
+ * FTC Team 25: Created by Breanna Chan and Bella Heinrichs on 11/1/17.
  */
 @TeleOp(name = "Violet Teleop", group = "Team25")
 public class VioletTeleop extends Robot {
@@ -93,6 +93,7 @@ public class VioletTeleop extends Robot {
     private Servo s3;
     private Servo jewel;
     private Servo relic;
+    //private Servo relicRotate;
 
     private FourWheelDirectDrivetrain drivetrain;
     private MecanumWheelDriveTask drive;
@@ -129,12 +130,13 @@ public class VioletTeleop extends Robot {
         linear     = hardwareMap.dcMotor.get("linear");
         slide      = hardwareMap.dcMotor.get("slide");
 
-        s2    = hardwareMap.servo.get("s2");
-        s4    = hardwareMap.servo.get("s4");
-        s1    = hardwareMap.servo.get("s1");
-        s3    = hardwareMap.servo.get("s3");
-        jewel       = hardwareMap.servo.get("jewel");
-        relic       = hardwareMap.servo.get("relic");
+        s2     = hardwareMap.servo.get("s2");
+        s4     = hardwareMap.servo.get("s4");
+        s1     = hardwareMap.servo.get("s1");
+        s3     = hardwareMap.servo.get("s3");
+        jewel  = hardwareMap.servo.get("jewel");
+        relic  = hardwareMap.servo.get("relic");
+        //relicRotate = hardwareMap.servo.get("relicRotate");
 
         // Sets position of jewel for teleop
         jewel.setPosition(VioletConstants.JEWEL_INIT);
@@ -284,7 +286,7 @@ public class VioletTeleop extends Robot {
     }
 
     /**
-     * Opens and closes relic servo.
+     * Opens and closes relic servo to pick up and drop relic.
      */
     private void toggleRelic()
     {
