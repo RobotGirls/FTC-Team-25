@@ -16,6 +16,7 @@ import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.SingleShotTimerTask;
 
 /*
  * FTC Team 25: Created by Elizabeth Wu on 10/28/17.
@@ -40,14 +41,16 @@ public class VioletJewelAutonomous extends Robot {
     private DeadReckonPath park;
     private DeadReckonPath pushJewel;
     private DeadReckonTask task;
-  //  private PersistentTelemetryTask ptt;
+    // private PersistentTelemetryTask ptt;
+    private SingleShotTimerTask stt;
     private Telemetry.Item particle;
     private Telemetry.Item allianceItem;
     private Telemetry.Item positionItem;
+    private Telemetry.Item pollItem;
+    private Telemetry.Item flashItem;
 
     boolean flashOn = false;
-
-   // boolean pollOn = false;
+    boolean pollOn = false;
 
 
 
@@ -62,7 +65,7 @@ public class VioletJewelAutonomous extends Robot {
     private int combo = 0;
 
 
-    // Combos.
+    // Park Combos.
     private static final int BLUE_FAR_RIGHT = 0;
     private static final int RED_FAR_RIGHT = 1;
     private static final int BLUE_NEAR_RIGHT = 2;
@@ -105,20 +108,24 @@ public class VioletJewelAutonomous extends Robot {
 
 
         // Telemetry setup.
-
-        // ptt = new PersistentTelemetryTask(this);
-        //  this.addTask(ptt);
         telemetry.setAutoClear(false);
         allianceItem = telemetry.addData("ALLIANCE", "Unselected (X/B)");
-        positionItem = telemetry.addData("POSITION", "Unselected (Y/A");
+        positionItem = telemetry.addData("POSITION", "Unselected (Y/A)");
         particle = telemetry.addData("Particle: ", "No data");
-
+      //  pollItem = telemetry.addData("PollingITEM:", "Off");
+        flashItem = telemetry.addData("Flash:", "Off");
 
         // Path setup.
         pushJewel   = new DeadReckonPath();
         park        = new DeadReckonPath();
 
-        jewel.setPosition(0.0);
+        jewel.setPosition(0.56);
+        // 145/256
+
+        // Single shot timer task for resetting arm position.
+        stt = new SingleShotTimerTask(this, 1500);
+
+        RobotLog.i("506 Arm moved in init.");
 
 
         // Alliance and autonomous choice selection.
@@ -134,22 +141,22 @@ public class VioletJewelAutonomous extends Robot {
     @Override
     public void start()
     {
-
+        jewel.setPosition(0.05);
+        // 15/256
+        RobotLog.i("506 Arm deployed in start.");
         this.addTask(new DeadReckonTask(this, pushJewel, drivetrain) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
-
-                   /* TODO: Put this back after we test jewel individually.
-
+                    jewel.setPosition(0.56);
+                    RobotLog.i("506 Arm reset to initial position after path done.");
                    addTask(new DeadReckonTask(robot, park, drivetrain) {
                         @Override
                         public void handleEvent(RobotEvent e) {
 
                         }
                     });
-                    */
                 }
             }
         });
@@ -161,51 +168,60 @@ public class VioletJewelAutonomous extends Robot {
             GamepadTask.GamepadEvent event = (GamepadTask.GamepadEvent) e;
 
             RobotLog.i("Jewel: Detected " + e.toString());
-            particle.setValue(e.toString());
 
             switch (event.kind) {
                 case BUTTON_X_DOWN:
                     selectAlliance(Alliance.BLUE);
-                    allianceItem.setValue("ALLIANCE", "Blue");
+                    allianceItem.setValue("Blue");
                     break;
                 case BUTTON_B_DOWN:
                     selectAlliance(Alliance.RED);
-                    allianceItem.setValue("ALLIANCE", "Red");
+                    allianceItem.setValue("Red");
                     break;
                 case BUTTON_Y_DOWN:
                     selectPosition(Position.FAR);
-                    positionItem.setValue("POSITION", "Far");
+                    positionItem.setValue("Far");
                     break;
                 case BUTTON_A_DOWN:
                     selectPosition(Position.NEAR);
-                    positionItem.setValue("POSITION", "Near");
+                    positionItem.setValue("Near");
                     break;
                 case RIGHT_BUMPER_DOWN:
-                    colorThiefTask.setPollingMode(ColorThiefTask.PollingMode.ON);
+                    togglePolling();
                     break;
                 case RIGHT_TRIGGER_DOWN:
-                    CameraDevice.getInstance().setFlashTorchMode(!flashOn);
-                    flashOn = !flashOn;
+                    toggleFlash();
                     break;
                 default:
                     break;
-
             }
-          //  telemetry.update();
         }
     }
 
-
-   /* TODO: add toggle for poll on/off
     private void togglePolling() {
+        if (pollOn == false) {
+            colorThiefTask.setPollingMode(ColorThiefTask.PollingMode.ON);
+            pollOn = true;
+           // pollItem.setValue("On");
 
-
+        } else {
+            colorThiefTask.setPollingMode(ColorThiefTask.PollingMode.OFF);
+            pollOn = false;
+           // pollItem.setValue("Off");
+        }
     }
-    */
 
-
-
-
+    private void toggleFlash() {
+        if (flashOn == false) {
+            CameraDevice.getInstance().setFlashTorchMode(flashOn);
+            flashOn = true;
+            flashItem.setValue("On");
+        } else {
+            CameraDevice.getInstance().setFlashTorchMode(!flashOn);
+            flashOn = false;
+            flashItem.setValue("Off");
+        }
+    }
 
     private void sense() {
          colorThiefTask = new ColorThiefTask(this) {
@@ -214,34 +230,41 @@ public class VioletJewelAutonomous extends Robot {
                 ColorThiefTask.ColorThiefEvent event = (ColorThiefEvent) e;
                 particle.setValue(event.toString());
 
-                jewel.setPosition(0.5);
-                RobotLog.i("506 Arm deployed.");
-
                 if (alliance == Alliance.RED) {
                     if (event.kind == EventKind.RED) {
                         RobotLog.i("506 Sensed RED");
-                        pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -VioletEConstants.STRAIGHT_SPEED);
-                        side = Side.LEFT;
-                    } else {
-                        RobotLog.i("506 Sensed BLUE");
+                        pushJewel.stop();
                         pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, VioletEConstants.STRAIGHT_SPEED);
                         side = Side.RIGHT;
+                    } else {
+                        RobotLog.i("506 Sensed BLUE");
+                        pushJewel.stop();
+                        pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -VioletEConstants.STRAIGHT_SPEED);
+                        side = Side.LEFT;
                     }
                 } else {
                     if (event.kind == EventKind.BLUE) {
                         RobotLog.i("506 Sensed BLUE");
-                        pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -VioletEConstants.STRAIGHT_SPEED);
-                        side = Side.LEFT;
-                    } else {
-                        RobotLog.i("506 Sensed RED");
+                        pushJewel.stop();
                         pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, VioletEConstants.STRAIGHT_SPEED);
                         side = Side.RIGHT;
+                    } else {
+                        RobotLog.i("506 Sensed RED");
+                        pushJewel.stop();
+                        pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -VioletEConstants.STRAIGHT_SPEED);
+                        side = Side.LEFT;
                     }
                 }
 
             }
         };
+
         addTask(colorThiefTask);
+
+        addTask(stt);
+        RobotLog.i("506 STT ran");
+
+        goPark();
     }
 
     // Previously methods used to push jewel off right and left but now putting the task setup together so code looks cleaner!
@@ -318,31 +341,39 @@ public class VioletJewelAutonomous extends Robot {
 
             switch(combo) {
                 case BLUE_FAR_RIGHT:
+                    RobotLog.i("506 Case Blue Far Right");
                     park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 30, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
                     park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
                     break;
                 case RED_FAR_RIGHT:
+                    RobotLog.i("506 Case Red Far Right");
                     park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 30, VioletEConstants.STRAIGHT_SPEED);
                     park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, VioletEConstants.STRAIGHT_SPEED);
                     break;
                 case BLUE_NEAR_RIGHT:
+                    RobotLog.i("506 Case Blue Near Right");
                     park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
                     break;
                 case RED_NEAR_RIGHT:
+                    RobotLog.i("506 Case Red Near Right");
                     park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, VioletEConstants.STRAIGHT_SPEED);
                     break;
                 case BLUE_FAR_LEFT:
+                    RobotLog.i("506 Case Blue Far Left");
                     park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
                     park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
                     break;
                 case RED_FAR_LEFT:
+                    RobotLog.i("506 Case Red Far Left");
                     park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, VioletEConstants.STRAIGHT_SPEED);
                     park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
                     break;
                 case BLUE_NEAR_LEFT:
+                    RobotLog.i("506 Case Blue Near Left");
                     park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, VioletEConstants.STRAIGHT_SPEED * turnMultiplier);
                     break;
                 case RED_NEAR_LEFT:
+                    RobotLog.i("506 Case Red Near Left");
                     park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, VioletEConstants.STRAIGHT_SPEED);
                     break;
             }
