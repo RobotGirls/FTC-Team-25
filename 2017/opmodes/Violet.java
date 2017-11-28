@@ -4,7 +4,7 @@ package opmodes;
  * FTC Team 25: Created by Elizabeth Wu on 10/28/17.
  */
 
-public class VioletEConstants
+public class Violet
 {
 
     // Autonomous constants.

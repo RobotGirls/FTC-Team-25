@@ -2,6 +2,7 @@ package test;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
@@ -14,7 +15,7 @@ import team25core.PersistentTelemetryTask;
  */
 
 @Autonomous(name = "TEST Range", group = "Team25")
-
+@Disabled
 public class RangeSensorTest extends OpMode {
 
     public DistanceSensor rangeSensor;

@@ -1,4 +1,4 @@
-package test;
+package opmodes;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -14,13 +14,12 @@ import team25core.OneWheelDriveTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
-import test.Violet;
 
 /**
  * FTC Team 25: Created by Elizabeth Wu on 11/1/17.
  */
-@TeleOp(name = "BC Teleop", group = "Team25")
-public class BreannaVioletTeleop extends Robot {
+@TeleOp(name = "VioletConstants Teleop", group = "Team25")
+public class VioletTeleop extends Robot {
 
      /*
 
@@ -119,6 +118,7 @@ public class BreannaVioletTeleop extends Robot {
         drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
 
         openClaw();
+        linear.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     /**
@@ -126,14 +126,13 @@ public class BreannaVioletTeleop extends Robot {
      */
     private void toggleClawVertical()
     {
-        if (clawDown == true) {
-            linear.setDirection(DcMotorSimple.Direction.FORWARD);
-            clawDown = false;
-        } else {
-            linear.setDirection(DcMotorSimple.Direction.REVERSE);
-            clawDown = true;
-        }
-        this.addTask(new RunToEncoderValueTask(this, linear, Violet.CLAW_VERTICAL, Violet.CLAW_VERTICAL_POWER));
+        linear.setDirection(DcMotorSimple.Direction.FORWARD);
+
+       // }//else {
+          //linear.setDirection(DcMotorSimple.Direction.REVERSE);
+            //clawDown = true;
+        //}
+        this.addTask(new RunToEncoderValueTask(this, linear, VioletConstants.CLAW_VERTICAL, VioletConstants.CLAW_VERTICAL_POWER));
     }
 
     /**
@@ -141,10 +140,10 @@ public class BreannaVioletTeleop extends Robot {
      */
     private void openClaw()
     {
-        s1.setPosition(Violet.S1_OPEN);
-        s2.setPosition(Violet.S2_OPEN);
-        s3.setPosition(Violet.S3_OPEN);
-        s4.setPosition(Violet.S4_OPEN);
+        s1.setPosition(VioletConstants.S1_OPEN);
+        s2.setPosition(VioletConstants.S2_OPEN);
+        s3.setPosition(VioletConstants.S3_OPEN);
+        s4.setPosition(VioletConstants.S4_OPEN);
 
         s1Open = true;
         s3Open = true;
@@ -156,12 +155,12 @@ public class BreannaVioletTeleop extends Robot {
     private void toggleS1()
     {
         if (s1Open == true) {
-            s1.setPosition(Violet.S1_CLOSED);
-            s2.setPosition(Violet.S2_CLOSED);
+            s1.setPosition(VioletConstants.S1_CLOSED);
+            s2.setPosition(VioletConstants.S2_CLOSED);
             s1Open = false;
         } else {
-            s1.setPosition(Violet.S1_OPEN);
-            s2.setPosition(Violet.S2_OPEN);
+            s1.setPosition(VioletConstants.S1_OPEN);
+            s2.setPosition(VioletConstants.S2_OPEN);
             s1Open = true;
         }
     }
@@ -172,12 +171,12 @@ public class BreannaVioletTeleop extends Robot {
     private void toggleS3()
     {
         if (s3Open == true) {
-            s3.setPosition(Violet.S3_CLOSED);
-            s4.setPosition(Violet.S4_CLOSED);
+            s3.setPosition(VioletConstants.S3_CLOSED);
+            s4.setPosition(VioletConstants.S4_CLOSED);
             s3Open = false;
         } else {
-            s3.setPosition(Violet.S3_OPEN);
-            s4.setPosition(Violet.S4_OPEN);
+            s3.setPosition(VioletConstants.S3_OPEN);
+            s4.setPosition(VioletConstants.S4_OPEN);
             s3Open = true;
         }
     }
@@ -194,12 +193,12 @@ public class BreannaVioletTeleop extends Robot {
 
         if (direction == Direction.CLOCKWISE) {
             rotate.setDirection(DcMotorSimple.Direction.REVERSE);
-            distance = Violet.DEGREES_180;
+            distance = VioletConstants.DEGREES_180;
         } else {
             rotate.setDirection(DcMotorSimple.Direction.FORWARD);
-            distance = (int)(Violet.DEGREES_180);
+            distance = (int)(VioletConstants.DEGREES_180);
         }
-        this.addTask(new RunToEncoderValueTask(this, rotate, distance, Violet.ROTATE_POWER));
+        this.addTask(new RunToEncoderValueTask(this, rotate, distance, VioletConstants.ROTATE_POWER));
     }
 
     /**
@@ -214,7 +213,7 @@ public class BreannaVioletTeleop extends Robot {
         } else {
             rotate.setDirection(DcMotorSimple.Direction.FORWARD);
         }
-        this.addTask(new RunToEncoderValueTask(this, rotate, Violet.NUDGE, Violet.NUDGE_POWER));
+        this.addTask(new RunToEncoderValueTask(this, rotate, VioletConstants.NUDGE, VioletConstants.NUDGE_POWER));
     }
 
     @Override
@@ -222,7 +221,6 @@ public class BreannaVioletTeleop extends Robot {
     {
         drive = new MecanumWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
         controlLinear = new OneWheelDriveTask(this, linear, true);
-
         this.addTask(drive);
         this.addTask(controlLinear);
 
@@ -239,13 +237,13 @@ public class BreannaVioletTeleop extends Robot {
 
                 switch (event.kind) {
                     case BUTTON_Y_DOWN:
-                        //Toggle the claw up and down.
+                        //Lifts glyph mechanism up
 
                         //toggleClawVertical();
-                        linear.setPower(0.5);
+                        linear.setPower(VioletConstants.CLAW_VERTICAL_POWER);
                         break;
                     case BUTTON_A_DOWN:
-                        //Open the claw
+                        //Open all claw servos
 
                         openClaw();
                         break;
@@ -260,13 +258,13 @@ public class BreannaVioletTeleop extends Robot {
                         toggleS3();
                         break;
                     case BUTTON_B_DOWN:
-                        //Rotate 180 degrees clockwise
+                        //Rotate 180 degrees clockwise looking from behind robot
 
                         lockout = true;
                         rotate(Direction.CLOCKWISE);
                         break;
                     case BUTTON_X_DOWN:
-                        // Rotate 180 degrees counterclockwise
+                        // Rotate 180 degrees counterclockwise looking from behind robot
 
                         lockout = true;
                         rotate(Direction.COUNTERCLOCKWISE);
@@ -282,9 +280,6 @@ public class BreannaVioletTeleop extends Robot {
 
                         lockout = true;
                         nudge(Direction.CLOCKWISE);
-                        break;
-                    default:
-                        linear.setPower(0.0);
                         break;
                 }
             }
