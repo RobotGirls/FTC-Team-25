@@ -32,30 +32,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import opmodes.Daisy;
-import opmodes.DaisyCalibration;
+import opmodes.Violet;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 
-@Autonomous(name="Daisy: Turn Test", group="AutoTeam25")
-@Disabled
-public class DaisyTurnTest extends Robot {
+import static test.Violet.turnMultiplier;
+
+@Autonomous(name="Violet: Turn Test", group="Team 25")
+public class VioletTurnTest extends Robot {
 
     private DcMotor frontRight;
     private DcMotor frontLeft;
     private DcMotor rearLeft;
     private DcMotor rearRight;
     private DeadReckonTask deadReckonTask;
-    private final static double STRAIGHT_SPEED = Daisy.STRAIGHT_SPEED;
-    private final static double TURN_SPEED = Daisy.TURN_SPEED;
-    private final static int TICKS_PER_INCH = Daisy.TICKS_PER_INCH;
-    private final static int TICKS_PER_DEGREE = Daisy.TICKS_PER_DEGREE;
+    private final static double STRAIGHT_SPEED = Violet.STRAIGHT_SPEED;
+    private final static double TURN_SPEED = Violet.TURN_SPEED;
+    private final static int TICKS_PER_INCH = Violet.TICKS_PER_INCH;
+    private final static int TICKS_PER_DEGREE = Violet.TICKS_PER_DEGREE;
     private DeadReckonPath deadReckon;
     private FourWheelDirectDrivetrain drivetrain;
 

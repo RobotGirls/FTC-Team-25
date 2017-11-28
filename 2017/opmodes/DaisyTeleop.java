@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -31,6 +32,7 @@ import team25core.RobotNavigation;
  */
 
 @TeleOp(name = "DAISY Teleop", group = "Team25")
+@Disabled
 public class DaisyTeleop extends Robot
 {
     /*

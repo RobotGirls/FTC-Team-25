@@ -2,6 +2,7 @@ package opmodes;
 
 import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.I2cDeviceImpl;
@@ -16,6 +17,7 @@ import team25core.RobotEvent;
  * FTC Team 25: Created by Katelyn Biesiadecki on 2/25/2017.
  */
 @Autonomous(name = "TEST Color", group = "Team 25")
+@Disabled
 public class DaisyColorTest extends Robot
 {
     DeviceInterfaceModule cdim;

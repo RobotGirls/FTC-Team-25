@@ -14,6 +14,7 @@ import team25core.RobotEvent;
  */
 
 @Autonomous(name = "TEST Sideways", group = "Team 25")
+@Disabled
 public class DaisySidewaysTest extends Robot
 {
     private DcMotor frontLeft;
