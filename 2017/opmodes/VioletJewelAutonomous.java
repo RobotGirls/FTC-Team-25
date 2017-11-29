@@ -50,8 +50,8 @@ public class VioletJewelAutonomous extends Robot {
     boolean flashOn = false;
     boolean pollOn = false;
 
-    private final int TICKS_PER_INCH = Violet.TICKS_PER_INCH;
-    private final int TICKS_PER_DEGREE = Violet.TICKS_PER_DEGREE;
+   // boolean pollOn = false;
+  
     private int turnMultiplier = -1;
     private int moveMultiplier = -1;
     private int color = 0;
@@ -356,7 +356,6 @@ public class VioletJewelAutonomous extends Robot {
                 break;
 
                 */
-        }
     }
 
 }
