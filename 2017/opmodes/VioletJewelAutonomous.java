@@ -290,7 +290,8 @@ public class VioletJewelAutonomous extends Robot {
         }
     }
 
-    private void setupParkPath() {
+    private void setupParkPath()
+    {
 
         if (alliance == Alliance.RED) {
             color = 1;
@@ -354,9 +355,8 @@ public class VioletJewelAutonomous extends Robot {
                 park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, Violet.STRAIGHT_SPEED);
                 park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, Violet.STRAIGHT_SPEED * moveMultiplier);
                 break;
-
-                */
+            */
+        }
     }
-
 }
 
