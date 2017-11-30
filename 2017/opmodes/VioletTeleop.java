@@ -35,10 +35,13 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+import team25core.DeadmanMotorTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
 import team25core.MecanumWheelDriveTask;
-//import team25core.OneWheelDriveTask;
+import team25core.OneWheelDriveTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
@@ -55,19 +58,19 @@ public class VioletTeleop extends Robot {
 
     GAMEPAD 1: DRIVETRAIN CONTROLLER
     --------------------------------------------------------------------------------------------
-      (L trigger)        (R trigger)    |  // FOR FUTURE..needs to be programmed
-                                        |  (LT) bward left diagonal    (RT) bward right diagonal
+      (L trigger)        (R trigger)    |  (LT) bward left diagonal    (RT) bward right diagonal                                        |
       (L bumper)         (R bumper)     |  (LB) fward left diagonal    (RB) fward right diagonal
-                            (y)         |
-      arrow pad          (x)   (b)      |
-                            (a)         |
+                            (y)         |   (y) toggle slowness
+      arrow pad          (x)   (b)      |   (x) toggle relic servo      (b) rotate relic
+                            (a)         |   (a)
+                                        |   (DPad - UP) extend relic   (DPad - DOWN) bring relic in
 
     GAMEPAD 2: MECHANISM CONTROLLER
     --------------------------------------------------------------------------------------------
-      (L trigger)        (R trigger)    | (LT) rotate block left      (RT) lower relic holder
-      (L bumper)         (R bumper)     | (LB) rotate block right     (RB) raise relic holder
+      (L trigger)        (R trigger)    | (LT) nudge block left       (RT) nudge block right
+      (L bumper)         (R bumper)     | (LB) toggle servos 1/2      (RB) toggle servos 3/4
                             (y)         |  (y)
-      arrow pad          (x)   (b)      |  (b)
+      arrow pad          (x)   (b)      |  (x) rotate block left      (b) rotate block right
                             (a)         |  (a)
 
     */
@@ -91,16 +94,22 @@ public class VioletTeleop extends Robot {
     private Servo s3;
     private Servo jewel;
     private Servo relic;
-    //private Servo relicRotate;
+    private Servo relicRotate;
 
     private FourWheelDirectDrivetrain drivetrain;
     private MecanumWheelDriveTask drive;
-    //private OneWheelDriveTask controlLinear;
+    private OneWheelDriveTask controlLinear;
+    //private OneWheelDriveTask controlSlide;
+    private DeadmanMotorTask runSlideOutTask;
+    private DeadmanMotorTask runSlideInTask;
 
+    private boolean slow;
     //private boolean clawDown = true;
-    private boolean s1Open = true;
-    private boolean s3Open = true;
-    private boolean relicOpen = true;
+    private boolean s1Open;
+    private boolean s3Open;
+    private boolean relicOpen;
+    private boolean relicDown;
+    private Telemetry.Item speed;
 
     private boolean lockout = false;
 
@@ -128,16 +137,19 @@ public class VioletTeleop extends Robot {
         linear     = hardwareMap.dcMotor.get("linear");
         slide      = hardwareMap.dcMotor.get("slide");
 
-        s2     = hardwareMap.servo.get("s2");
-        s4     = hardwareMap.servo.get("s4");
-        s1     = hardwareMap.servo.get("s1");
-        s3     = hardwareMap.servo.get("s3");
-        jewel  = hardwareMap.servo.get("jewel");
-        relic  = hardwareMap.servo.get("relic");
-        //relicRotate = hardwareMap.servo.get("relicRotate");
+        s2    = hardwareMap.servo.get("s2");
+        s4    = hardwareMap.servo.get("s4");
+        s1    = hardwareMap.servo.get("s1");
+        s3    = hardwareMap.servo.get("s3");
+        jewel       = hardwareMap.servo.get("jewel");
+        relic       = hardwareMap.servo.get("relic");
+        relicRotate = hardwareMap.servo.get("relicRotate");
 
         // Sets position of jewel for teleop
         jewel.setPosition(VioletConstants.JEWEL_INIT);
+
+        runSlideOutTask = new DeadmanMotorTask(this, slide, 0.75, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
+        runSlideInTask = new DeadmanMotorTask(this, slide, -0.75, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
 
         // Reset encoders.
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -148,19 +160,22 @@ public class VioletTeleop extends Robot {
         rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rotate.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         linear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         linear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Allows for rotate, linear, and slide motor to hold position when no button is pressed
+        rotate.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
 
         // Sets claw servos to open position
         openClaw();
-
-        // Allows for linear and slide motor to hold position when no button is pressed
-        linear.setZeroPowerBehavior(BRAKE);
-        slide.setZeroPowerBehavior(BRAKE);
     }
 
     /**
@@ -245,7 +260,7 @@ public class VioletTeleop extends Robot {
             rotate.setDirection(DcMotorSimple.Direction.FORWARD);
             distance = VioletConstants.DEGREES_180;
         }
-        this.addTask(new RunToEncoderValueTask(this, rotate, distance, VioletConstants.ROTATE_POWER));
+        this.addTask(new RunToEncoderValueTask(this, rotate, VioletConstants.DEGREES_180, VioletConstants.ROTATE_POWER));
     }
 
     /**
@@ -284,16 +299,30 @@ public class VioletTeleop extends Robot {
     }
 
     /**
-     * Opens and closes relic servo to pick up and drop relic.
+     * Opens and closes relic claw servo.
      */
     private void toggleRelic()
     {
         if (relicOpen == true) {
             relic.setPosition(VioletConstants.RELIC_CLOSED);
-            relicOpen= false;
+            relicOpen = false;
         } else {
             relic.setPosition(VioletConstants.RELIC_OPEN);
             relicOpen = true;
+        }
+    }
+
+    /**
+     * Rotates relic rotate servo. NEED TO FIGURE OUT.
+     */
+    private void rotateRelic()
+    {
+        if (relicDown == true) {
+            relicRotate.setPosition(VioletConstants.RELIC_ROTATE_DOWN);
+            relicOpen= false;
+        } else {
+            relicRotate.setPosition(VioletConstants.RELIC_ROTATE_UP);
+            relicDown = true;
         }
     }
 
@@ -301,13 +330,19 @@ public class VioletTeleop extends Robot {
     public void start()
     {
         drive = new MecanumWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
-        //controlLinear = new OneWheelDriveTask(this, linear, true);
+        // Left joystick (Gamepad 2) controls lifting and lowers of glyph mechanism
+        controlLinear = new OneWheelDriveTask(this, linear, true);
+        // Right joystick (Gamepad 2) controls extending and contracting of relic mechanism
+        //controlSlide = new OneWheelDriveTask(this, slide, false);
         this.addTask(drive);
-        //this.addTask(controlLinear);
+        this.addTask(controlLinear);
+        //this.addTask(controlSlide);
+        this.addTask(runSlideOutTask);
+        this.addTask(runSlideInTask);
 
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e) {
-                GamepadTask.GamepadEvent event = (GamepadTask.GamepadEvent) e;
+                GamepadEvent event = (GamepadEvent) e;
 
 
                 // Finish a move before we allow another one.
@@ -316,18 +351,7 @@ public class VioletTeleop extends Robot {
                     return;
                 }
 
-                if (event.kind == EventKind.BUTTON_Y_DOWN) {
-                    // Lifts glyph mechanism
-
-                    toggleClawUp();
-                    linear.setPower(VioletConstants.CLAW_VERTICAL_POWER);
-                } else if (event.kind == EventKind.BUTTON_A_DOWN) {
-                    // Lowers glyph mechanism
-
-                    toggleClawDown();
-                    linear.setPower(VioletConstants.CLAW_VERTICAL_POWER);
-                    //openClaw();
-                } else if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
+                if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
                     // Toggle s1/s2
 
                     toggleS1();
