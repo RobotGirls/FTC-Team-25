@@ -383,5 +383,34 @@ public class VioletTeleop extends Robot {
             }
         });
 
+        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
+            public void handleEvent(RobotEvent e) {
+                GamepadEvent event = (GamepadEvent) e;
+
+
+                if (event.kind == EventKind.BUTTON_X_DOWN) {
+                    // Toggle relic claw servo
+
+                    toggleRelic();
+                } else if (event.kind == EventKind.BUTTON_B_DOWN) {
+                    // Rotate relic NEEDS TO BE CALIBRATED
+
+                    rotateRelic();
+                } else if (event.kind == EventKind.BUTTON_Y_DOWN) {
+                    // Toggles slowness of motors
+
+                    if (!slow) {
+                        drive.slowDown(0.3);
+                        slow = true;
+                        speed = telemetry.addData("SLOW", "true");
+                    } else {
+                        drive.slowDown(false);
+                        slow = false;
+                        speed = telemetry.addData("SLOW", "false");
+                    }
+                }
+            }
+        });
+
     }
 }
