@@ -50,8 +50,8 @@ public class VioletJewelAutonomous extends Robot {
     boolean flashOn = false;
     boolean pollOn = false;
 
-    private final int TICKS_PER_INCH = Violet.TICKS_PER_INCH;
-    private final int TICKS_PER_DEGREE = Violet.TICKS_PER_DEGREE;
+   // boolean pollOn = false;
+  
     private int turnMultiplier = -1;
     private int moveMultiplier = -1;
     private int color = 0;
@@ -115,6 +115,7 @@ public class VioletJewelAutonomous extends Robot {
        // pushJewel   = new DeadReckonPath();
         park        = new DeadReckonPath();
 
+        // Arm initialized up
         jewel.setPosition(0.56);    // 145/256
 
         // Single shot timer tasks for delays.
@@ -134,6 +135,7 @@ public class VioletJewelAutonomous extends Robot {
     @Override
     public void start()
     {
+        // Arm goes down
         jewel.setPosition(0.05);
         // 15/256
         RobotLog.i("506 Arm deployed in start.");
@@ -145,16 +147,21 @@ public class VioletJewelAutonomous extends Robot {
                             @Override
                             public void handleEvent(RobotEvent e) {
                                 DeadReckonEvent path = (DeadReckonEvent) e;
-                                if (path.kind == EventKind.PATH_DONE) {
-                                    jewel.setPosition(0.56);
-                                    RobotLog.i("506 Arm reset to initial position after path done.");
-                                   addTask(new DeadReckonTask(robot, park, drivetrain) {
-                                        @Override
-                                        public void handleEvent(RobotEvent e) {
-                                        }
-                                    });
-
-
+                                switch (path.kind) {
+                                    case SEGMENT_DONE:
+                                        jewel.setPosition(0.56);
+                                        RobotLog.i("506 Arm reset to initial position after segment done.");
+                                        break;
+                                    case PATH_DONE:
+                                        RobotLog.i("506 Arm reset to initial position after path done.");
+                                        addTask(new DeadReckonTask(robot, park, drivetrain) {
+                                            @Override
+                                            public void handleEvent(RobotEvent e) {
+                                            }
+                                        });
+                                        break;
+                                    default:
+                                        break;
                                 }
                             }
                         });
@@ -265,7 +272,7 @@ public class VioletJewelAutonomous extends Robot {
         };
 
         addTask(colorThiefTask);
-        addTask(stt);
+        addTask(stt); //Craig says this doesn't do anything, returns immediately
 
         setupParkPath();
     }
@@ -290,7 +297,8 @@ public class VioletJewelAutonomous extends Robot {
         }
     }
 
-    private void setupParkPath() {
+    private void setupParkPath()
+    {
 
         if (alliance == Alliance.RED) {
             color = 1;
@@ -354,10 +362,8 @@ public class VioletJewelAutonomous extends Robot {
                 park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, Violet.STRAIGHT_SPEED);
                 park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, Violet.STRAIGHT_SPEED * moveMultiplier);
                 break;
-
-                */
+            */
         }
     }
-
 }
 
