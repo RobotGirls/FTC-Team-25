@@ -141,11 +141,9 @@ public class VioletJewelAutonomous extends Robot {
         // Arm goes down
         jewel.setPosition(0.05);
         // 15/256
-        RobotLog.i("506 Arm deployed in start.");
         addTask(new SingleShotTimerTask(this, 500) {
                     @Override
                     public void handleEvent(RobotEvent e) {
-                        RobotLog.i("506 Path delay ran.");
                         robot.addTask(new DeadReckonTask(robot, pushJewel, drivetrain) {
                             @Override
                             public void handleEvent(RobotEvent e) {
@@ -303,9 +301,7 @@ public class VioletJewelAutonomous extends Robot {
                             //pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -Violet.STRAIGHT_SPEED);
                         }
                     }
-
                 }
-
             }
         };
 
@@ -362,12 +358,10 @@ public class VioletJewelAutonomous extends Robot {
 
         switch (combo) {
             case BLUE_FAR:
-                RobotLog.i("506 Park Path: BLUE FAR");
                 park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 30, Violet.STRAIGHT_SPEED * turnMultiplier);
                 park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, Violet.STRAIGHT_SPEED * turnMultiplier);
                 break;
             case RED_FAR:
-                RobotLog.i("506 Park Path: RED FAR");
                 park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 30, Violet.STRAIGHT_SPEED);
 
                 park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, Violet.STRAIGHT_SPEED);
