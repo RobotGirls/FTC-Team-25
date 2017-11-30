@@ -60,6 +60,7 @@ public class VioletJewelAutonomous extends Robot {
     private int combo = 0;
     private int liftJewel = 0;
     private int isBlack = 0;
+    private boolean firstSegment = false;
 
 
     // Park combos.
@@ -147,7 +148,7 @@ public class VioletJewelAutonomous extends Robot {
                             @Override
                             public void handleEvent(RobotEvent e) {
                                 DeadReckonEvent path = (DeadReckonEvent) e;
-                                /* switch (path.kind) {
+                                /*switch (path.kind) {
                                     case SEGMENT_DONE:
                                         jewel.setPosition(0.56);
                                         RobotLog.i("506 Arm reset to initial position after segment done.");
@@ -165,6 +166,7 @@ public class VioletJewelAutonomous extends Robot {
                                         break;
 
                                 } */
+
                                 if (path.kind == EventKind.PATH_DONE) {
 
                                     if (liftJewel == 1) {
@@ -175,6 +177,18 @@ public class VioletJewelAutonomous extends Robot {
                                     addTask(new DeadReckonTask(robot, park, drivetrain) {
                                         @Override
                                         public void handleEvent(RobotEvent e) {
+                                            DeadReckonEvent path = (DeadReckonEvent) e;
+                                            switch (path.kind) {
+                                                case SEGMENT_DONE:
+                                                    if (firstSegment) {
+                                                        jewel.setPosition(0.56);
+                                                        firstSegment = false;
+                                                    }
+                                                    break;
+                                                default:
+                                                    break;
+
+                                            }
                                         }
                                     });
 
@@ -345,24 +359,24 @@ public class VioletJewelAutonomous extends Robot {
 
         switch (combo) {
             case BLUE_FAR:
-                jewel.setPosition(0.56);
                 park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 30, Violet.STRAIGHT_SPEED * turnMultiplier);
                 park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, Violet.STRAIGHT_SPEED * turnMultiplier);
                 break;
             case RED_FAR:
-                jewel.setPosition(0.56);
                 park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 30, Violet.STRAIGHT_SPEED);
+
                 park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, Violet.STRAIGHT_SPEED);
                 break;
             case BLUE_NEAR:
-                jewel.setPosition(0.56);
-                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, Violet.STRAIGHT_SPEED * turnMultiplier);
+                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, Violet.STRAIGHT_SPEED * turnMultiplier);
+                firstSegment = true;
+                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, Violet.STRAIGHT_SPEED * turnMultiplier);
                 park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, Violet.STRAIGHT_SPEED);
 
                 break;
             case RED_NEAR:
                 park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, Violet.STRAIGHT_SPEED);
-                jewel.setPosition(0.56);
+                firstSegment = true;
                 park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, Violet.STRAIGHT_SPEED);
                 park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, Violet.STRAIGHT_SPEED);
                 break;
