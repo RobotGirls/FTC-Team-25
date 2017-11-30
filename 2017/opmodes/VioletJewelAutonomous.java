@@ -301,7 +301,6 @@ public class VioletJewelAutonomous extends Robot {
                             //pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -Violet.STRAIGHT_SPEED);
                         }
                     }
-
                 }
             }
         };
