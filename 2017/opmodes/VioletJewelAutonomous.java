@@ -147,25 +147,6 @@ public class VioletJewelAutonomous extends Robot {
                             @Override
                             public void handleEvent(RobotEvent e) {
                                 DeadReckonEvent path = (DeadReckonEvent) e;
-                                /*switch (path.kind) {
-                                    case SEGMENT_DONE:
-                                        jewel.setPosition(0.56);
-                                        RobotLog.i("506 Arm reset to initial position after segment done.");
-                                        break;
-
-                                    case PATH_DONE:
-                                        RobotLog.i("506 Arm reset to initial position after path done.");
-                                        addTask(new DeadReckonTask(robot, park, drivetrain) {
-                                            @Override
-                                            public void handleEvent(RobotEvent e) {
-                                            }
-                                        });
-                                        break;
-                                    default:
-                                        break;
-
-                                } */
-
                                 if (path.kind == EventKind.PATH_DONE) {
 
                                     if (liftJewel == 1) {
@@ -190,9 +171,13 @@ public class VioletJewelAutonomous extends Robot {
                                             }*/
                                         }
                                     });
-
-
                                 }
+                            }
+                        });
+                        robot.addTask(new SingleShotTimerTask(robot, 700) {
+                            @Override
+                            public void handleEvent(RobotEvent e) {
+                                jewel.setPosition(0.56);
                             }
                         });
                     }
