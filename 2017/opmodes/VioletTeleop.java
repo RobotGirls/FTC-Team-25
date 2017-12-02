@@ -319,7 +319,8 @@ public class VioletTeleop extends Robot {
     {
         if (relicDown == true) {
             relicRotate.setPosition(VioletConstants.RELIC_ROTATE_UP);
-            relicOpen= false;
+
+            relicDown= false;
         } else {
             relicRotate.setPosition(VioletConstants.RELIC_ROTATE_DOWN);
             relicDown = true;
