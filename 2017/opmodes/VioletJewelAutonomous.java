@@ -58,7 +58,8 @@ public class VioletJewelAutonomous extends Robot {
     private int distance = 0;
     private int whichSide = 0;
     private int combo = 0;
-    private int liftJewel = 0;
+    private boolean liftJewelArm = false;
+    private boolean liftArmLater = false;
     private int isBlack = 0;
    // private boolean firstSegment = false;
 
@@ -149,7 +150,7 @@ public class VioletJewelAutonomous extends Robot {
                                 DeadReckonEvent path = (DeadReckonEvent) e;
                                 if (path.kind == EventKind.PATH_DONE) {
 
-                                    if (liftJewel == 1) {
+                                    if (liftJewelArm) {
                                         jewel.setPosition(0.56);
                                         RobotLog.i("506 Jewel arm reset");
                                     }
@@ -160,9 +161,11 @@ public class VioletJewelAutonomous extends Robot {
                                             DeadReckonEvent path = (DeadReckonEvent) e;
                                             /*switch (path.kind) {
                                                 case SEGMENT_DONE:
-                                                    if (firstSegment) {
-                                                        jewel.setPosition(0.56);
-                                                        firstSegment = false;
+                                                    //liftArmLater is true, then lift the jewel arm only after
+                                                    // the first segment of the "park" dead reckoning path.
+                                                    if (liftArmLater) {
+                                                        jewel.setPosition(0.56); //Lift  jewel Arm
+                                                        liftJewelArm = false;
                                                     }
                                                     break;
                                                 default:
@@ -273,6 +276,7 @@ public class VioletJewelAutonomous extends Robot {
                             pushJewel.stop();
                             pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, Violet.STRAIGHT_SPEED * moveMultiplier);
                             liftJewel = 1;
+
                         }
                     } else if (alliance == Alliance.BLUE) {
                         if (event.kind == EventKind.BLUE) {
