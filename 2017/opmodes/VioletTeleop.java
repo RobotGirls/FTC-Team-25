@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package test;
+package opmodes;
 
 
 import android.util.EventLog;
@@ -47,7 +47,7 @@ import team25core.RobotEvent;
  * FTC Team 25: Created by Elizabeth Wu on 11/1/17.
  */
 @TeleOp(name = "Team 25 Teleop", group = "Team25")
-public class RRTeleop extends Robot {
+public class VioletTeleop extends Robot {
 
      /*
 

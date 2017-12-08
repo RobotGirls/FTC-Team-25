@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -18,6 +19,7 @@ import team25core.SingleShotTimerTask;
  * FTC Team 25: Created by Katelyn Biesiadecki on 11/5/2016.
  */
 @Autonomous(name = "DAISY Launch", group = "Team25")
+@Disabled
 public class DaisyLaunchAutonomous extends Robot
 {
     private DcMotor frontLeft;

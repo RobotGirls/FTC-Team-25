@@ -94,9 +94,7 @@ public class BeaconHelper
                 robot.removeTask(senseColorTask);
             }
         };
-        /**
-         * FIXME: You need a class where you are keeping all your constants.
-         */
+
 
         if (alliance == Alliance.RED) {
             colorSensorTask.setModeCompare(Daisy.RED_THRESHOLD);

@@ -13,6 +13,7 @@ import team25core.RobotEvent;
  * Created by jeffb on 10/8/2016.
  */
 @Autonomous(name="Simple Motor Test", group="Team 25")
+@Disabled
 public class SimpleMotorTest extends Robot {
     private DcMotor motor;
 
