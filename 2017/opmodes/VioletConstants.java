@@ -19,20 +19,25 @@ public class VioletConstants
 
     private static double SERVO_DOMAIN = 256.0;
 
-    public static double S1_OPEN      = 10  / SERVO_DOMAIN;
-    public static double S1_CLOSED    = 150  / SERVO_DOMAIN;
-    public static double S2_OPEN      = 255 / SERVO_DOMAIN;
-    public static double S2_CLOSED    = 120 / SERVO_DOMAIN;
-    public static double S3_OPEN      = 224  / SERVO_DOMAIN;
-    public static double S3_CLOSED    = 85  / SERVO_DOMAIN;
-    public static double S4_OPEN      = 10 / SERVO_DOMAIN;
-    public static double S4_CLOSED    = 140  / SERVO_DOMAIN;
     public static double JEWEL_INIT   = 145 / SERVO_DOMAIN;
+    public static double S1_INIT      = 10  / SERVO_DOMAIN;
+    public static double S2_INIT      = 255 / SERVO_DOMAIN;
+    public static double S3_INIT      = 224 / SERVO_DOMAIN;
+    public static double S4_INIT      = 10  / SERVO_DOMAIN;
+    // Need to test to make sure open positions are correct
+    public static double S1_OPEN      = 70  / SERVO_DOMAIN;
+    public static double S1_CLOSED    = 150 / SERVO_DOMAIN;
+    public static double S2_OPEN      = 172 / SERVO_DOMAIN;
+    public static double S2_CLOSED    = 120 / SERVO_DOMAIN;
+    public static double S3_OPEN      = 155 / SERVO_DOMAIN;
+    public static double S3_CLOSED    = 85  / SERVO_DOMAIN;
+    public static double S4_OPEN      = 65  / SERVO_DOMAIN;
+    public static double S4_CLOSED    = 140 / SERVO_DOMAIN;
     // Hesitant initial values. Will have to calibrate servo later.
     public static double RELIC_OPEN   = 100 / SERVO_DOMAIN;
     public static double RELIC_CLOSED = 170 / SERVO_DOMAIN;
     public static double RELIC_ROTATE_DOWN = 128 / SERVO_DOMAIN;
-    public static double RELIC_ROTATE_UP = 135 / SERVO_DOMAIN;
+    public static double RELIC_ROTATE_UP   = 135 / SERVO_DOMAIN;
 
     //public static int DEGREES_180_CLOCKWISE = 375;
     //public static int DEGREES_180_COUNTERCLOCKWISE = 400;
