@@ -1,6 +1,9 @@
 package test;
 
+import android.support.annotation.StringDef;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -16,6 +19,7 @@ import team25core.RobotEvent;
  */
 
 @Autonomous(name="Violet: Straight Test", group = "Team 25")
+@Disabled
 public class VioletStraightTest extends Robot {
 
     private DcMotor frontRight;
