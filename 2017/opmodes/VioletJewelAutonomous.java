@@ -259,22 +259,22 @@ public class VioletJewelAutonomous extends Robot {
                         } else {
                             RobotLog.i("506 Sensed BLUE");
                             pushJewel.stop();
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
+                            pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, Violet.STRAIGHT_SPEED);
                             liftJewel = 1;
                         }
                     } else if (alliance == Alliance.BLUE) {
                         if (event.kind == EventKind.BLUE) {
                             RobotLog.i("506 Sensed BLUE");
                             pushJewel.stop();
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
+                            pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
                             liftJewel = 1;
                         } else {
                             RobotLog.i("506 Sensed RED");
                             pushJewel.stop();
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, Violet.TURN_SPEED);
                             pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, Violet.TURN_SPEED * TURN_MULTIPLIER);
+                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, Violet.TURN_SPEED);
                             liftJewel = 1;
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, Violet.STRAIGHT_SPEED);
+                            pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 11, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
                         }
                     }
                 }
@@ -331,20 +331,20 @@ public class VioletJewelAutonomous extends Robot {
             case BLUE_FAR:
                 RobotLog.i("506 Case: BLUE_FAR");
                 park.stop();
-                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
-                park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 7, Violet.STRAIGHT_SPEED);
+                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 27, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
+                park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
                 break;
             case RED_FAR:
                 RobotLog.i("506 Case: RED_FAR");
                 park.stop();
-                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 30, Violet.STRAIGHT_SPEED);
-                park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 9 , Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
+                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 27, Violet.STRAIGHT_SPEED);
+                park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10 , Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
                 break;
             case BLUE_NEAR:
                 RobotLog.i("506 Case: BLUE_NEAR");
                 park.stop();
-                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
-                park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, Violet.STRAIGHT_SPEED);
+                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 18, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
+                park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 7, Violet.STRAIGHT_SPEED);
                 break;
             case RED_NEAR:
                 RobotLog.i("506 Case: RED_NEAR");
