@@ -100,8 +100,8 @@ public class VioletTeleop extends Robot {
     private MecanumWheelDriveTask drive;
     private OneWheelDriveTask controlLinear;
     //private OneWheelDriveTask controlSlide;
-    private DeadmanMotorTask runSlideOutTask;
-    private DeadmanMotorTask runSlideInTask;
+    //private DeadmanMotorTask runSlideOutTask;
+    //private DeadmanMotorTask runSlideInTask;
 
     private boolean slow;
     //private boolean clawDown = true;
@@ -149,8 +149,8 @@ public class VioletTeleop extends Robot {
         // Sets position of jewel for teleop
         jewel.setPosition(VioletConstants.JEWEL_INIT);
 
-        runSlideOutTask = new DeadmanMotorTask(this, slide, 0.75, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
-        runSlideInTask = new DeadmanMotorTask(this, slide, -0.75, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
+        //runSlideOutTask = new DeadmanMotorTask(this, slide, 0.75, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
+        //runSlideInTask = new DeadmanMotorTask(this, slide, -0.75, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
 
         // Reset encoders.
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -180,18 +180,32 @@ public class VioletTeleop extends Robot {
     }
 
     /**
-     * Move claw up. Uses a 60 motor.
+     * Moves claw up or down. Uses a 60 motor.
      */
-    private void toggleClawUp()
+    private void moveClaw(Direction direction)
+    {
+        if (direction == Direction.CLOCKWISE)
+            linear.setDirection(DcMotorSimple.Direction.REVERSE);
+        else
+            linear.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        this.addTask(new RunToEncoderValueTask(this, linear, VioletConstants.CLAW_VERTICAL, VioletConstants.CLAW_VERTICAL_POWER));
+    }
+
+    /**
+     * Lift claw up. Uses a 60 motor.
+     */
+    private void liftClawUp()
     {
         linear.setDirection(DcMotorSimple.Direction.FORWARD);
 
         this.addTask(new RunToEncoderValueTask(this, linear, VioletConstants.CLAW_VERTICAL, VioletConstants.CLAW_VERTICAL_POWER));
     }
+
     /**
-     * Move claw down. Uses a 60 motor.
+     * Lower claw down. Uses a 60 motor.
      */
-    private void toggleClawDown()
+    private void lowerClawDown()
     {
         linear.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -252,6 +266,8 @@ public class VioletTeleop extends Robot {
      */
     private void rotate(Direction direction)
     {
+        moveClaw(Direction.COUNTERCLOCKWISE);
+
         //int distance;
 
         if (direction == Direction.CLOCKWISE) {
@@ -263,6 +279,8 @@ public class VioletTeleop extends Robot {
         }
 
         this.addTask(new RunToEncoderValueTask(this, rotate, VioletConstants.DEGREES_180, VioletConstants.ROTATE_POWER));
+
+        moveClaw(Direction.CLOCKWISE);
     }
 
     /**
@@ -336,13 +354,12 @@ public class VioletTeleop extends Robot {
         drive = new MecanumWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
         // Left joystick (Gamepad 2) controls lifting and lowering of glyph mechanism
         controlLinear = new OneWheelDriveTask(this, linear, true);
-        // Right joystick (Gamepad 2) controls extending and contracting of relic mechanism
         //controlSlide = new OneWheelDriveTask(this, slide, false);
         this.addTask(drive);
         this.addTask(controlLinear);
         //this.addTask(controlSlide);
-        this.addTask(runSlideOutTask);
-        this.addTask(runSlideInTask);
+        //this.addTask(runSlideOutTask);
+        //this.addTask(runSlideInTask);
 
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e) {
