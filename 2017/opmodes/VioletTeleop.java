@@ -111,6 +111,7 @@ public class VioletTeleop extends Robot {
     private boolean relicDown;
     private Telemetry.Item speed;
 
+    private boolean rotated180 = false;
     private boolean lockout = false;
 
     @Override
@@ -198,14 +199,14 @@ public class VioletTeleop extends Robot {
     }
 
     /**
-     * Blindly open both claws and set the state appropriately.
+     * Blindly open both claws completely and sets to initial state appropriately.
      */
     private void openClaw()
     {
-        s1.setPosition(VioletConstants.S1_OPEN);
-        s2.setPosition(VioletConstants.S2_OPEN);
-        s3.setPosition(VioletConstants.S3_OPEN);
-        s4.setPosition(VioletConstants.S4_OPEN);
+        s1.setPosition(VioletConstants.S1_INIT);
+        s2.setPosition(VioletConstants.S2_INIT);
+        s3.setPosition(VioletConstants.S3_INIT);
+        s4.setPosition(VioletConstants.S4_INIT);
 
         s1Open = true;
         s3Open = true;
@@ -214,7 +215,7 @@ public class VioletTeleop extends Robot {
     /**
      * The servos always work in pairs.  S1/S2 and S3/S4.  toggleS1 therefore refers the to the S1/S2 pair.
      */
-    private void toggleS1()
+    private void toggleS1() //pair on top at beginning
     {
         if (s1Open == true) {
             s1.setPosition(VioletConstants.S1_CLOSED);
@@ -230,7 +231,7 @@ public class VioletTeleop extends Robot {
     /**
      * The servos always work in pairs.  S1/S2 and S3/S4.  toggleS3 therefore refers the to the S3/S4 pair.
      */
-    private void toggleS3()
+    private void toggleS3() //pair on bottom at beginning
     {
         if (s3Open == true) {
             s3.setPosition(VioletConstants.S3_CLOSED);
@@ -251,15 +252,16 @@ public class VioletTeleop extends Robot {
      */
     private void rotate(Direction direction)
     {
-        int distance;
+        //int distance;
 
         if (direction == Direction.CLOCKWISE) {
             rotate.setDirection(DcMotorSimple.Direction.REVERSE);
-            distance = VioletConstants.DEGREES_180;
+            //distance = VioletConstants.DEGREES_180;
         } else {
             rotate.setDirection(DcMotorSimple.Direction.FORWARD);
-            distance = VioletConstants.DEGREES_180;
+            //distance = VioletConstants.DEGREES_180;
         }
+
         this.addTask(new RunToEncoderValueTask(this, rotate, VioletConstants.DEGREES_180, VioletConstants.ROTATE_POWER));
     }
 
@@ -319,7 +321,7 @@ public class VioletTeleop extends Robot {
     {
         if (relicDown == true) {
             relicRotate.setPosition(VioletConstants.RELIC_ROTATE_UP);
-            relicDown= false;
+            relicOpen= false;
         } else {
             relicRotate.setPosition(VioletConstants.RELIC_ROTATE_DOWN);
             relicDown = true;
@@ -332,7 +334,7 @@ public class VioletTeleop extends Robot {
     public void start()
     {
         drive = new MecanumWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
-        // Left joystick (Gamepad 2) controls lifting and lowers of glyph mechanism
+        // Left joystick (Gamepad 2) controls lifting and lowering of glyph mechanism
         controlLinear = new OneWheelDriveTask(this, linear, true);
         // Right joystick (Gamepad 2) controls extending and contracting of relic mechanism
         //controlSlide = new OneWheelDriveTask(this, slide, false);
@@ -354,23 +356,31 @@ public class VioletTeleop extends Robot {
                 }
 
                 if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
-                    // Toggle s1/s2
+                    // Toggle top servo pair
 
-                    toggleS1();
+                    if (rotated180)
+                        toggleS3();
+                    else
+                        toggleS1();
                 } else if (event.kind == EventKind.RIGHT_BUMPER_DOWN) {
-                    // Toggle s3/s4
+                    // Toggle bottom servo pair
 
-                    toggleS3();
+                    if (rotated180)
+                        toggleS1();
+                    else
+                        toggleS3();
                 } else if (event.kind == EventKind.BUTTON_B_DOWN) {
                     // Rotate 180 degrees clockwise looking from behind robot
 
                     lockout = true;
                     rotate(Direction.CLOCKWISE);
+                    rotated180 = false;
                 } else if (event.kind == EventKind.BUTTON_X_DOWN) {
                     // Rotate 180 degrees counterclockwise looking from behind robot
 
                     lockout = true;
                     rotate(Direction.COUNTERCLOCKWISE);
+                    rotated180 = true;
                 } else if (event.kind == EventKind.LEFT_TRIGGER_DOWN) {
                     // Nudge counterclockwise looking from behind robot
 
@@ -398,7 +408,15 @@ public class VioletTeleop extends Robot {
                     // Rotate relic NEEDS TO BE CALIBRATED
 
                     rotateRelic();
-                } else if (event.kind == EventKind.BUTTON_Y_DOWN) {
+                } else if (event.kind == EventKind.DPAD_UP_DOWN) {
+                    // Extends Relic slide out
+
+                    extendRelic();
+                } else if (event.kind == EventKind.DPAD_DOWN_DOWN) {
+                    // Contracts Relic slide out
+
+                    contractRelic();
+                } else if (event.kind == EventKind.BUTTON_A_DOWN) {
                     // Toggles slowness of motors
 
                     if (!slow) {
