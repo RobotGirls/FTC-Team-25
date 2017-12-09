@@ -14,7 +14,6 @@ import team25core.RobotTask;
  */
 
 @Autonomous(name = "TEST Motor", group = "AutoTest")
-@Disabled
 public class LameingoMotorTest extends Robot {
 
     private DcMotor motor;
@@ -27,7 +26,7 @@ public class LameingoMotorTest extends Robot {
 
     @Override
     public void init() {
-        motor = hardwareMap.dcMotor.get("motorBL");
+        motor = hardwareMap.dcMotor.get("frontLeft");
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }

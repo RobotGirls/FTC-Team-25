@@ -1,6 +1,7 @@
 package test;
 
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -20,6 +21,8 @@ import test.Violet;
  * FTC Team 25: Created by Elizabeth Wu on 11/1/17.
  */
 @TeleOp(name = "BC Teleop", group = "Team25")
+@Disabled
+
 public class BreannaVioletTeleop extends Robot {
 
      /*
