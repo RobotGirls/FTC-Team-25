@@ -41,6 +41,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
+import team25core.MechanumGearedDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 
@@ -58,7 +59,7 @@ public class GlyphPaths extends Robot {
     private DcMotor backRight;
 
 
-    private FourWheelDirectDrivetrain drivetrain;
+    private MechanumGearedDrivetrain drivetrain;
 
     /**
      * The default event handler for the robot.
@@ -82,104 +83,17 @@ public class GlyphPaths extends Robot {
         backLeft = hardwareMap.get(DcMotor.class, "rearLeft");
         backRight = hardwareMap.get(DcMotor.class, "rearRight");
 
-        drivetrain = new FourWheelDirectDrivetrain(frontRight, backRight, frontLeft, backLeft);
+        drivetrain = new MechanumGearedDrivetrain( GlyphConstants.TICKS_PER_INCH, frontRight, backRight, frontLeft, backLeft);
     }
 
     @Override
     public void start()
     {
-        DeadReckonPath redFrontP1 = new DeadReckonPath();
-        DeadReckonPath redFrontP2 = new DeadReckonPath();
-        DeadReckonPath redFrontP3 = new DeadReckonPath();
-        DeadReckonPath redBackP1 = new DeadReckonPath();
-        DeadReckonPath redBackP2 = new DeadReckonPath();
-        DeadReckonPath redBackP3 = new DeadReckonPath();
-        DeadReckonPath blueFrontP1 = new DeadReckonPath();
-        DeadReckonPath blueFrontP2 = new DeadReckonPath();
-        DeadReckonPath blueFrontP3 = new DeadReckonPath();
-        DeadReckonPath blueBackP1 = new DeadReckonPath();
-        DeadReckonPath blueBackP2 = new DeadReckonPath();
-        DeadReckonPath blueBackP3 = new DeadReckonPath();
+        GlyphAutonomousPathUtility utility = new GlyphAutonomousPathUtility();
 
-        //path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 1.0);
+        DeadReckonPath path = utility.getPath(GlyphAutonomousPathUtility.TargetColumn.LEFT, GlyphAutonomousPathUtility.StartStone.RED_NEAR);
 
-
-        //Red Front Position 1 Path
-        redFrontP1.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, GlyphConstants.STRAIGHT_SPEED);
-        redFrontP1.addSegment(DeadReckonPath.SegmentType.TURN, 90, GlyphConstants.TURN_SPEED);
-        redFrontP1.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, GlyphConstants.STRAIGHT_SPEED);
-
-        //Red Front Position 2 Path
-        redFrontP2.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 18, GlyphConstants.STRAIGHT_SPEED);
-        redFrontP2.addSegment(DeadReckonPath.SegmentType.TURN,90 , GlyphConstants.TURN_SPEED);
-        redFrontP2.addSegment(DeadReckonPath.SegmentType.STRAIGHT , 4, GlyphConstants.STRAIGHT_SPEED);
-
-        //Red Front Position 3 Path
-        redFrontP3.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 21, GlyphConstants.STRAIGHT_SPEED);
-        redFrontP3.addSegment(DeadReckonPath.SegmentType.TURN, 90, GlyphConstants.TURN_SPEED);
-        redFrontP3.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, GlyphConstants.STRAIGHT_SPEED);
-
-        //----------------------------------------------------------------
-
-        //Red Back Position 1 Path
-        redBackP1.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, GlyphConstants.STRAIGHT_SPEED);
-        redBackP1.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, GlyphConstants.STRAIGHT_SPEED );
-        redBackP1.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, GlyphConstants.STRAIGHT_SPEED);
-
-        //Red Back Position 2 Path
-        redBackP2.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, GlyphConstants.STRAIGHT_SPEED);
-        redBackP2.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 11, GlyphConstants.STRAIGHT_SPEED);
-        redBackP2.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, GlyphConstants.STRAIGHT_SPEED);
-
-        //Red back Position 3 Path
-        redBackP3.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, GlyphConstants.STRAIGHT_SPEED);
-        redBackP3.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 14, GlyphConstants.STRAIGHT_SPEED);
-        redBackP3.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, GlyphConstants.STRAIGHT_SPEED);
-
-        //-----------------------------------------------------------------
-
-        //Blue Front Position 1 Path
-        blueFrontP1.addSegment(DeadReckonPath.SegmentType.STRAIGHT, -15, GlyphConstants.STRAIGHT_SPEED);
-        blueFrontP1.addSegment(DeadReckonPath.SegmentType.TURN, 90, GlyphConstants.TURN_SPEED);
-        blueFrontP1.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, GlyphConstants.STRAIGHT_SPEED);
-
-        //Blue Front Position 2 Path
-        blueFrontP2.addSegment(DeadReckonPath.SegmentType.STRAIGHT, -18, GlyphConstants.STRAIGHT_SPEED);
-        blueFrontP2.addSegment(DeadReckonPath.SegmentType.TURN, 90, GlyphConstants.TURN_SPEED);
-        blueFrontP2.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, GlyphConstants.STRAIGHT_SPEED);
-
-        //Blue Front Position 3 Path
-        blueFrontP3.addSegment(DeadReckonPath.SegmentType.STRAIGHT, -21, GlyphConstants.STRAIGHT_SPEED);
-        blueFrontP3.addSegment(DeadReckonPath.SegmentType.TURN, 90, GlyphConstants.TURN_SPEED);
-        blueFrontP3.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, GlyphConstants.STRAIGHT_SPEED);
-
-        //----------------------------------------------------------------
-
-        //Blue Back Position 1 Path
-        blueBackP1.addSegment(DeadReckonPath.SegmentType.STRAIGHT, -15, GlyphConstants.STRAIGHT_SPEED);
-        blueBackP1.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, -8, 1.0);
-        blueBackP1.addSegment(DeadReckonPath.SegmentType.TURN, 180, GlyphConstants.TURN_SPEED);
-        blueBackP1.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, GlyphConstants.STRAIGHT_SPEED);
-
-        //Blue Back Position 2 Path
-        blueBackP2.addSegment(DeadReckonPath.SegmentType.STRAIGHT, -15, GlyphConstants.STRAIGHT_SPEED);
-        blueBackP2.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, -11, 1.0);
-        blueBackP2.addSegment(DeadReckonPath.SegmentType.TURN, 180, GlyphConstants.TURN_SPEED);
-        blueBackP2.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, GlyphConstants.STRAIGHT_SPEED);
-
-        //Blue Back Position 3 Path
-        blueBackP3.addSegment(DeadReckonPath.SegmentType.STRAIGHT, -15, GlyphConstants.STRAIGHT_SPEED);
-        blueBackP3.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, -14, 1.0);
-        blueBackP3.addSegment(DeadReckonPath.SegmentType.TURN, 180, GlyphConstants.TURN_SPEED);
-        blueBackP3.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, GlyphConstants.STRAIGHT_SPEED);
-
-
-        /**
-         * Alternatively, this could be an anonymous class declaration that implements
-         * handleEvent() for task specific event handlers.
-         */
-        this.addTask(new DeadReckonTask(this, redFrontP1, drivetrain));
-
+        addTask(new DeadReckonTask(this, path, drivetrain));
     }
 
 }
