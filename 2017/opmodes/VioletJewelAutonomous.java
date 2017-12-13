@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -24,6 +25,7 @@ import team25core.SingleShotTimerTask;
  */
 
 @Autonomous(name = "Violet Jewel Autonomous", group = "Team 25")
+@Disabled
 public class VioletJewelAutonomous extends Robot {
 
     private DcMotor frontLeft;
@@ -125,7 +127,7 @@ public class VioletJewelAutonomous extends Robot {
 
         drivetrain.setNoncanonicalMotorDirection();
 
-        sense();
+        //sense();
 
 
     }
@@ -235,7 +237,7 @@ public class VioletJewelAutonomous extends Robot {
         }
     }
 
-    private void sense()
+    /*private void sense()
     {
          colorThiefTask = new ColorThiefTask(this, VuforiaLocalizer.CameraDirection.FRONT) {
             @Override
@@ -283,7 +285,7 @@ public class VioletJewelAutonomous extends Robot {
 
         addTask(colorThiefTask);
        // setupParkPath();
-    }
+    }*/
 
     private void selectAlliance(Alliance color) {
         if (color == Alliance.BLUE) {
