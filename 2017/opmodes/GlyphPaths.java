@@ -91,7 +91,7 @@ public class GlyphPaths extends Robot {
     {
         GlyphAutonomousPathUtility utility = new GlyphAutonomousPathUtility();
 
-        DeadReckonPath path = utility.getPath(GlyphAutonomousPathUtility.TargetColumn.LEFT, GlyphAutonomousPathUtility.StartStone.RED_NEAR);
+        DeadReckonPath path = utility.getPath(GlyphAutonomousPathUtility.TargetColumn.LEFT, GlyphAutonomousPathUtility.StartStone.RED_FAR);
 
         addTask(new DeadReckonTask(this, path, drivetrain));
     }
