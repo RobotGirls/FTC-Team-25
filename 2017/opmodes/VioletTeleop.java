@@ -37,7 +37,9 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+
 import team25core.DeadmanMotorTask;
+import opmodes.VioletConstants;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
 import team25core.MecanumWheelDriveTask;
@@ -45,6 +47,7 @@ import team25core.OneWheelDriveTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
+import team25core.SingleShotTimerTask;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
@@ -99,20 +102,26 @@ public class VioletTeleop extends Robot {
     private FourWheelDirectDrivetrain drivetrain;
     private MecanumWheelDriveTask drive;
     private OneWheelDriveTask controlLinear;
-    //private OneWheelDriveTask controlSlide;
+    private OneWheelDriveTask controlSlide;
     //private DeadmanMotorTask runSlideOutTask;
     //private DeadmanMotorTask runSlideInTask;
 
-    private boolean slow;
+    private boolean slow = false;
     //private boolean clawDown = true;
-    private boolean s1Open;
-    private boolean s3Open;
-    private boolean relicOpen;
-    private boolean relicDown;
+    private boolean s1Open= true;
+    private boolean s3Open = true;
+    private boolean relicOpen = true;
+    private boolean relicDown = true;
     private Telemetry.Item speed;
+    private Telemetry.Item encoderRelic;
+    private Telemetry.Item encoderLift;
 
     private boolean rotated180 = false;
     private boolean lockout = false;
+
+    public Direction currentDirection;
+    public int currentEncoder;
+    public boolean goDown = false;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -147,7 +156,7 @@ public class VioletTeleop extends Robot {
         relicRotate = hardwareMap.servo.get("relicRotate");
 
         // Sets position of jewel for teleop
-        jewel.setPosition(VioletConstants.JEWEL_INIT);
+        jewel.setPosition(VioletConstants.JEWEL_UP);
 
         //runSlideOutTask = new DeadmanMotorTask(this, slide, 0.75, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
         //runSlideInTask = new DeadmanMotorTask(this, slide, -0.75, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
@@ -165,8 +174,8 @@ public class VioletTeleop extends Robot {
         rotate.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         linear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         linear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Allows for rotate, linear, and slide motor to hold position when no button is pressed
         rotate.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -177,39 +186,8 @@ public class VioletTeleop extends Robot {
 
         // Sets claw servos to open position
         openClaw();
-    }
-
-    /**
-     * Moves claw up or down. Uses a 60 motor.
-     */
-    private void moveClaw(Direction direction)
-    {
-        if (direction == Direction.CLOCKWISE)
-            linear.setDirection(DcMotorSimple.Direction.REVERSE);
-        else
-            linear.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        this.addTask(new RunToEncoderValueTask(this, linear, VioletConstants.CLAW_VERTICAL, VioletConstants.CLAW_VERTICAL_POWER));
-    }
-
-    /**
-     * Lift claw up. Uses a 60 motor.
-     */
-    private void liftClawUp()
-    {
-        linear.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        this.addTask(new RunToEncoderValueTask(this, linear, VioletConstants.CLAW_VERTICAL, VioletConstants.CLAW_VERTICAL_POWER));
-    }
-
-    /**
-     * Lower claw down. Uses a 60 motor.
-     */
-    private void lowerClawDown()
-    {
-        linear.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        this.addTask(new RunToEncoderValueTask(this, linear, VioletConstants.CLAW_VERTICAL, VioletConstants.CLAW_VERTICAL_POWER));
+        relic.setPosition(VioletConstants.RELIC_CLOSED);
+        relicRotate.setPosition(VioletConstants.RELIC_ROTATE_DOWN);
     }
 
     /**
@@ -259,28 +237,108 @@ public class VioletTeleop extends Robot {
     }
 
     /**
+     * Move claw up or down. Uses a 60 motor.
+     */
+    private void moveClaw(Direction direction)
+    {
+        if (direction == Direction.CLOCKWISE)
+            linear.setDirection(DcMotorSimple.Direction.REVERSE);
+        else
+            linear.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        this.addTask(new RunToEncoderValueTask(this, linear, VioletConstants.VERTICAL_MIN_HEIGHT, VioletConstants.CLAW_VERTICAL_POWER));
+    }
+
+    /**
+     * Lift claw up. Uses a 60 motor.
+     */
+    private void liftClawUp()
+    {
+        linear.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        this.addTask(new RunToEncoderValueTask(this, linear, VioletConstants.CLAW_VERTICAL, VioletConstants.CLAW_VERTICAL_POWER));
+    }
+
+    /**
+     * Lower claw down. Uses a 60 motor.
+     */
+    private void lowerClawDown()
+    {
+        linear.setDirection(DcMotorSimple.Direction.REVERSE);
+        RobotLog.e("Beginning LowerClawDown: %d", linear.getCurrentPosition());
+
+        this.addTask(new RunToEncoderValueTask(this, linear, VioletConstants.VERTICAL_MIN_HEIGHT, VioletConstants.CLAW_VERTICAL_POWER) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                RunToEncoderValueTask.RunToEncoderValueEvent blah = (RunToEncoderValueTask.RunToEncoderValueEvent) e;
+                // note that because we reversed direction, when we start going down, the encoder values are actually
+                // increasing as we go down instead of decreasing
+                RobotLog.e("LowerClawDown Handler: %d", linear.getCurrentPosition());
+                if (blah.kind == RunToEncoderValueTask.EventKind.DONE) {
+                    RobotLog.e("LowerClawDown Handler DONE***");
+                    linear.setDirection(DcMotorSimple.Direction.FORWARD);
+                    RobotLog.e("Before clear encoder: %d", linear.getCurrentPosition());
+                    //linear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    RobotLog.e("After clear encoder: %d", linear.getCurrentPosition());
+
+                }
+            }
+        });
+    }
+
+    /**
      * We will spin the claw back and forth, be careful that you alternate directions so that
      * you don't wrap the servo cables around the motor shaft.
      *
      * This motor's movement is not symmetrical, so we'll compensate in one direction.
      */
-    private void rotate(Direction direction)
+    private void rotateGlyph(Direction direction)
     {
-        moveClaw(Direction.COUNTERCLOCKWISE);
+        currentEncoder = linear.getCurrentPosition();
+        currentDirection = direction;
 
-        //int distance;
+        RobotLog.e("----------------------------------------------------------------------------------------------------");
+        RobotLog.e("Rotate Glyph Current Encoder: %d", currentEncoder);
 
-        if (direction == Direction.CLOCKWISE) {
-            rotate.setDirection(DcMotorSimple.Direction.REVERSE);
-            //distance = VioletConstants.DEGREES_180;
-        } else {
-            rotate.setDirection(DcMotorSimple.Direction.FORWARD);
-            //distance = VioletConstants.DEGREES_180;
+        if (currentEncoder < VioletConstants.VERTICAL_MIN_HEIGHT) {
+            moveClaw(Direction.COUNTERCLOCKWISE);
+            RobotLog.e("Now moving claw up");
+            goDown = true;
         }
+        addTask(new SingleShotTimerTask(this, 1500) {
+                    @Override
+                    public void handleEvent(RobotEvent e) {
+                        //int distance;
+                        if (currentDirection == Direction.CLOCKWISE) {
+                            rotate.setDirection(DcMotorSimple.Direction.REVERSE);
+                            //distance = VioletConstants.DEGREES_180;
+                        } else {
+                            rotate.setDirection(DcMotorSimple.Direction.FORWARD);
+                            //distance = VioletConstants.DEGREES_180;
+                        }
 
-        this.addTask(new RunToEncoderValueTask(this, rotate, VioletConstants.DEGREES_180, VioletConstants.ROTATE_POWER));
-
-        moveClaw(Direction.CLOCKWISE);
+                        robot.addTask(new RunToEncoderValueTask(robot, rotate, VioletConstants.DEGREES_180, VioletConstants.ROTATE_POWER) {
+                            @Override
+                            public void handleEvent (RobotEvent e){
+                                RunToEncoderValueTask.RunToEncoderValueEvent blah = (RunToEncoderValueTask.RunToEncoderValueEvent) e;
+                                RobotLog.e("Rotate Encoder Event" + e.toString());
+                                if (blah.kind == RunToEncoderValueTask.EventKind.DONE) {
+                                    RobotLog.e("Rotate done.");
+                                    addTask(new SingleShotTimerTask(robot, 1500) {
+                                        @Override
+                                        public void handleEvent(RobotEvent e) {
+                                            if (goDown) {
+                                                //moveClaw(Direction.CLOCKWISE);
+                                                lowerClawDown();
+                                                //RobotLog.e("Now moving claw down");
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+        });
     }
 
     /**
@@ -288,7 +346,7 @@ public class VioletTeleop extends Robot {
      * avoid operator error wherein the motor is held on too long and we over rotate thereby
      * damaging the cabling or wire harnesses.
      */
-    private void nudge(Direction direction)
+    private void nudgeGlyph(Direction direction)
     {
         if (direction == Direction.CLOCKWISE) {
             rotate.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -299,7 +357,7 @@ public class VioletTeleop extends Robot {
     }
 
     /**
-     * Extend relic mechanism out. Uses a 40 motor.
+     * Extend relic mechanism out. Uses a 60 motor.
      */
     private void extendRelic()
     {
@@ -309,7 +367,7 @@ public class VioletTeleop extends Robot {
     }
 
     /**
-     * Bring relic mechanism back in. Uses a 40 motor.
+     * Bring relic mechanism back in. Uses a 60 motor.
      */
     private void contractRelic()
     {
@@ -319,9 +377,9 @@ public class VioletTeleop extends Robot {
     }
 
     /**
-     * Opens and closes relic claw servo.
+     * Open and close relic claw servo.
      */
-    private void toggleRelic()
+    private void toggleRelicClaw()
     {
         if (relicOpen == true) {
             relic.setPosition(VioletConstants.RELIC_CLOSED);
@@ -333,13 +391,13 @@ public class VioletTeleop extends Robot {
     }
 
     /**
-     * Rotates relic rotate servo. NEED TO FIGURE OUT.
+     * Rotate relic rotate servo.
      */
     private void rotateRelic()
     {
         if (relicDown == true) {
             relicRotate.setPosition(VioletConstants.RELIC_ROTATE_UP);
-            relicOpen= false;
+            relicDown= false;
         } else {
             relicRotate.setPosition(VioletConstants.RELIC_ROTATE_DOWN);
             relicDown = true;
@@ -352,12 +410,15 @@ public class VioletTeleop extends Robot {
     public void start()
     {
         drive = new MecanumWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
+
         // Left joystick (Gamepad 2) controls lifting and lowering of glyph mechanism
+        linear.setDirection(DcMotorSimple.Direction.FORWARD); // To run glyph mechanism up
         controlLinear = new OneWheelDriveTask(this, linear, true);
-        //controlSlide = new OneWheelDriveTask(this, slide, false);
+        controlSlide = new OneWheelDriveTask(this, slide, false);
+        controlSlide.useCeiling(VioletConstants.RELIC_CEILING);
         this.addTask(drive);
         this.addTask(controlLinear);
-        //this.addTask(controlSlide);
+        this.addTask(controlSlide);
         //this.addTask(runSlideOutTask);
         //this.addTask(runSlideInTask);
 
@@ -372,7 +433,27 @@ public class VioletTeleop extends Robot {
                     return;
                 }
 
-                if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
+                if (event.kind == EventKind.BUTTON_X_DOWN) {
+                    // Rotate 180 degrees counterclockwise looking from behind robot
+
+                    lockout = true;
+                    rotateGlyph(Direction.COUNTERCLOCKWISE);
+                    rotated180 = true;
+                } else if (event.kind == EventKind.BUTTON_B_DOWN) {
+                    // Rotate 180 degrees clockwise looking from behind robot
+
+                    lockout = true;
+                    rotateGlyph(Direction.CLOCKWISE);
+                    rotated180 = false;
+                } /**else if (event.kind == EventKind.DPAD_UP_DOWN) {
+                    // Extends relic slide out
+
+                    extendRelic();
+                } else if (event.kind == EventKind.DPAD_DOWN_DOWN) {
+                    // Contracts relic slide in
+
+                    contractRelic();
+                } */else if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
                     // Toggle top servo pair
 
                     if (rotated180)
@@ -386,28 +467,18 @@ public class VioletTeleop extends Robot {
                         toggleS1();
                     else
                         toggleS3();
-                } else if (event.kind == EventKind.BUTTON_B_DOWN) {
-                    // Rotate 180 degrees clockwise looking from behind robot
-
-                    lockout = true;
-                    rotate(Direction.CLOCKWISE);
-                    rotated180 = false;
-                } else if (event.kind == EventKind.BUTTON_X_DOWN) {
-                    // Rotate 180 degrees counterclockwise looking from behind robot
-
-                    lockout = true;
-                    rotate(Direction.COUNTERCLOCKWISE);
-                    rotated180 = true;
                 } else if (event.kind == EventKind.LEFT_TRIGGER_DOWN) {
                     // Nudge counterclockwise looking from behind robot
 
                     lockout = true;
-                    nudge(Direction.COUNTERCLOCKWISE);
+                    nudgeGlyph(Direction.COUNTERCLOCKWISE);
                 } else if (event.kind == EventKind.RIGHT_TRIGGER_DOWN) {
                     // Nudge clockwise looking from behind robot
 
                     lockout = true;
-                    nudge(Direction.CLOCKWISE);
+                    nudgeGlyph(Direction.CLOCKWISE);
+                } else if (event.kind == EventKind.BUTTON_A_DOWN) {
+                    moveClaw(Direction.CLOCKWISE);
                 }
             }
         });
@@ -420,32 +491,32 @@ public class VioletTeleop extends Robot {
                 if (event.kind == EventKind.BUTTON_X_DOWN) {
                     // Toggle relic claw servo
 
-                    toggleRelic();
+                    toggleRelicClaw();
                 } else if (event.kind == EventKind.BUTTON_B_DOWN) {
-                    // Rotate relic NEEDS TO BE CALIBRATED
+                    // Rotate relic
 
                     rotateRelic();
-                } else if (event.kind == EventKind.DPAD_UP_DOWN) {
-                    // Extends Relic slide out
-
-                    extendRelic();
-                } else if (event.kind == EventKind.DPAD_DOWN_DOWN) {
-                    // Contracts Relic slide out
-
-                    contractRelic();
                 } else if (event.kind == EventKind.BUTTON_A_DOWN) {
-                    // Toggles slowness of motors
+                    // If slow, then normal speed. If fast, then slow speed of motors.
 
-                    if (!slow) {
+                    if (slow) {
+                        drive.slowDown(1.0);
+                        slow = false;
+                        speed = telemetry.addData("SLOW", "false");
+                    } else {
                         drive.slowDown(0.3);
                         slow = true;
                         speed = telemetry.addData("SLOW", "true");
-                    } else {
-                        drive.slowDown(false);
-                        slow = false;
-                        speed = telemetry.addData("SLOW", "false");
                     }
-                }
+                } /**else if (event.kind == EventKind.DPAD_UP_DOWN) {
+                    // Extends relic slide out
+
+                    extendRelic();
+                } else if (event.kind == EventKind.DPAD_DOWN_DOWN) {
+                    // Contracts relic slide out
+
+                    contractRelic();
+                }*/
             }
         });
 
