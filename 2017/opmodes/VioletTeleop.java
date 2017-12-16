@@ -110,7 +110,7 @@ public class VioletTeleop extends Robot {
     //private boolean clawDown = true;
     private boolean s1Open= true;
     private boolean s3Open = true;
-    private boolean relicOpen = true;
+    private boolean relicOpen = false;
     private boolean relicDown = true;
     private Telemetry.Item speed;
     private Telemetry.Item encoderRelic;
@@ -186,7 +186,7 @@ public class VioletTeleop extends Robot {
 
         // Sets claw servos to open position
         openClaw();
-        relic.setPosition(VioletConstants.RELIC_CLOSED);
+        relic.setPosition(VioletConstants.RELIC_INIT);
         relicRotate.setPosition(VioletConstants.RELIC_ROTATE_DOWN);
     }
 
@@ -322,6 +322,7 @@ public class VioletTeleop extends Robot {
                             public void handleEvent (RobotEvent e){
                                 RunToEncoderValueTask.RunToEncoderValueEvent blah = (RunToEncoderValueTask.RunToEncoderValueEvent) e;
                                 RobotLog.e("Rotate Encoder Event" + e.toString());
+                                lockout = false;
                                 if (blah.kind == RunToEncoderValueTask.EventKind.DONE) {
                                     RobotLog.e("Rotate done.");
                                     addTask(new SingleShotTimerTask(robot, 1500) {
@@ -433,7 +434,11 @@ public class VioletTeleop extends Robot {
                     return;
                 }
 
-                if (event.kind == EventKind.BUTTON_X_DOWN) {
+                if (event.kind == EventKind.BUTTON_Y_DOWN) {
+                    // Toggle relic claw servo
+
+                    toggleRelicClaw();
+                } else if (event.kind == EventKind.BUTTON_X_DOWN) {
                     // Rotate 180 degrees counterclockwise looking from behind robot
 
                     lockout = true;
@@ -445,6 +450,10 @@ public class VioletTeleop extends Robot {
                     lockout = true;
                     rotateGlyph(Direction.CLOCKWISE);
                     rotated180 = false;
+                } else if (event.kind == EventKind.BUTTON_A_DOWN) {
+                    // Rotate relic
+
+                    rotateRelic();
                 } /**else if (event.kind == EventKind.DPAD_UP_DOWN) {
                     // Extends relic slide out
 
