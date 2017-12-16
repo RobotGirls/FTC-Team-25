@@ -22,17 +22,17 @@ public class VioletConstants
     public static double S3_INIT      = 224 / SERVO_DOMAIN;
     public static double S4_INIT      = 10  / SERVO_DOMAIN;
     public static double RELIC_INIT   = 116 / SERVO_DOMAIN;
-    public static double S1_OPEN      = 70  / SERVO_DOMAIN;
-    public static double S1_CLOSED    = 150 / SERVO_DOMAIN;
-    public static double S2_OPEN      = 172 / SERVO_DOMAIN;
+    public static double S1_OPEN      = 102 / SERVO_DOMAIN;
+    public static double S1_CLOSED    = 151 / SERVO_DOMAIN;
+    public static double S2_OPEN      = 166 / SERVO_DOMAIN;
     public static double S2_CLOSED    = 120 / SERVO_DOMAIN;
-    public static double S3_OPEN      = 155 / SERVO_DOMAIN;
+    public static double S3_OPEN      = 121 / SERVO_DOMAIN;
     public static double S3_CLOSED    = 85  / SERVO_DOMAIN;
-    public static double S4_OPEN      = 65  / SERVO_DOMAIN;
+    public static double S4_OPEN      = 92  / SERVO_DOMAIN;
     public static double S4_CLOSED    = 140 / SERVO_DOMAIN;
-    public static double RELIC_OPEN   = 16  / SERVO_DOMAIN; //FIXME
+    public static double RELIC_OPEN   = 16  / SERVO_DOMAIN;
     public static double RELIC_CLOSED = 100 / SERVO_DOMAIN;
-    public static double RELIC_ROTATE_DOWN = 109 / SERVO_DOMAIN; //FIXME
+    public static double RELIC_ROTATE_DOWN = 109 / SERVO_DOMAIN;
     public static double RELIC_ROTATE_UP   = 127 / SERVO_DOMAIN;
 
     //public static int DEGREES_180_CLOCKWISE = 375;
@@ -41,8 +41,8 @@ public class VioletConstants
     public static double ROTATE_POWER = 0.3;
     public static int NUDGE = 15;
     public static double NUDGE_POWER = 0.1;
-    public static int VERTICAL_MIN_HEIGHT = 700; //FIXME
-    public static int CLAW_VERTICAL = 700; //FIXME
+    public static int VERTICAL_MIN_HEIGHT = 700;
+    public static int CLAW_VERTICAL = 700;
     public static double CLAW_VERTICAL_POWER = 0.75;
     // put on actual teleop in order to be able to change power in certain instances (Bella)
     // Hesitant initial values for relic slides.
