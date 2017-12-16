@@ -21,6 +21,7 @@ public class VioletConstants
     public static double S2_INIT      = 255 / SERVO_DOMAIN;
     public static double S3_INIT      = 224 / SERVO_DOMAIN;
     public static double S4_INIT      = 10  / SERVO_DOMAIN;
+    public static double RELIC_INIT   = 116 / SERVO_DOMAIN;
     public static double S1_OPEN      = 70  / SERVO_DOMAIN;
     public static double S1_CLOSED    = 150 / SERVO_DOMAIN;
     public static double S2_OPEN      = 172 / SERVO_DOMAIN;
@@ -29,8 +30,8 @@ public class VioletConstants
     public static double S3_CLOSED    = 85  / SERVO_DOMAIN;
     public static double S4_OPEN      = 65  / SERVO_DOMAIN;
     public static double S4_CLOSED    = 140 / SERVO_DOMAIN;
-    public static double RELIC_OPEN   = 0   / SERVO_DOMAIN; //FIXME
-    public static double RELIC_CLOSED = 40  / SERVO_DOMAIN;
+    public static double RELIC_OPEN   = 16  / SERVO_DOMAIN; //FIXME
+    public static double RELIC_CLOSED = 100 / SERVO_DOMAIN;
     public static double RELIC_ROTATE_DOWN = 109 / SERVO_DOMAIN; //FIXME
     public static double RELIC_ROTATE_UP   = 127 / SERVO_DOMAIN;
 
