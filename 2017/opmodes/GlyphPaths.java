@@ -83,7 +83,7 @@ public class GlyphPaths extends Robot {
         backLeft = hardwareMap.get(DcMotor.class, "rearLeft");
         backRight = hardwareMap.get(DcMotor.class, "rearRight");
 
-        drivetrain = new MechanumGearedDrivetrain( GlyphConstants.TICKS_PER_INCH, frontRight, backRight, frontLeft, backLeft);
+        drivetrain = new MechanumGearedDrivetrain(GlyphConstants.TICKS_PER_INCH, frontRight, backRight, frontLeft, backLeft);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class GlyphPaths extends Robot {
     {
         GlyphAutonomousPathUtility utility = new GlyphAutonomousPathUtility();
 
-        DeadReckonPath path = utility.getPath(GlyphAutonomousPathUtility.TargetColumn.LEFT, GlyphAutonomousPathUtility.StartStone.RED_FAR);
+        DeadReckonPath path = utility.getPath(GlyphAutonomousPathUtility.TargetColumn.RIGHT, GlyphAutonomousPathUtility.StartStone.BLUE_FAR);
 
         addTask(new DeadReckonTask(this, path, drivetrain));
     }
