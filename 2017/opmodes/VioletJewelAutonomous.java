@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -25,6 +26,7 @@ import team25core.VuforiaBase;
  */
 
 @Autonomous(name = "Violet Jewel Autonomous", group = "Team 25")
+@Disabled
 public class VioletJewelAutonomous extends Robot {
 
     private DcMotor frontLeft;
@@ -110,10 +112,10 @@ public class VioletJewelAutonomous extends Robot {
         particle        = telemetry.addData("Particle: ", "No data");
 
         // Path setup.
-        park        = new DeadReckonPath();
+        park = new DeadReckonPath();
 
         // Arm initialized up
-        jewel.setPosition(0.56);    // 145/256
+        jewel.setPosition(VioletConstants.JEWEL_UP);    // 145/256
 
         // Single shot timer tasks for delays.
         stt = new SingleShotTimerTask(this, 1500);          // Delay resetting arm position
@@ -127,8 +129,6 @@ public class VioletJewelAutonomous extends Robot {
         drivetrain.setNoncanonicalMotorDirection();
 
         sense();
-
-
     }
 
  /*   public void parkPathChoice()
@@ -155,7 +155,7 @@ public class VioletJewelAutonomous extends Robot {
     {
 
         // Arm goes down
-        jewel.setPosition(0.05);
+        jewel.setPosition(VioletConstants.JEWEL_DOWN);
         // 15/256
         addTask(new SingleShotTimerTask(this, 500) {
                     @Override
@@ -184,7 +184,7 @@ public class VioletJewelAutonomous extends Robot {
                         robot.addTask(new SingleShotTimerTask(robot, 500) {
                             @Override
                             public void handleEvent(RobotEvent e) {
-                                jewel.setPosition(0.56);
+                                jewel.setPosition(VioletConstants.JEWEL_UP);
                             }
                         });
                     }

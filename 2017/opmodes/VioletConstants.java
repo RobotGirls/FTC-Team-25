@@ -16,7 +16,7 @@ public class VioletConstants
     private static double SERVO_DOMAIN = 256.0;
 
     public static double JEWEL_UP     = 175 / SERVO_DOMAIN;
-    public static double JEWEL_DOWN   = 50  / SERVO_DOMAIN;
+    public static double JEWEL_DOWN   = 35  / SERVO_DOMAIN;
     public static double S1_INIT      = 10  / SERVO_DOMAIN;
     public static double S2_INIT      = 255 / SERVO_DOMAIN;
     public static double S3_INIT      = 224 / SERVO_DOMAIN;
