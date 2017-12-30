@@ -18,6 +18,7 @@ import team25core.GamepadTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
+import team25core.VuforiaBase;
 
 /*
  * FTC Team 25: Created by Elizabeth Wu on 10/28/17.
@@ -237,7 +238,11 @@ public class VioletJewelAutonomous extends Robot {
 
     private void sense()
     {
-         colorThiefTask = new ColorThiefTask(this, VuforiaLocalizer.CameraDirection.FRONT) {
+        VuforiaBase vuforiaBase = new VuforiaBase();
+        vuforiaBase.init(this);
+        vuforiaBase.setCameraDirection(VuforiaLocalizer.CameraDirection.FRONT);
+
+        colorThiefTask = new ColorThiefTask(this, vuforiaBase) {
             @Override
             public void handleEvent(RobotEvent e) {
                 ColorThiefTask.ColorThiefEvent event = (ColorThiefEvent) e;
