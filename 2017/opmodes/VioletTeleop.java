@@ -210,7 +210,7 @@ public class VioletTeleop extends Robot {
      */
     private void toggleS1() //pair on top at beginning
     {
-        if (s1Open == true) {
+        if (s1Open) {
             s1.setPosition(VioletConstants.S1_CLOSED);
             s2.setPosition(VioletConstants.S2_CLOSED);
             s1Open = false;
@@ -226,7 +226,7 @@ public class VioletTeleop extends Robot {
      */
     private void toggleS3() //pair on bottom at beginning
     {
-        if (s3Open == true) {
+        if (s3Open) {
             s3.setPosition(VioletConstants.S3_CLOSED);
             s4.setPosition(VioletConstants.S4_CLOSED);
             s3Open = false;
@@ -398,7 +398,7 @@ public class VioletTeleop extends Robot {
      */
     private void toggleRelicClaw()
     {
-        if (relicOpen == true) {
+        if (relicOpen) {
             relic.setPosition(VioletConstants.RELIC_CLOSED);
             relicOpen = false;
         } else {
@@ -412,9 +412,9 @@ public class VioletTeleop extends Robot {
      */
     private void rotateRelic()
     {
-        if (relicDown == true) {
+        if (relicDown) {
             relicRotate.setPosition(VioletConstants.RELIC_ROTATE_UP);
-            relicDown= false;
+            relicDown = false;
         } else {
             relicRotate.setPosition(VioletConstants.RELIC_ROTATE_DOWN);
             relicDown = true;
@@ -500,8 +500,6 @@ public class VioletTeleop extends Robot {
 
                     lockout = true;
                     nudgeGlyph(Direction.CLOCKWISE);
-                } else if (event.kind == EventKind.BUTTON_A_DOWN) {
-                    moveClaw(Direction.CLOCKWISE);
                 }
             }
         });
