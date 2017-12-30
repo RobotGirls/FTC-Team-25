@@ -36,7 +36,6 @@ public class VioletJewelAutonomous extends Robot {
     private DcMotor rotate;
     private Servo jewel;
     private ColorThiefTask colorThiefTask;
-    private VuforiaBase vuforiaBase;
     private DeviceInterfaceModule cdim;
     private Alliance alliance;
     private Position position;
@@ -113,7 +112,7 @@ public class VioletJewelAutonomous extends Robot {
         particle        = telemetry.addData("Particle: ", "No data");
 
         // Path setup.
-        park        = new DeadReckonPath();
+        park = new DeadReckonPath();
 
         // Arm initialized up
         jewel.setPosition(VioletConstants.JEWEL_UP);    // 145/256
@@ -129,12 +128,7 @@ public class VioletJewelAutonomous extends Robot {
 
         drivetrain.setNoncanonicalMotorDirection();
 
-        vuforiaBase = new VuforiaBase();
-        vuforiaBase.init(this);
-
         sense();
-
-
     }
 
  /*   public void parkPathChoice()
@@ -244,7 +238,11 @@ public class VioletJewelAutonomous extends Robot {
 
     private void sense()
     {
-         colorThiefTask = new ColorThiefTask(this, vuforiaBase, VuforiaLocalizer.CameraDirection.FRONT) {
+        VuforiaBase vuforiaBase = new VuforiaBase();
+        vuforiaBase.init(this);
+        vuforiaBase.setCameraDirection(VuforiaLocalizer.CameraDirection.FRONT);
+
+        colorThiefTask = new ColorThiefTask(this, vuforiaBase) {
             @Override
             public void handleEvent(RobotEvent e) {
                 ColorThiefTask.ColorThiefEvent event = (ColorThiefEvent) e;

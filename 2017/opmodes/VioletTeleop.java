@@ -64,17 +64,17 @@ public class VioletTeleop extends Robot {
       (L trigger)        (R trigger)    |  (LT) bward left diagonal    (RT) bward right diagonal                                        |
       (L bumper)         (R bumper)     |  (LB) fward left diagonal    (RB) fward right diagonal
                             (y)         |   (y) toggle slowness
-      arrow pad          (x)   (b)      |   (x) toggle relic servo      (b) rotate relic
+      arrow pad          (x)   (b)      |   (x)                        (b)
                             (a)         |   (a)
                                         |   (DPad - UP) extend relic   (DPad - DOWN) bring relic in
 
     GAMEPAD 2: MECHANISM CONTROLLER
     --------------------------------------------------------------------------------------------
       (L trigger)        (R trigger)    | (LT) nudge block left       (RT) nudge block right
-      (L bumper)         (R bumper)     | (LB) toggle servos 1/2      (RB) toggle servos 3/4
-                            (y)         |  (y)
+      (L bumper)         (R bumper)     | (LB) toggle top servos      (RB) toggle bottom servos
+                            (y)         |  (y) toggle relic servo
       arrow pad          (x)   (b)      |  (x) rotate block left      (b) rotate block right
-                            (a)         |  (a)
+                            (a)         |  (a) rotate relic
 
     */
 
@@ -112,6 +112,7 @@ public class VioletTeleop extends Robot {
     private boolean s3Open = true;
     private boolean relicOpen = false;
     private boolean relicDown = true;
+    private boolean rotateLeft = false;
     private Telemetry.Item speed;
     private Telemetry.Item encoderRelic;
     private Telemetry.Item encoderLift;
@@ -184,14 +185,14 @@ public class VioletTeleop extends Robot {
 
         drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
 
-        // Sets claw servos to open position
+        // Sets initial positions for claw servos, relic grab servo, and relicRotate servo
         openClaw();
         relic.setPosition(VioletConstants.RELIC_INIT);
         relicRotate.setPosition(VioletConstants.RELIC_ROTATE_DOWN);
     }
 
     /**
-     * Blindly open both claws completely and sets to initial state appropriately.
+     * Blindly open both claws completely and sets to initial state in order to fit in box.
      */
     private void openClaw()
     {
@@ -209,7 +210,7 @@ public class VioletTeleop extends Robot {
      */
     private void toggleS1() //pair on top at beginning
     {
-        if (s1Open == true) {
+        if (s1Open) {
             s1.setPosition(VioletConstants.S1_CLOSED);
             s2.setPosition(VioletConstants.S2_CLOSED);
             s1Open = false;
@@ -225,7 +226,7 @@ public class VioletTeleop extends Robot {
      */
     private void toggleS3() //pair on bottom at beginning
     {
-        if (s3Open == true) {
+        if (s3Open) {
             s3.setPosition(VioletConstants.S3_CLOSED);
             s4.setPosition(VioletConstants.S4_CLOSED);
             s3Open = false;
@@ -270,11 +271,11 @@ public class VioletTeleop extends Robot {
         this.addTask(new RunToEncoderValueTask(this, linear, VioletConstants.VERTICAL_MIN_HEIGHT, VioletConstants.CLAW_VERTICAL_POWER) {
             @Override
             public void handleEvent(RobotEvent e) {
-                RunToEncoderValueTask.RunToEncoderValueEvent blah = (RunToEncoderValueTask.RunToEncoderValueEvent) e;
+                RunToEncoderValueTask.RunToEncoderValueEvent lowerClaw = (RunToEncoderValueTask.RunToEncoderValueEvent) e;
                 // note that because we reversed direction, when we start going down, the encoder values are actually
                 // increasing as we go down instead of decreasing
                 RobotLog.e("LowerClawDown Handler: %d", linear.getCurrentPosition());
-                if (blah.kind == RunToEncoderValueTask.EventKind.DONE) {
+                if (lowerClaw.kind == RunToEncoderValueTask.EventKind.DONE) {
                     RobotLog.e("LowerClawDown Handler DONE***");
                     linear.setDirection(DcMotorSimple.Direction.FORWARD);
                     RobotLog.e("Before clear encoder: %d", linear.getCurrentPosition());
@@ -320,10 +321,10 @@ public class VioletTeleop extends Robot {
                         robot.addTask(new RunToEncoderValueTask(robot, rotate, VioletConstants.DEGREES_180, VioletConstants.ROTATE_POWER) {
                             @Override
                             public void handleEvent (RobotEvent e){
-                                RunToEncoderValueTask.RunToEncoderValueEvent blah = (RunToEncoderValueTask.RunToEncoderValueEvent) e;
+                                RunToEncoderValueTask.RunToEncoderValueEvent rotate = (RunToEncoderValueTask.RunToEncoderValueEvent) e;
                                 RobotLog.e("Rotate Encoder Event" + e.toString());
                                 lockout = false;
-                                if (blah.kind == RunToEncoderValueTask.EventKind.DONE) {
+                                if (rotate.kind == RunToEncoderValueTask.EventKind.DONE) {
                                     RobotLog.e("Rotate done.");
                                     addTask(new SingleShotTimerTask(robot, 1500) {
                                         @Override
@@ -340,6 +341,21 @@ public class VioletTeleop extends Robot {
                         });
                     }
         });
+    }
+
+    /**
+     * Alternates the 180 degree rotation of the glyph mechanism.
+     */
+
+    private void alternateRotate()
+    {
+        if (rotateLeft) {
+            rotateGlyph(Direction.CLOCKWISE);
+            rotateLeft = false;
+        } else {
+            rotateGlyph(Direction.COUNTERCLOCKWISE);
+            rotateLeft = true;
+        }
     }
 
     /**
@@ -382,7 +398,7 @@ public class VioletTeleop extends Robot {
      */
     private void toggleRelicClaw()
     {
-        if (relicOpen == true) {
+        if (relicOpen) {
             relic.setPosition(VioletConstants.RELIC_CLOSED);
             relicOpen = false;
         } else {
@@ -396,16 +412,14 @@ public class VioletTeleop extends Robot {
      */
     private void rotateRelic()
     {
-        if (relicDown == true) {
+        if (relicDown) {
             relicRotate.setPosition(VioletConstants.RELIC_ROTATE_UP);
-            relicDown= false;
+            relicDown = false;
         } else {
             relicRotate.setPosition(VioletConstants.RELIC_ROTATE_DOWN);
             relicDown = true;
         }
     }
-
-    //
 
     @Override
     public void start()
@@ -439,10 +453,10 @@ public class VioletTeleop extends Robot {
 
                     toggleRelicClaw();
                 } else if (event.kind == EventKind.BUTTON_X_DOWN) {
-                    // Rotate 180 degrees counterclockwise looking from behind robot
+                    // Rotate 180 degrees counterclockwise looking from behind robot FIRST
 
                     lockout = true;
-                    rotateGlyph(Direction.COUNTERCLOCKWISE);
+                    alternateRotate();
                     rotated180 = true;
                 } else if (event.kind == EventKind.BUTTON_B_DOWN) {
                     // Rotate 180 degrees clockwise looking from behind robot
@@ -486,8 +500,6 @@ public class VioletTeleop extends Robot {
 
                     lockout = true;
                     nudgeGlyph(Direction.CLOCKWISE);
-                } else if (event.kind == EventKind.BUTTON_A_DOWN) {
-                    moveClaw(Direction.CLOCKWISE);
                 }
             }
         });
