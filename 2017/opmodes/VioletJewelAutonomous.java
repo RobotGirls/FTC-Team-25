@@ -127,7 +127,7 @@ public class VioletJewelAutonomous extends Robot {
 
         drivetrain.setNoncanonicalMotorDirection();
 
-        //sense();
+        sense();
 
 
     }
@@ -237,7 +237,7 @@ public class VioletJewelAutonomous extends Robot {
         }
     }
 
-    /*private void sense()
+    private void sense()
     {
          colorThiefTask = new ColorThiefTask(this, VuforiaLocalizer.CameraDirection.FRONT) {
             @Override
@@ -285,7 +285,7 @@ public class VioletJewelAutonomous extends Robot {
 
         addTask(colorThiefTask);
        // setupParkPath();
-    }*/
+    }
 
     private void selectAlliance(Alliance color) {
         if (color == Alliance.BLUE) {
