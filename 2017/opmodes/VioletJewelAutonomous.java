@@ -6,8 +6,10 @@ import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.vuforia.CameraDevice;
+import com.vuforia.VuMarkTarget;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 
 import team25core.ColorThiefTask;
@@ -18,6 +20,8 @@ import team25core.GamepadTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
+import team25core.VuMarkIdentificationTask;
+import team25core.VuforiaBase;
 
 /*
  * FTC Team 25: Created by Elizabeth Wu on 10/28/17.
@@ -42,12 +46,22 @@ public class VioletJewelAutonomous extends Robot {
     private DeadReckonTask task;
     private SingleShotTimerTask stt;
     private SingleShotTimerTask moveDelay;
+    private GlyphAutonomousPathUtility utility;
+    private GlyphAutonomousPathUtility.StartStone stonePosition;
+    private GlyphAutonomousPathUtility.TargetColumn targetColumn;
+    private RelicRecoveryVuMark vuMark;
+    private VuMarkIdentificationTask vmIdTask;
+    private VuforiaBase vuforiaBase;
+
+    private GlyphAutonomousPathUtility.TargetColumn tgtColumn = GlyphAutonomousPathUtility.TargetColumn.LEFT;
+
 
     private Telemetry.Item particle;
     private Telemetry.Item allianceItem;
     private Telemetry.Item positionItem;
     private Telemetry.Item pollItem;
     private Telemetry.Item flashItem;
+    private Telemetry.Item vuMarkItem;
 
     boolean flashOn = false;
     boolean pollOn = false;
@@ -60,19 +74,13 @@ public class VioletJewelAutonomous extends Robot {
     private int liftJewel = 0;
     private int isBlack = 0;
 
-
-
     // Park combos.
     private static final int BLUE_FAR = 0;
     private static final int RED_FAR = 1;
     private static final int BLUE_NEAR = 2;
     private static final int RED_NEAR = 3;
 
-
-
-
     private FourWheelDirectDrivetrain drivetrain;
-
 
     public enum Alliance {
         RED,
@@ -107,9 +115,10 @@ public class VioletJewelAutonomous extends Robot {
         allianceItem    = telemetry.addData("ALLIANCE", "Unselected (X/B)");
         positionItem    = telemetry.addData("POSITION", "Unselected (Y/A)");
         particle        = telemetry.addData("Particle: ", "No data");
+        vuMarkItem      = telemetry.addData("VuMark: ", "No data");
 
         // Path setup.
-        park        = new DeadReckonPath();
+        park = new DeadReckonPath();
 
         // Arm initialized up
         jewel.setPosition(VioletConstants.JEWEL_UP);    // 145/256
@@ -122,61 +131,49 @@ public class VioletJewelAutonomous extends Robot {
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));
 
         drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
-
         drivetrain.setNoncanonicalMotorDirection();
 
+        RobotLog.i("506 init: before new GlyphAutonomousPathUtility")
+        utility = new GlyphAutonomousPathUtility();
+
+        RobotLog.i("506 init: after new GlyphAutonomousPathUtility")
         sense();
-
-
+       // detectVuMark();
+      //  vuforiaBase.setCameraDirection(VuforiaLocalizer.CameraDirection.BACK);
     }
 
- /*   public void parkPathChoice()
-    {
-        if (alliance == Alliance.RED) {
-            color = 1;
-        } else if (alliance == Alliance.BLUE) {
-            color = 0;
-        }
-
-        if (position == Position.NEAR) {
-            distance = 2;
-        } else {
-            distance = 0;
-        }
-
-        combo = color + distance; // + whichSide;
-
-    } */
-
-
-    @Override
     public void start()
     {
-
         // Arm goes down
         jewel.setPosition(VioletConstants.JEWEL_DOWN);
         // 15/256
         addTask(new SingleShotTimerTask(this, 500) {
                     @Override
+                    // This handleEvent occurs after half a second passes to raise the arm.
                     public void handleEvent(RobotEvent e) {
                         robot.addTask(new DeadReckonTask(robot, pushJewel, drivetrain) {
                             @Override
+                            // This handleEvent occurs after the pushJewel runs.
                             public void handleEvent(RobotEvent e) {
                                 DeadReckonEvent path = (DeadReckonEvent) e;
                                 if (path.kind == EventKind.PATH_DONE) {
 
-                                   /* if (liftJewel == 1) {
-                                        jewel.setPosition(0.56);
-                                        RobotLog.i("506 Jewel arm reset");
-                                    }
-                                    */
-
-                                    addTask(new DeadReckonTask(robot, park, drivetrain) {
+                                    /*addTask(new DeadReckonTask(robot, park, drivetrain) {
                                         @Override
                                         public void handleEvent(RobotEvent e) {
                                             DeadReckonEvent path = (DeadReckonEvent) e;
                                         }
                                     });
+                                    */
+                                    RobotLog.i("506 start: before detectVuMark");
+                                    targetColumn = detectVuMark(robot);
+                                    RobotLog.i("506 start: after detectVuMark");
+                                    // FIXME: jewel sensing and knock off works but glyph paths throw NullPointerException
+                                    vuMarkItem.setValue(vuMark.toString());
+                                    park = utility.getPath(targetColumn, stonePosition);
+                                    RobotLog.i("506 start: after utility.getPath");
+                                    robot.addTask(new DeadReckonTask(robot, park, drivetrain));
+                                    RobotLog.i("506 start: after addTask DeadReckonTask");
                                 }
                             }
                         });
@@ -221,23 +218,30 @@ public class VioletJewelAutonomous extends Robot {
                 default:
                     break;
             }
-        } setupParkPath();
+        } // setupParkPath();
     }
 
     private void togglePolling() {
         if (pollOn == false) {
             colorThiefTask.setPollingMode(ColorThiefTask.PollingMode.ON);
+            vmIdTask.setPollingMode(VuMarkIdentificationTask.PollingMode.ON);
             pollOn = true;
 
         } else {
             colorThiefTask.setPollingMode(ColorThiefTask.PollingMode.OFF);
+            vmIdTask.setPollingMode(VuMarkIdentificationTask.PollingMode.OFF);
             pollOn = false;
         }
     }
 
+
     private void sense()
     {
-         colorThiefTask = new ColorThiefTask(this, VuforiaLocalizer.CameraDirection.FRONT) {
+        VuforiaBase vuforiaBase = new VuforiaBase();
+        vuforiaBase.init(this);
+        vuforiaBase.setCameraDirection(VuforiaLocalizer.CameraDirection.FRONT);
+
+        colorThiefTask = new ColorThiefTask(this, vuforiaBase) {
             @Override
             public void handleEvent(RobotEvent e) {
                 ColorThiefTask.ColorThiefEvent event = (ColorThiefEvent) e;
@@ -259,14 +263,14 @@ public class VioletJewelAutonomous extends Robot {
                         } else {
                             RobotLog.i("506 Sensed BLUE");
                             pushJewel.stop();
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, Violet.STRAIGHT_SPEED);
+                           // pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, Violet.STRAIGHT_SPEED);
                             liftJewel = 1;
                         }
                     } else if (alliance == Alliance.BLUE) {
                         if (event.kind == EventKind.BLUE) {
                             RobotLog.i("506 Sensed BLUE");
                             pushJewel.stop();
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
+                           // pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
                             liftJewel = 1;
                         } else {
                             RobotLog.i("506 Sensed RED");
@@ -282,7 +286,34 @@ public class VioletJewelAutonomous extends Robot {
         };
 
         addTask(colorThiefTask);
-       // setupParkPath();
+    }
+
+    private GlyphAutonomousPathUtility.TargetColumn detectVuMark(Robot robot)
+    {
+        //vmIdTask = new VuMarkIdentificationTask(robot, vuforiaBase);
+        RobotLog.i("506 added VuMark ID task");
+        robot.addTask(new VuMarkIdentificationTask(robot, vuforiaBase) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                VuMarkIdentificationTask.VuMarkIdentificationEvent position = (VuMarkIdentificationTask.VuMarkIdentificationEvent) e;
+                switch (position.kind) {
+                    case CENTER:
+                        tgtColumn = GlyphAutonomousPathUtility.TargetColumn.CENTER;
+                        break;
+                    case LEFT:
+                        tgtColumn = GlyphAutonomousPathUtility.TargetColumn.LEFT;
+                        break;
+                    case RIGHT:
+                        tgtColumn = GlyphAutonomousPathUtility.TargetColumn.RIGHT;
+                        break;
+                    default:
+                        RobotLog.i("506 Detect VuMark invalid position kind:", position.kind);
+                        break;
+                }
+
+            }
+        });
+        return tgtColumn;
     }
 
     private void selectAlliance(Alliance color) {
@@ -307,7 +338,43 @@ public class VioletJewelAutonomous extends Robot {
         }
     }
 
-    private void setupParkPath()
+    private void getStonePosition()
+    {
+        if (alliance == Alliance.RED) {
+            color = 1;
+        } else if (alliance == Alliance.BLUE) {
+            color = 0;
+        }
+
+        if (position == Position.NEAR) {
+            distance = 2;
+        } else {
+            distance = 0;
+        }
+
+        combo = color + distance;
+
+        switch (combo) {
+            case BLUE_FAR:
+                stonePosition = GlyphAutonomousPathUtility.StartStone.BLUE_FAR;
+                break;
+            case RED_FAR:
+                stonePosition = GlyphAutonomousPathUtility.StartStone.RED_FAR;
+                break;
+            case BLUE_NEAR:
+                stonePosition = GlyphAutonomousPathUtility.StartStone.BLUE_NEAR;
+                break;
+            case RED_NEAR:
+                stonePosition = GlyphAutonomousPathUtility.StartStone.RED_NEAR;
+                break;
+            default:
+                break;
+
+        }
+    }
+
+
+  /*  private void setupParkPath()
     {
 
 
@@ -337,8 +404,8 @@ public class VioletJewelAutonomous extends Robot {
             case RED_FAR:
                 RobotLog.i("506 Case: RED_FAR");
                 park.stop();
-                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 27, Violet.STRAIGHT_SPEED);
-                park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10 , Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
+                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 24, Violet.STRAIGHT_SPEED);
+                park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 13 , Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
                 break;
             case BLUE_NEAR:
                 RobotLog.i("506 Case: BLUE_NEAR");
@@ -358,6 +425,7 @@ public class VioletJewelAutonomous extends Robot {
             default:
                 break;
         }
-    }
+    } */
+
 }
 

@@ -31,9 +31,9 @@ public class VioletConstants
     public static double S4_OPEN      = 65  / SERVO_DOMAIN;
     public static double S4_CLOSED    = 140 / SERVO_DOMAIN;
     public static double RELIC_OPEN   = 16  / SERVO_DOMAIN; //FIXME
-    public static double RELIC_CLOSED = 100 / SERVO_DOMAIN;
+    public static double RELIC_CLOSED = 110 / SERVO_DOMAIN;
     public static double RELIC_ROTATE_DOWN = 109 / SERVO_DOMAIN; //FIXME
-    public static double RELIC_ROTATE_UP   = 127 / SERVO_DOMAIN;
+    public static double RELIC_ROTATE_UP   = 127.3 / SERVO_DOMAIN;
 
     //public static int DEGREES_180_CLOCKWISE = 375;
     //public static int DEGREES_180_COUNTERCLOCKWISE = 400;
