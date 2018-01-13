@@ -11,7 +11,7 @@ import static android.R.attr.name;
  */
 
 @TeleOp(name = "Gamepad Test", group = "Team 25")
-@Disabled
+//@Disabled
 public class GamepadTest extends OpMode
 {
 
@@ -24,7 +24,9 @@ public class GamepadTest extends OpMode
     @Override
     public void loop()
     {
-        telemetry.addData("Left Joystick", gamepad1.left_stick_x);
-        telemetry.addData("Right Joystick", gamepad1.right_stick_x);
+        telemetry.addData("Left Joystick (x)", gamepad1.left_stick_x);
+        telemetry.addData("Left Joystick (y)", gamepad1.left_stick_y);
+        telemetry.addData("Right Joystick (x)", gamepad1.right_stick_x);
+        telemetry.addData("Right Joystick (y)", gamepad1.right_stick_y);
     }
 }
