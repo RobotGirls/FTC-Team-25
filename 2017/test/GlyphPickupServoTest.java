@@ -1,5 +1,6 @@
 package test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -13,6 +14,7 @@ import team25core.RobotEvent;
  */
 
 @TeleOp(name = "Glyph Pickup Servo Test")
+@Disabled
 public class GlyphPickupServoTest extends Robot {
 
     // Continuous servos work like motors.

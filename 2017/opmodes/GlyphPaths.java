@@ -50,7 +50,6 @@ import team25core.RobotEvent;
  */
 
 @Autonomous(name = "Glyph Paths Testing")
-//@Disabled
 public class GlyphPaths extends Robot {
 
     private DcMotor frontLeft;
@@ -91,7 +90,7 @@ public class GlyphPaths extends Robot {
     {
         GlyphAutonomousPathUtility utility = new GlyphAutonomousPathUtility();
 
-        DeadReckonPath path = utility.getPath(GlyphAutonomousPathUtility.TargetColumn.RIGHT, GlyphAutonomousPathUtility.StartStone.BLUE_FAR);
+        DeadReckonPath path = utility.getPath(GlyphAutonomousPathUtility.TargetColumn.LEFT, GlyphAutonomousPathUtility.StartStone.RED_NEAR);
 
         addTask(new DeadReckonTask(this, path, drivetrain));
     }

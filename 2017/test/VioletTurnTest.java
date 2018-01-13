@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import opmodes.Violet;
@@ -44,6 +45,7 @@ import team25core.RobotEvent;
 import static test.Violet.turnMultiplier;
 
 @Autonomous(name="Violet: Turn Test", group="Team 25")
+@Disabled
 public class VioletTurnTest extends Robot {
 
     private DcMotor frontRight;
