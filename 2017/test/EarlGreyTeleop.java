@@ -38,10 +38,10 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import opmodes.VioletConstants;
-import team25core.BreannaMecanumWheelDriveTask;
+import team25core.TankMechanumControlScheme;
+import team25core.TeleopDriveTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
-import team25core.MecanumWheelDriveTask;
 import team25core.OneWheelDriveTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -98,7 +98,7 @@ public class EarlGreyTeleop extends Robot {
 
     private FourWheelDirectDrivetrain drivetrain;
     //private MecanumWheelDriveTask drive;
-    private BreannaMecanumWheelDriveTask drive;
+    private TeleopDriveTask drive;
     private OneWheelDriveTask controlLinear;
     private OneWheelDriveTask controlSlide;
     //private DeadmanMotorTask runSlideOutTask;
@@ -432,8 +432,9 @@ public class EarlGreyTeleop extends Robot {
     @Override
     public void start()
     {
-        //drive = new MecanumWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
-        drive = new BreannaMecanumWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight, true);
+        TankMechanumControlScheme scheme = new TankMechanumControlScheme(gamepad1);
+
+        drive = new TeleopDriveTask(this, scheme, frontLeft, frontRight, rearLeft, rearRight);
 
 
         if (programmingRobot == false) {
