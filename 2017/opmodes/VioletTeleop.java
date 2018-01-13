@@ -38,18 +38,16 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
-import team25core.DeadmanMotorTask;
-import opmodes.VioletConstants;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
-import team25core.MecanumWheelDriveTask;
+import team25core.LeftAirplaneMechanumControlScheme;
 import team25core.OneWheelDriveTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
-
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
+import team25core.TankMechanumControlScheme;
+import team25core.TeleopDriveTask;
 
 /**
  * FTC Team 25: Created by Breanna Chan and Bella Heinrichs on 11/1/17.
@@ -63,9 +61,9 @@ public class VioletTeleop extends Robot {
     --------------------------------------------------------------------------------------------
       (L trigger)        (R trigger)    |  (LT) bward left diagonal    (RT) bward right diagonal                                        |
       (L bumper)         (R bumper)     |  (LB) fward left diagonal    (RB) fward right diagonal
-                            (y)         |   (y) toggle slowness
+                            (y)         |   (y)
       arrow pad          (x)   (b)      |   (x)                        (b)
-                            (a)         |   (a)
+                            (a)         |   (a) toggle slowness
                                         |   (DPad - UP) extend relic   (DPad - DOWN) bring relic in
 
     GAMEPAD 2: MECHANISM CONTROLLER
@@ -73,7 +71,7 @@ public class VioletTeleop extends Robot {
       (L trigger)        (R trigger)    | (LT) nudge block left       (RT) nudge block right
       (L bumper)         (R bumper)     | (LB) toggle top servos      (RB) toggle bottom servos
                             (y)         |  (y) toggle relic servo
-      arrow pad          (x)   (b)      |  (x) rotate block left      (b) rotate block right
+      arrow pad          (x)   (b)      |  (x)                        (b) rotate glyph
                             (a)         |  (a) rotate relic
 
     */
@@ -100,14 +98,13 @@ public class VioletTeleop extends Robot {
     private Servo relicRotate;
 
     private FourWheelDirectDrivetrain drivetrain;
-    private MecanumWheelDriveTask drive;
+    private TeleopDriveTask drive;
     private OneWheelDriveTask controlLinear;
     private OneWheelDriveTask controlSlide;
     //private DeadmanMotorTask runSlideOutTask;
     //private DeadmanMotorTask runSlideInTask;
 
     private boolean slow = false;
-    //private boolean clawDown = true;
     private boolean s1Open= true;
     private boolean s3Open = true;
     private boolean relicOpen = false;
@@ -291,7 +288,7 @@ public class VioletTeleop extends Robot {
      * We will spin the claw back and forth, be careful that you alternate directions so that
      * you don't wrap the servo cables around the motor shaft.
      *
-     * This motor's movement is not symmetrical, so we'll compensate in one direction.
+     * This motor's movement is not symmetrical, so we'll compensate using nudge.
      */
     private void rotateGlyph(Direction direction)
     {
@@ -424,13 +421,18 @@ public class VioletTeleop extends Robot {
     @Override
     public void start()
     {
-        drive = new MecanumWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
+        TankMechanumControlScheme scheme = new TankMechanumControlScheme(gamepad1);
+
+        drive = new TeleopDriveTask(this, scheme, frontLeft, frontRight, rearLeft, rearRight);
 
         // Left joystick (Gamepad 2) controls lifting and lowering of glyph mechanism
         linear.setDirection(DcMotorSimple.Direction.FORWARD); // To run glyph mechanism up
         controlLinear = new OneWheelDriveTask(this, linear, true);
+
+        // Right joystick (Gamepad 2) controls running out of relic mechanism
         controlSlide = new OneWheelDriveTask(this, slide, false);
         controlSlide.useCeiling(VioletConstants.RELIC_CEILING);
+
         this.addTask(drive);
         this.addTask(controlLinear);
         this.addTask(controlSlide);
@@ -452,18 +454,12 @@ public class VioletTeleop extends Robot {
                     // Toggle relic claw servo
 
                     toggleRelicClaw();
-                } else if (event.kind == EventKind.BUTTON_X_DOWN) {
-                    // Rotate 180 degrees counterclockwise looking from behind robot FIRST
+                } else if (event.kind == EventKind.BUTTON_B_DOWN) {
+                    // Rotate 180 degrees
 
                     lockout = true;
                     alternateRotate();
                     rotated180 = true;
-                } else if (event.kind == EventKind.BUTTON_B_DOWN) {
-                    // Rotate 180 degrees clockwise looking from behind robot
-
-                    lockout = true;
-                    rotateGlyph(Direction.CLOCKWISE);
-                    rotated180 = false;
                 } else if (event.kind == EventKind.BUTTON_A_DOWN) {
                     // Rotate relic
 
