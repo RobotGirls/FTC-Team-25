@@ -11,7 +11,7 @@ import static android.R.attr.name;
  */
 
 @TeleOp(name = "Gamepad Test", group = "Team 25")
-//@Disabled
+@Disabled
 public class GamepadTest extends OpMode
 {
 
