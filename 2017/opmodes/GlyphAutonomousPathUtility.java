@@ -149,6 +149,9 @@ public class GlyphAutonomousPathUtility {
 
     public DeadReckonPath getPath(TargetColumn column, StartStone stone)
     {
+        RobotLog.i("506 Stone is " + stone);
+        RobotLog.i("506 Target Column is " + column);
+
         return paths[stone.ordinal()][column.ordinal()];
     }
 }
