@@ -14,6 +14,7 @@ import team25core.RobotTask;
  */
 
 @Autonomous(name = "TEST Motor", group = "AutoTest")
+@Disabled
 public class LameingoMotorTest extends Robot {
 
     private DcMotor motor;

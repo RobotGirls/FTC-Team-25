@@ -50,7 +50,6 @@ import team25core.RobotEvent;
  */
 
 @Autonomous(name = "Glyph Paths Testing")
-//@Disabled
 public class GlyphPaths extends Robot {
 
     private DcMotor frontLeft;
