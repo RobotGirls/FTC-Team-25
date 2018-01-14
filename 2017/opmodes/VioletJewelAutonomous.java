@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -28,6 +29,7 @@ import team25core.VuforiaBase;
  */
 
 @Autonomous(name = "Violet Jewel Autonomous", group = "Team 25")
+@Disabled
 public class VioletJewelAutonomous extends Robot {
 
     private DcMotor frontLeft;
@@ -123,7 +125,7 @@ public class VioletJewelAutonomous extends Robot {
         //vuMarkItem      = telemetry.addData("VuMark: ", "No data");
 
         // Path setup.
-       // park = new DeadReckonPath();
+        // park = new DeadReckonPath();
         backUp = new DeadReckonPath();
 
         // Arm initialized up

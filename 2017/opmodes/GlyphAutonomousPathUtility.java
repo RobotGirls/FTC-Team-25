@@ -43,7 +43,6 @@ public class GlyphAutonomousPathUtility {
 
     public GlyphAutonomousPathUtility()
     {
-        RobotLog.i("506 inside GlyphAutonomousPathUtility");
         /**
          * Initialize all of your paths here.  Note this wastes memory, but puts all your path
          * definitions in one nice location for ease of reading and modification.  If we were sending
@@ -151,7 +150,6 @@ public class GlyphAutonomousPathUtility {
     {
         RobotLog.i("506 Stone is " + stone);
         RobotLog.i("506 Target Column is " + column);
-
         return paths[stone.ordinal()][column.ordinal()];
     }
 }
