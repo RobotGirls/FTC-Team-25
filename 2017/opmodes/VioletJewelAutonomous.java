@@ -3,6 +3,7 @@ package opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -20,6 +21,7 @@ import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
 import team25core.VuMarkIdentificationTask;
 import team25core.VuforiaBase;
@@ -32,11 +34,17 @@ import team25core.VuforiaBase;
 //@Disabled
 public class VioletJewelAutonomous extends Robot {
 
+    private enum Direction {
+        CLOCKWISE,
+        COUNTERCLOCKWISE,
+    }
+
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor rearLeft;
     private DcMotor rearRight;
     private DcMotor rotate;
+    private DcMotor linear;
     private Servo jewel;
     private Servo s3bottom;
     private Servo s4bottom;
@@ -112,6 +120,7 @@ public class VioletJewelAutonomous extends Robot {
         frontRight  = hardwareMap.dcMotor.get("frontRight");
         rearLeft    = hardwareMap.dcMotor.get("rearLeft");
         rearRight   = hardwareMap.dcMotor.get("rearRight");
+        linear      = hardwareMap.dcMotor.get("linear");
         jewel       = hardwareMap.servo.get("jewel");
         s3bottom    = hardwareMap.servo.get("s3");
         s4bottom    = hardwareMap.servo.get("s4");
@@ -149,8 +158,8 @@ public class VioletJewelAutonomous extends Robot {
         utility = new GlyphAutonomousPathUtility();
 
         // Setting stone position.
-        getStonePosition();
-        RobotLog.i("506 Stone Position is", stonePosition.toString());
+        //getStonePosition();
+        //RobotLog.i("506 Stone Position is", stonePosition.toString());
 
         sense();
         detectVuMark(this);
@@ -158,14 +167,19 @@ public class VioletJewelAutonomous extends Robot {
 
     public void start()
     {
+        // Put jewel arm down
         jewel.setPosition(VioletConstants.JEWEL_DOWN);
+        // Closing bottom claws to grab glyph
         s3bottom.setPosition(VioletConstants.S3_CLOSED);
         s4bottom.setPosition(VioletConstants.S4_CLOSED);
+
+        // Lift glyph mechanism up to gain clearance before driving off balancing stone
+        moveClaw(Direction.COUNTERCLOCKWISE);
 
         addTask(new SingleShotTimerTask(this, 500) {
                 @Override
 
-                // This handleEvent occurs after half a second passes to raise the arm.
+                // This handleEvent occurs after half a second passes to lower the arm.
                 public void handleEvent(RobotEvent e) {
                     RobotLog.i("506 SST running");
                     robot.addTask(new DeadReckonTask(robot, pushJewel, drivetrain) {
@@ -225,12 +239,27 @@ public class VioletJewelAutonomous extends Robot {
                     positionItem.setValue("Near");
                     break;
                 case RIGHT_BUMPER_DOWN:
+                    getStonePosition();
+                    RobotLog.i("506 Stone Position is", stonePosition.toString());
                     togglePolling();
                     break;
                 default:
                     break;
             }
         }
+    }
+
+    /**
+     * Move claw up or down. Uses a 60 motor.
+     */
+    private void moveClaw(Direction direction)
+    {
+        if (direction == Direction.CLOCKWISE)                       // down
+            linear.setDirection(DcMotorSimple.Direction.REVERSE);
+        else                                                        // up
+            linear.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        this.addTask(new RunToEncoderValueTask(this, linear, VioletConstants.VERTICAL_MIN_HEIGHT, VioletConstants.CLAW_VERTICAL_POWER));
     }
 
     private void togglePolling() {
