@@ -29,7 +29,7 @@ import team25core.VuforiaBase;
  */
 
 @Autonomous(name = "Violet Jewel Autonomous", group = "Team 25")
-@Disabled
+//@Disabled
 public class VioletJewelAutonomous extends Robot {
 
     private DcMotor frontLeft;
@@ -235,12 +235,16 @@ public class VioletJewelAutonomous extends Robot {
 
     private void togglePolling() {
         if (pollOn == false) {
+            RobotLog.w("506 togglePolling. pollOn equals false");
             colorThiefTask.setPollingMode(ColorThiefTask.PollingMode.ON);
+            RobotLog.w("506 togglePolling. After color thief");
             vmIdTask.setPollingMode(VuMarkIdentificationTask.PollingMode.ON);
             pollOn = true;
 
         } else {
+            RobotLog.w("506 togglePolling. pollOn equals true");
             colorThiefTask.setPollingMode(ColorThiefTask.PollingMode.OFF);
+            RobotLog.w("506 togglePolling. After color thief");
             vmIdTask.setPollingMode(VuMarkIdentificationTask.PollingMode.OFF);
             pollOn = false;
         }
@@ -298,7 +302,8 @@ public class VioletJewelAutonomous extends Robot {
     private GlyphAutonomousPathUtility.TargetColumn detectVuMark(Robot robot)
     {
         RobotLog.i("506 added VuMark ID task");
-        robot.addTask(new VuMarkIdentificationTask(robot, vuforiaBase) {
+        //robot.addTask(new VuMarkIdentificationTask(robot, vuforiaBase) {
+        robot.addTask(vmIdTask = new VuMarkIdentificationTask(robot, vuforiaBase) {
             @Override
             public void handleEvent(RobotEvent e) {
                 VuMarkIdentificationTask.VuMarkIdentificationEvent position = (VuMarkIdentificationTask.VuMarkIdentificationEvent) e;
