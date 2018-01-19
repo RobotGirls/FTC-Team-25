@@ -169,17 +169,24 @@ public class VioletJewelAutonomous extends Robot {
     {
         // Put jewel arm down
         jewel.setPosition(VioletConstants.JEWEL_DOWN);
-        // Closing bottom claws to grab glyph
+        // Close bottom claws to grab glyph
         s3bottom.setPosition(VioletConstants.S3_CLOSED);
         s4bottom.setPosition(VioletConstants.S4_CLOSED);
 
-        // Lift glyph mechanism up to gain clearance before driving off balancing stone
-        moveClaw(Direction.COUNTERCLOCKWISE);
 
         addTask(new SingleShotTimerTask(this, 500) {
+            @Override
+            // This handleEvent occurs after half a second passes to close the bottom claws of the glyph mechanism.
+            public void handleEvent(RobotEvent e) {
+                // Lift glyph mechanism up to gain clearance before driving off balancing stone
+                moveClaw(Direction.COUNTERCLOCKWISE);
+            }
+        });
+
+        addTask(new SingleShotTimerTask(this, 1000) {
                 @Override
 
-                // This handleEvent occurs after half a second passes to lower the arm.
+                // This handleEvent occurs after one second passes to lower the arm.
                 public void handleEvent(RobotEvent e) {
                     RobotLog.i("506 SST running");
                     robot.addTask(new DeadReckonTask(robot, pushJewel, drivetrain) {
@@ -191,18 +198,22 @@ public class VioletJewelAutonomous extends Robot {
 
                                 park = utility.getPath(tgtColumn, stonePosition);
                                 RobotLog.i("506 start: after utility.getPath");
-                                robot.addTask(new DeadReckonTask(robot, park, drivetrain) /* {
+                                //robot.addTask(new DeadReckonTask(robot, park, drivetrain) /* {
+                                robot.addTask(new DeadReckonTask(robot, park, drivetrain) {
                                     @Override
                                     public void handleEvent(RobotEvent e) {
                                         DeadReckonEvent path = (DeadReckonEvent) e;
                                         if (path.kind == EventKind.PATH_DONE) {
+                                            // Open bottom claws
                                             s3bottom.setPosition(VioletConstants.S3_OPEN);
                                             s4bottom.setPosition(VioletConstants.S4_OPEN);
+                                            moveClaw(Direction.CLOCKWISE);
                                             backUp.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, VioletConstants.STRAIGHT_SPEED);
                                             robot.addTask(new DeadReckonTask(robot, backUp, drivetrain));
                                         }
                                     }
-                                } */);  // end of park task
+                                });  // end of park task
+                                //} */);  // end of park task
                             }
                         } // end handleEvent when pushJewel path is done
                     });  // end pushJewel
@@ -240,7 +251,7 @@ public class VioletJewelAutonomous extends Robot {
                     break;
                 case RIGHT_BUMPER_DOWN:
                     getStonePosition();
-                    RobotLog.i("506 Stone Position is", stonePosition.toString());
+                    RobotLog.i("506 Stone Position is " + stonePosition.toString());
                     togglePolling();
                     break;
                 default:
@@ -264,14 +275,14 @@ public class VioletJewelAutonomous extends Robot {
 
     private void togglePolling() {
         if (pollOn == false) {
-            RobotLog.w("506 togglePolling. pollOn equals false");
+            RobotLog.w("506 togglePolling. pollOn false, turn poll on");
             colorThiefTask.setPollingMode(ColorThiefTask.PollingMode.ON);
             RobotLog.w("506 togglePolling. After color thief");
             vmIdTask.setPollingMode(VuMarkIdentificationTask.PollingMode.ON);
             pollOn = true;
 
         } else {
-            RobotLog.w("506 togglePolling. pollOn equals true");
+            RobotLog.w("506 togglePolling. pollOn true, turn poll off");
             colorThiefTask.setPollingMode(ColorThiefTask.PollingMode.OFF);
             RobotLog.w("506 togglePolling. After color thief");
             vmIdTask.setPollingMode(VuMarkIdentificationTask.PollingMode.OFF);
@@ -380,18 +391,23 @@ public class VioletJewelAutonomous extends Robot {
     private GlyphAutonomousPathUtility.StartStone getStonePosition()
     {
         if (alliance == Alliance.RED) {
-            color = 1;
-        } else if (alliance == Alliance.BLUE) {
             color = 0;
+        } else if (alliance == Alliance.BLUE) {
+            color = 2;
         }
 
         if (position == Position.NEAR) {
-            distance = 2;
-        } else {
             distance = 0;
+        } else {
+            distance = 1;
         }
 
         combo = color + distance;
+
+        // RED_NEAR = 0;
+        // RED_FAR = 1;
+        // BLUE_NEAR = 3;
+        // BLUE_FAR = 4;
 
         switch (combo) {
             case BLUE_FAR:
