@@ -45,7 +45,8 @@ public class VioletConstants
     public static double ROTATE_POWER = 0.3;
     public static int NUDGE = 15;
     public static double NUDGE_POWER = 0.1;
-    public static int VERTICAL_MIN_HEIGHT = 700;
+    //public static int VERTICAL_MIN_HEIGHT = 700;
+    public static int VERTICAL_MIN_HEIGHT = 1500;
     public static int CLAW_VERTICAL = 700;
     public static double CLAW_VERTICAL_POWER = 0.75;
     // put on actual teleop in order to be able to change power in certain instances (Bella)
