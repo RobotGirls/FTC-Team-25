@@ -195,7 +195,6 @@ public class VioletJewelAutonomous extends Robot {
                         public void handleEvent(RobotEvent e) {
                             DeadReckonEvent path = (DeadReckonEvent) e;
                             if (path.kind == EventKind.PATH_DONE) {
-
                                 park = utility.getPath(tgtColumn, stonePosition);
                                 RobotLog.i("506 start: after utility.getPath");
                                 //robot.addTask(new DeadReckonTask(robot, park, drivetrain) /* {
@@ -204,12 +203,19 @@ public class VioletJewelAutonomous extends Robot {
                                     public void handleEvent(RobotEvent e) {
                                         DeadReckonEvent path = (DeadReckonEvent) e;
                                         if (path.kind == EventKind.PATH_DONE) {
-                                            // Open bottom claws
-                                            s3bottom.setPosition(VioletConstants.S3_OPEN);
-                                            s4bottom.setPosition(VioletConstants.S4_OPEN);
+                                            // Lower glyph mechanism
                                             moveClaw(Direction.CLOCKWISE);
-                                            backUp.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, VioletConstants.STRAIGHT_SPEED);
-                                            robot.addTask(new DeadReckonTask(robot, backUp, drivetrain));
+                                            addTask(new SingleShotTimerTask(robot, 1000) {
+                                                @Override
+                                                // This handleEvent occurs after half a second passes to lower glyph mechanism.
+                                                public void handleEvent(RobotEvent e) {
+                                                    // Open bottom claws
+                                                    s3bottom.setPosition(VioletConstants.S3_OPEN);
+                                                    s4bottom.setPosition(VioletConstants.S4_OPEN);
+                                                    backUp.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -VioletConstants.STRAIGHT_SPEED);
+                                                    robot.addTask(new DeadReckonTask(robot, backUp, drivetrain));
+                                                }
+                                            });
                                         }
                                     }
                                 });  // end of park task
@@ -307,10 +313,13 @@ public class VioletJewelAutonomous extends Robot {
                         if (event.kind == EventKind.RED) {
                             pushJewel.stop();
                             RobotLog.i("506 Sensed RED, Alliance RED");
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, VioletConstants.TURN_SPEED);
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, VioletConstants.TURN_SPEED * TURN_MULTIPLIER);
+                            //pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, VioletConstants.TURN_SPEED);
+                            //pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, VioletConstants.TURN_SPEED * TURN_MULTIPLIER);
+                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 5, VioletConstants.TURN_SPEED);
+                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 5, VioletConstants.TURN_SPEED * TURN_MULTIPLIER);
                             // FIXME: Need to add a delay to the last jewel segment because it keeps on pushing the jewel off.
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 11, Violet.STRAIGHT_SPEED);
+                            //pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 11, Violet.STRAIGHT_SPEED);
+                            pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, Violet.STRAIGHT_SPEED);
                             liftJewel = 1;
                         } else {
                             RobotLog.i("506 Sensed BLUE, Alliance RED");
@@ -327,10 +336,13 @@ public class VioletJewelAutonomous extends Robot {
                         } else {
                             RobotLog.i("506 Sensed RED, Alliance BLUE");
                             pushJewel.stop();
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, VioletConstants.TURN_SPEED * TURN_MULTIPLIER);
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, VioletConstants.TURN_SPEED);
+                            //pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, VioletConstants.TURN_SPEED * TURN_MULTIPLIER);
+                            //pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, VioletConstants.TURN_SPEED);
+                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 5, VioletConstants.TURN_SPEED * TURN_MULTIPLIER);
+                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 5, VioletConstants.TURN_SPEED);
                             liftJewel = 1;
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 11, VioletConstants.STRAIGHT_SPEED * TURN_MULTIPLIER);
+                            //pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 11, VioletConstants.STRAIGHT_SPEED * TURN_MULTIPLIER);
+                            pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
                         }
                     }
                 }
