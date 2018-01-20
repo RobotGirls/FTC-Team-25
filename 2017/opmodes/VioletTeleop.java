@@ -113,7 +113,6 @@ public class VioletTeleop extends Robot {
     private Telemetry.Item speed;
     private Telemetry.Item encoderRelic;
     private Telemetry.Item encoderLift;
-
     private boolean rotated180 = false;
     private boolean lockout = false;
 
@@ -303,7 +302,7 @@ public class VioletTeleop extends Robot {
             RobotLog.e("Now moving claw up");
             goDown = true;
         }
-        addTask(new SingleShotTimerTask(this, 1500) {
+        addTask(new SingleShotTimerTask(this, 500) {
                     @Override
                     public void handleEvent(RobotEvent e) {
                         //int distance;
@@ -323,7 +322,7 @@ public class VioletTeleop extends Robot {
                                 lockout = false;
                                 if (rotate.kind == RunToEncoderValueTask.EventKind.DONE) {
                                     RobotLog.e("Rotate done.");
-                                    addTask(new SingleShotTimerTask(robot, 1500) {
+                                    addTask(new SingleShotTimerTask(robot, 500) {
                                         @Override
                                         public void handleEvent(RobotEvent e) {
                                             if (goDown) {
