@@ -11,6 +11,7 @@ public class GlyphConstants
     public static final int TICKS_PER_DEGREE = 19;
     //public final static double STRAIGHT_SPEED = 0.75;
     public final static double STRAIGHT_SPEED = 1.0;
+    public final static double STRAIGHT_SPEED_FAR = 0.75;
     public final static double SIDEWAYS_SPEED = 0.5;
     public final static double TURN_SPEED = 0.3;
 
