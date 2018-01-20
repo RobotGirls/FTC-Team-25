@@ -1,13 +1,13 @@
 package opmodes;
 
 /**
- * FTC Team 25: Created by Elizabeth Wu (updated by Breanna Chan) on 10/28/2017.
+ * FTC Team 25: Created by Bella Heinrichs on 10/28/2017.
  */
 
 public class GlyphConstants
 {
     // Autonomous constants.
-    public static final int TICKS_PER_INCH = (int) 1400/4;
+    public static final int TICKS_PER_INCH = (int)1400/400;
     public static final int TICKS_PER_DEGREE = 19;
     //public final static double STRAIGHT_SPEED = 0.75;
     public final static double STRAIGHT_SPEED = 1.0;

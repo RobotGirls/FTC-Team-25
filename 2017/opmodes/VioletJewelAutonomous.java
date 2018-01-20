@@ -30,7 +30,7 @@ import team25core.VuforiaBase;
  * FTC Team 25: Created by Elizabeth Wu on 10/28/17.
  */
 
-@Autonomous(name = "Violet Jewel Autonomous", group = "Team 25")
+@Autonomous(name = "Violet Autonomous", group = "Team 25")
 //@Disabled
 public class VioletJewelAutonomous extends Robot {
 
