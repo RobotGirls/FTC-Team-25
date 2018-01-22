@@ -7,9 +7,8 @@ package opmodes;
 public class VioletConstants
 {
     // Autonomous constants.
-    //public static final int TICKS_PER_INCH = 36;
-    public static final int TICKS_PER_INCH = 350;
-    public static final int TICKS_PER_DEGREE = 19;
+    public static final int TICKS_PER_INCH = 45;
+    public static final int TICKS_PER_DEGREE = 22;
     public final static double STRAIGHT_SPEED = 0.7;
     public final static double TURN_SPEED = 1;
 
@@ -34,7 +33,7 @@ public class VioletConstants
     //public static double S4_OPEN      = 65  / SERVO_DOMAIN;
     public static double S4_OPEN      = 92  / SERVO_DOMAIN;
     public static double S4_CLOSED    = 140 / SERVO_DOMAIN;
-    public static double RELIC_OPEN   = 10  / SERVO_DOMAIN;
+    public static double RELIC_OPEN   = 0  / SERVO_DOMAIN;
     public static double RELIC_CLOSED = 100 / SERVO_DOMAIN;
     public static double RELIC_ROTATE_DOWN = 0 / SERVO_DOMAIN;
     public static double RELIC_ROTATE_UP   = 240 / SERVO_DOMAIN;

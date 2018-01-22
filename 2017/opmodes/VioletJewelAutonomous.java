@@ -34,11 +34,6 @@ import team25core.VuforiaBase;
 //@Disabled
 public class VioletJewelAutonomous extends Robot {
 
-    private enum Direction {
-        CLOCKWISE,
-        COUNTERCLOCKWISE,
-    }
-
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor rearLeft;
@@ -48,11 +43,12 @@ public class VioletJewelAutonomous extends Robot {
     private Servo jewel;
     private Servo s3bottom;
     private Servo s4bottom;
+
     private ColorThiefTask colorThiefTask;
     private DeviceInterfaceModule cdim;
     private Alliance alliance;
     private Position position;
-    private Side side;
+  //  private Side side;
     private DeadReckonPath park;
     private DeadReckonPath pushJewel;
     private DeadReckonPath backUp;
@@ -105,15 +101,20 @@ public class VioletJewelAutonomous extends Robot {
         FAR,
     }
 
-    public enum Side {
+    private enum Direction {
+        CLOCKWISE,
+        COUNTERCLOCKWISE,
+    }
+
+
+   /* public enum Side {
         LEFT,
         RIGHT,
-    }
+    } */
 
     @Override
     public void init() {
         telemetry.setAutoClear(false);
-
 
         // Hardware mapping.
         frontLeft   = hardwareMap.dcMotor.get("frontLeft");
@@ -125,7 +126,6 @@ public class VioletJewelAutonomous extends Robot {
         s3bottom    = hardwareMap.servo.get("s3");
         s4bottom    = hardwareMap.servo.get("s4");
 
-
         // Telemetry setup.
         telemetry.setAutoClear(false);
         allianceItem    = telemetry.addData("ALLIANCE", "Unselected (X/B)");
@@ -134,7 +134,6 @@ public class VioletJewelAutonomous extends Robot {
         //vuMarkItem      = telemetry.addData("VuMark: ", "No data");
 
         // Path setup.
-        // park = new DeadReckonPath();
         backUp = new DeadReckonPath();
 
         // Arm initialized up
@@ -158,8 +157,8 @@ public class VioletJewelAutonomous extends Robot {
         utility = new GlyphAutonomousPathUtility();
 
         // Setting stone position.
-        //getStonePosition();
-        //RobotLog.i("506 Stone Position is", stonePosition.toString());
+        getStonePosition();
+        RobotLog.i("506 Stone Position is", stonePosition.toString());
 
         sense();
         detectVuMark(this);
@@ -197,7 +196,6 @@ public class VioletJewelAutonomous extends Robot {
                             if (path.kind == EventKind.PATH_DONE) {
                                 park = utility.getPath(tgtColumn, stonePosition);
                                 RobotLog.i("506 start: after utility.getPath");
-                                //robot.addTask(new DeadReckonTask(robot, park, drivetrain) /* {
                                 robot.addTask(new DeadReckonTask(robot, park, drivetrain) {
                                     @Override
                                     public void handleEvent(RobotEvent e) {
@@ -416,11 +414,6 @@ public class VioletJewelAutonomous extends Robot {
 
         combo = color + distance;
 
-        // RED_NEAR = 0;
-        // RED_FAR = 1;
-        // BLUE_NEAR = 3;
-        // BLUE_FAR = 4;
-
         switch (combo) {
             case BLUE_FAR:
                 stonePosition = GlyphAutonomousPathUtility.StartStone.BLUE_FAR;
@@ -444,60 +437,5 @@ public class VioletJewelAutonomous extends Robot {
         }
         return stonePosition;
     }
-
-
-  /*  private void setupParkPath()
-    {
-
-
-        if (alliance == Alliance.RED) {
-            color = 1;
-        } else if (alliance == Alliance.BLUE) {
-            color = 0;
-        }
-
-        if (position == Position.NEAR) {
-            distance = 2;
-        } else {
-            distance = 0;
-        }
-
-        combo = color + distance;
-
-         // + whichSide;
-
-        switch (combo) {
-            case BLUE_FAR:
-                RobotLog.i("506 Case: BLUE_FAR");
-                park.stop();
-                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 27, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
-                park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
-                break;
-            case RED_FAR:
-                RobotLog.i("506 Case: RED_FAR");
-                park.stop();
-                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 24, Violet.STRAIGHT_SPEED);
-                park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 13 , Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
-                break;
-            case BLUE_NEAR:
-                RobotLog.i("506 Case: BLUE_NEAR");
-                park.stop();
-                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 18, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
-                park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 7, Violet.STRAIGHT_SPEED);
-                break;
-            case RED_NEAR:
-                RobotLog.i("506 Case: RED_NEAR");
-                park.stop();
-
-                // TODO: make the straight and side segments further
-
-                park.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, Violet.STRAIGHT_SPEED);
-                park.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 9, Violet.STRAIGHT_SPEED);
-                break;
-            default:
-                break;
-        }
-    } */
-
 }
 

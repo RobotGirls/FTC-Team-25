@@ -77,7 +77,7 @@ public class GlyphAutonomousPathUtility {
         //RED NEAR LEFT  --------------------------------------------------------------------------------------------------------------------------------------------------------------
         paths[StartStone.RED_NEAR.ordinal()][TargetColumn.LEFT.ordinal()] = new DeadReckonPath();
         paths[StartStone.RED_NEAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 42.15, GlyphConstants.STRAIGHT_SPEED);
-        paths[StartStone.RED_NEAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_90+2, GlyphConstants.TURN_SPEED);
+        paths[StartStone.RED_NEAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_90, GlyphConstants.TURN_SPEED);
         paths[StartStone.RED_NEAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, GlyphConstants.placeGlyph, GlyphConstants.STRAIGHT_SPEED);
 
         //RED FAR RIGHT  ----------------------------------------------------------------------------------------------------------------------------------------------------------------
