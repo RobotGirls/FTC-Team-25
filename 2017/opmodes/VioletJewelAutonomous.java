@@ -1,5 +1,6 @@
 package opmodes;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,6 +12,8 @@ import com.vuforia.CameraDevice;
 import com.vuforia.VuMarkTarget;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 
@@ -19,6 +22,7 @@ import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
+import team25core.IMUSensorCriteria;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
@@ -88,6 +92,11 @@ public class VioletJewelAutonomous extends Robot {
     private static final int RED_FAR = 1;
     private static final int BLUE_NEAR = 2;
     private static final int BLUE_FAR = 3;
+
+    private IMUSensorCriteria imuSensorCriteria;
+    BNO055IMU imu;
+    Orientation angles;
+    Acceleration gravity;
 
     private FourWheelDirectDrivetrain drivetrain;
 
@@ -162,6 +171,9 @@ public class VioletJewelAutonomous extends Robot {
 
         sense();
         detectVuMark(this);
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imuSensorCriteria = new IMUSensorCriteria(imu, VioletConstants.MAX_TILT);
     }
 
     public void start()
@@ -188,7 +200,7 @@ public class VioletJewelAutonomous extends Robot {
                 // This handleEvent occurs after one second passes to lower the arm.
                 public void handleEvent(RobotEvent e) {
                     RobotLog.i("506 SST running");
-                    robot.addTask(new DeadReckonTask(robot, pushJewel, drivetrain) {
+                    robot.addTask(new DeadReckonTask(robot, pushJewel, drivetrain, imuSensorCriteria) {
                         @Override
                         // This handleEvent occurs after the pushJewel runs.
                         public void handleEvent(RobotEvent e) {

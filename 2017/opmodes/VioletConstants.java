@@ -53,4 +53,6 @@ public class VioletConstants
     public static double RELIC_CEILING = 0.3;
     public static int RELIC_HORIZONTAL = 100; //FIXME
     public static double RELIC_HORIZONTAL_POWER = 0.5;
+
+    public final static double MAX_TILT = 30;
 }
