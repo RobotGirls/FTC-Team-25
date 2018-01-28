@@ -16,7 +16,7 @@ public class GlyphConstants
     public final static double TURN_SPEED = 0.3;
 
     //public final static double TURN_ANGLE_90 = 82;
-    public final static double TURN_ANGLE_90 = 90;
+    public final static double TURN_ANGLE_90 = 89;
     public final static double TURN_ANGLE_90_BLUE = 95;
     public final static double TURN_ANGLE_90_BLUE_C= 105;
     public final static double TURN_ANGLE_180_P1 = 130;
@@ -24,7 +24,7 @@ public class GlyphConstants
 
 
     //public static double placeGlyph = 3;
-    public static double placeGlyph = 7;
+    public static double placeGlyph = 6.5;
     public static double placeGlyphFAR = 2;
 
 }

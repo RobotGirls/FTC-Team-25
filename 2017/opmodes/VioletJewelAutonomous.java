@@ -134,6 +134,8 @@ public class VioletJewelAutonomous extends Robot {
         jewel       = hardwareMap.servo.get("jewel");
         s3bottom    = hardwareMap.servo.get("s3");
         s4bottom    = hardwareMap.servo.get("s4");
+        imu         = hardwareMap.get(BNO055IMU.class, "imu");
+
 
         // Telemetry setup.
         telemetry.setAutoClear(false);
@@ -155,6 +157,8 @@ public class VioletJewelAutonomous extends Robot {
         // Alliance and autonomous choice selection.
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));
 
+        // Initialize IMU sensor criteria.
+        imuSensorCriteria = new IMUSensorCriteria(imu, VioletConstants.MAX_TILT);
 
         drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
         drivetrain.setNoncanonicalMotorDirection();
@@ -166,14 +170,13 @@ public class VioletJewelAutonomous extends Robot {
         utility = new GlyphAutonomousPathUtility();
 
         // Setting stone position.
-        getStonePosition();
-        RobotLog.i("506 Stone Position is", stonePosition.toString());
+        // getStonePosition();
+        //RobotLog.i("506 Stone Position is", stonePosition.toString());
 
         sense();
         detectVuMark(this);
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imuSensorCriteria = new IMUSensorCriteria(imu, VioletConstants.MAX_TILT);
+
     }
 
     public void start()
@@ -201,9 +204,10 @@ public class VioletJewelAutonomous extends Robot {
                 public void handleEvent(RobotEvent e) {
                     RobotLog.i("506 SST running");
                     robot.addTask(new DeadReckonTask(robot, pushJewel, drivetrain, imuSensorCriteria) {
-                        @Override
                         // This handleEvent occurs after the pushJewel runs.
+                        @Override
                         public void handleEvent(RobotEvent e) {
+                            RobotLog.i("506 inside pushJewel handleEvent");
                             DeadReckonEvent path = (DeadReckonEvent) e;
                             if (path.kind == EventKind.PATH_DONE) {
                                 park = utility.getPath(tgtColumn, stonePosition);
@@ -226,21 +230,20 @@ public class VioletJewelAutonomous extends Robot {
                                                     robot.addTask(new DeadReckonTask(robot, backUp, drivetrain));
                                                 }
                                             });
-                                        }
-                                    }
-                                });  // end of park task
-                                //} */);  // end of park task
-                            }
+                                        }  // if park path DONE
+                                    }  // end of handleEvent for park
+                                });  // end of adding park task
+                            }  // end pushJewel path is done
                         } // end handleEvent when pushJewel path is done
-                    });  // end pushJewel
+                    });  // end add pushJewel task
                     robot.addTask(new SingleShotTimerTask(robot, 500) {
                         @Override
                         public void handleEvent(RobotEvent e) {
                             jewel.setPosition(VioletConstants.JEWEL_UP);
                         }
                     });  // end SingleShotTimerTask
-                }
-            });
+                } // handleEvent for 1 sec SST
+        }); // 1 sec SST
 
     }
 
@@ -286,7 +289,7 @@ public class VioletJewelAutonomous extends Robot {
         else                                                        // up
             linear.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        this.addTask(new RunToEncoderValueTask(this, linear, VioletConstants.VERTICAL_MIN_HEIGHT, VioletConstants.CLAW_VERTICAL_POWER));
+        this.addTask(new RunToEncoderValueTask(this, linear, 1550, VioletConstants.CLAW_VERTICAL_POWER));
     }
 
     private void togglePolling() {
@@ -323,12 +326,8 @@ public class VioletJewelAutonomous extends Robot {
                         if (event.kind == EventKind.RED) {
                             pushJewel.stop();
                             RobotLog.i("506 Sensed RED, Alliance RED");
-                            //pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, VioletConstants.TURN_SPEED);
-                            //pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, VioletConstants.TURN_SPEED * TURN_MULTIPLIER);
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 5, VioletConstants.TURN_SPEED);
-                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 5, VioletConstants.TURN_SPEED * TURN_MULTIPLIER);
-                            // FIXME: Need to add a delay to the last jewel segment because it keeps on pushing the jewel off.
-                            //pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 11, Violet.STRAIGHT_SPEED);
+                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 6, VioletConstants.TURN_SPEED);
+                            pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 6, VioletConstants.TURN_SPEED * TURN_MULTIPLIER);
                             pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, Violet.STRAIGHT_SPEED);
                             liftJewel = 1;
                         } else {
