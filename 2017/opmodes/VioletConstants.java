@@ -15,8 +15,8 @@ public class VioletConstants
 
     private static double SERVO_DOMAIN = 256.0;
 
-    public static double JEWEL_UP     = 175 / SERVO_DOMAIN;
-    public static double JEWEL_DOWN   = 35  / SERVO_DOMAIN;
+    public static double JEWEL_UP     = 164 / SERVO_DOMAIN;
+    public static double JEWEL_DOWN   = 29  / SERVO_DOMAIN;
     public static double S1_INIT      = 10  / SERVO_DOMAIN;
     public static double S2_INIT      = 255 / SERVO_DOMAIN;
     public static double S3_INIT      = 224 / SERVO_DOMAIN;
@@ -41,7 +41,7 @@ public class VioletConstants
 
     //public static int DEGREES_180_CLOCKWISE = 375;
     //public static int DEGREES_180_COUNTERCLOCKWISE = 400;
-    public static int DEGREES_180 = 450;
+    public static int DEGREES_180 = 475;
     public static double ROTATE_POWER = 0.3;
     public static int NUDGE = 15;
     public static double NUDGE_POWER = 0.1;
