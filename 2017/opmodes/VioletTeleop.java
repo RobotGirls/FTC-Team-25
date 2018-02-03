@@ -40,7 +40,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
-import team25core.LeftAirplaneMechanumControlScheme;
 import team25core.OneWheelDriveTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -277,7 +276,6 @@ public class VioletTeleop extends Robot {
                     RobotLog.e("Before clear encoder: %d", linear.getCurrentPosition());
                     //linear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     RobotLog.e("After clear encoder: %d", linear.getCurrentPosition());
-
                 }
             }
         });
@@ -291,56 +289,20 @@ public class VioletTeleop extends Robot {
      */
     private void rotateGlyph(Direction direction)
     {
-        currentEncoder = linear.getCurrentPosition();
-        currentDirection = direction;
-
-        RobotLog.e("----------------------------------------------------------------------------------------------------");
-        RobotLog.e("Rotate Glyph Current Encoder: %d", currentEncoder);
-
-        if (currentEncoder < VioletConstants.VERTICAL_MIN_HEIGHT) {
-            moveClaw(Direction.COUNTERCLOCKWISE);
-            RobotLog.e("Now moving claw up");
-            goDown = true;
+        if (direction == Direction.CLOCKWISE) {
+            rotate.setDirection(DcMotorSimple.Direction.REVERSE);
+            //distance = VioletConstants.DEGREES_180;
+        } else {
+            rotate.setDirection(DcMotorSimple.Direction.FORWARD);
+            //distance = VioletConstants.DEGREES_180;
         }
-        addTask(new SingleShotTimerTask(this, 500) {
-                    @Override
-                    public void handleEvent(RobotEvent e) {
-                        //int distance;
-                        if (currentDirection == Direction.CLOCKWISE) {
-                            rotate.setDirection(DcMotorSimple.Direction.REVERSE);
-                            //distance = VioletConstants.DEGREES_180;
-                        } else {
-                            rotate.setDirection(DcMotorSimple.Direction.FORWARD);
-                            //distance = VioletConstants.DEGREES_180;
-                        }
-
-                        robot.addTask(new RunToEncoderValueTask(robot, rotate, VioletConstants.DEGREES_180, VioletConstants.ROTATE_POWER) {
-                            @Override
-                            public void handleEvent (RobotEvent e){
-                                RunToEncoderValueTask.RunToEncoderValueEvent rotate = (RunToEncoderValueTask.RunToEncoderValueEvent) e;
-                                RobotLog.e("Rotate Encoder Event" + e.toString());
-                                lockout = false;
-                                if (rotate.kind == RunToEncoderValueTask.EventKind.DONE) {
-                                    RobotLog.e("Rotate done.");
-                                    addTask(new SingleShotTimerTask(robot, 500) {
-                                        @Override
-                                        public void handleEvent(RobotEvent e) {
-                                            if (goDown) {
-                                                //moveClaw(Direction.CLOCKWISE);
-                                                lowerClawDown();
-                                                //RobotLog.e("Now moving claw down");
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    }
-        });
+        this.addTask(new RunToEncoderValueTask(this, rotate, VioletConstants.DEGREES_180, VioletConstants.ROTATE_POWER));
     }
 
     /**
-     * Alternates the 180 degree rotation of the glyph mechanism.
+     * Alternates the 180 degree rotation of the glyph mechanism. rotateLeft is initialized
+     * to false at beginning. Also controls the alternating of controls for the top and bottom
+     * servo claw pairs.
      */
 
     private void alternateRotate()
@@ -348,9 +310,11 @@ public class VioletTeleop extends Robot {
         if (rotateLeft) {
             rotateGlyph(Direction.CLOCKWISE);
             rotateLeft = false;
+            rotated180 = false; // rotated180 equal to false means that S1 and S2 servo pair is on top
         } else {
             rotateGlyph(Direction.COUNTERCLOCKWISE);
             rotateLeft = true;
+            rotated180 = true; // rotated180 equal to true means that S3 and S4 servo pair is on top
         }
     }
 
@@ -458,7 +422,6 @@ public class VioletTeleop extends Robot {
 
                     lockout = true;
                     alternateRotate();
-                    rotated180 = true;
                 } else if (event.kind == EventKind.BUTTON_A_DOWN) {
                     // Rotate relic
 

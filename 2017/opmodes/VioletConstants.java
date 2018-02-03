@@ -55,7 +55,7 @@ public class VioletConstants extends LinearOpMode
 
     //public static int DEGREES_180_CLOCKWISE = 375;
     //public static int DEGREES_180_COUNTERCLOCKWISE = 400;
-    public static int DEGREES_180 = 450;
+    public static int DEGREES_180 = 475;
     public static double ROTATE_POWER = 0.3;
     public static int NUDGE = 15;
     public static double NUDGE_POWER = 0.1;
