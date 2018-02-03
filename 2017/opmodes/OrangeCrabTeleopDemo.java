@@ -33,6 +33,7 @@
 
 package opmodes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -47,6 +48,7 @@ import team25core.TwoWheelDriveTask;
 
 
 @TeleOp(name="OrangeCrabDemo")
+@Disabled
 public class OrangeCrabTeleopDemo extends Robot {
 
     private enum Direction {

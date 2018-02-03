@@ -1,5 +1,6 @@
 package test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -13,6 +14,7 @@ import team25core.RobotEvent;
  */
 
 @TeleOp(name = "Relic X-Rail Servo Test")
+@Disabled
 
 // Bella's prototype
 
