@@ -52,7 +52,7 @@ public class VioletJewelAutonomous extends Robot {
     private DeviceInterfaceModule cdim;
     private Alliance alliance;
     private Position position;
-  //  private Side side;
+    //  private Side side;
     private DeadReckonPath park;
     private DeadReckonPath pushJewel;
     private DeadReckonPath backUp;
@@ -72,9 +72,10 @@ public class VioletJewelAutonomous extends Robot {
     private Telemetry.Item particle;
     private Telemetry.Item allianceItem;
     private Telemetry.Item positionItem;
+    private Telemetry.Item imuStatus;
     private Telemetry.Item pollItem;
     private Telemetry.Item flashItem;
-   // private Telemetry.Item vuMarkItem;
+    // private Telemetry.Item vuMarkItem;
 
     boolean flashOn = false;
     boolean pollOn = false;
@@ -126,22 +127,23 @@ public class VioletJewelAutonomous extends Robot {
         telemetry.setAutoClear(false);
 
         // Hardware mapping.
-        frontLeft   = hardwareMap.dcMotor.get("frontLeft");
-        frontRight  = hardwareMap.dcMotor.get("frontRight");
-        rearLeft    = hardwareMap.dcMotor.get("rearLeft");
-        rearRight   = hardwareMap.dcMotor.get("rearRight");
-        linear      = hardwareMap.dcMotor.get("linear");
-        jewel       = hardwareMap.servo.get("jewel");
-        s3bottom    = hardwareMap.servo.get("s3");
-        s4bottom    = hardwareMap.servo.get("s4");
-        imu         = hardwareMap.get(BNO055IMU.class, "imu");
+        frontLeft = hardwareMap.dcMotor.get("frontLeft");
+        frontRight = hardwareMap.dcMotor.get("frontRight");
+        rearLeft = hardwareMap.dcMotor.get("rearLeft");
+        rearRight = hardwareMap.dcMotor.get("rearRight");
+        linear = hardwareMap.dcMotor.get("linear");
+        jewel = hardwareMap.servo.get("jewel");
+        s3bottom = hardwareMap.servo.get("s3");
+        s4bottom = hardwareMap.servo.get("s4");
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
 
 
         // Telemetry setup.
         telemetry.setAutoClear(false);
-        allianceItem    = telemetry.addData("ALLIANCE", "Unselected (X/B)");
-        positionItem    = telemetry.addData("POSITION", "Unselected (Y/A)");
-        particle        = telemetry.addData("Particle: ", "No data");
+        allianceItem = telemetry.addData("ALLIANCE", "Unselected (X/B)");
+        positionItem = telemetry.addData("POSITION", "Unselected (Y/A)");
+        particle = telemetry.addData("Particle: ", "No data");
+        imuStatus = telemetry.addData("IMU: ", "All Good");
         //vuMarkItem      = telemetry.addData("VuMark: ", "No data");
 
         // Path setup.
@@ -179,6 +181,39 @@ public class VioletJewelAutonomous extends Robot {
 
     }
 
+    protected void dispenseGlyph()
+    {
+        moveClaw(Direction.CLOCKWISE);
+        addTask(new SingleShotTimerTask(this, 1000) {
+            @Override
+            // This handleEvent occurs after half a second passes to lower glyph mechanism.
+            public void handleEvent(RobotEvent e) {
+                // Open bottom claws
+                s3bottom.setPosition(VioletConstants.S3_OPEN);
+                s4bottom.setPosition(VioletConstants.S4_OPEN);
+                backUp.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -VioletConstants.STRAIGHT_SPEED);
+                robot.addTask(new DeadReckonTask(robot, backUp, drivetrain, imuSensorCriteria));
+            }
+        });
+    }
+
+    protected void runGlyphPath()
+    {
+        park = utility.getPath(tgtColumn, stonePosition);
+        RobotLog.i("506 start: after utility.getPath");
+        this.addTask(new DeadReckonTask(this, park, drivetrain, imuSensorCriteria) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent event = (DeadReckonEvent) e;
+                if (event.kind == EventKind.PATH_DONE) {
+                    dispenseGlyph();
+                } else if (event.kind == EventKind.SENSOR_SATISFIED) {
+                    imuStatus.setValue("Catastrophe Averted!!!!!!!");
+                }
+            }  // end of handleEvent for park
+        });  // end of adding park task
+    }
+
     public void start()
     {
         // Put jewel arm down
@@ -208,32 +243,12 @@ public class VioletJewelAutonomous extends Robot {
                         @Override
                         public void handleEvent(RobotEvent e) {
                             RobotLog.i("506 inside pushJewel handleEvent");
-                            DeadReckonEvent path = (DeadReckonEvent) e;
-                            if (path.kind == EventKind.PATH_DONE) {
-                                park = utility.getPath(tgtColumn, stonePosition);
-                                RobotLog.i("506 start: after utility.getPath");
-                                robot.addTask(new DeadReckonTask(robot, park, drivetrain) {
-                                    @Override
-                                    public void handleEvent(RobotEvent e) {
-                                        DeadReckonEvent path = (DeadReckonEvent) e;
-                                        if (path.kind == EventKind.PATH_DONE) {
-                                            // Lower glyph mechanism
-                                            moveClaw(Direction.CLOCKWISE);
-                                            addTask(new SingleShotTimerTask(robot, 1000) {
-                                                @Override
-                                                // This handleEvent occurs after half a second passes to lower glyph mechanism.
-                                                public void handleEvent(RobotEvent e) {
-                                                    // Open bottom claws
-                                                    s3bottom.setPosition(VioletConstants.S3_OPEN);
-                                                    s4bottom.setPosition(VioletConstants.S4_OPEN);
-                                                    backUp.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -VioletConstants.STRAIGHT_SPEED);
-                                                    robot.addTask(new DeadReckonTask(robot, backUp, drivetrain));
-                                                }
-                                            });
-                                        }  // if park path DONE
-                                    }  // end of handleEvent for park
-                                });  // end of adding park task
-                            }  // end pushJewel path is done
+                            DeadReckonEvent event = (DeadReckonEvent) e;
+                            if (event.kind == EventKind.PATH_DONE) {
+                                runGlyphPath();
+                            } else if (event.kind == EventKind.SENSOR_SATISFIED) {
+                                imuStatus.setValue("Catastrophe Averted!!!!!!!");
+                            }
                         } // end handleEvent when pushJewel path is done
                     });  // end add pushJewel task
                     robot.addTask(new SingleShotTimerTask(robot, 500) {
