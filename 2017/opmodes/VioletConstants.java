@@ -35,21 +35,21 @@ public class VioletConstants extends LinearOpMode
     public static double S2_INIT      = 255 / SERVO_DOMAIN;
     public static double S3_INIT      = 224 / SERVO_DOMAIN;
     public static double S4_INIT      = 10  / SERVO_DOMAIN;
-    public static double RELIC_INIT   = 116 / SERVO_DOMAIN;
+    public static double RELIC_INIT   = 241 / SERVO_DOMAIN;
     //public static double S1_OPEN      = 70  / SERVO_DOMAIN;
     public static double S1_OPEN      = 102 / SERVO_DOMAIN;
     public static double S1_CLOSED    = 151 / SERVO_DOMAIN;
     //public static double S2_OPEN      = 172 / SERVO_DOMAIN;
     public static double S2_OPEN      = 166 / SERVO_DOMAIN;
-    public static double S2_CLOSED    = 120 / SERVO_DOMAIN;
+    public static double S2_CLOSED    = 115 / SERVO_DOMAIN;
     //public static double S3_OPEN      = 155 / SERVO_DOMAIN;
     public static double S3_OPEN      = 121 / SERVO_DOMAIN;
-    public static double S3_CLOSED    = 85  / SERVO_DOMAIN;
+    public static double S3_CLOSED    = 80  / SERVO_DOMAIN;
     //public static double S4_OPEN      = 65  / SERVO_DOMAIN;
     public static double S4_OPEN      = 92  / SERVO_DOMAIN;
     public static double S4_CLOSED    = 140 / SERVO_DOMAIN;
-    public static double RELIC_OPEN   = 0  / SERVO_DOMAIN;
-    public static double RELIC_CLOSED = 100 / SERVO_DOMAIN;
+    public static double RELIC_OPEN   = 130  / SERVO_DOMAIN;
+    public static double RELIC_CLOSED = 241 / SERVO_DOMAIN;
     public static double RELIC_ROTATE_DOWN = 0 / SERVO_DOMAIN;
     public static double RELIC_ROTATE_UP   = 240 / SERVO_DOMAIN;
 
@@ -69,7 +69,7 @@ public class VioletConstants extends LinearOpMode
     public static int RELIC_HORIZONTAL = 100; //FIXME
     public static double RELIC_HORIZONTAL_POWER = 0.5;
 
-    public final static double MAX_TILT = 150;
+    public final static double MAX_TILT = 100;
 
     BNO055IMU imu;
     Orientation angles;

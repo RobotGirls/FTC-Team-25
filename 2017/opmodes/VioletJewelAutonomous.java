@@ -191,7 +191,9 @@ public class VioletJewelAutonomous extends Robot {
                 // Open bottom claws
                 s3bottom.setPosition(VioletConstants.S3_OPEN);
                 s4bottom.setPosition(VioletConstants.S4_OPEN);
-                backUp.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -VioletConstants.STRAIGHT_SPEED);
+                backUp.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, -VioletConstants.STRAIGHT_SPEED);
+                backUp.addSegment(DeadReckonPath.SegmentType.TURN, 210, VioletConstants.TURN_SPEED);
+                backUp.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, -VioletConstants.STRAIGHT_SPEED);
                 robot.addTask(new DeadReckonTask(robot, backUp, drivetrain, imuSensorCriteria));
             }
         });

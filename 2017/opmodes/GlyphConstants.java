@@ -24,7 +24,7 @@ public class GlyphConstants
 
 
     //public static double placeGlyph = 3;
-    public static double placeGlyph = 6.5;
+    public static double placeGlyph = 9;
     public static double placeGlyphFAR = 2;
 
 }

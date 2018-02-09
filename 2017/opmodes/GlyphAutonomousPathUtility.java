@@ -103,48 +103,47 @@ public class GlyphAutonomousPathUtility {
 
         //BLUE NEAR LEFT  --------------------------------------------------------------------------------------------------------------------------------------------------------------
         paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.LEFT.ordinal()] = new DeadReckonPath();
-        paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 25, -GlyphConstants.STRAIGHT_SPEED);
-        paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_90_BLUE+.75, GlyphConstants.TURN_SPEED);
+        paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 28.5, -GlyphConstants.STRAIGHT_SPEED);
+        paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_90_BLUE + 1, GlyphConstants.TURN_SPEED);
         paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, GlyphConstants.placeGlyph, GlyphConstants.STRAIGHT_SPEED);
 
         //BLUE NEAR CENTER  ------------------------------------------------------------------------------------------------------------------------------------------------------------
         paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.CENTER.ordinal()] = new DeadReckonPath();
-        paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.CENTER.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 35, -GlyphConstants.STRAIGHT_SPEED);
-        paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.CENTER.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_90_BLUE_C, GlyphConstants.TURN_SPEED);
+        paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.CENTER.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 37, -GlyphConstants.STRAIGHT_SPEED);
+        paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.CENTER.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_90_BLUE_C + 1, GlyphConstants.TURN_SPEED);
         paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.CENTER.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, GlyphConstants.placeGlyph, GlyphConstants.STRAIGHT_SPEED);
 
         //BLUE NEAR RIGHT  -------------------------------------------------------------------------------------------------------------------------------------------------------------
         paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.RIGHT.ordinal()] = new DeadReckonPath();
-        paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 42, -GlyphConstants.STRAIGHT_SPEED);
-        paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_90_BLUE, GlyphConstants.TURN_SPEED);
+        paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 45, -GlyphConstants.STRAIGHT_SPEED);
+        paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_90_BLUE + 1, GlyphConstants.TURN_SPEED);
         paths[StartStone.BLUE_NEAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, GlyphConstants.placeGlyph, GlyphConstants.STRAIGHT_SPEED);
 
         //BLUE FAR RIGHT  ---------------------------------------------------------------------------------------------------------------------------------------------------------------
         paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.RIGHT.ordinal()] = new DeadReckonPath();
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, -GlyphConstants.STRAIGHT_SPEED_FAR);
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 2, -GlyphConstants.SIDEWAYS_SPEED);
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 25, -GlyphConstants.STRAIGHT_SPEED_FAR);
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, -GlyphConstants.SIDEWAYS_SPEED);
         paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_180_P1, GlyphConstants.TURN_SPEED);
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, -GlyphConstants.STRAIGHT_SPEED);
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, -GlyphConstants.STRAIGHT_SPEED);
         paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_180_P2, GlyphConstants.TURN_SPEED);
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 2.5, -GlyphConstants.SIDEWAYS_SPEED);
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 18, GlyphConstants.SIDEWAYS_SPEED);
         paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.RIGHT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, GlyphConstants.placeGlyphFAR, GlyphConstants.STRAIGHT_SPEED);
 
         //BLUE FAR CENTER  -------------------------------------------------------------------------------------------------------------------------------------------------------------
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.CENTER.ordinal()] = new DeadReckonPath();
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.CENTER.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, -GlyphConstants.STRAIGHT_SPEED_FAR);
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.CENTER.ordinal()].addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 2, -GlyphConstants.SIDEWAYS_SPEED);
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.CENTER.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_180_P1, GlyphConstants.TURN_SPEED);
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.CENTER.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, -GlyphConstants.STRAIGHT_SPEED);
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.CENTER.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_180_P2, GlyphConstants.TURN_SPEED);
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.CENTER.ordinal()].addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 0.25, GlyphConstants.SIDEWAYS_SPEED);
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.CENTER.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, GlyphConstants.placeGlyphFAR, GlyphConstants.STRAIGHT_SPEED);
-
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()] = new DeadReckonPath();
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 25, -GlyphConstants.STRAIGHT_SPEED_FAR);
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, -GlyphConstants.SIDEWAYS_SPEED);
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_180_P1, GlyphConstants.TURN_SPEED);
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, -GlyphConstants.STRAIGHT_SPEED);
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_180_P2, GlyphConstants.TURN_SPEED);
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4.25, GlyphConstants.SIDEWAYS_SPEED);
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, GlyphConstants.placeGlyphFAR, GlyphConstants.STRAIGHT_SPEED);
         //BLUE FAR LEFT  --------------------------------------------------------------------------------------------------------------------------------------------------------------
         paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()] = new DeadReckonPath();
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, -GlyphConstants.STRAIGHT_SPEED_FAR);
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 2, -GlyphConstants.SIDEWAYS_SPEED);
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 25, -GlyphConstants.STRAIGHT_SPEED_FAR);
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, -GlyphConstants.SIDEWAYS_SPEED);
         paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_180_P1, GlyphConstants.TURN_SPEED);
-        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, -GlyphConstants.STRAIGHT_SPEED);
+        paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, -GlyphConstants.STRAIGHT_SPEED);
         paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.TURN, GlyphConstants.TURN_ANGLE_180_P2, GlyphConstants.TURN_SPEED);
         paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 2.25, GlyphConstants.SIDEWAYS_SPEED);
         paths[StartStone.BLUE_FAR.ordinal()][TargetColumn.LEFT.ordinal()].addSegment(DeadReckonPath.SegmentType.STRAIGHT, GlyphConstants.placeGlyphFAR, GlyphConstants.STRAIGHT_SPEED);
