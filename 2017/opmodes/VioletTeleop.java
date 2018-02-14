@@ -151,8 +151,8 @@ public class VioletTeleop extends Robot {
         relic       = hardwareMap.servo.get("relic");
         relicRotate = hardwareMap.servo.get("relicRotate");
 
-        // Sets position of jewel for teleop
-        jewel.setPosition(VioletConstants.JEWEL_UP);
+        // Sets position of jewel for teleop  (moved to start)
+        //jewel.setPosition(VioletConstants.JEWEL_UP);
 
         //runSlideOutTask = new DeadmanMotorTask(this, slide, 0.75, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
         //runSlideInTask = new DeadmanMotorTask(this, slide, -0.75, GamepadTask.GamepadNumber.GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
@@ -180,10 +180,10 @@ public class VioletTeleop extends Robot {
 
         drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
 
-        // Sets initial positions for claw servos, relic grab servo, and relicRotate servo
-        openClaw();
-        relic.setPosition(VioletConstants.RELIC_INIT);
-        relicRotate.setPosition(VioletConstants.RELIC_ROTATE_DOWN);
+        // Sets initial positions for claw servos, relic grab servo, and relicRotate servo (moved to start)
+        //openClaw();
+        //relic.setPosition(VioletConstants.RELIC_INIT);
+        //relicRotate.setPosition(VioletConstants.RELIC_ROTATE_DOWN);
     }
 
     /**
@@ -384,6 +384,14 @@ public class VioletTeleop extends Robot {
     @Override
     public void start()
     {
+        // Sets position of jewel for teleop  (moved to start)
+        jewel.setPosition(VioletConstants.JEWEL_UP);
+
+        // Sets initial positions for claw servos, relic grab servo, and relicRotate servo
+        openClaw();
+        relic.setPosition(VioletConstants.RELIC_INIT);
+        relicRotate.setPosition(VioletConstants.RELIC_ROTATE_DOWN);
+
         TankMechanumControlScheme scheme = new TankMechanumControlScheme(gamepad1);
 
         drive = new TeleopDriveTask(this, scheme, frontLeft, frontRight, rearLeft, rearRight);
