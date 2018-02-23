@@ -251,7 +251,7 @@ public class VioletJewelAutonomous extends Robot {
                             if (event.kind == EventKind.PATH_DONE) {
                                 runGlyphPath();
                             } else if (event.kind == EventKind.SENSOR_SATISFIED) {
-                                imuStatus.setValue("Catastrophe Averted!!!!!!!");
+                                imuStatus.setValue("Catastrophe Averted!");
                             }
                         } // end handleEvent when pushJewel path is done
                     });  // end add pushJewel task
@@ -308,7 +308,7 @@ public class VioletJewelAutonomous extends Robot {
         else                                                        // up
             linear.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        this.addTask(new RunToEncoderValueTask(this, linear, 1550, VioletConstants.CLAW_VERTICAL_POWER));
+        this.addTask(new RunToEncoderValueTask(this, linear, 1700, VioletConstants.CLAW_VERTICAL_POWER));
     }
 
     private void togglePolling() {
@@ -366,11 +366,8 @@ public class VioletJewelAutonomous extends Robot {
                             RobotLog.i("506 Sensed RED, Alliance BLUE");
                             liftJewel = 1;
                             pushJewel.stop();
-                            //pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, VioletConstants.TURN_SPEED * TURN_MULTIPLIER);
-                            //pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 30, VioletConstants.TURN_SPEED);
                             pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 5, VioletConstants.TURN_SPEED * TURN_MULTIPLIER);
                             pushJewel.addSegment(DeadReckonPath.SegmentType.TURN, 5, VioletConstants.TURN_SPEED);
-                            //pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 11, VioletConstants.STRAIGHT_SPEED * TURN_MULTIPLIER);
                             pushJewel.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, Violet.STRAIGHT_SPEED * TURN_MULTIPLIER);
                         }
                     }
