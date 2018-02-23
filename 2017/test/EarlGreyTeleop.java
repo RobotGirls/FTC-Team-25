@@ -104,6 +104,8 @@ public class EarlGreyTeleop extends Robot {
     //private DeadmanMotorTask runSlideOutTask;
     //private DeadmanMotorTask runSlideInTask;
 
+    private OneWheelDriveTask controlRotate; // for testing the reed switch
+
     private boolean programmingRobot = true;
 
     private boolean slow = false;
@@ -448,6 +450,9 @@ public class EarlGreyTeleop extends Robot {
             //this.addTask(runSlideOutTask);
             //this.addTask(runSlideInTask);
         }
+
+        //controlRotate = new OneWheelDriveTask(this, linear, true); // left joystick (gamepad 2) rotates motor to test reed switch
+        //this.addTask(controlRotate);
 
         this.addTask(drive);
 
