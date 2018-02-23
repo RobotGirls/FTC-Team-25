@@ -13,7 +13,7 @@ import team25core.ServoCalibrateTask;
  * Created by jeffb on 10/8/2016.
  */
 @Autonomous(name="Simple Servo Test", group="Team 25")
-@Disabled
+//@Disabled
 public class ServoTest extends Robot {
     private Servo servo;
 
@@ -26,7 +26,7 @@ public class ServoTest extends Robot {
     @Override
     public void init()
     {
-        servo = hardwareMap.servo.get("jewel");
+        servo = hardwareMap.servo.get("relic");
     }
 
     @Override
