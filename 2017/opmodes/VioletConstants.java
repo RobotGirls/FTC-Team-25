@@ -35,21 +35,17 @@ public class VioletConstants extends LinearOpMode
     public static double S2_INIT      = 255 / SERVO_DOMAIN;
     public static double S3_INIT      = 224 / SERVO_DOMAIN;
     public static double S4_INIT      = 10  / SERVO_DOMAIN;
-    public static double RELIC_INIT   = 241 / SERVO_DOMAIN;
-    //public static double S1_OPEN      = 70  / SERVO_DOMAIN;
+    public static double RELIC_INIT   = 107 / SERVO_DOMAIN;
     public static double S1_OPEN      = 102 / SERVO_DOMAIN;
     public static double S1_CLOSED    = 151 / SERVO_DOMAIN;
-    //public static double S2_OPEN      = 172 / SERVO_DOMAIN;
     public static double S2_OPEN      = 166 / SERVO_DOMAIN;
     public static double S2_CLOSED    = 115 / SERVO_DOMAIN;
-    //public static double S3_OPEN      = 155 / SERVO_DOMAIN;
     public static double S3_OPEN      = 121 / SERVO_DOMAIN;
     public static double S3_CLOSED    = 80  / SERVO_DOMAIN;
-    //public static double S4_OPEN      = 65  / SERVO_DOMAIN;
     public static double S4_OPEN      = 92  / SERVO_DOMAIN;
     public static double S4_CLOSED    = 140 / SERVO_DOMAIN;
-    public static double RELIC_OPEN   = 130  / SERVO_DOMAIN;
-    public static double RELIC_CLOSED = 241 / SERVO_DOMAIN;
+    public static double RELIC_OPEN   = 52  / SERVO_DOMAIN;
+    public static double RELIC_CLOSED = 107 / SERVO_DOMAIN;
     public static double RELIC_ROTATE_DOWN = 0 / SERVO_DOMAIN;
     public static double RELIC_ROTATE_UP   = 240 / SERVO_DOMAIN;
 
