@@ -12,13 +12,12 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  */
 
 @TeleOp(name = "Reed Switch Test", group = "Test")
-@Disabled
+//@Disabled
 
 public class ReedSwitchTest extends OpMode {
 
     private Telemetry.Item reedTelemetry;
     private DigitalChannel reedSwitch;
-    private final static int LIMIT_SWITCH_PORT = 3;;
 
     @Override
     public void init()
