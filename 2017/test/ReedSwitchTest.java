@@ -30,7 +30,7 @@ public class ReedSwitchTest extends OpMode {
     @Override
     public void loop()
     {
-        if (reedSwitch.getState() == true) {        // when opened, reed switch is off magnet
+        if (reedSwitch.getState() == false) {        // when opened, reed switch is off magnet
             reedTelemetry.setValue("Opened");
         } else {                                    // when closed, reed switch is on magnet
             reedTelemetry.setValue("Closed");
