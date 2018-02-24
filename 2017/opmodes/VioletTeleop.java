@@ -32,14 +32,19 @@ package opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
+import team25core.DeadReckonPath;
+import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
+import team25core.LimitSwitchCriteria;
+import team25core.OneWheelDirectDrivetrain;
 import team25core.OneWheelDriveTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -47,6 +52,7 @@ import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
 import team25core.TankMechanumControlScheme;
 import team25core.TeleopDriveTask;
+import team25core.VioletOneWheelDriveTask;
 
 /**
  * FTC Team 25: Created by Breanna Chan and Bella Heinrichs on 11/1/17.
@@ -96,10 +102,18 @@ public class VioletTeleop extends Robot {
     private Servo relic;
     private Servo relicRotate;
 
+    private DigitalChannel limitSwitch;
+    private LimitSwitchCriteria limitSwitchCriteria;
+
+    private DeadReckonPath rotatePath;
+
     private FourWheelDirectDrivetrain drivetrain;
+    private OneWheelDirectDrivetrain rotateDrivetrain;
     private TeleopDriveTask drive;
-    private OneWheelDriveTask controlLinear;
-    private OneWheelDriveTask controlSlide;
+    //private OneWheelDriveTask controlLinear;
+    //private OneWheelDriveTask controlSlide;
+    private VioletOneWheelDriveTask controlLinear;
+    private VioletOneWheelDriveTask controlSlide;
     //private DeadmanMotorTask runSlideOutTask;
     //private DeadmanMotorTask runSlideInTask;
 
@@ -108,7 +122,7 @@ public class VioletTeleop extends Robot {
     private boolean s3Open = true;
     private boolean relicOpen = false;
     private boolean relicDown = true;
-    private boolean rotateLeft = false;
+    private boolean rotateLeft = true;
     private Telemetry.Item speed;
     private Telemetry.Item encoderRelic;
     private Telemetry.Item encoderLift;
@@ -151,6 +165,11 @@ public class VioletTeleop extends Robot {
         relic       = hardwareMap.servo.get("relic");
         relicRotate = hardwareMap.servo.get("relicRotate");
 
+        limitSwitch = hardwareMap.digitalChannel.get("limit");
+        limitSwitchCriteria = new LimitSwitchCriteria(limitSwitch);
+
+        rotatePath = new DeadReckonPath();
+
         // Sets position of jewel for teleop  (moved to start)
         //jewel.setPosition(VioletConstants.JEWEL_UP);
 
@@ -179,6 +198,7 @@ public class VioletTeleop extends Robot {
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
+        rotateDrivetrain = new OneWheelDirectDrivetrain(rotate);
 
         // Sets initial positions for claw servos, relic grab servo, and relicRotate servo (moved to start)
         //openClaw();
@@ -282,6 +302,27 @@ public class VioletTeleop extends Robot {
     }
 
     /**
+     * This dead reckon path rotates the glyph mechanism off the switch. Runs at a faster speed.
+     */
+    private DeadReckonPath moveOffSwitchPath()
+    {
+        DeadReckonPath path = new DeadReckonPath();
+        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, 0.2);
+        return path;
+    }
+
+    /**
+     * This dead reckon path rotates the glyph mechanism until it senses the limit switch.
+     * Runs at a slower speed so we don't miss the switch.
+     */
+    private DeadReckonPath moveToSwitchPath()
+    {
+        DeadReckonPath path = new DeadReckonPath();
+        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, 0.1);
+        return path;
+    }
+
+    /**
      * We will spin the claw back and forth, be careful that you alternate directions so that
      * you don't wrap the servo cables around the motor shaft.
      *
@@ -289,14 +330,34 @@ public class VioletTeleop extends Robot {
      */
     private void rotateGlyph(Direction direction)
     {
+        RobotLog.e("251: in rotate glyph.");
         if (direction == Direction.CLOCKWISE) {
             rotate.setDirection(DcMotorSimple.Direction.REVERSE);
-            //distance = VioletConstants.DEGREES_180;
         } else {
             rotate.setDirection(DcMotorSimple.Direction.FORWARD);
-            //distance = VioletConstants.DEGREES_180;
         }
         this.addTask(new RunToEncoderValueTask(this, rotate, VioletConstants.DEGREES_180, VioletConstants.ROTATE_POWER));
+        /**
+        this.addTask(new DeadReckonTask(this, moveOffSwitchPath(), rotateDrivetrain) {
+            @Override
+            public void handleEvent(RobotEvent event) {
+                RobotLog.e("504 251 Rotate: in handleEvent");
+                rotateDrivetrain.stop();
+                robot.addTask(new DeadReckonTask(robot, moveToSwitchPath(), rotateDrivetrain, limitSwitchCriteria) {
+                    @Override
+                    public void handleEvent (RobotEvent event) {
+                        DeadReckonEvent e = (DeadReckonEvent) event;
+                        RobotLog.e("504 251 added limitSwitch deadReckonTask");
+
+                        if (e.kind == EventKind.SENSOR_SATISFIED) {
+                            RobotLog.e("504 251 SENSOR SATISFIED");
+                            rotateDrivetrain.stop();
+                        }
+                    }
+                });
+                RobotLog.e("504 251 stopping first path task");
+            }
+        }); */
     }
 
     /**
@@ -307,14 +368,17 @@ public class VioletTeleop extends Robot {
 
     private void alternateRotate()
     {
-        if (rotateLeft) {
+        if (rotateLeft) {       // happens first
+            RobotLog.e("251: in alternate rotate glyph, rotateLeft true. Clockwise");
             rotateGlyph(Direction.CLOCKWISE);
             rotateLeft = false;
-            rotated180 = false; // rotated180 equal to false means that S1 and S2 servo pair is on top
+            rotated180 = true; // rotated180 equal to true means that S3 and S4 servo pair is on top
+
         } else {
+            RobotLog.e("251: in alternate rotate glyph, rotateLeft false. Counterclockwise");
             rotateGlyph(Direction.COUNTERCLOCKWISE);
             rotateLeft = true;
-            rotated180 = true; // rotated180 equal to true means that S3 and S4 servo pair is on top
+            rotated180 = false; // rotated180 equal to false means that S1 and S2 servo pair is on top
         }
     }
 
@@ -326,8 +390,10 @@ public class VioletTeleop extends Robot {
     private void nudgeGlyph(Direction direction)
     {
         if (direction == Direction.CLOCKWISE) {
+            RobotLog.e("251: in nudgle glyph. Clockwise");
             rotate.setDirection(DcMotorSimple.Direction.REVERSE);
         } else {
+            RobotLog.e("251: in nudgle glyph. Counterclockwise");
             rotate.setDirection(DcMotorSimple.Direction.FORWARD);
         }
         this.addTask(new RunToEncoderValueTask(this, rotate, VioletConstants.NUDGE, VioletConstants.NUDGE_POWER));
@@ -384,10 +450,10 @@ public class VioletTeleop extends Robot {
     @Override
     public void start()
     {
-        // Sets position of jewel for teleop  (moved to start)
+        // Sets position of jewel for teleop
         jewel.setPosition(VioletConstants.JEWEL_UP);
 
-        // Sets initial positions for claw servos, relic grab servo, and relicRotate servo
+        // Sets initial positions for claw servos, relic claw servo, and relicRotate servo
         openClaw();
         relic.setPosition(VioletConstants.RELIC_INIT);
         relicRotate.setPosition(VioletConstants.RELIC_ROTATE_DOWN);
@@ -398,10 +464,13 @@ public class VioletTeleop extends Robot {
 
         // Left joystick (Gamepad 2) controls lifting and lowering of glyph mechanism
         linear.setDirection(DcMotorSimple.Direction.FORWARD); // To run glyph mechanism up
-        controlLinear = new OneWheelDriveTask(this, linear, true);
+        //controlLinear = new OneWheelDriveTask(this, linear, true);
+        controlLinear = new VioletOneWheelDriveTask(this, linear, true, 0.5);
 
         // Right joystick (Gamepad 2) controls running out of relic mechanism
-        controlSlide = new OneWheelDriveTask(this, slide, false);
+        slide.setDirection(DcMotorSimple.Direction.REVERSE); //FIXME?
+        //controlSlide = new OneWheelDriveTask(this, slide, false);
+        controlSlide = new VioletOneWheelDriveTask(this, slide, false, 1.0);
         controlSlide.useCeiling(VioletConstants.RELIC_CEILING);
 
         this.addTask(drive);
@@ -429,6 +498,7 @@ public class VioletTeleop extends Robot {
                     // Rotate 180 degrees
 
                     lockout = true;
+                    RobotLog.e("251: in button b.");
                     alternateRotate();
                 } else if (event.kind == EventKind.BUTTON_A_DOWN) {
                     // Rotate relic
@@ -445,6 +515,7 @@ public class VioletTeleop extends Robot {
                 } */else if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
                     // Toggle top servo pair
 
+                    RobotLog.e("251: in left bumper for nudge");
                     if (rotated180)
                         toggleS3();
                     else
@@ -452,6 +523,7 @@ public class VioletTeleop extends Robot {
                 } else if (event.kind == EventKind.RIGHT_BUMPER_DOWN) {
                     // Toggle bottom servo pair
 
+                    RobotLog.e("251: in right bumper for nudge");
                     if (rotated180)
                         toggleS1();
                     else
