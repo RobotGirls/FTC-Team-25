@@ -44,14 +44,15 @@ public class VioletConstants extends LinearOpMode
     public static double S3_CLOSED    = 80  / SERVO_DOMAIN;
     public static double S4_OPEN      = 92  / SERVO_DOMAIN;
     public static double S4_CLOSED    = 140 / SERVO_DOMAIN;
-    public static double RELIC_OPEN   = 52  / SERVO_DOMAIN;
-    public static double RELIC_CLOSED = 107 / SERVO_DOMAIN;
+    //public static double RELIC_OPEN   = 52  / SERVO_DOMAIN;
+    public static double RELIC_OPEN   = 15  / SERVO_DOMAIN; //FIXME
+    public static double RELIC_CLOSED = 110 / SERVO_DOMAIN;
     public static double RELIC_ROTATE_DOWN = 0 / SERVO_DOMAIN;
     public static double RELIC_ROTATE_UP   = 240 / SERVO_DOMAIN;
 
     //public static int DEGREES_180_CLOCKWISE = 375;
     //public static int DEGREES_180_COUNTERCLOCKWISE = 400;
-    public static int DEGREES_180 = 475;
+    public static int DEGREES_180 = 450;
     public static double ROTATE_POWER = 0.3;
     public static int NUDGE = 15;
     public static double NUDGE_POWER = 0.1;
