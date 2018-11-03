@@ -1,4 +1,4 @@
-package test;
+package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 
 import team25core.RunToEncoderValueTask;
-import test.Lilac;
+import opmodes.Lilac;
 import team25core.ColorThiefTask;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
@@ -21,14 +21,12 @@ import team25core.GamepadTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
-import team25core.VuforiaBase;
 
 /**
- * FTC Team 25: Created by Bella Heinrichs on 10/23/2018.
+ * FTC Team 25: Created by Bella Heinrichs & Elizabeth Wu on 10/23/2018.
  */
 
 @Autonomous(name = "Lilac Autonomous", group = "Team 25")
-@Disabled
 public class LilacAutonomous extends Robot {
 
     private DcMotor frontLeft;
@@ -52,7 +50,7 @@ public class LilacAutonomous extends Robot {
     private int combo = 0;
     private int color = 0;
 
-    private static final int TURN_MULTIPLIER = -1;
+    private static final int SPEED_MULTIPLIER = -1;
     private int distance = 0;
 
 
@@ -109,7 +107,7 @@ public class LilacAutonomous extends Robot {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
-                // Score the lilac smelling nice marker.
+                //TODO: Score the lilac smelling nice marker.
             }
         });
     }
@@ -130,6 +128,7 @@ public class LilacAutonomous extends Robot {
         this.addTask(new RunToEncoderValueTask(this, latchArm, 0, 1.0 ) {
             @Override
             public void handleEvent(RobotEvent e) {
+                // Right now the "LATCH" path both de-latches the robot and navigates to depot
                 doLatchDetach();
             }
         });
@@ -172,7 +171,8 @@ public class LilacAutonomous extends Robot {
                     break;
             }
         }
-        setupParkPath();
+        setLatchPath();
+        setMarkerPath();
     }
 
     private void selectAlliance(LilacAutonomous.Alliance color) {
@@ -197,9 +197,27 @@ public class LilacAutonomous extends Robot {
         }
     }
 
-    private void setupParkPath()
+    private void setLatchPath()
     {
+        latch.stop();
+        latch.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 2, Lilac.STRAIGHT_SPEED); // Right
+        latch.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 27, Lilac.STRAIGHT_SPEED * SPEED_MULTIPLIER);
+        if (position == Position.MARKER) {
+            latch.addSegment(DeadReckonPath.SegmentType.TURN, 135, Lilac.TURN_SPEED);
+            latch.addSegment(DeadReckonPath.SegmentType.LEFT_DIAGONAL, 25, Lilac.STRAIGHT_SPEED * SPEED_MULTIPLIER);
+            // Change to front right diagonal after implementing that in deadReckonPath segment types
+            // Jk we need to figure out the speeds here though
+            latch.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 72, Lilac.STRAIGHT_SPEED);
+        }
+
+    }
+    private void setMarkerPath() {
+        // Edit later when we figure out sensing gold block & need to implement
+        // specific marker paths based off different positions of gold block.
+
+        /*
         if (alliance == LilacAutonomous.Alliance.RED) {
+
             color = 1;
         } else if (alliance == LilacAutonomous.Alliance.BLUE) {
             color = 0;
@@ -218,24 +236,26 @@ public class LilacAutonomous extends Robot {
         switch (combo) {
             case BLUE_CRATER:
                 RobotLog.i("506 Case: BLUE_CRATER");
-                latch.stop();
-                latch.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 27, test.Lilac.STRAIGHT_SPEED * TURN_MULTIPLIER);
+                scoreMarker.stop();
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 2, Lilac.STRAIGHT_SPEED); // Right
                 break;
             case RED_CRATER:
                 RobotLog.i("506 Case: RED_CRATER");
-                latch.stop();
-                latch.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 27, test.Lilac.STRAIGHT_SPEED);
+                scoreMarker.stop();
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 27, Lilac.STRAIGHT_SPEED);
                 break;
             case BLUE_MARKER:
                 RobotLog.i("506 Case: BLUE_MARKER");
-                latch.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 18, test.Lilac.STRAIGHT_SPEED * TURN_MULTIPLIER);
+                latch.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 18, Lilac.STRAIGHT_SPEED * TURN_MULTIPLIER);
                 break;
             case RED_MARKER:
                 RobotLog.i("506 Case: RED_MARKER");
-                latch.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, test.Lilac.STRAIGHT_SPEED);
+                latch.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, Lilac.STRAIGHT_SPEED);
                 break;
             default:
                 break;
+
         }
+        */
     }
 }

@@ -1,4 +1,4 @@
-package test;
+package opmodes;
 
 /**
  * FTC Team 25: Created by Bella Heinrichs on 10/23/2018.
