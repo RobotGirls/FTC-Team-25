@@ -39,6 +39,7 @@ public class LilacAutonomous extends Robot {
     private LilacAutonomous.Position position;
     //private LilacAutonomous.Side side;
     private DeadReckonPath latch;
+    private DeadReckonPath detachRobot;
     private DeadReckonPath scoreMarker;
     private DeadReckonTask gold;
     private SingleShotTimerTask stt;
@@ -107,13 +108,13 @@ public class LilacAutonomous extends Robot {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
-                //TODO: Score the lilac smelling nice marker.
+                //TODO: Score the lilac smelling nice marker. qq     
             }
         });
     }
 
     public void doLatchDetach() {
-        this.addTask(new DeadReckonTask(this, latch, drivetrain) {
+        this.addTask(new DeadReckonTask(this, detachRobot, drivetrain) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -211,11 +212,19 @@ public class LilacAutonomous extends Robot {
         }
 
     }
+
+    private void setDetachRobot()
+    {
+        detachRobot.stop();
+        detachRobot.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, Lilac.SIDEWAYS_DETACH_SPEED);
+        detachRobot.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, - Lilac.SIDEWAYS_DETACH_SPEED);
+        detachRobot.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, - Lilac.SIDEWAYS_DETACH_SPEED);
+    }
+
     private void setMarkerPath() {
         // Edit later when we figure out sensing gold block & need to implement
         // specific marker paths based off different positions of gold block.
 
-        /*
         if (alliance == LilacAutonomous.Alliance.RED) {
 
             color = 1;
@@ -246,7 +255,7 @@ public class LilacAutonomous extends Robot {
                 break;
             case BLUE_MARKER:
                 RobotLog.i("506 Case: BLUE_MARKER");
-                latch.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 18, Lilac.STRAIGHT_SPEED * TURN_MULTIPLIER);
+                    latch.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 18, Lilac.STRAIGHT_SPEED * SPEED_MULTIPLIER);
                 break;
             case RED_MARKER:
                 RobotLog.i("506 Case: RED_MARKER");
@@ -256,6 +265,5 @@ public class LilacAutonomous extends Robot {
                 break;
 
         }
-        */
     }
 }
