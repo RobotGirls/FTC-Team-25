@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import team25core.FourWheelDirectDrivetrain;
+import team25core.MecanumWheelDriveTask;
+import team25core.MechanumGearedDrivetrain;
 import team25core.OneWheelDriveTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -15,24 +17,29 @@ import team25core.TankDriveTask;
 @TeleOp(name="Lilac Teleop", group="Team 25")
 public class LilacTeleop extends Robot {
 
+    private enum Direction {
+        CLOCKWISE,
+        COUNTERCLOCKWISE,
+    }
+
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor rearLeft;
     private DcMotor rearRight;
-    private DcMotor latchArm;
+    //private DcMotor latchArm;
 
     private FourWheelDirectDrivetrain drivetrain;
-    private TankDriveTask drive;
+    private MecanumWheelDriveTask drive;
     private OneWheelDriveTask driveArm;
 
     @Override
-    public void init( ) {
+    public void init() {
         // Hardware mapping.
         frontLeft  = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
         rearLeft   = hardwareMap.dcMotor.get("rearLeft");
         rearRight  = hardwareMap.dcMotor.get("rearRight");
-        latchArm        = hardwareMap.dcMotor.get("arm");
+       // latchArm        = hardwareMap.dcMotor.get("arm");
 
         // Reset encoders.
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -44,7 +51,6 @@ public class LilacTeleop extends Robot {
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        drive = new TankDriveTask(this, drivetrain);
         drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
 
     }
@@ -57,7 +63,9 @@ public class LilacTeleop extends Robot {
     @Override
     public void start() {
 
-       this.addTask(drive);
+        drive = new MecanumWheelDriveTask(this, frontLeft, frontRight, rearLeft, rearRight);
+
+        this.addTask(drive);
     }
 
 }
