@@ -10,8 +10,9 @@ public class Lilac
     public static final int TICKS_PER_INCH = 60;
     public static final int TICKS_PER_DEGREE = 19;
     public final static double STRAIGHT_SPEED = 1;
+    public final static double SIDEWAYS_DETACH_SPEED = 0.5;
     public final static double TURN_SPEED = 1;
-    public final static int turnMultiplier = -1;
+    public final static int TURN_Multiplier = -1;
 
     private static double SERVO_DOMAIN = 256.0;
 

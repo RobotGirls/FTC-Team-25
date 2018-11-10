@@ -1,5 +1,6 @@
 package opmodes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -15,6 +16,7 @@ import team25core.TankDriveTask;
  * FTC Team 25: Created by Elizabeth, November 03, 2018
  */
 @TeleOp(name="Lilac Teleop", group="Team 25")
+@Disabled
 public class LilacTeleop extends Robot {
 
     private enum Direction {
