@@ -35,10 +35,10 @@ public class LilacTeleop extends Robot {
     @Override
     public void init() {
         // Hardware mapping.
-        frontLeft  = hardwareMap.dcMotor.get("frontLeft");
-        frontRight = hardwareMap.dcMotor.get("frontRight");
-        rearLeft   = hardwareMap.dcMotor.get("rearLeft");
-        rearRight  = hardwareMap.dcMotor.get("rearRight");
+        rearLeft  = hardwareMap.dcMotor.get("frontLeft");
+        rearRight = hardwareMap.dcMotor.get("frontRight");
+        frontLeft   = hardwareMap.dcMotor.get("rearLeft");
+        frontRight  = hardwareMap.dcMotor.get("rearRight");
        // latchArm        = hardwareMap.dcMotor.get("arm");
 
         // Reset encoders.
