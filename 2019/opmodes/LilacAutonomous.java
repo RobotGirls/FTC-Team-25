@@ -45,8 +45,8 @@ public class LilacAutonomous extends Robot {
     private SingleShotTimerTask stt;
     private SingleShotTimerTask moveDelay;
 
-    private Telemetry.Item allianceItem;
-    private Telemetry.Item positionItem;
+    // private Telemetry.Item allianceItem;
+    // private Telemetry.Item positionItem;
 
     private int combo = 0;
     private int color = 0;
@@ -76,7 +76,7 @@ public class LilacAutonomous extends Robot {
 
     @Override
     public void init() {
-        telemetry.setAutoClear(false);
+        // telemetry.setAutoClear(false);
 
         // Hardware mapping.
         frontLeft   = hardwareMap.dcMotor.get("frontLeft");
@@ -86,9 +86,9 @@ public class LilacAutonomous extends Robot {
         latchArm    = hardwareMap.dcMotor.get("latch");
 
         // Telemetry setup.
-        telemetry.setAutoClear(false);
-        allianceItem    = telemetry.addData("ALLIANCE", "Unselected (X/B)");
-        positionItem    = telemetry.addData("POSITION", "Unselected (Y/A)");
+        // telemetry.setAutoClear(false);
+        // allianceItem    = telemetry.addData("ALLIANCE", "Unselected (X/B)");
+        // positionItem    = telemetry.addData("POSITION", "Unselected (Y/A)");
 
         // Path setup.
         latch        = new DeadReckonPath();
@@ -103,49 +103,8 @@ public class LilacAutonomous extends Robot {
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));
 
         drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
-    }
-
-    public void doMoveToDepot() {
-        this.addTask(new DeadReckonTask(this, scoreMarker, drivetrain) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                //TODO: Score the lilac smelling nice marker. qq
-            }
-        });
-    }
-
-    public void doLatchDetach() {
-        this.addTask(new DeadReckonTask(this, detachRobot, drivetrain) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE) {
-                    doMoveToDepot();
-                }
-            }
-        });
-    }
-
-    public void doLowerRobot() {
-        this.addTask(new RunToEncoderValueTask(this, latchArm, 0, 1.0  ) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                // Right now the "LATCH" path both de-latches the robot and navigates to depot
-                doLatchDetach();
-            }
-        });
-    }
-
-    @Override
-    public void start()
-    {
-        addTask(new SingleShotTimerTask(this, 500) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                doLowerRobot();
-            }
-        });
+        drivetrain.resetEncoders();
+        drivetrain.encodersOn();
     }
 
     @Override
@@ -156,19 +115,19 @@ public class LilacAutonomous extends Robot {
             switch (event.kind) {
                 case BUTTON_X_DOWN:
                     selectAlliance(LilacAutonomous.Alliance.BLUE);
-                    allianceItem.setValue("Blue");
+                    // allianceItem.setValue("Blue");
                     break;
                 case BUTTON_B_DOWN:
                     selectAlliance(LilacAutonomous.Alliance.RED);
-                    allianceItem.setValue("Red");
+                    // allianceItem.setValue("Red");
                     break;
                 case BUTTON_Y_DOWN:
                     selectPosition(LilacAutonomous.Position.CRATER);
-                    positionItem.setValue("Far");
+                    // positionItem.setValue("Far");
                     break;
                 case BUTTON_A_DOWN:
                     selectPosition(LilacAutonomous.Position.MARKER);
-                    positionItem.setValue("Near");
+                    // positionItem.setValue("Near");
                     break;
                 default:
                     break;
@@ -177,6 +136,63 @@ public class LilacAutonomous extends Robot {
         setLatchPath();
         setMarkerPath();
     }
+
+    @Override
+    public void start()
+    {
+        doMoveToDepot();
+        /*
+        addTask(new SingleShotTimerTask(this, 500) {
+
+            @Override
+            public void handleEvent(RobotEvent e) {
+                doLowerRobot();
+            }
+        });
+        */
+    }
+
+    public void doMoveToDepot() {
+        RobotLog.i("doMoveToDepot");
+        scoreMarker.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, Lilac.STRAIGHT_SPEED);
+        scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,3, Lilac.STRAIGHT_SPEED);
+        scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -Lilac.STRAIGHT_SPEED);
+        scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,9, -Lilac.STRAIGHT_SPEED);
+        scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, -Lilac.STRAIGHT_SPEED);
+        this.addTask(new DeadReckonTask(this, scoreMarker, drivetrain) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                //TODO: Score the lilac smelling nice marker.
+                RobotLog.i("Lilac path done");
+            }
+        });
+    }
+
+    /* public void doLatchDetach() {
+        this.addTask(new DeadReckonTask(this, detachRobot, drivetrain) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    doMoveToDepot();
+                }
+            }
+        });
+    }
+     */
+
+  /*  public void doLowerRobot() {
+        this.addTask(new RunToEncoderValueTask(this, latchArm, 0, 1.0  ) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                // Right now the "LATCH" path both de-latches the robot and navigates to depot
+                doLatchDetach();
+            }
+        });
+    }
+*/
+
 
     private void selectAlliance(LilacAutonomous.Alliance color) {
         if (color == LilacAutonomous.Alliance.BLUE) {
@@ -211,8 +227,6 @@ public class LilacAutonomous extends Robot {
             // Change to front right diagonal after implementing that in deadReckonPath segment types
             // Jk we need to figure out the speeds here though
             latch.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 72, Lilac.STRAIGHT_SPEED);*/
-        }
-
     }
 
     private void setDetachRobot()
