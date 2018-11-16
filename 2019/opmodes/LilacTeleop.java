@@ -16,7 +16,7 @@ import team25core.TankDriveTask;
  * FTC Team 25: Created by Elizabeth, November 03, 2018
  */
 @TeleOp(name="Lilac Teleop", group="Team 25")
-@Disabled
+//@Disabled
 public class LilacTeleop extends Robot {
 
     private enum Direction {
@@ -37,14 +37,14 @@ public class LilacTeleop extends Robot {
     @Override
     public void init() {
         // Hardware mapping.
-        rearLeft  = hardwareMap.dcMotor.get("frontLeft");
-        rearRight = hardwareMap.dcMotor.get("frontRight");
-        frontLeft   = hardwareMap.dcMotor.get("rearLeft");
-        frontRight  = hardwareMap.dcMotor.get("rearRight");
+        frontLeft  = hardwareMap.dcMotor.get("frontLeft");
+        frontRight = hardwareMap.dcMotor.get("frontRight");
+        rearLeft   = hardwareMap.dcMotor.get("rearLeft");
+        rearRight  = hardwareMap.dcMotor.get("rearRight");
        // latchArm        = hardwareMap.dcMotor.get("arm");
 
         // Reset encoders.
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        /*frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -52,8 +52,12 @@ public class LilacTeleop extends Robot {
         rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        */
 
         drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
+        drivetrain.setCanonicalMotorDirection();
+        drivetrain.resetEncoders();
+        drivetrain.encodersOn();
 
     }
 

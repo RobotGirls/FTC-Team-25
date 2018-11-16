@@ -45,8 +45,8 @@ public class LilacAutonomous extends Robot {
     private SingleShotTimerTask stt;
     private SingleShotTimerTask moveDelay;
 
-    // private Telemetry.Item allianceItem;
-    // private Telemetry.Item positionItem;
+    private Telemetry.Item allianceItem;
+    private Telemetry.Item positionItem;
 
     private int combo = 0;
     private int color = 0;
@@ -87,8 +87,8 @@ public class LilacAutonomous extends Robot {
 
         // Telemetry setup.
         // telemetry.setAutoClear(false);
-        // allianceItem    = telemetry.addData("ALLIANCE", "Unselected (X/B)");
-        // positionItem    = telemetry.addData("POSITION", "Unselected (Y/A)");
+        allianceItem    = telemetry.addData("ALLIANCE", "Unselected (X/B)");
+        positionItem    = telemetry.addData("POSITION", "Unselected (Y/A)");
 
         // Path setup.
         latch        = new DeadReckonPath();
@@ -115,26 +115,26 @@ public class LilacAutonomous extends Robot {
             switch (event.kind) {
                 case BUTTON_X_DOWN:
                     selectAlliance(LilacAutonomous.Alliance.BLUE);
-                    // allianceItem.setValue("Blue");
+                    allianceItem.setValue("Blue");
                     break;
                 case BUTTON_B_DOWN:
                     selectAlliance(LilacAutonomous.Alliance.RED);
-                    // allianceItem.setValue("Red");
+                    allianceItem.setValue("Red");
                     break;
                 case BUTTON_Y_DOWN:
                     selectPosition(LilacAutonomous.Position.CRATER);
-                    // positionItem.setValue("Far");
+                    positionItem.setValue("Crater");
                     break;
                 case BUTTON_A_DOWN:
                     selectPosition(LilacAutonomous.Position.MARKER);
-                    // positionItem.setValue("Near");
+                    positionItem.setValue("Marker");
                     break;
                 default:
                     break;
             }
+            setMarkerPath();
         }
-        setLatchPath();
-        setMarkerPath();
+        //setLatchPath();
     }
 
     @Override
@@ -153,18 +153,21 @@ public class LilacAutonomous extends Robot {
     }
 
     public void doMoveToDepot() {
-        RobotLog.i("doMoveToDepot");
-        scoreMarker.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, Lilac.STRAIGHT_SPEED);
-        scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,3, Lilac.STRAIGHT_SPEED);
+        RobotLog.i("506 doMoveToDepot");
+       /* scoreMarker.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, Lilac.STRAIGHT_SPEED);
+        scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,30, Lilac.STRAIGHT_SPEED);
         scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -Lilac.STRAIGHT_SPEED);
-        scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,9, -Lilac.STRAIGHT_SPEED);
-        scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, -Lilac.STRAIGHT_SPEED);
+        scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,90, -Lilac.STRAIGHT_SPEED);
+        scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, -Lilac.STRAIGHT_SPEED);*/
         this.addTask(new DeadReckonTask(this, scoreMarker, drivetrain) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
-                //TODO: Score the lilac smelling nice marker.
-                RobotLog.i("Lilac path done");
+                if (path.kind == EventKind.PATH_DONE) {
+                    RobotLog.i("506 scoreMarker path done");
+                } else {
+                    RobotLog.i("506 scoreMarker handler being called");
+                }
             }
         });
     }
@@ -209,10 +212,10 @@ public class LilacAutonomous extends Robot {
     public void selectPosition(LilacAutonomous.Position choice) {
         if (choice == LilacAutonomous.Position.CRATER) {
             position = LilacAutonomous.Position.CRATER;
-            RobotLog.i("506 Position: FAR");
+            RobotLog.i("506 Position: CRATER");
         } else {
             position = LilacAutonomous.Position.MARKER;
-            RobotLog.i("506 Position: NEAR");
+            RobotLog.i("506 Position: MARKER");
         }
     }
 
@@ -264,18 +267,18 @@ public class LilacAutonomous extends Robot {
                 RobotLog.i("506 Case: BLUE_CRATER");
                 scoreMarker.stop();
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, -Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,3, -Lilac.STRAIGHT_SPEED);
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,30, -Lilac.STRAIGHT_SPEED);
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,9, Lilac.STRAIGHT_SPEED);
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,90, Lilac.STRAIGHT_SPEED);
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, Lilac.STRAIGHT_SPEED);
                 break;
             case RED_CRATER:
                 RobotLog.i("506 Case: RED_CRATER");
                 scoreMarker.stop();
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,3, Lilac.STRAIGHT_SPEED);
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,30, Lilac.STRAIGHT_SPEED);
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,9, -Lilac.STRAIGHT_SPEED);
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,90, -Lilac.STRAIGHT_SPEED);
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, -Lilac.STRAIGHT_SPEED);
                 break;
             case BLUE_MARKER:
@@ -289,14 +292,13 @@ public class LilacAutonomous extends Robot {
             case RED_MARKER:
                 RobotLog.i("506 Case: RED_MARKER");
                 scoreMarker.stop();
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 12, Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12, Lilac.STRAIGHT_SPEED);
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, Lilac.STRAIGHT_SPEED);
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, -Lilac.STRAIGHT_SPEED);
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN, 30, Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 30, -Lilac.STRAIGHT_SPEED);
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, -5, -Lilac.STRAIGHT_SPEED);
                 break;
             default:
                 break;
-
         }
     }
 }
