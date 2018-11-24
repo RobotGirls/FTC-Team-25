@@ -7,6 +7,7 @@ package opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
@@ -102,13 +103,19 @@ public class LatchTeleopFixed extends Robot {
             public void handleEvent(RobotEvent e) {
                 GamepadEvent event = (GamepadEvent) e;
 
-
+                //RobotLog.i(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> eventkind", event.kind);
                 if (event.kind == EventKind.BUTTON_Y_DOWN) {
                     // latchArm
                     latchArm.setPower(1);
+                } else if (event.kind == EventKind.BUTTON_Y_UP) {
+                    // latchArm
+                    latchArm.setPower(0);
                 } else if (event.kind == EventKind.BUTTON_A_DOWN) {
                     // latchArm
                     latchArm.setPower(-1);
+                } else if (event.kind == EventKind.BUTTON_A_UP) {
+                    // latchArm
+                    latchArm.setPower(0);
                 } else if (event.kind == EventKind.BUTTON_B_DOWN) {
                     // latchServo open
                     latchServo.setPosition(LATCH_OPEN);
