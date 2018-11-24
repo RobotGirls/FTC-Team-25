@@ -1,110 +1,87 @@
 package opmodes;
+/*
+ * FTC Team 25: Created by Elizabeth Wu, November 24, 2018
+ */
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
-import com.vuforia.CameraDevice;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 
-import team25core.RunToEncoderValueTask;
-import opmodes.Lilac;
-import team25core.ColorThiefTask;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
+import team25core.MineralDetectionTask;
+import team25core.OneWheelDirectDrivetrain;
+import team25core.OneWheelDriveTask;
 import team25core.Robot;
 import team25core.RobotEvent;
-import team25core.SingleShotTimerTask;
-
-/**
- * FTC Team 25: Created by Bella Heinrichs on 10/23/2018.
- */
+import team25core.RunToEncoderValueTask;
 
 @Autonomous(name = "Lilac Autonomous", group = "Team 25")
 public class LilacAutonomous extends Robot {
+
 
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor rearLeft;
     private DcMotor rearRight;
     private DcMotor latchArm;
-    private Servo marker;
-    private LilacAutonomous.Alliance alliance;
-    private LilacAutonomous.Position position;
-    //private LilacAutonomous.Side side;
-    private DeadReckonPath latch;
-    private DeadReckonPath detachRobot;
-    private DeadReckonPath scoreMarker;
-    private DeadReckonTask gold;
-    private SingleShotTimerTask stt;
-    private SingleShotTimerTask moveDelay;
-
-    private Telemetry.Item allianceItem;
-    private Telemetry.Item positionItem;
-
-    private int combo = 0;
-    private int color = 0;
-
-    private static final int SPEED_MULTIPLIER = -1;
-    private int distance = 0;
-
-
-    // Park combos.
-    private static final int BLUE_CRATER = 0;
-    private static final int RED_CRATER = 1;
-    private static final int BLUE_MARKER = 2;
-    private static final int RED_MARKER = 3;
+    private Servo   marker;
+    private Servo   latchServo;
 
     private FourWheelDirectDrivetrain drivetrain;
+    private OneWheelDirectDrivetrain single;
 
-    public enum Alliance {
-        RED,
-        BLUE,
-    }
+    private LilacAutonomous.Position position;
+    private DeadReckonPath scoreMarker;
+    private DeadReckonPath detachPath;
+    private DeadReckonPath unlatchScan;
+
+    private MineralDetectionTask mdTask;
+
+
+    private Telemetry.Item positionItem;
 
     public enum Position {
         MARKER,
         CRATER,
     }
 
-
     @Override
     public void init() {
-        // telemetry.setAutoClear(false);
 
         // Hardware mapping.
         frontLeft   = hardwareMap.dcMotor.get("frontLeft");
         frontRight  = hardwareMap.dcMotor.get("frontRight");
         rearLeft    = hardwareMap.dcMotor.get("rearLeft");
         rearRight   = hardwareMap.dcMotor.get("rearRight");
-        latchArm    = hardwareMap.dcMotor.get("latch");
-
-        // Telemetry setup.
-        // telemetry.setAutoClear(false);
-        allianceItem    = telemetry.addData("ALLIANCE", "Unselected (X/B)");
-        positionItem    = telemetry.addData("POSITION", "Unselected (Y/A)");
-
-        // Path setup.
-        latch        = new DeadReckonPath();
-        detachRobot  = new DeadReckonPath();
-        scoreMarker  = new DeadReckonPath();
-
-        // Single shot timer tasks for delays.
-        // stt = new SingleShotTimerTask(this, 1500);          // Delay resetting arm position
-        // moveDelay = new SingleShotTimerTask(this, 500);     // Delay moving after setting arm down.
-
-        // Alliance and autonomous choice selection.
-        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));
+        latchArm    = hardwareMap.dcMotor.get("latchArm");
+        marker      = hardwareMap.servo.get("marker");
 
         drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
-        drivetrain.resetEncoders();
-        drivetrain.encodersOn();
+        single     = new OneWheelDirectDrivetrain(latchArm);
+
+        // Telemetry for selection.
+        positionItem = telemetry.addData("POSITION", "Unselected (Y/A)");
+
+        // Init selection.
+        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));
+
+        // Path setup.
+        scoreMarker = new DeadReckonPath();
+        detachPath  = new DeadReckonPath();
+        unlatchScan = new DeadReckonPath();
+
+        // Segment setup.
+        setOtherPaths();
+
+        mdTask = new MineralDetectionTask(this);
+        mdTask.init(telemetry, hardwareMap);
+        mdTask.setDetectionKind(MineralDetectionTask.DetectionKind.LARGEST_GOLD);
     }
 
     @Override
@@ -113,14 +90,6 @@ public class LilacAutonomous extends Robot {
             GamepadTask.GamepadEvent event = (GamepadTask.GamepadEvent) e;
 
             switch (event.kind) {
-                case BUTTON_X_DOWN:
-                    selectAlliance(LilacAutonomous.Alliance.BLUE);
-                    allianceItem.setValue("Blue");
-                    break;
-                case BUTTON_B_DOWN:
-                    selectAlliance(LilacAutonomous.Alliance.RED);
-                    allianceItem.setValue("Red");
-                    break;
                 case BUTTON_Y_DOWN:
                     selectPosition(LilacAutonomous.Position.CRATER);
                     positionItem.setValue("Crater");
@@ -134,171 +103,83 @@ public class LilacAutonomous extends Robot {
             }
             setMarkerPath();
         }
-        //setLatchPath();
     }
 
-    @Override
-    public void start()
-    {
-        doMoveToDepot();
-        /*
-        addTask(new SingleShotTimerTask(this, 500) {
 
-            @Override
-            public void handleEvent(RobotEvent e) {
-                doLowerRobot();
-            }
-        });
-        */
-    }
-
-    public void doMoveToDepot() {
-        RobotLog.i("506 doMoveToDepot");
-       /* scoreMarker.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, Lilac.STRAIGHT_SPEED);
-        scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,30, Lilac.STRAIGHT_SPEED);
-        scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -Lilac.STRAIGHT_SPEED);
-        scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,90, -Lilac.STRAIGHT_SPEED);
-        scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, -Lilac.STRAIGHT_SPEED);*/
-        this.addTask(new DeadReckonTask(this, scoreMarker, drivetrain) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE) {
-                    RobotLog.i("506 scoreMarker path done");
-                } else {
-                    RobotLog.i("506 scoreMarker handler being called");
-                }
-            }
-        });
-    }
-
-    /* public void doLatchDetach() {
-        this.addTask(new DeadReckonTask(this, detachRobot, drivetrain) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE) {
-                    doMoveToDepot();
-                }
-            }
-        });
-    }
-     */
-
-  /*  public void doLowerRobot() {
-        this.addTask(new RunToEncoderValueTask(this, latchArm, 0, 1.0  ) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                // Right now the "LATCH" path both de-latches the robot and navigates to depot
-                doLatchDetach();
-            }
-        });
-    }
-*/
-
-
-    private void selectAlliance(LilacAutonomous.Alliance color) {
-        if (color == LilacAutonomous.Alliance.BLUE) {
-            // Blue setup.
-            RobotLog.i("506 Alliance: BLUE");
-            alliance = LilacAutonomous.Alliance.BLUE;
-        } else {
-            // Red setup.
-            RobotLog.i("506 Alliance: RED");
-            alliance = LilacAutonomous.Alliance.RED;
-        }
-    }
 
     public void selectPosition(LilacAutonomous.Position choice) {
-        if (choice == LilacAutonomous.Position.CRATER) {
+        if (choice == Position.CRATER) {
             position = LilacAutonomous.Position.CRATER;
             RobotLog.i("506 Position: CRATER");
         } else {
             position = LilacAutonomous.Position.MARKER;
-            RobotLog.i("506 Position: MARKER");
+            RobotLog.i("506 Position: Marker");
         }
     }
 
-    private void setLatchPath()
-    {
-        latch.stop();
-        /*latch.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 2, Lilac.STRAIGHT_SPEED); // Right
-        latch.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 27, Lilac.STRAIGHT_SPEED * SPEED_MULTIPLIER);
-        if (position == Position.MARKER) {
-            latch.addSegment(DeadReckonPath.SegmentType.TURN, 135, Lilac.TURN_SPEED);
-            latch.addSegment(DeadReckonPath.SegmentType.LEFT_DIAGONAL, 25, Lilac.STRAIGHT_SPEED * SPEED_MULTIPLIER);
-            // Change to front right diagonal after implementing that in deadReckonPath segment types
-            // Jk we need to figure out the speeds here though
-            latch.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 72, Lilac.STRAIGHT_SPEED);*/
+    @Override
+    public void start() {
+        detach();
     }
 
-    private void setDetachRobot()
-    {
-        detachRobot.stop();
-        /* detachRobot.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, Lilac.SIDEWAYS_DETACH_SPEED);
-        detachRobot.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, - Lilac.SIDEWAYS_DETACH_SPEED);
-        detachRobot.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, - Lilac.SIDEWAYS_DETACH_SPEED);*/
+    public void detach() {
+        RobotLog.i("506 detaching");
+        this.addTask(new DeadReckonTask(this, detachPath, single) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    RobotLog.i("506 Detaching done");
+                     moveToFirst();
+                }
+            }
+        });
+    }
+
+    public void moveToFirst() {
+
+
+        this.addTask(new DeadReckonTask(this, unlatchScan, single) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    RobotLog.i("506 Unlatch and move for first sample done");
+                    sample();
+                }
+            }
+        });
+    }
+
+    public void sample() {
+        //TODO: TEST 11/25/18
+        this.addTask(new MineralDetectionTask(this) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                MineralDetectionEvent event = (MineralDetectionEvent) e;
+                RobotLog.i("Saw: " + event.kind + "Confidence: " + event.minerals.get(0).getConfidence());
+            }
+        });
     }
 
 
-    private void setMarkerPath() {
-        // Edit later when we figure out sensing gold block & need to implement
-        // specific marker paths based off different positions of gold block.
-
-        if (alliance == LilacAutonomous.Alliance.RED) {  // Blue and crater = 0; Red and crater = 1, Blue and marker = 2, Red and marker = 3
-
-            color = 1;
-        } else if (alliance == LilacAutonomous.Alliance.BLUE) {
-            color = 0;
-        }
-
-        if (position == LilacAutonomous.Position.MARKER) {
-            distance = 2;
+    public void setMarkerPath() {
+        // TODO: implement this AFTER sample + push
+        if (position == Position.CRATER) {
+            scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, -Lilac.STRAIGHT_SPEED);
         } else {
-            distance = 0;
-        }
-
-        combo = color + distance;
-
-        // + whichSide;
-
-        switch (combo) {
-            case BLUE_CRATER:
-                RobotLog.i("506 Case: BLUE_CRATER");
-                scoreMarker.stop();
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, -Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,30, -Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,90, Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, Lilac.STRAIGHT_SPEED);
-                break;
-            case RED_CRATER:
-                RobotLog.i("506 Case: RED_CRATER");
-                scoreMarker.stop();
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,30, Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN,90, -Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, -Lilac.STRAIGHT_SPEED);
-                break;
-            case BLUE_MARKER:
-                RobotLog.i("506 Case: BLUE_MARKER");
-                scoreMarker.stop();
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN, 10, -Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -Lilac.STRAIGHT_SPEED);
-                break;
-            case RED_MARKER:
-                RobotLog.i("506 Case: RED_MARKER");
-                scoreMarker.stop();
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, -Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN, 30, Lilac.STRAIGHT_SPEED);
-                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, -5, -Lilac.STRAIGHT_SPEED);
-                break;
-            default:
-                break;
+            scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, -Lilac.STRAIGHT_SPEED);
         }
     }
+
+    public void setOtherPaths() {
+        // FIXME: all measurements are approx. as of 11/24/18
+
+        detachPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, Lilac.STRAIGHT_SPEED);
+
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, Lilac.SIDEWAYS_DETACH_SPEED);
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, -Lilac.STRAIGHT_SPEED);
+
+    }
+
 }
