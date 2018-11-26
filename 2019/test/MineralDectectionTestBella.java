@@ -1,6 +1,7 @@
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.MineralDetectionTask;
@@ -11,6 +12,7 @@ import team25core.SingleShotTimerTask;
 import static test.MDConstants.*;
 
 @Autonomous(name = "Mineral Detection Test Bella", group = "Team 25")
+@Disabled
 public class MineralDectectionTestBella extends Robot {
 
     private final static String TAG = "MineralDetectionTest";
@@ -58,9 +60,7 @@ public class MineralDectectionTestBella extends Robot {
                     //in center
                     RobotLog.ii(TAG, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>LEFT IN CENTER");
                 }
-
             }
-
         }); */
     }
 

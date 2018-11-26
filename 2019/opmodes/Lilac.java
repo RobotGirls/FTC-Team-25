@@ -24,7 +24,7 @@ public class Lilac
     public static double CAMERA_ROTATE = 150  / SERVO_DOMAIN; //?
 
     // Marker Constants (DEPENDING ON HOW DEPLOYED)
-    public static double MARKER_OPEN  = 10  / SERVO_DOMAIN;
-    public static double MARKER_CLOSED  = 10  / SERVO_DOMAIN;
+    public static double MARKER_OPEN  = 30  / SERVO_DOMAIN;
+    public static double MARKER_CLOSED  = 356  / SERVO_DOMAIN;
 
 }

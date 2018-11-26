@@ -43,8 +43,8 @@ public class LatchTeleopFixed extends Robot {
     private OneWheelDriveTask driveArm;
 
 
-    public static double LATCH_OPEN = 130;
-    public static double LATCH_CLOSED = 180;
+    public static double LATCH_OPEN = 160/256.0;
+    public static double LATCH_CLOSED = 210/256.0;
 
     @Override
     public void init() {
@@ -68,7 +68,6 @@ public class LatchTeleopFixed extends Robot {
 
         latchServo.setPosition(LATCH_CLOSED);
 
-
         //drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
         //drivetrain.setCanonicalMotorDirection();
         //drivetrain.resetEncoders();
@@ -84,7 +83,6 @@ public class LatchTeleopFixed extends Robot {
     @Override
     public void start() {
 
-
         // sets up joysticks, so
         // both Y sticks up   - drives forward
         // both Y stick down - drives backward
@@ -94,33 +92,42 @@ public class LatchTeleopFixed extends Robot {
         // left trigger - backward diagonal to the left
         // right bumper - forward diagonal to the right
         // left bumper - forward diagonal to the left
+
+        RobotLog.i(">>>> inside start");
         TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
 
         drive = new TeleopDriveTaskReverse(this, scheme, frontLeft, frontRight, rearLeft, rearRight);
         this.addTask(drive);
 
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
+            @Override
             public void handleEvent(RobotEvent e) {
                 GamepadEvent event = (GamepadEvent) e;
 
-                //RobotLog.i(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> eventkind", event.kind);
+                RobotLog.i(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> eventkind" + event.kind);
                 if (event.kind == EventKind.BUTTON_Y_DOWN) {
                     // latchArm
                     latchArm.setPower(1);
+                    RobotLog.i(">>>>>>>>>>>>>>>> eventkind" + event.kind);
                 } else if (event.kind == EventKind.BUTTON_Y_UP) {
                     // latchArm
                     latchArm.setPower(0);
+                    RobotLog.i(">>>>>>>>>>>>>>>> eventkind" + event.kind);
                 } else if (event.kind == EventKind.BUTTON_A_DOWN) {
                     // latchArm
                     latchArm.setPower(-1);
+                    RobotLog.i(">>>>>>>>>>>>>>>> eventkind" + event.kind);
                 } else if (event.kind == EventKind.BUTTON_A_UP) {
                     // latchArm
                     latchArm.setPower(0);
+                    RobotLog.i(">>>>>>>>>>>>>>>> eventkind" + event.kind);
                 } else if (event.kind == EventKind.BUTTON_B_DOWN) {
                     // latchServo open
                     latchServo.setPosition(LATCH_OPEN);
+                    RobotLog.i(">>>>>>>>>>>>>>>> eventkind " + event.kind);
                 } else if (event.kind == EventKind.BUTTON_X_DOWN) {
                     latchServo.setPosition(LATCH_CLOSED);
+                    RobotLog.i(">>>>>>>>>>>>>>>> eventkind " + event.kind);
                 }
             }
         });
