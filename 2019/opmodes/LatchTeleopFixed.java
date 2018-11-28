@@ -44,7 +44,7 @@ public class LatchTeleopFixed extends Robot {
 
 
     public static double LATCH_OPEN = 160/256.0;
-    public static double LATCH_CLOSED = 210/256.0;
+    public static double LATCH_CLOSED = 220/256.0;
 
     @Override
     public void init() {

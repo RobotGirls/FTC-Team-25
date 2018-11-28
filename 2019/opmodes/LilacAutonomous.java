@@ -61,7 +61,7 @@ public class LilacAutonomous extends Robot {
 
 
     public static double LATCH_OPEN = 160.0 / 256.0 ;
-    public static double LATCH_CLOSED = 210.0 / 256.0 ;
+    public static double LATCH_CLOSED = 220.0 / 256.0 ;
 
 
     private Telemetry.Item positionItem;
@@ -131,7 +131,7 @@ public class LilacAutonomous extends Robot {
                         inCenter = true;
                         knockOff();
                         mdTask.stop();
-
+                        drivetrain.stop();
                     }
                 }
             }
@@ -187,7 +187,7 @@ public class LilacAutonomous extends Robot {
     public void setOtherPaths() {
         // TODO: all measurements are approx. as of 11/24/18
 
-        detachPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, Lilac.STRAIGHT_SPEED);
+        detachPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.4, Lilac.STRAIGHT_SPEED);
 
         unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, Lilac.SIDEWAYS_DETACH_SPEED);
         unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, -Lilac.STRAIGHT_SPEED);
@@ -205,7 +205,7 @@ public class LilacAutonomous extends Robot {
 
     public void unlatchArm() {
         latchServo.setPosition(LATCH_OPEN);
-        this.addTask(new SingleShotTimerTask(this, 1000) { // 1 second
+        this.addTask(new SingleShotTimerTask(this, 2500) { // 2.5 second
             @Override
             public void handleEvent(RobotEvent e) {
                 SingleShotTimerEvent event = (SingleShotTimerEvent) e;
@@ -225,7 +225,7 @@ public class LilacAutonomous extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     RobotLog.i("506 Detaching done");
-                    moveAway();
+                    //moveAway();
                 }
             }
         });
