@@ -132,6 +132,7 @@ public class LilacAutonomous extends Robot {
                         knockOff();
                         mdTask.stop();
                         drivetrain.stop();
+                        drivetrain.setStrafeReverse(false);
                     }
                 }
             }
@@ -187,25 +188,26 @@ public class LilacAutonomous extends Robot {
     public void setOtherPaths() {
         // TODO: all measurements are approx. as of 11/24/18
 
-        detachPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.4, Lilac.STRAIGHT_SPEED);
+        detachPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.09, Lilac.STRAIGHT_SPEED);
 
-        unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, Lilac.SIDEWAYS_DETACH_SPEED);
-        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, -Lilac.STRAIGHT_SPEED);
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, Lilac.SIDEWAYS_DETACH_SPEED);
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2.5, -Lilac.STRAIGHT_SPEED);
 
-        knockOff.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, -Lilac.STRAIGHT_SPEED);
+        knockOff.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2.5, -Lilac.STRAIGHT_SPEED);
 
 
     }
 
     @Override
     public void start() {
-        unlatchArm();
+        //unlatchArm();
+        moveAway();
 
     }
 
     public void unlatchArm() {
         latchServo.setPosition(LATCH_OPEN);
-        this.addTask(new SingleShotTimerTask(this, 2500) { // 2.5 second
+        this.addTask(new SingleShotTimerTask(this, 2000) { // 2 second
             @Override
             public void handleEvent(RobotEvent e) {
                 SingleShotTimerEvent event = (SingleShotTimerEvent) e;
@@ -246,7 +248,8 @@ public class LilacAutonomous extends Robot {
 
     public void sample() {
         addTask(mdTask);
-        drivetrain.strafe(-0.5);
+        //drivetrain.strafeReverse(-0.1);
+        drivetrain.strafeReverse(0.1);
     }
 
     private void knockOff() {
