@@ -3,17 +3,12 @@ package opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
-import com.vuforia.CameraDevice;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 
 import team25core.RunToEncoderValueTask;
-import opmodes.Lilac;
-import team25core.ColorThiefTask;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
@@ -243,7 +238,7 @@ public class LilaAutonomous extends Robot {
     }
 
 
-    private void setMarkerPath() {
+    private void setMarkerPath() { /*
         // Edit later when we figure out sensing gold block & need to implement
         // specific marker paths based off different positions of gold block.
 
@@ -296,5 +291,6 @@ public class LilaAutonomous extends Robot {
             default:
                 break;
         }
+    } */
     }
 }
