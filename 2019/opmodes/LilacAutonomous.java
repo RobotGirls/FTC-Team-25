@@ -160,6 +160,42 @@ public class LilacAutonomous extends Robot {
         mdTask.setDetectionKind(MineralDetectionTask.DetectionKind.LARGEST_GOLD);
     }
 
+
+    public void other_init() {
+
+        // Telemetry for selection.
+        positionItem = telemetry.addData("POSITION", "Unselected (Y/A)");
+
+        mdTask = new MineralDetectionTask(this) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                MineralDetectionEvent event = (MineralDetectionEvent) e;
+                confidence1 = event.minerals.get(0).getConfidence();
+                left1 = event.minerals.get(0).getLeft();
+                RobotLog.i(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>left in init"+left1 +"blah");
+                RobotLog.i("Saw: " + event.kind + " Confidence: " + event.minerals.get(0).getConfidence());
+                RobotLog.i("Saw: " + event.kind + " LEFT: " + event.minerals.get(0).getLeft());
+
+                imageMidpoint = event.minerals.get(0).getImageWidth() / 2.0;
+                goldMidpoint  = (event.minerals.get(0).getWidth() / 2.0) + left1;
+
+                leftMidpointTlm = telemetry.addData("LEFT_MDPT: ", goldMidpoint);
+                imageMidpointTlm = telemetry.addData(" IMG_MDPT: ", imageMidpoint);
+
+                if (event.kind == EventKind.OBJECTS_DETECTED) {
+                    if (Math.abs(imageMidpoint-goldMidpoint) < margin) {
+                        inCenter = true;
+                        RobotLog.i("506 Found gold");
+                        mdTask.stop();
+                    }
+                }
+            }
+        };
+        mdTask.init(telemetry,hardwareMap);
+        mdTask.setDetectionKind(MineralDetectionTask.DetectionKind.LARGEST_GOLD);
+        addTask(mdTask);
+    }
+
     @Override
     public void handleEvent(RobotEvent e) {
         if (e instanceof GamepadTask.GamepadEvent) {
@@ -253,6 +289,7 @@ public class LilacAutonomous extends Robot {
 
         latchServo.setPosition(LATCH_OPEN);
     }
+
 
     /*public void unlatchArm() {
         latchServo.setPosition(LATCH_OPEN);
