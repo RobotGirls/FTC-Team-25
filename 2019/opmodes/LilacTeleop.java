@@ -6,11 +6,17 @@ package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.RobotLog;
 
+import team25core.DeadReckonPath;
+import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
+import team25core.LimitSwitchCriteria;
 import team25core.MecanumWheelDriveTask;
+import team25core.OneWheelDirectDrivetrain;
 import team25core.OneWheelDriveTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -39,7 +45,17 @@ public class LilacTeleop extends Robot {
     private Servo latchServo;
     private Servo marker;
 
+
+
+    private DeadReckonPath moveArm;
+    private DeadReckonTask moveArmTask;
+
+    private DigitalChannel limitSwitch;
+    private LimitSwitchCriteria limitSwitchCriteria;
+
     //private FourWheelDirectDrivetrain drivetrain;
+    private OneWheelDirectDrivetrain single;
+
     //private TeleopDriveTaskReverse drive;
     private TeleopDriveTask drive;
     //private MecanumWheelDriveTask drive;
@@ -58,7 +74,11 @@ public class LilacTeleop extends Robot {
         frontRight = hardwareMap.dcMotor.get("frontRight");
         rearLeft   = hardwareMap.dcMotor.get("rearLeft");
         rearRight  = hardwareMap.dcMotor.get("rearRight");
+
         marker     = hardwareMap.servo.get("marker");
+
+        limitSwitch = hardwareMap.digitalChannel.get("limit");
+        limitSwitchCriteria = new LimitSwitchCriteria(limitSwitch);
 
         // Latch arm used to raise/lower arm
         latchArm        = hardwareMap.dcMotor.get("latchArm");
@@ -66,13 +86,26 @@ public class LilacTeleop extends Robot {
         // Latch servo used to close claw at end of latch arm
         latchServo      = hardwareMap.servo.get("latchServo");
 
-        latchArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        latchArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        single = new OneWheelDirectDrivetrain(latchArm);
+        single.resetEncoders();
+        single.encodersOn();
 
         // Allows for latchArm to hold position when no button is pressed
         latchArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         latchServo.setPosition(LATCH_CLOSED);
+
+        moveArm = new DeadReckonPath();
+
+        moveArmTask = new DeadReckonTask(this, moveArm, single) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    single.stop();
+                }
+            }
+        };
 
         //drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
         //drivetrain.setCanonicalMotorDirection();
@@ -84,6 +117,11 @@ public class LilacTeleop extends Robot {
     @Override
     public void handleEvent(RobotEvent e) {
         // Nothing
+    }
+
+    private void runArm()
+    {
+        this.addTask(moveArmTask);
     }
 
     @Override
@@ -99,7 +137,6 @@ public class LilacTeleop extends Robot {
         // right bumper - forward diagonal to the right
         // left bumper - forward diagonal to the left
 
-        //TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
         TankMechanumControlScheme scheme = new TankMechanumControlScheme(gamepad1);
 
         drive = new TeleopDriveTask(this, scheme, frontLeft, frontRight, rearLeft, rearRight);
@@ -110,15 +147,32 @@ public class LilacTeleop extends Robot {
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e) {
                 GamepadEvent event = (GamepadEvent) e;
-                if (event.kind == EventKind.BUTTON_Y_DOWN) {
-                    // latchArm
-                    latchArm.setPower(1);
+                if (event.kind == EventKind.BUTTON_Y_DOWN) { // Going out
+                   // latchArm.setPower(1);
+                   // arm up
+                   moveArm.stop();
+                   moveArm.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.1, 0.5);
+                   runArm();
                 } else if (event.kind == EventKind.BUTTON_Y_UP) {
-                    latchArm.setPower(0);
-                } else if (event.kind == EventKind.BUTTON_A_DOWN) {
-                    // latchArm
-                    latchArm.setPower(-1);
+                    //latchArm.setPower(0);
+                } else if (event.kind == EventKind.BUTTON_A_DOWN) { // Going in
+                   // latchArm
+                   // arm down
+                   moveArm.stop();
+                   moveArm.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.1, -0.5);
+                   runArm();
                 } else if (event.kind == EventKind.BUTTON_A_UP) {
+                   // latchArm.setPower(0);
+                } else if (event.kind == EventKind.RIGHT_BUMPER_DOWN) {
+                    moveArmTask.stop();
+                    latchArm.setPower(0);
+                } else if (event.kind == EventKind.LEFT_TRIGGER_DOWN) {
+                    latchArm.setPower(-1);
+                } else if (event.kind == EventKind.LEFT_TRIGGER_UP) {
+                    latchArm.setPower(0);
+                } else if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
+                    latchArm.setPower(1);
+                } else if (event.kind == EventKind.LEFT_BUMPER_UP) {
                     latchArm.setPower(0);
                 } else if (event.kind == EventKind.BUTTON_B_DOWN) {
                     // latchServo open

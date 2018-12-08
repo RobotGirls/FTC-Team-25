@@ -50,6 +50,7 @@ public class LilacAutonomous extends Robot {
     private DeadReckonPath unlatchScan;
     private DeadReckonPath knockOff;
 
+    // Stuff for Mineral Detection
     private MineralDetectionTask mdTask;
     private double  confidence1;
     private double  left1;
@@ -59,6 +60,12 @@ public class LilacAutonomous extends Robot {
     private double  imageMidpoint;
     private double  goldMidpoint;
     private double  margin = 50;
+    private double  initPos;
+    private double  finalPos;
+    private double  deltaPos;
+    private static double FIRST;
+    private static double SECOND;
+    private static double THIRD;
 
 
     public static double LATCH_OPEN     = 255 / 256.0;
@@ -205,13 +212,13 @@ public class LilacAutonomous extends Robot {
                     selectPosition(LilacAutonomous.RobotPosition.CRATER);
                     robotPosition = RobotPosition.CRATER;
                     positionItem.setValue("Crater");
-                    setMarkerPath();
+                    //setMarkerPath();
                     break;
                 case BUTTON_Y_DOWN:
                     selectPosition(LilacAutonomous.RobotPosition.MARKER);
                     robotPosition = RobotPosition.MARKER;
                     positionItem.setValue("Marker");
-                    setMarkerPath();
+                    //setMarkerPath();
                     break;
                 default:
                     break;
@@ -256,13 +263,12 @@ public class LilacAutonomous extends Robot {
     {
         runLatchPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -STRAIGHT_SPEED);
 
+        // FIXME
         detachPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.1, STRAIGHT_SPEED);
 
-        // FIXME
         unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, STRAIGHT_SPEED);
         unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 11, -STRAIGHT_SPEED);
         //unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, , STRAIGHT_SPEED);
-
 
         knockOff.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 25, -STRAIGHT_SPEED);
 
@@ -341,11 +347,39 @@ public class LilacAutonomous extends Robot {
     public void sample()
     {
         addTask(mdTask);
+        initPos = drivetrain.getCurrentPosition();
+        RobotLog.i("506 Lilac Current Position: " + initPos);
+
         drivetrain.strafe(-0.3);
     }
 
     private void knockOff()
     {
+        finalPos = drivetrain.getCurrentPosition();
+        deltaPos = finalPos - initPos;
+
+        if (robotPosition == RobotPosition.CRATER) {
+            if (deltaPos < FIRST) {
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN, 50, TURN_SPEED);
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
+            } else if (deltaPos > FIRST && deltaPos < THIRD) {
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
+            } else if (deltaPos > SECOND) {
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN, 50, -TURN_SPEED);
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
+            }
+        } else {
+            if (deltaPos < FIRST) {
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN, 50, TURN_SPEED);
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
+            } else if (deltaPos > FIRST && deltaPos < THIRD) {
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
+            } else if (deltaPos > SECOND) {
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN, 50, -TURN_SPEED);
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
+            }
+        }
+
         this.addTask(new DeadReckonTask(this, knockOff, drivetrain) {
             @Override
             public void handleEvent(RobotEvent e) {
