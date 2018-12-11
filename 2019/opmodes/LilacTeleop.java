@@ -77,7 +77,7 @@ public class LilacTeleop extends Robot {
 
         marker     = hardwareMap.servo.get("marker");
 
-        limitSwitch = hardwareMap.digitalChannel.get("limit");
+        // limitSwitch = hardwareMap.digitalChannel.get("limit");
         limitSwitchCriteria = new LimitSwitchCriteria(limitSwitch);
 
         // Latch arm used to raise/lower arm
@@ -151,7 +151,7 @@ public class LilacTeleop extends Robot {
                    // latchArm.setPower(1);
                    // arm up
                    moveArm.stop();
-                   moveArm.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.1, 0.5);
+                   moveArm.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, 0.5);
                    runArm();
                 } else if (event.kind == EventKind.BUTTON_Y_UP) {
                     //latchArm.setPower(0);
@@ -159,7 +159,7 @@ public class LilacTeleop extends Robot {
                    // latchArm
                    // arm down
                    moveArm.stop();
-                   moveArm.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.1, -0.5);
+                   moveArm.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, -0.5);
                    runArm();
                 } else if (event.kind == EventKind.BUTTON_A_UP) {
                    // latchArm.setPower(0);
