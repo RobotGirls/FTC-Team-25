@@ -34,7 +34,7 @@ public class LilacAutonomous extends Robot {
 
     private final int TICKS_PER_INCH = Lilac.TICKS_PER_INCH;
     private final int TICKS_PER_DEGREE = Lilac.TICKS_PER_DEGREE;
-    private final double STRAIGHT_SPEED = 0.5; // Autonomous - slower; it's diff from LilacConstants
+    private final double STRAIGHT_SPEED = 0.3; // Autonomous - slower; it's diff from LilacConstants
     private final double TURN_SPEED = Lilac.TURN_SPEED;
 
    // private FourWheelDirectDrivetrain drivetrain;
@@ -63,9 +63,9 @@ public class LilacAutonomous extends Robot {
     private double  initPos;
     private double  finalPos;
     private double  deltaPos;
-    private static double FIRST;
-    private static double SECOND;
-    private static double THIRD;
+    private static double FIRST = 100;
+    private static double SECOND = 200;
+    private static double THIRD = 300;
 
 
 
@@ -153,6 +153,7 @@ public class LilacAutonomous extends Robot {
                 leftMidpointTlm = telemetry.addData("LEFT_MDPT: ", goldMidpoint);
                 imageMidpointTlm = telemetry.addData(" IMG_MDPT: ", imageMidpoint);
 
+                RobotLog.i("506 Current Position: " + initPos);
                 if (event.kind == EventKind.OBJECTS_DETECTED) {
                     if (Math.abs(imageMidpoint-goldMidpoint) < margin) {
                         inCenter = true;
@@ -357,25 +358,39 @@ public class LilacAutonomous extends Robot {
     private void knockOff()
     {
         finalPos = drivetrain.getCurrentPosition();
+        RobotLog.i("506 Final Position: " + finalPos);
         deltaPos = finalPos - initPos;
+        RobotLog.i("506 Setting deltaPos: " + deltaPos);
 
         if (robotPosition == RobotPosition.CRATER) {
             if (deltaPos < FIRST) {
+                RobotLog.i("506 First position");
+                scoreMarker.stop();
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN, 50, TURN_SPEED);
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
             } else if (deltaPos > FIRST && deltaPos < THIRD) {
+                RobotLog.i("506 Second position");
+                scoreMarker.stop();
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
             } else if (deltaPos > SECOND) {
+                RobotLog.i("506 Third position");
+                scoreMarker.stop();
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN, 50, -TURN_SPEED);
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
             }
         } else {
             if (deltaPos < FIRST) {
+                RobotLog.i("506 First position");
+                scoreMarker.stop();
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN, 50, TURN_SPEED);
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
             } else if (deltaPos > FIRST && deltaPos < THIRD) {
+                RobotLog.i("506 Second position");
+                scoreMarker.stop();
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
             } else if (deltaPos > SECOND) {
+                RobotLog.i("506 Third position");
+                scoreMarker.stop();
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN, 50, -TURN_SPEED);
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
             }
