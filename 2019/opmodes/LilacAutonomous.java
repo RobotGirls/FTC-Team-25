@@ -69,8 +69,8 @@ public class LilacAutonomous extends Robot {
 
 
 
-    public static double LATCH_OPEN     = 255 / 256.0;
-    public static double LATCH_CLOSED   = 35  / 256.0;
+    public static double LATCH_OPEN     = 1 / 256.0;
+    public static double LATCH_CLOSED   = 230  / 256.0;
     public static double MARKER_OPEN    = 250 / 256.0;
     public static double MARKER_CLOSED  = 129 / 256.0;
 
@@ -264,9 +264,15 @@ public class LilacAutonomous extends Robot {
     public void setOtherPaths()
     {
         runLatchPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -STRAIGHT_SPEED);
+        //runLatchPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 55, -STRAIGHT_SPEED);
 
         // FIXME
-        detachPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.1, STRAIGHT_SPEED);
+        detachPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 55, STRAIGHT_SPEED);
+
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, STRAIGHT_SPEED);
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -STRAIGHT_SPEED);
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, -STRAIGHT_SPEED);
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, STRAIGHT_SPEED);
 
         unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, STRAIGHT_SPEED);
         unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 11, -STRAIGHT_SPEED);
@@ -278,7 +284,7 @@ public class LilacAutonomous extends Robot {
 
     @Override
     public void start() {
-       moveAway();
+       runLatch();
     }
 
     public void runLatch()
@@ -322,7 +328,7 @@ public class LilacAutonomous extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     RobotLog.i("506 Detaching done");
-                    //moveAway();
+                    moveAway();
                 }
             }
         });

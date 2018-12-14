@@ -63,8 +63,8 @@ public class LilacTeleop extends Robot {
     private OneWheelDriveTask driveArm;
 
 
-    public static double LATCH_OPEN     = 231  / 256.0;
-    public static double LATCH_CLOSED   = 32   / 256.0;
+    public static double LATCH_OPEN     = 1  / 256.0;
+    public static double LATCH_CLOSED   = 230   / 256.0;
     public static double MARKER_OPEN    = 250  / 256.0;
     public static double MARKER_CLOSED  = 129  / 256.0;
 
@@ -152,7 +152,7 @@ public class LilacTeleop extends Robot {
                    // latchArm.setPower(1);
                    // arm up
                    moveArm.stop();
-                   moveArm.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, 0.5);
+                   moveArm.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 55, 0.5);
                    runArm();
                 } else if (event.kind == EventKind.BUTTON_Y_UP) {
                     //latchArm.setPower(0);
@@ -160,7 +160,7 @@ public class LilacTeleop extends Robot {
                    // latchArm
                    // arm down
                    moveArm.stop();
-                   moveArm.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, -0.5);
+                   moveArm.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 55, -0.5);
                    runArm();
                 } else if (event.kind == EventKind.BUTTON_A_UP) {
                    // latchArm.setPower(0);
