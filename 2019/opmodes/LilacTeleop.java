@@ -62,9 +62,11 @@ public class LilacTeleop extends Robot {
     //private MecanumWheelDriveTask drive;
     private OneWheelDriveTask driveArm;
 
+    private boolean slow = false;
 
-    public static double LATCH_OPEN     = 1  / 256.0;
-    public static double LATCH_CLOSED   = 230   / 256.0;
+
+    public static double LATCH_OPEN     = 255  / 256.0;
+    public static double LATCH_CLOSED   = 45   / 256.0;
     public static double MARKER_OPEN    = 250  / 256.0;
     public static double MARKER_CLOSED  = 129  / 256.0;
 
@@ -77,6 +79,7 @@ public class LilacTeleop extends Robot {
         rearRight  = hardwareMap.dcMotor.get("rearRight");
 
         marker     = hardwareMap.servo.get("marker");
+
 
         // limitSwitch = hardwareMap.digitalChannel.get("limit");
         limitSwitchCriteria = new LimitSwitchCriteria(limitSwitch);
@@ -145,6 +148,26 @@ public class LilacTeleop extends Robot {
 
         this.addTask(drive);
 
+       /* TODO add slow mode
+       this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
+            public void handleEvent(RobotEvent e) {
+                GamepadEvent event = (GamepadEvent) e;
+                if (event.kind == EventKind.BUTTON_Y_DOWN) { // Going out
+                    // latchArm.setPower(1);
+                    // arm up
+                    if (slow) {
+
+                    }
+                    moveArm.stop();
+                    moveArm.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 55, 0.5);
+                    runArm();
+                }
+            }
+
+        }); */
+
+
+
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e) {
                 GamepadEvent event = (GamepadEvent) e;
@@ -165,6 +188,9 @@ public class LilacTeleop extends Robot {
                 } else if (event.kind == EventKind.BUTTON_A_UP) {
                    // latchArm.setPower(0);
                 } else if (event.kind == EventKind.RIGHT_BUMPER_DOWN) {
+                    moveArmTask.stop();
+                    latchArm.setPower(0);
+                } else if (event.kind == EventKind.RIGHT_TRIGGER_DOWN) {
                     moveArmTask.stop();
                     latchArm.setPower(0);
                 } else if (event.kind == EventKind.LEFT_TRIGGER_DOWN) {

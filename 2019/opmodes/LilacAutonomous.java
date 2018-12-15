@@ -69,8 +69,8 @@ public class LilacAutonomous extends Robot {
 
 
 
-    public static double LATCH_OPEN     = 1 / 256.0;
-    public static double LATCH_CLOSED   = 230  / 256.0;
+    public static double LATCH_OPEN     = 255 / 256.0;
+    public static double LATCH_CLOSED   = 40  / 256.0;
     public static double MARKER_OPEN    = 250 / 256.0;
     public static double MARKER_CLOSED  = 129 / 256.0;
 
@@ -102,6 +102,7 @@ public class LilacAutonomous extends Robot {
         //drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
         //GEAR
         drivetrain = new MechanumGearedDrivetrain(TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
+
         single     = new OneWheelDirectDrivetrain(latchArm);
 
         drivetrain.resetEncoders();
@@ -121,7 +122,6 @@ public class LilacAutonomous extends Robot {
 
         // Telemetry for selection.
         positionItem = telemetry.addData("POSITION", "Unselected (Y/A)");
-
 
         // Path setup.
         scoreMarker     = new DeadReckonPath();
@@ -170,7 +170,7 @@ public class LilacAutonomous extends Robot {
     }
 
 
-    public void other_init() {
+ /*   public void other_init() {
 
         // Telemetry for selection.
         positionItem = telemetry.addData("POSITION", "Unselected (Y/A)");
@@ -203,7 +203,7 @@ public class LilacAutonomous extends Robot {
         mdTask.init(telemetry,hardwareMap);
         mdTask.setDetectionKind(MineralDetectionTask.DetectionKind.LARGEST_GOLD);
         addTask(mdTask);
-    }
+    } */
 
     @Override
     public void handleEvent(RobotEvent e) {
@@ -263,28 +263,28 @@ public class LilacAutonomous extends Robot {
 
     public void setOtherPaths()
     {
+        runLatchPath.stop();
         runLatchPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -STRAIGHT_SPEED);
         //runLatchPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 55, -STRAIGHT_SPEED);
 
         // FIXME
-        detachPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 55, STRAIGHT_SPEED);
+        detachPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 55, STRAIGHT_SPEED); // This is to run the arm DOWN
 
-        unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, STRAIGHT_SPEED);
-        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -STRAIGHT_SPEED);
-        unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, -STRAIGHT_SPEED);
-        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, STRAIGHT_SPEED);
+        unlatchScan.stop();
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, STRAIGHT_SPEED); // Move away from lander
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, -STRAIGHT_SPEED);
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, STRAIGHT_SPEED);
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, -STRAIGHT_SPEED);
 
-        unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, STRAIGHT_SPEED);
-        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 11, -STRAIGHT_SPEED);
-        //unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, , STRAIGHT_SPEED);
-
-        knockOff.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 25, -STRAIGHT_SPEED);
+        runLatchPath.stop();
+        knockOff.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
 
     }
 
     @Override
     public void start() {
-       runLatch();
+        runLatch();
+        //moveAway();
     }
 
     public void runLatch()
@@ -358,11 +358,12 @@ public class LilacAutonomous extends Robot {
         initPos = drivetrain.getCurrentPosition();
         RobotLog.i("506 Lilac Current Position: " + initPos);
 
-        drivetrain.strafe(-0.3);
+        drivetrain.strafe(-0.20);
     }
 
     private void knockOff()
     {
+        /*
         finalPos = drivetrain.getCurrentPosition();
         RobotLog.i("506 Final Position: " + finalPos);
         deltaPos = finalPos - initPos;
@@ -400,7 +401,7 @@ public class LilacAutonomous extends Robot {
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.TURN, 50, -TURN_SPEED);
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
             }
-        }
+        } */
 
         this.addTask(new DeadReckonTask(this, knockOff, drivetrain) {
             @Override
@@ -408,7 +409,7 @@ public class LilacAutonomous extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     RobotLog.i("506 Knock off done");
-                    toMarker();
+                    //toMarker();
                 }
             }
         });
