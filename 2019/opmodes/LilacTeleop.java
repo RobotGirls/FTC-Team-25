@@ -97,7 +97,7 @@ public class LilacTeleop extends Robot {
         // Allows for latchArm to hold position when no button is pressed
         latchArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        latchServo.setPosition(LATCH_CLOSED);
+       // latchServo.setPosition(LATCH_CLOSED);
 
         moveArm = new DeadReckonPath();
 
@@ -168,6 +168,20 @@ public class LilacTeleop extends Robot {
 
 
 
+        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
+            public void handleEvent(RobotEvent e) {
+                GamepadEvent event = (GamepadEvent) e;
+                if (event.kind == EventKind.RIGHT_TRIGGER_DOWN) {
+                    moveArmTask.stop();
+                    latchArm.setPower(0);
+                } else if (event.kind == EventKind.RIGHT_BUMPER_DOWN) {
+                    moveArmTask.stop();
+                    latchArm.setPower(0);
+                }
+            }
+        });
+
+
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e) {
                 GamepadEvent event = (GamepadEvent) e;
@@ -194,7 +208,7 @@ public class LilacTeleop extends Robot {
                     moveArmTask.stop();
                     latchArm.setPower(0);
                 } else if (event.kind == EventKind.LEFT_TRIGGER_DOWN) {
-                    latchArm.setPower(-1);
+                    latchArm.setPower(-0.7);
                 } else if (event.kind == EventKind.LEFT_TRIGGER_UP) {
                     latchArm.setPower(0);
                 } else if (event.kind == EventKind.LEFT_BUMPER_DOWN) {
@@ -203,9 +217,10 @@ public class LilacTeleop extends Robot {
                     latchArm.setPower(0);
                 } else if (event.kind == EventKind.BUTTON_B_DOWN) {
                     // latchServo open
-                    latchServo.setPosition(LATCH_OPEN);
+                   // latchServo.setPosition(LATCH_OPEN);
                 } else if (event.kind == EventKind.BUTTON_X_DOWN) {
-                    latchServo.setPosition(LATCH_CLOSED);
+                    // latchServo.setPosition(LATCH_CLOSED);
+                    // todo add holdpostask
                 } else if (event.kind == EventKind.DPAD_UP_DOWN) {
                     marker.setPosition(MARKER_OPEN);
                 } else if (event.kind == EventKind.DPAD_DOWN_DOWN) {

@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.GamepadTask;
+import team25core.HoldPositionTask;
 import team25core.MechanumGearedDrivetrain;
 import team25core.MineralDetectionTask;
 import team25core.OneWheelDirectDrivetrain;
@@ -21,7 +22,7 @@ import team25core.RobotEvent;
  * FTC Team 25: Created by Elizabeth Wu, November 24, 2018
  */
 
-@Autonomous(name = "Lilac Autonomous", group = "Team 25")
+@Autonomous(name = "Lilac Autonomous Update", group = "Team 25")
 public class LilacAutonomous extends Robot {
 
     private DcMotor frontLeft;
@@ -34,7 +35,7 @@ public class LilacAutonomous extends Robot {
 
     private final int TICKS_PER_INCH = Lilac.TICKS_PER_INCH;
     private final int TICKS_PER_DEGREE = Lilac.TICKS_PER_DEGREE;
-    private final double STRAIGHT_SPEED = 0.3; // Autonomous - slower; it's diff from LilacConstants
+    private final double STRAIGHT_SPEED = 0.4; // Autonomous - slower; it's diff from LilacConstants
     private final double TURN_SPEED = Lilac.TURN_SPEED;
 
    // private FourWheelDirectDrivetrain drivetrain;
@@ -50,6 +51,7 @@ public class LilacAutonomous extends Robot {
     private DeadReckonPath unlatchScan;
     private DeadReckonPath knockOff;
 
+    private HoldPositionTask holdPosTask;
     // Stuff for Mineral Detection
     private MineralDetectionTask mdTask;
     private double  confidence1;
@@ -78,6 +80,7 @@ public class LilacAutonomous extends Robot {
     private Telemetry.Item positionItem;
     private Telemetry.Item actualPosItem;
     private Telemetry.Item runPos;
+    private Telemetry.Item noDisconnect;
 
     private Telemetry.Item leftMidpointTlm;
     private Telemetry.Item imageMidpointTlm;
@@ -100,7 +103,6 @@ public class LilacAutonomous extends Robot {
         marker      = hardwareMap.servo.get("marker");
 
         //drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
-        //GEAR
         drivetrain = new MechanumGearedDrivetrain(TICKS_PER_INCH, frontRight, rearRight, frontLeft, rearLeft);
 
         single     = new OneWheelDirectDrivetrain(latchArm);
@@ -115,13 +117,15 @@ public class LilacAutonomous extends Robot {
         latchArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         latchArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         latchArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        latchServo.setPosition(LATCH_CLOSED);
+        latchArm.setPower(0.0);
+       // latchServo.setPosition(LATCH_CLOSED);
 
         // Close marker servo
         marker.setPosition(MARKER_CLOSED);
 
         // Telemetry for selection.
         positionItem = telemetry.addData("POSITION", "Unselected (Y/A)");
+        noDisconnect = telemetry.addData("Connect", "!");
 
         // Path setup.
         scoreMarker     = new DeadReckonPath();
@@ -133,19 +137,21 @@ public class LilacAutonomous extends Robot {
         // Init selection.
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1));
 
-
         // Segment setup.
         setOtherPaths();
 
+        // Keep arm in position.
+        holdPosTask = new HoldPositionTask(this,latchArm, 1);
+        this.addTask(holdPosTask);
+
+        // Setting up mineral detection.
         mdTask = new MineralDetectionTask(this) {
             @Override
             public void handleEvent(RobotEvent e) {
                 MineralDetectionEvent event = (MineralDetectionEvent) e;
                 confidence1 = event.minerals.get(0).getConfidence();
                 left1 = event.minerals.get(0).getLeft();
-                RobotLog.i(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>left in init"+left1 +"blah");
                 RobotLog.i("Saw: " + event.kind + " Confidence: " + event.minerals.get(0).getConfidence());
-                RobotLog.i("Saw: " + event.kind + " LEFT: " + event.minerals.get(0).getLeft());
 
                 imageMidpoint = event.minerals.get(0).getImageWidth() / 2.0;
                 goldMidpoint  = (event.minerals.get(0).getWidth() / 2.0) + left1;
@@ -153,13 +159,17 @@ public class LilacAutonomous extends Robot {
                 leftMidpointTlm = telemetry.addData("LEFT_MDPT: ", goldMidpoint);
                 imageMidpointTlm = telemetry.addData(" IMG_MDPT: ", imageMidpoint);
 
-                RobotLog.i("506 Current Position: " + initPos);
+                RobotLog.i("506 Image midpoint: " + imageMidpoint);
+                RobotLog.i("506 Gold midpoint: " + goldMidpoint);
+
                 if (event.kind == EventKind.OBJECTS_DETECTED) {
                     if (Math.abs(imageMidpoint-goldMidpoint) < margin) {
+                        drivetrain.stop();
+                        stop();
                         inCenter = true;
                         RobotLog.i("506 Found gold");
-                        mdTask.stop();
-                        drivetrain.stop();
+                       // mdTask.stop();
+                       // drivetrain.stop();
                         knockOff();
                     }
                 }
@@ -167,6 +177,14 @@ public class LilacAutonomous extends Robot {
         };
         mdTask.init(telemetry,hardwareMap);
         mdTask.setDetectionKind(MineralDetectionTask.DetectionKind.LARGEST_GOLD);
+    }
+
+    public void loop()
+    {
+        super.loop();
+        // telemetry.clear();
+       // telemetry.addData("Do not disconnect", "!");
+        noDisconnect.setValue("Don't disconnect");
     }
 
 
@@ -261,29 +279,38 @@ public class LilacAutonomous extends Robot {
         }
     }
 
-    public void setOtherPaths()
+    private void setOtherPaths()
     {
         runLatchPath.stop();
         runLatchPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -STRAIGHT_SPEED);
         //runLatchPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 55, -STRAIGHT_SPEED);
 
         // FIXME
+        detachPath.stop();
         detachPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 55, STRAIGHT_SPEED); // This is to run the arm DOWN
 
         unlatchScan.stop();
-        unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, STRAIGHT_SPEED); // Move away from lander
-        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, -STRAIGHT_SPEED);
+       // unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, STRAIGHT_SPEED);
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 6, STRAIGHT_SPEED); // Move away from lander
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -STRAIGHT_SPEED);
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.TURN, 15, -TURN_SPEED);
+        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, -STRAIGHT_SPEED);
         unlatchScan.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, STRAIGHT_SPEED);
-        unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, -STRAIGHT_SPEED);
+        //unlatchScan.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, -STRAIGHT_SPEED);
 
-        runLatchPath.stop();
-        knockOff.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -STRAIGHT_SPEED);
+        knockOff.stop();
+        knockOff.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 23, -STRAIGHT_SPEED); // try to push AND park in crater
+        //marker was 15
+        knockOff.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, STRAIGHT_SPEED);
 
     }
 
     @Override
     public void start() {
-        runLatch();
+
+        this.removeTask(holdPosTask);
+        //runLatch();
+        lowerRobot();
         //moveAway();
     }
 
@@ -297,6 +324,7 @@ public class LilacAutonomous extends Robot {
                 if (path.kind == EventKind.PATH_DONE) {
                     RobotLog.i("506 Run latch done");
                     lowerRobot();
+                    stop();
                 }
             }
         });
@@ -336,6 +364,7 @@ public class LilacAutonomous extends Robot {
 
     private void moveAway()
     {
+
         this.addTask(new DeadReckonTask(this, unlatchScan,  drivetrain) {
             @Override
             public void handleEvent(RobotEvent e) {
@@ -358,7 +387,7 @@ public class LilacAutonomous extends Robot {
         initPos = drivetrain.getCurrentPosition();
         RobotLog.i("506 Lilac Current Position: " + initPos);
 
-        drivetrain.strafe(-0.20);
+        drivetrain.strafe(-0.15);
     }
 
     private void knockOff()
