@@ -16,14 +16,13 @@ import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
 import team25core.LimitSwitchCriteria;
 import team25core.MecanumWheelDriveTask;
+import team25core.MotorStallTask;
 import team25core.OneWheelDirectDrivetrain;
 import team25core.OneWheelDriveTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.TankMechanumControlScheme;
-import team25core.TankMechanumControlSchemeReverse;
 import team25core.TeleopDriveTask;
-import team25core.TeleopDriveTaskReverse;
 
 /*
  * FTC Team 25: Created by Elizabeth, November 03, 2018
@@ -51,6 +50,8 @@ public class LilacTeleop extends Robot {
     private DeadReckonPath moveArm;
     private DeadReckonTask moveArmTask;
 
+    private MotorStallTask stallTask;
+
     private DigitalChannel limitSwitch;
     private LimitSwitchCriteria limitSwitchCriteria;
 
@@ -77,18 +78,12 @@ public class LilacTeleop extends Robot {
         frontRight = hardwareMap.dcMotor.get("frontRight");
         rearLeft   = hardwareMap.dcMotor.get("rearLeft");
         rearRight  = hardwareMap.dcMotor.get("rearRight");
-
+        latchArm   = hardwareMap.dcMotor.get("latchArm");
         marker     = hardwareMap.servo.get("marker");
-
+        latchServo = hardwareMap.servo.get("latchServo");
 
         // limitSwitch = hardwareMap.digitalChannel.get("limit");
         limitSwitchCriteria = new LimitSwitchCriteria(limitSwitch);
-
-        // Latch arm used to raise/lower arm
-        latchArm        = hardwareMap.dcMotor.get("latchArm");
-
-        // Latch servo used to close claw at end of latch arm
-        latchServo      = hardwareMap.servo.get("latchServo");
 
         single = new OneWheelDirectDrivetrain(latchArm);
         single.resetEncoders();
@@ -111,6 +106,7 @@ public class LilacTeleop extends Robot {
             }
         };
 
+
         //drivetrain = new FourWheelDirectDrivetrain(frontRight, rearRight, frontLeft, rearLeft);
         //drivetrain.setCanonicalMotorDirection();
         //drivetrain.resetEncoders();
@@ -119,7 +115,8 @@ public class LilacTeleop extends Robot {
     }
 
     @Override
-    public void handleEvent(RobotEvent e) {
+    public void handleEvent(RobotEvent e)
+    {
         // Nothing
     }
 
@@ -128,8 +125,15 @@ public class LilacTeleop extends Robot {
         this.addTask(moveArmTask);
     }
 
+    private void stopStallMotor()
+    {
+        this.addTask(stallTask);
+        latchArm.setPower(0.0);
+    }
+
     @Override
-    public void start() {
+    public void start()
+    {
 
         // sets up joysticks, so
         // both Y sticks up   - drives forward
@@ -148,7 +152,8 @@ public class LilacTeleop extends Robot {
 
         this.addTask(drive);
 
-       /* TODO add slow mode
+
+        /* TODO add slow mode
        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
             public void handleEvent(RobotEvent e) {
                 GamepadEvent event = (GamepadEvent) e;
@@ -192,13 +197,12 @@ public class LilacTeleop extends Robot {
                    moveArm.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 55, 0.5);
                    runArm();
                 } else if (event.kind == EventKind.BUTTON_Y_UP) {
+                    latchArm.setPower(-0.4);
+                    stopStallMotor();
                     //latchArm.setPower(0);
                 } else if (event.kind == EventKind.BUTTON_A_DOWN) { // Going in
                    // latchArm
                    // arm down
-                   moveArm.stop();
-                   moveArm.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 55, -0.5);
-                   runArm();
                 } else if (event.kind == EventKind.BUTTON_A_UP) {
                    // latchArm.setPower(0);
                 } else if (event.kind == EventKind.RIGHT_BUMPER_DOWN) {
@@ -215,12 +219,6 @@ public class LilacTeleop extends Robot {
                     latchArm.setPower(1);
                 } else if (event.kind == EventKind.LEFT_BUMPER_UP) {
                     latchArm.setPower(0);
-                } else if (event.kind == EventKind.BUTTON_B_DOWN) {
-                    // latchServo open
-                   // latchServo.setPosition(LATCH_OPEN);
-                } else if (event.kind == EventKind.BUTTON_X_DOWN) {
-                    // latchServo.setPosition(LATCH_CLOSED);
-                    // todo add holdpostask
                 } else if (event.kind == EventKind.DPAD_UP_DOWN) {
                     marker.setPosition(MARKER_OPEN);
                 } else if (event.kind == EventKind.DPAD_DOWN_DOWN) {
