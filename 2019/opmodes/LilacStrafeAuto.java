@@ -179,8 +179,6 @@ public class LilacStrafeAuto extends Robot {
     public void loop()
     {
         super.loop();
-        // telemetry.clear();
-       // telemetry.addData("Do not disconnect", "!");
         noDisconnect.setValue("Don't disconnect");
     }
 
@@ -245,6 +243,7 @@ public class LilacStrafeAuto extends Robot {
 
                 scoreMarker.stop();
                 scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15 , -STRAIGHT_SPEED);
+                scoreMarker.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1 , STRAIGHT_SPEED);
                 break;
             default:
                 break;
