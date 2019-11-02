@@ -129,7 +129,6 @@ public class StoneAutonomous extends Robot {
 
                 RobotLog.ii(TAG, "Saw: " + event.kind + " Confidence: " + confidence);
                 RobotLog.i("startHandleEvent");
-                handleEvntTlm = telemetry.addData("detecting","unknown");
 
                 imageMidpoint = event.stones.get(0).getImageWidth() / 2.0;
                 stoneMidpoint = (event.stones.get(0).getWidth() / 2.0) + left;
@@ -144,7 +143,7 @@ public class StoneAutonomous extends Robot {
                         inCenter = true;
                         RobotLog.i("506 Found gold");
                         sdTask.stop();
-                        drivetrain.stop();
+                        //drivetrain.stop();
                         goPickupSkystone();
                     }
                 }
@@ -178,6 +177,7 @@ public class StoneAutonomous extends Robot {
         allianceTlm = telemetry.addData("ALLIANCE", "Unselected (X-blue /B-red)");
         positionTlm = telemetry.addData("POSITION", "Unselected (Y-build/A-depot)");
 
+
         setStoneDetection();
     }
 
@@ -186,7 +186,14 @@ public class StoneAutonomous extends Robot {
         //start looking for Skystones
         RobotLog.i("startStrafing");
         addTask(sdTask);
+        loggingTlm.setValue("startStrafing:before starting to strafe");
         drivetrain.strafe(SkyStoneConstants25.STRAFE_SPEED);
+        loggingTlm.setValue("startStrafing:after starting to strafe");
+    }
+
+    public void parkUnderBridge()
+    {
+        // go park under sky bridge
     }
 
     @Override
@@ -203,15 +210,26 @@ public class StoneAutonomous extends Robot {
         path.addSegment(DeadReckonPath.SegmentType.TURN, 90, 1.0); */
 
 
+        loggingTlm = telemetry.addData("log", "unknown");
+        handleEvntTlm = telemetry.addData("detecting","unknown");
 
         /**
          * Alternatively, this could be an anonymous class declaration that implements
          * handleEvent() for task specific event handlers.
          */
         //this.addTask(new DeadReckonTask(this, path, drivetrain));
-        RobotLog.i("start: before startStrafing");
-        loggingTlm = telemetry.addData("log", "unknown");
-        startStrafing();
+        if (robotPosition == RobotPosition.BUILD_SITE)
+        {
+            parkUnderBridge();
+
+        }
+        else if (robotPosition == RobotPosition.DEPOT)
+        {
+            RobotLog.i("start: before startStrafing");
+            loggingTlm.setValue("start:in DEPOT about to startStrafing");
+
+            startStrafing();
+        }
 
     }
 }
