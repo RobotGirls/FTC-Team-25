@@ -37,7 +37,7 @@ package test;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import team25core.FourWheelDirectDrivetrain;
+import team25core.MechanumGearedDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.TankMechanumControlScheme;
@@ -55,7 +55,7 @@ public class FourWheeledMecanumTeleop extends Robot {
 
     private TeleopDriveTask drivetask;
 
-    private FourWheelDirectDrivetrain drivetrain;
+    private MechanumGearedDrivetrain drivetrain;
 
     private static final int TICKS_PER_INCH = 79;
 
