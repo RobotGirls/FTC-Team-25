@@ -15,11 +15,14 @@ import team25core.RobotEvent;
 public class ServoLinearSlidesPrototype extends Robot {
     private Servo leftServo;
     private Servo rightServo;
+    private Servo monsterRetentionServo;
     private DcMotor liftMotor;
-    private final double OPEN_LEFT_SERVO = 136; //FIXME
-    private final double OPEN_RIGHT_SERVO = 160; //FIXME
-    private final double CLOSE_LEFT_SERVO = 128; //FIXME
-    private final double CLOSE_RIGHT_SERVO = 190; //FIXME
+    private final double OPEN_LEFT_SERVO = 85/256; //FIXME
+    private final double OPEN_RIGHT_SERVO = 171/256; //FIXME
+    private final double CLOSE_LEFT_SERVO = 52/256; //FIXME
+    private final double CLOSE_RIGHT_SERVO = 196/256; //FIXME
+    private final double OPEN_MONSTER_RETENTION_SERVO = 0/256;
+    private final double CLOSE_MONSTER_RETENTION_SERVO = 128/256;
     Telemetry leftServoPosit;
     Telemetry rightServoPosit;
     Telemetry handleEvent;
@@ -35,16 +38,20 @@ public class ServoLinearSlidesPrototype extends Robot {
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         leftServo = hardwareMap.servo.get("leftServo");
         rightServo = hardwareMap.servo.get("rightServo");
+        monsterRetentionServo = hardwareMap.servo.get ("monsterRetentionServo");
         leftServo.setPosition(OPEN_LEFT_SERVO);
         rightServo.setPosition(OPEN_RIGHT_SERVO);
+        monsterRetentionServo.setPosition(CLOSE_MONSTER_RETENTION_SERVO);
 
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         liftMotor.setPower(0.0);
     }
-    
+
     @Override
     public void start()
     {
+        monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
+
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
             @Override
             public void handleEvent(RobotEvent e) {
