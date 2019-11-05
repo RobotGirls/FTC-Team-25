@@ -36,9 +36,7 @@ public class ServoLinearSlidesPrototype extends Robot {
         leftServo = hardwareMap.servo.get("leftServo");
         rightServo = hardwareMap.servo.get("rightServo");
         monsterRetentionServo = hardwareMap.servo.get ("monsterRetentionServo");
-        leftServo.setPosition(CLOSE_LEFT_SERVO);
-        rightServo.setPosition(CLOSE_RIGHT_SERVO);
-        monsterRetentionServo.setPosition(CLOSE_MONSTER_RETENTION_SERVO);
+        monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
 
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         liftMotor.setPower(0.0);
@@ -47,7 +45,6 @@ public class ServoLinearSlidesPrototype extends Robot {
     @Override
     public void start()
     {
-        monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
 
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
             @Override
