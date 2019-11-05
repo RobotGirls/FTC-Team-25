@@ -14,7 +14,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.StoneDetectionTask;
 
-@Autonomous(name = "SkyStone Autonomous", group = "Team 25")
+@Autonomous(name = "SkyStone Autonomous2", group = "Team 25")
 public class StoneAutonomous extends Robot {
 
 
@@ -111,12 +111,6 @@ public class StoneAutonomous extends Robot {
 
     public void setStoneDetection()
     {
-        //caption: what appears on the phone
-        stonePositionTlm = telemetry.addData("LeftOrigin", "unknown");
-        stoneConfidTlm = telemetry.addData("Confidence", "N/A");
-        stoneTypeTlm = telemetry.addData("StoneType","unknown");
-        imageMidpointTlm = telemetry.addData("Image_Mdpt", "unknown");
-        stoneMidpointTlm = telemetry.addData("Stone Mdpt", "unknown");
 
         sdTask = new StoneDetectionTask(this, "Webcam1") {
             //starts when you find a skystone
@@ -143,7 +137,7 @@ public class StoneAutonomous extends Robot {
                         inCenter = true;
                         RobotLog.i("506 Found gold");
                         sdTask.stop();
-                        //drivetrain.stop();
+                        drivetrain.stop();
                         goPickupSkystone();
                     }
                 }
@@ -155,17 +149,38 @@ public class StoneAutonomous extends Robot {
         sdTask.setDetectionKind(StoneDetectionTask.DetectionKind.SKY_STONE_DETECTED);
 
     }
+
+
+    public void loop()
+    {
+        super.loop();
+
+    }
+
     @Override
     public void init()
     {
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+        /*frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         rearLeft = hardwareMap.get(DcMotor.class, "rearLeft");
-        rearRight = hardwareMap.get(DcMotor.class, "rearRight");
+        rearRight = hardwareMap.get(DcMotor.class, "rearRight");*/
+        frontLeft = hardwareMap.dcMotor.get("frontLeft");
+        frontRight = hardwareMap.dcMotor.get("frontRight");
+        rearLeft = hardwareMap.dcMotor.get("rearLeft");
+        rearRight = hardwareMap.dcMotor.get("rearRight");
+
+        //caption: what appears on the phone
+        stonePositionTlm = telemetry.addData("LeftOrigin", "unknown");
+        stoneConfidTlm = telemetry.addData("Confidence", "N/A");
+        stoneTypeTlm = telemetry.addData("StoneType","unknown");
+        imageMidpointTlm = telemetry.addData("Image_Mdpt", "unknown");
+        stoneMidpointTlm = telemetry.addData("Stone Mdpt", "unknown");
+
 
         drivetrain = new MechanumGearedDrivetrain(360, frontRight, rearRight, frontLeft, rearLeft);
-        drivetrain.encodersOn();
         drivetrain.resetEncoders();
+        drivetrain.encodersOn();
+        RobotLog.i("start moving");
 
         //initializing gamepad variables
         allianceColor = allianceColor.DEFAULT;
