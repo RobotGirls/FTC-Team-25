@@ -40,14 +40,21 @@ public class StoneAutonomous extends Robot {
     private Telemetry.Item imageMidpointTlm;
     private Telemetry.Item loggingTlm;
     private Telemetry.Item handleEvntTlm;
+    private Telemetry.Item deltaTlm;
+
 
     private double confidence;
     private double left;
     private double type;
     private double imageMidpoint;
     private double stoneMidpoint;
-    private double margin;
+    private double delta;
+    private double margin = 500;
     private boolean inCenter;
+    private String stoneType;
+    private StoneDetectionTask.EventKind stoneKind;
+
+    DeadReckonPath path = new DeadReckonPath();
 
     StoneDetectionTask sdTask;
 
@@ -126,11 +133,17 @@ public class StoneAutonomous extends Robot {
 
                 imageMidpoint = event.stones.get(0).getImageWidth() / 2.0;
                 stoneMidpoint = (event.stones.get(0).getWidth() / 2.0) + left;
+                stoneType = event.stones.get(0).getLabel();
+                stoneKind = event.kind;
+                delta = Math.abs(imageMidpoint - stoneMidpoint);
 
                 stonePositionTlm.setValue(left);
                 stoneConfidTlm.setValue(confidence);
                 imageMidpointTlm.setValue(imageMidpoint);
                 stoneMidpointTlm.setValue(stoneMidpoint);
+                stoneTypeTlm.setValue(stoneType);
+                stoneTlm.setValue(stoneKind);
+                deltaTlm.setValue(delta);
 
                 if (event.kind == StoneDetectionTask.EventKind.OBJECTS_DETECTED) {
                     if (Math.abs(imageMidpoint - stoneMidpoint) < margin) {
@@ -145,7 +158,7 @@ public class StoneAutonomous extends Robot {
         };
 
         sdTask.init(telemetry, hardwareMap);
-        //later will find skystone
+        //later adbwill find skystone
         sdTask.setDetectionKind(StoneDetectionTask.DetectionKind.SKY_STONE_DETECTED);
 
     }
@@ -175,6 +188,8 @@ public class StoneAutonomous extends Robot {
         stoneTypeTlm = telemetry.addData("StoneType","unknown");
         imageMidpointTlm = telemetry.addData("Image_Mdpt", "unknown");
         stoneMidpointTlm = telemetry.addData("Stone Mdpt", "unknown");
+        stoneTlm = telemetry.addData("kind", "unknown");
+        deltaTlm = telemetry.addData("delta", "unknown");
 
 
         drivetrain = new MechanumGearedDrivetrain(360, frontRight, rearRight, frontLeft, rearLeft);
@@ -208,21 +223,16 @@ public class StoneAutonomous extends Robot {
 
     public void parkUnderBridge()
     {
-        // go park under sky bridge
+        this.addTask(new DeadReckonTask(this, path, drivetrain));
     }
 
     @Override
     public void start()
     {
-        DeadReckonPath path = new DeadReckonPath();
-        //this.addTask(new DeadReckonTask(this, path, drivetrain));
 
-        /*path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 1.0);
-        path.addSegment(DeadReckonPath.SegmentType.TURN, 90, 1.0);
-        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 1.0);
-        path.addSegment(DeadReckonPath.SegmentType.TURN, 90, 1.0);
-        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 1.0);
-        path.addSegment(DeadReckonPath.SegmentType.TURN, 90, 1.0); */
+
+        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -1.0);
+
 
 
         loggingTlm = telemetry.addData("log", "unknown");
@@ -232,8 +242,10 @@ public class StoneAutonomous extends Robot {
          * Alternatively, this could be an anonymous class declaration that implements
          * handleEvent() for task specific event handlers.
          */
-        //this.addTask(new DeadReckonTask(this, path, drivetrain));
-        if (robotPosition == RobotPosition.BUILD_SITE)
+
+        parkUnderBridge();
+
+        /* if (robotPosition == RobotPosition.BUILD_SITE)
         {
             parkUnderBridge();
 
@@ -244,7 +256,7 @@ public class StoneAutonomous extends Robot {
             loggingTlm.setValue("start:in DEPOT about to startStrafing");
 
             startStrafing();
-        }
+        }*/
 
     }
 }

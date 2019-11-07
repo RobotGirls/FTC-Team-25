@@ -84,6 +84,7 @@ public class FourWheelDeadReckonPath extends Robot {
     {
         DeadReckonPath path = new DeadReckonPath();
 
+
         path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 1.0);
         path.addSegment(DeadReckonPath.SegmentType.TURN, 90, 1.0);
         path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 1.0);
