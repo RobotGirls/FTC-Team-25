@@ -1,6 +1,6 @@
 package test;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -16,7 +16,8 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.ServoCalibrateTask;
 
-@Autonomous(name = "ServoCalibrateUtility")
+@TeleOp
+        (name = "ServoCalibrateUtility2")
 //@Disabled
 public class ServoCalibrate extends Robot {
 

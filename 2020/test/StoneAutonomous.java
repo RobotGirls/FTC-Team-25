@@ -191,6 +191,8 @@ public class StoneAutonomous extends Robot {
         stoneTlm = telemetry.addData("kind", "unknown");
         deltaTlm = telemetry.addData("delta", "unknown");
 
+        RobotLog.ii(TAG,  "delta: " + delta);
+
 
         drivetrain = new MechanumGearedDrivetrain(360, frontRight, rearRight, frontLeft, rearLeft);
         drivetrain.resetEncoders();
