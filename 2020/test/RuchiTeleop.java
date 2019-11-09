@@ -64,20 +64,19 @@ public class RollingStoneTeleop extends Robot {
     private Servo rightServo;
     private Servo monsterRetentionServo;
     private DcMotor liftMotor;
-    private final double OPEN_LEFT_SERVO = (float)30 / (float)256.0; //FIXME
-    private final double CLOSE_LEFT_SERVO = (float)95 / (float)256.0; //FIXME
-
-    private final double OPEN_RIGHT_SERVO = (float)241 / (float)256.0; //FIXME
-    private final double CLOSE_RIGHT_SERVO = (float)199 / (float)256.0; //FIXME
-    private final double OPEN_MONSTER_RETENTION_SERVO = (float)220 / (float)256.0;  //
-    private final double CLOSE_MONSTER_RETENTION_SERVO = (float)117/(float)256.0; //
-    private final int DELTA_HEIGHT = 150;
+    private final double OPEN_LEFT_SERVO = 183 / 256; //FIXME
+    private final double OPEN_RIGHT_SERVO = 88 / 256; //FIXME
+    private final double CLOSE_LEFT_SERVO = 176 / 256; //FIXME
+    private final double CLOSE_RIGHT_SERVO = 170 / 256; //FIXME
+    private final double OPEN_MONSTER_RETENTION_SERVO = 220 / 256;  //
+    private final double CLOSE_MONSTER_RETENTION_SERVO = 117/ 256; //
+    private final int DELTA_HEIGHT = 50;
     private final int LINEAR_INITIAL_POS = 100;
     private final DcMotorSimple.Direction LIFT_DIRECTION_UP = DcMotorSimple.Direction.FORWARD;
     private final DcMotorSimple.Direction LIFT_DIRECTION_DOWN = DcMotorSimple.Direction.REVERSE;
     private int currentHeight =  LINEAR_INITIAL_POS;
 
-    private Telemetry.Item linearPos;
+    private Telemetry.Item linearEncoderVal;
     //emily's code
 
     private TeleopDriveTask drivetask;
@@ -112,10 +111,7 @@ public class RollingStoneTeleop extends Robot {
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-       linearPos = telemetry.addData("linearpos", 0);
-
-        leftServo.setPosition(OPEN_LEFT_SERVO);
-        rightServo.setPosition(OPEN_RIGHT_SERVO);
+        //linearEncoderVal.addData("linearpos", "unknown");
         //emily's
 
         TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
@@ -126,30 +122,24 @@ public class RollingStoneTeleop extends Robot {
 
     public void liftMotorOneStep(DcMotorSimple.Direction direction)
     {
-        if (direction == DcMotorSimple.Direction.REVERSE) {  // down
+        if (direction == DcMotorSimple.Direction.REVERSE) {
 
             currentHeight -=  DELTA_HEIGHT;
-            if (currentHeight < 50) {
-                currentHeight = 50;
-            }
         } else {
             currentHeight += DELTA_HEIGHT;
-            if (currentHeight > 500) {
-                currentHeight = 500;
-            }
         }
         liftMotor.setDirection(direction);
-        linearPos.setValue(currentHeight);
-        this.addTask(new RunToEncoderValueTask(this,  liftMotor, currentHeight, .75));
+        //linearEncoderVal.setValue(currentHeight);
+        this.addTask(new RunToEncoderValueTask(this,  liftMotor, currentHeight, .50));
     }
 
     @Override
     public void start() {
         this.addTask(new TankDriveTask(this, drivetrain));
 
-        monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
+        monsterRetentionServo.setPosition(CLOSE_MONSTER_RETENTION_SERVO);
         //emily's
-        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
+        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
             //@Override
             public void handleEvent(RobotEvent e) {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
