@@ -233,7 +233,7 @@ public class StoneAutonomous extends Robot {
     {
 
 
-        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, -1.0);
+        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2.5, -1.0);
 
 
 
