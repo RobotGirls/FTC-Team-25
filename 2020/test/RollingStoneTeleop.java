@@ -64,12 +64,12 @@ public class RollingStoneTeleop extends Robot {
     private Servo rightServo;
     private Servo monsterRetentionServo;
     private DcMotor liftMotor;
-    private final double OPEN_LEFT_SERVO = 183 / 256; //FIXME
-    private final double OPEN_RIGHT_SERVO = 170 / 256; //FIXME
-    private final double CLOSE_LEFT_SERVO = 176 / 256; //FIXME
-    private final double CLOSE_RIGHT_SERVO = 88 / 256; //FIXME
-    private final double OPEN_MONSTER_RETENTION_SERVO = 256 / 256;
-    private final double CLOSE_MONSTER_RETENTION_SERVO = 128 / 256;
+    private final double OPEN_LEFT_SERVO = 183 / 256;
+    private final double OPEN_RIGHT_SERVO = 170 / 256;
+    private final double CLOSE_LEFT_SERVO = 176 / 256;
+    private final double CLOSE_RIGHT_SERVO = 88 / 256;
+    private final double OPEN_MONSTER_RETENTION_SERVO = 220 / 256; //FIXME
+    private final double CLOSE_MONSTER_RETENTION_SERVO = 117 / 256; //FIXME
     private final int DELTA_HEIGHT = 50;
     private final int LINEAR_INITIAL_POS = 100;
     private final DcMotorSimple.Direction LIFT_DIRECTION_UP = DcMotorSimple.Direction.REVERSE;
@@ -135,7 +135,7 @@ public class RollingStoneTeleop extends Robot {
 
     @Override
     public void start() {
-        this.addTask(new TankDriveTask(this, drivetrain));
+        this.addTask(new TankDriveTask(thadis, drivetrain));
 
         monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
         //emily's
