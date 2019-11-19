@@ -166,17 +166,7 @@ public class SkyStoneAutoMeet1 extends Robot {
                     moveStonetoBuild();
                 }
             }
-
         });
-        this.addTask(new DeadReckonTask(this, redDepotPath, drivetrain1){
-            @Override
-            public void handleEvent(RobotEvent e){
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if path.kind
-            }
-                     }
-
-        );
     }
 
     public void setStoneDetection()
@@ -252,7 +242,7 @@ public class SkyStoneAutoMeet1 extends Robot {
 
         redDepotPath.stop();
         redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,3.4, -STRAIGHT_SPEED);
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, STRAIGHT_SPEED); 
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, STRAIGHT_SPEED);
 
         bmoveAcross.stop();
         bmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3 ,STRAIGHT_SPEED);
@@ -260,7 +250,7 @@ public class SkyStoneAutoMeet1 extends Robot {
 
         rmoveAcross.stop();
         rmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3 ,STRAIGHT_SPEED); //FIXME
-        rmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, -STRAIGHT_SPEED); //FIXME
+        rmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, STRAIGHT_SPEED); //FIXME
 
 
 
