@@ -27,8 +27,8 @@ public class SkyStoneAutoMeet1 extends Robot {
     private DcMotor rearRight;
     //for mechanism
     private Servo grabberServo;
-    private final double DOWN_GRABBER_SERVO = (float) 115/ (float)256.0;
-    private final double UP_GRABBER_SERVO = (float)160 / (float)256.0;
+    private final double DOWN_GRABBER_SERVO = (float) 1/ (float)256.0;
+    private final double UP_GRABBER_SERVO = (float)67 / (float)256.0;
 
     private MechanumGearedDrivetrain drivetrain1;
 
@@ -51,6 +51,7 @@ public class SkyStoneAutoMeet1 extends Robot {
     private DeadReckonPath blueFoundationPath;
     private DeadReckonPath bmoveAcross;
     private DeadReckonPath rmoveAcross;
+    private DeadReckonPath moveAcross;
 
 
     private double confidence;
@@ -105,14 +106,16 @@ public class SkyStoneAutoMeet1 extends Robot {
                 case BUTTON_X_DOWN:
                     allianceColor = AllianceColor.BLUE;
                     allianceTlm.setValue("BLUE");
-                    depotPath = blueDepotPath;
+                    //depotPath = blueDepotPath;
                     foundationPath = blueFoundationPath;
+                    moveAcross = bmoveAcross;
                     break;
                 case BUTTON_B_DOWN:
                     allianceColor = AllianceColor.RED;
                     allianceTlm.setValue("RED");
-                    depotPath = redDepotPath;
+                    //depotPath = redDepotPath;
                     foundationPath = redFoundationPath;
+                    moveAcross = rmoveAcross;
                     break;
                 case BUTTON_Y_DOWN:
                     robotPosition = RobotPosition.BUILD_SITE;
@@ -133,7 +136,7 @@ public class SkyStoneAutoMeet1 extends Robot {
 
 
         //starts when you have stone and want to move
-        this.addTask(new DeadReckonTask(this, bmoveAcross, drivetrain1){
+        this.addTask(new DeadReckonTask(this, moveAcross, drivetrain1){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -148,14 +151,14 @@ public class SkyStoneAutoMeet1 extends Robot {
         });
     }
 
-    public void goPickupSkystone()
+    public void goPickupSkystone(DeadReckonPath depotPath)
     {
         //FIXME
         RobotLog.i("Go Pick Up Skystone");
 
 
             //starts when you find a skystone
-        this.addTask(new DeadReckonTask(this, blueDepotPath, drivetrain1){
+        this.addTask(new DeadReckonTask(this, depotPath, drivetrain1){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -209,7 +212,13 @@ public class SkyStoneAutoMeet1 extends Robot {
                         RobotLog.i("506 Found gold");
                         sdTask.stop();
                         drivetrain1.stop();
-                        goPickupSkystone();
+                        if (allianceColor == AllianceColor.RED) {
+                            goPickupSkystone(redDepotPath);
+                            RobotLog.i("506 chose red depot path");
+                        } else {
+                            goPickupSkystone(blueDepotPath);
+                            RobotLog.i("506 chose blue depot path");
+                        }
                     }
                 }
             }
@@ -238,20 +247,19 @@ public class SkyStoneAutoMeet1 extends Robot {
 
         blueDepotPath.stop();
         blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,3.4, STRAIGHT_SPEED);  //3forprogramming
-        blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, -STRAIGHT_SPEED); //5.75for programming
+        blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, STRAIGHT_SPEED); //5.75for programming
 
         redDepotPath.stop();
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,3.4, -STRAIGHT_SPEED);
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, STRAIGHT_SPEED);
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,3.4, STRAIGHT_SPEED);
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, -STRAIGHT_SPEED); //change
 
         bmoveAcross.stop();
-        bmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3 ,STRAIGHT_SPEED);
-        bmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, -STRAIGHT_SPEED);
+        bmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3 ,-STRAIGHT_SPEED);
+        bmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, STRAIGHT_SPEED);
 
         rmoveAcross.stop();
         rmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3 ,STRAIGHT_SPEED); //FIXME
-        rmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, STRAIGHT_SPEED); //FIXME
-
+        rmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, -STRAIGHT_SPEED); //FIXME
 
 
 
