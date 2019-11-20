@@ -42,6 +42,7 @@ public class SkyStoneAutoMeet1 extends Robot {
     private Telemetry.Item handleEvntTlm;
     private Telemetry.Item deltaTlm;
     private Telemetry.Item numStonesSeenTlm;
+    private Telemetry.Item pathTlm;
     private int numStonesSeen;
     private DeadReckonPath redDepotPath;
     private DeadReckonPath blueDepotPath;
@@ -61,6 +62,7 @@ public class SkyStoneAutoMeet1 extends Robot {
     private double stoneMidpoint;
     private double delta;
     private double margin = 50;
+    private double setColor;
     private boolean inCenter;
     private String stoneType;
     private StoneDetectionTask.EventKind stoneKind;
@@ -201,6 +203,7 @@ public class SkyStoneAutoMeet1 extends Robot {
                 stoneTypeTlm.setValue(stoneType);
                 stoneTlm.setValue(stoneKind);
                 deltaTlm.setValue(delta);
+                pathTlm.setValue(setColor);
 
                 numStonesSeen = event.stones.size();
                 numStonesSeenTlm.setValue(numStonesSeen);
@@ -215,9 +218,11 @@ public class SkyStoneAutoMeet1 extends Robot {
                         if (allianceColor == AllianceColor.RED) {
                             goPickupSkystone(redDepotPath);
                             RobotLog.i("506 chose red depot path");
+                            pathTlm.setValue("taking red depot path");
                         } else {
                             goPickupSkystone(blueDepotPath);
                             RobotLog.i("506 chose blue depot path");
+                            pathTlm.setValue("taking blue depot path" );
                         }
                     }
                 }
@@ -246,7 +251,7 @@ public class SkyStoneAutoMeet1 extends Robot {
         rmoveAcross = new DeadReckonPath();
 
         blueDepotPath.stop();
-        blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,3.4, STRAIGHT_SPEED);  //3forprogramming
+        blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,3.4, -STRAIGHT_SPEED);  //3forprogramming
         blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, STRAIGHT_SPEED); //5.75for programming
 
         redDepotPath.stop();
@@ -286,6 +291,7 @@ public class SkyStoneAutoMeet1 extends Robot {
         stoneTlm = telemetry.addData("kind", "unknown");
         deltaTlm = telemetry.addData("delta", "unknown");
         numStonesSeenTlm = telemetry.addData("numStones",-1);
+        pathTlm = telemetry.addData("AllianceClr", "unknown");
 
         RobotLog.ii(TAG,  "delta: " + delta);
 
