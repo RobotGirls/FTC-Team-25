@@ -19,7 +19,7 @@ import team25core.StoneDetectionTask;
 public class SkyStoneAutoMeet1 extends Robot {
 
 
-    private final static String TAG = "Margarita";
+    private final static String TAG = "STONEZ";
 
     private DcMotor frontLeft;
     private DcMotor frontRight;
@@ -27,8 +27,15 @@ public class SkyStoneAutoMeet1 extends Robot {
     private DcMotor rearRight;
     //for mechanism
     private Servo grabberServo;
+    private Servo foundationHookRightServo;
+    private Servo foundationHookLeftServo;
     private final double DOWN_GRABBER_SERVO = (float) 1/ (float)256.0;
-    private final double UP_GRABBER_SERVO = (float)67 / (float)256.0;
+    private final double UP_GRABBER_SERVO = (float)80 / (float)256.0;
+    private final double OPEN_FOUNDATION_HOOK_RIGHT_SERVO = (float)89 / (float)256.0;
+    private final double OPEN_FOUNDATION_HOOK_LEFT_SERVO  = (float)10 / (float)256.0;
+    private final double CLOSE_FOUNDATION_HOOK_RIGHT_SERVO  = (float)215/ (float)256.0;  //FIX ALL FOUNDATION SERVO
+    private final double CLOSE_FOUNDATION_HOOK_LEFT_SERVO = (float)139 / (float)256.0;
+
 
     private MechanumGearedDrivetrain drivetrain1;
 
@@ -53,6 +60,9 @@ public class SkyStoneAutoMeet1 extends Robot {
     private DeadReckonPath bmoveAcross;
     private DeadReckonPath rmoveAcross;
     private DeadReckonPath moveAcross;
+    private DeadReckonPath endRedFoundation;
+    private DeadReckonPath endBlueFoundation;
+    private DeadReckonPath endFoundationPath;
 
 
     private double confidence;
@@ -108,16 +118,18 @@ public class SkyStoneAutoMeet1 extends Robot {
                 case BUTTON_X_DOWN:
                     allianceColor = AllianceColor.BLUE;
                     allianceTlm.setValue("BLUE");
-                    //depotPath = blueDepotPath;
+                    depotPath = blueDepotPath;
                     foundationPath = blueFoundationPath;
                     moveAcross = bmoveAcross;
+                    endFoundationPath = endBlueFoundation;
                     break;
                 case BUTTON_B_DOWN:
                     allianceColor = AllianceColor.RED;
                     allianceTlm.setValue("RED");
-                    //depotPath = redDepotPath;
+                    depotPath = redDepotPath;
                     foundationPath = redFoundationPath;
                     moveAcross = rmoveAcross;
+                    endFoundationPath = endRedFoundation;
                     break;
                 case BUTTON_Y_DOWN:
                     robotPosition = RobotPosition.BUILD_SITE;
@@ -153,7 +165,7 @@ public class SkyStoneAutoMeet1 extends Robot {
         });
     }
 
-    public void goPickupSkystone(DeadReckonPath depotPath)
+    public void goPickupSkystone(final DeadReckonPath depotPath)
     {
         //FIXME
         RobotLog.i("Go Pick Up Skystone");
@@ -169,6 +181,50 @@ public class SkyStoneAutoMeet1 extends Robot {
                     grabberServo.setPosition(DOWN_GRABBER_SERVO);
                     RobotLog.i("Done with path");
                     moveStonetoBuild();
+                }
+            }
+        });
+    }
+
+    public void moveFoundationtoBuild()
+    {
+        //FIXME
+        RobotLog.i("move foundation to build corner");
+
+
+        //starts when you find a skystone
+        this.addTask(new DeadReckonTask(this, endFoundationPath, drivetrain1){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    foundationHookRightServo.setPosition(OPEN_FOUNDATION_HOOK_RIGHT_SERVO);
+                    foundationHookLeftServo.setPosition(OPEN_FOUNDATION_HOOK_LEFT_SERVO);
+                    RobotLog.i("Done with path");
+                }
+            }
+        });
+    }
+
+
+    public void moveFoundation(final DeadReckonPath foundationPath)
+    {
+        //FIXME
+        RobotLog.i("Move to Foundation");
+
+
+        //starts when you find a skystone
+        this.addTask(new DeadReckonTask(this, foundationPath, drivetrain1){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    foundationHookRightServo.setPosition(CLOSE_FOUNDATION_HOOK_RIGHT_SERVO);
+                    foundationHookLeftServo.setPosition(CLOSE_FOUNDATION_HOOK_LEFT_SERVO);
+                    RobotLog.i("Done with foundation path to hook foundation");
+                    moveFoundationtoBuild();
                 }
             }
         });
@@ -215,6 +271,7 @@ public class SkyStoneAutoMeet1 extends Robot {
                         RobotLog.i("506 Found gold");
                         sdTask.stop();
                         drivetrain1.stop();
+
                         if (allianceColor == AllianceColor.RED) {
                             goPickupSkystone(redDepotPath);
                             RobotLog.i("506 chose red depot path");
@@ -245,26 +302,48 @@ public class SkyStoneAutoMeet1 extends Robot {
     {
         blueDepotPath = new DeadReckonPath();
         redDepotPath = new DeadReckonPath();
+
         redFoundationPath = new DeadReckonPath();
         blueFoundationPath = new DeadReckonPath();
+
         bmoveAcross = new DeadReckonPath();
         rmoveAcross = new DeadReckonPath();
 
+        endRedFoundation = new DeadReckonPath();
+        endBlueFoundation = new DeadReckonPath();
+        //add path to get to bridge
+
         blueDepotPath.stop();
-        blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,3.4, -STRAIGHT_SPEED);  //3forprogramming
-        blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, STRAIGHT_SPEED); //5.75for programming
+        blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,1.5, STRAIGHT_SPEED);  //left
+        blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, -STRAIGHT_SPEED); //forward
 
         redDepotPath.stop();
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,3.4, STRAIGHT_SPEED);
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, -STRAIGHT_SPEED); //change
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,3, STRAIGHT_SPEED); //left
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, -STRAIGHT_SPEED); //forward
 
         bmoveAcross.stop();
-        bmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3 ,-STRAIGHT_SPEED);
+        bmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3 ,STRAIGHT_SPEED);
         bmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, STRAIGHT_SPEED);
 
         rmoveAcross.stop();
         rmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3 ,STRAIGHT_SPEED); //FIXME
         rmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, -STRAIGHT_SPEED); //FIXME
+
+        redFoundationPath.stop();
+        redFoundationPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 6, STRAIGHT_SPEED);
+        redFoundationPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, STRAIGHT_SPEED);  //FIXME
+
+        blueFoundationPath.stop();
+        blueFoundationPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 6, -STRAIGHT_SPEED);
+        blueFoundationPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, STRAIGHT_SPEED);  //FIXME
+
+        endRedFoundation.stop();
+        endRedFoundation.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, -STRAIGHT_SPEED);  //FIXME
+
+        endBlueFoundation.stop();
+        endBlueFoundation.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, -STRAIGHT_SPEED);  //FIXME
+
+
 
 
 
@@ -278,9 +357,15 @@ public class SkyStoneAutoMeet1 extends Robot {
         frontRight = hardwareMap.dcMotor.get("frontRight");
         rearLeft = hardwareMap.dcMotor.get("rearLeft");
         rearRight = hardwareMap.dcMotor.get("rearRight");
-        grabberServo = hardwareMap.servo.get("grabberServo");
 
+        grabberServo = hardwareMap.servo.get("grabberServo");
         grabberServo.setPosition(UP_GRABBER_SERVO);
+
+        foundationHookLeftServo = hardwareMap.servo.get("foundationHookLeftServo");
+        foundationHookLeftServo.setPosition(OPEN_FOUNDATION_HOOK_LEFT_SERVO);
+
+        foundationHookRightServo = hardwareMap.servo.get("foundationHookRightServo");
+        foundationHookRightServo.setPosition(OPEN_FOUNDATION_HOOK_RIGHT_SERVO);
 
         //caption: what appears on the phone
         stonePositionTlm = telemetry.addData("LeftOrigin", "unknown");
@@ -322,7 +407,11 @@ public class SkyStoneAutoMeet1 extends Robot {
         RobotLog.i("startStrafing");
         addTask(sdTask);
         loggingTlm.setValue("startStrafing:before starting to strafe");
-        drivetrain1.strafe(SkyStoneConstants25.STRAFE_SPEED);
+        if (allianceColor == AllianceColor.RED) {
+            drivetrain1.strafe(SkyStoneConstants25.STRAFE_SPEED);
+        } else {
+            drivetrain1.strafe(-SkyStoneConstants25.STRAFE_SPEED);
+        }
         loggingTlm.setValue("startStrafing:after starting to strafe");
     }
 
@@ -331,10 +420,7 @@ public class SkyStoneAutoMeet1 extends Robot {
         this.addTask(new DeadReckonTask(this, path, drivetrain1));
     }
 
-    public void moveFoundation()
-    {
-        this.addTask(new DeadReckonTask(this, foundationPath, drivetrain1));
-    }
+
     @Override
     public void start()
     {
@@ -357,7 +443,7 @@ public class SkyStoneAutoMeet1 extends Robot {
         if (robotPosition == RobotPosition.BUILD_SITE)
         {
            //parkUnderBridge();
-            moveFoundation();
+            moveFoundation(foundationPath);
 
         }
         else if (robotPosition == RobotPosition.DEPOT)
