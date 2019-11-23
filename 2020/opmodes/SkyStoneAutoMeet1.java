@@ -314,7 +314,7 @@ public class SkyStoneAutoMeet1 extends Robot {
         //add path to get to bridge
 
         blueDepotPath.stop();
-        blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,1.5, STRAIGHT_SPEED);  //left
+        blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,2, STRAIGHT_SPEED);  //left
         blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, -STRAIGHT_SPEED); //forward
 
         redDepotPath.stop();
