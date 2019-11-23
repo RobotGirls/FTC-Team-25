@@ -61,8 +61,8 @@ public class RollingStoneTeleop extends Robot {
     //amory's
 
 
-        private Servo foundationHookLeft;
-        private Servo foundationHookRight;
+    private Servo foundationHookLeft;
+    private Servo foundationHookRight;
 
     //emily's code
 
@@ -70,18 +70,19 @@ public class RollingStoneTeleop extends Robot {
     private Servo rightServo;
     private Servo monsterRetentionServo;
     private DcMotor liftMotor;
-    private Servo grabberServo;
-    private final double OPEN_LEFT_SERVO = 183 / 256;
-    private final double OPEN_RIGHT_SERVO = 170 / 256;
-    private final double CLOSE_LEFT_SERVO = 176 / 256;
-    private final double CLOSE_RIGHT_SERVO = 88 / 256;
+    private final double OPEN_LEFT_SERVO = (float)10 / (float)256;
+    private final double OPEN_RIGHT_SERVO = (float)250 / (float)256;
+    private final double CLOSE_LEFT_SERVO = (float)95 / (float)256;
+    private final double CLOSE_RIGHT_SERVO = (float)199 / (float)256;
     private final double OPEN_MONSTER_RETENTION_SERVO = 220 / 256; //FIXME
     private final double CLOSE_MONSTER_RETENTION_SERVO = 117 / 256; //FIXME
-    private final int DELTA_HEIGHT = 50;
+    private final int DELTA_HEIGHT = 180;
     private final int LINEAR_INITIAL_POS = 100;
-    private final DcMotorSimple.Direction LIFT_DIRECTION_UP = DcMotorSimple.Direction.REVERSE;
-    private final DcMotorSimple.Direction LIFT_DIRECTION_DOWN = DcMotorSimple.Direction.FORWARD;
+    private final DcMotorSimple.Direction LIFT_DIRECTION_UP = DcMotorSimple.Direction.FORWARD;
+    private final DcMotorSimple.Direction LIFT_DIRECTION_DOWN = DcMotorSimple.Direction.REVERSE;
     private int currentHeight =  LINEAR_INITIAL_POS;
+
+    private Telemetry.Item linearPos;
 
     private Telemetry.Item linearEncoderVal;
     //emily's code
@@ -102,9 +103,8 @@ public class RollingStoneTeleop extends Robot {
     @Override
     public void init() {
 
-        foundationHookLeft = hardwareMap.servo.get("foundationHookLeft");
-        foundationHookRight = hardwareMap.servo.get("foundationHookRight");
-        grabberServo = hardwareMap.servo.get("grabberServo");
+        foundationHookLeft = hardwareMap.servo.get("foundationHookLeftServo");
+        foundationHookRight = hardwareMap.servo.get("foundationHookRightServo");
 
         foundationHookLeft.setPosition(0.0390625);
         foundationHookRight.setPosition(0.34765625);
@@ -132,6 +132,7 @@ public class RollingStoneTeleop extends Robot {
 
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        linearPos = telemetry.addData("linearpos", 0);
 
         //linearEncoderVal.addData("linearpos", "unknown");
         //emily's
@@ -145,15 +146,25 @@ public class RollingStoneTeleop extends Robot {
 
     public void liftMotorOneStep(DcMotorSimple.Direction direction)
     {
-        if (direction == DcMotorSimple.Direction.FORWARD) {
+        if (direction == DcMotorSimple.Direction.REVERSE) {
 
             currentHeight -=  DELTA_HEIGHT;
+            if(currentHeight < 50) {
+                currentHeight = 50;
+            }
+
         } else {
             currentHeight += DELTA_HEIGHT;
+            if (currentHeight > 500) {
+                currentHeight = 500;
+            }
+
         }
+        linearPos.setValue(currentHeight);
+
         liftMotor.setDirection(direction);
         //linearEncoderVal.setValue(currentHeight);
-        this.addTask(new RunToEncoderValueTask(this,  liftMotor, currentHeight, .25));
+        this.addTask(new RunToEncoderValueTask(this,  liftMotor, currentHeight, .75));
     }
 
     @Override
@@ -171,8 +182,33 @@ public class RollingStoneTeleop extends Robot {
 
         monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
 
-        //emily's
+        leftServo.setPosition(OPEN_LEFT_SERVO);
+        rightServo.setPosition(OPEN_RIGHT_SERVO);
+
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
+            //@Override
+            public void handleEvent(RobotEvent e) {
+                GamepadEvent gamepadEvent = (GamepadEvent) e;
+
+                switch (gamepadEvent.kind) {
+                    case RIGHT_BUMPER_DOWN:
+                        foundationHookLeft.setPosition(0.0390625); //open
+                        foundationHookRight.setPosition(0.34765625);
+                        break;
+                    case RIGHT_TRIGGER_DOWN:
+                        foundationHookLeft.setPosition(0.54296875);
+                        foundationHookRight.setPosition(0.83984375);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+
+        
+
+        //emily's
+        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             //@Override
             public void handleEvent(RobotEvent e) {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
@@ -199,16 +235,6 @@ public class RollingStoneTeleop extends Robot {
                         break;
                     case DPAD_LEFT_DOWN:
                         monsterRetentionServo.setPosition(CLOSE_MONSTER_RETENTION_SERVO);
-                        break;
-                    case RIGHT_TRIGGER_DOWN:
-                        foundationHookLeft.setPosition(0.0390625);
-                        foundationHookRight.setPosition(0.34765625);
-                        break;
-                    case RIGHT_BUMPER_DOWN:
-                        foundationHookLeft.setPosition(0.54296875);
-                        foundationHookRight.setPosition(0.83984375);
-                        break;
-                        default:
                         break;
                 }
             }

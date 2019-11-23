@@ -15,8 +15,8 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.StoneDetectionTask;
 
-@Autonomous(name = "AutoMeet1", group = "Team 25")
-public class SkyStoneAutoMeet1modified extends Robot {
+@Autonomous(name = "AutoMeet2", group = "Team 25")
+public class SkyStoneAutoMeet1 extends Robot {
 
 
     private final static String TAG = "STONEZ";
@@ -393,21 +393,21 @@ public class SkyStoneAutoMeet1modified extends Robot {
         redFoundationPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 6, STRAIGHT_SPEED);
         redFoundationPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, STRAIGHT_SPEED);
 
+        endRedFoundation.stop();
+        endRedFoundation.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, -STRAIGHT_SPEED);
+
+        redFoundationUnderBridge.stop();
+        redFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 9, -STRAIGHT_SPEED);
+
         blueFoundationPath.stop();
         blueFoundationPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 6, -STRAIGHT_SPEED);
         blueFoundationPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, STRAIGHT_SPEED);
 
-        endRedFoundation.stop();
-        endRedFoundation.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, -STRAIGHT_SPEED);
-
         endBlueFoundation.stop();
         endBlueFoundation.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, -STRAIGHT_SPEED);
 
-        blueFoundationPath.stop();
-        blueFoundationPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, -STRAIGHT_SPEED);
-
-        redFoundationPath.stop();
-        redFoundationPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, STRAIGHT_SPEED);
+        blueFoundationUnderBridge.stop();
+        blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 7.5, STRAIGHT_SPEED);
 
         blueSkyStoneUnderBridge.stop();
         blueSkyStoneUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3.4, -STRAIGHT_SPEED);
