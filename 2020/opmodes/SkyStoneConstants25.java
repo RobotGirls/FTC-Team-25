@@ -1,4 +1,4 @@
-package test;
+package opmodes;
 
 public class SkyStoneConstants25 {
     //static-will have space in memory
