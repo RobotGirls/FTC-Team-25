@@ -64,6 +64,7 @@ public class leagueMeet1Teleop extends Robot {
     private Servo leftServo;
     private Servo rightServo;
     private Servo monsterRetentionServo;
+    //private Servo grabberServo
     private DcMotor liftMotor;
     private final double OPEN_LEFT_SERVO = (float)10 / (float)256.0; //FIXME
     private final double CLOSE_LEFT_SERVO = (float)95 / (float)256.0; //FIXME
@@ -105,6 +106,7 @@ public class leagueMeet1Teleop extends Robot {
             liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
             leftServo = hardwareMap.servo.get("leftServo");
             rightServo = hardwareMap.servo.get("rightServo");
+            //grabberServo = hardwareMap.servo.get("grabberServo");
             liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             liftMotor.setPower(0.0);
 
@@ -193,6 +195,9 @@ public class leagueMeet1Teleop extends Robot {
                         break;
                     case DPAD_LEFT_DOWN:
                         monsterRetentionServo.setPosition(CLOSE_MONSTER_RETENTION_SERVO);
+                        break;
+                    case RIGHT_TRIGGER_DOWN:
+                        //grabberServo
                         break;
                     default:
                         break;
