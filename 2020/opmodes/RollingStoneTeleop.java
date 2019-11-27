@@ -40,8 +40,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import team25core.DeadmanMotorTask;
 import team25core.GamepadTask;
-import team25core.MechanumGearedDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
@@ -59,25 +59,32 @@ public class RollingStoneTeleop extends Robot {
     private DcMotor rearRight;
 
     //amory's
-
-
     private Servo foundationHookLeft;
     private Servo foundationHookRight;
 
     //emily's code
-
     private Servo leftServo;
     private Servo rightServo;
     private Servo monsterRetentionServo;
+    private Servo grabberServo;
     private DcMotor liftMotor;
-    private final double OPEN_LEFT_SERVO = (float)10 / (float)256;
+
+    private final double OPEN_LEFT_SERVO = (float)159 / (float)256;
     private final double OPEN_RIGHT_SERVO = (float)250 / (float)256;
-    private final double CLOSE_LEFT_SERVO = (float)95 / (float)256;
+    private final double CLOSE_LEFT_SERVO = (float)202 / (float)256;
     private final double CLOSE_RIGHT_SERVO = (float)199 / (float)256;
-    private final double OPEN_MONSTER_RETENTION_SERVO = 220 / 256; //FIXME
-    private final double CLOSE_MONSTER_RETENTION_SERVO = 117 / 256; //FIXME
+    private final double OPEN_MONSTER_RETENTION_SERVO = 220 / 256;
+    private final double CLOSE_MONSTER_RETENTION_SERVO = 117 / 256;
+    private final double LIFT_POWER_UP = -0.5;
+    private final double LIFT_POWER_DOWN = 0.5;
+    DeadmanMotorTask liftLinearUp;
+    DeadmanMotorTask liftLinearDown;
+
     private final int DELTA_HEIGHT = 180;
     private final int LINEAR_INITIAL_POS = 100;
+    private final int MAX_LINEAR_HEIGHT = 50;
+    private final int MIN_LINEAR_HEIGHT = 500;
+
     private final DcMotorSimple.Direction LIFT_DIRECTION_UP = DcMotorSimple.Direction.FORWARD;
     private final DcMotorSimple.Direction LIFT_DIRECTION_DOWN = DcMotorSimple.Direction.REVERSE;
     private int currentHeight =  LINEAR_INITIAL_POS;
@@ -90,7 +97,7 @@ public class RollingStoneTeleop extends Robot {
     private TeleopDriveTask drivetask;
 
     //private FourWheelDirectDrivetrain drivetrain;
-    private MechanumGearedDrivetrain drivetrain;
+    //private MechanumGearedDrivetrain drivetrain;
 
     private static final int TICKS_PER_INCH = 79;
 
@@ -105,6 +112,7 @@ public class RollingStoneTeleop extends Robot {
 
         foundationHookLeft = hardwareMap.servo.get("foundationHookLeftServo");
         foundationHookRight = hardwareMap.servo.get("foundationHookRightServo");
+        grabberServo = hardwareMap.servo.get("grabberServo");
 
         foundationHookLeft.setPosition(0.0390625);
         foundationHookRight.setPosition(0.34765625);
@@ -139,8 +147,14 @@ public class RollingStoneTeleop extends Robot {
 
         TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
 
-        drivetrain = new MechanumGearedDrivetrain(360, frontRight, rearRight, frontLeft, rearLeft);
-        drivetrain.setNoncanonicalMotorDirection();
+       //drivetrain = new MechanumGearedDrivetrain(360, frontRight, rearRight, frontLeft, rearLeft);
+        //drivetrain.setNoncanonicalMotorDirection();
+
+        liftLinearUp = new DeadmanMotorTask(this, liftMotor, LIFT_POWER_UP, GamepadTask.GamepadNumber. GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
+        liftLinearUp.setMaxMotorPosition(MAX_LINEAR_HEIGHT);
+
+        liftLinearDown = new DeadmanMotorTask(this, liftMotor, LIFT_POWER_DOWN, GamepadTask.GamepadNumber. GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
+        liftLinearUp.setMinMotorPosition(MIN_LINEAR_HEIGHT);
     }
 
 
@@ -171,7 +185,8 @@ public class RollingStoneTeleop extends Robot {
     public void start() {
 
        //switch (gamepadEvent.kind)
-
+        addTask(liftLinearUp);
+        addTask(liftLinearDown);
 
         TankMechanumControlSchemeBackwards scheme = new TankMechanumControlSchemeBackwards(gamepad1);
         // added lines 146 and 148
@@ -222,14 +237,14 @@ public class RollingStoneTeleop extends Robot {
                         leftServo.setPosition(CLOSE_LEFT_SERVO);
                         rightServo.setPosition(CLOSE_RIGHT_SERVO);
                         break;
-                    case BUTTON_A_DOWN:
+                    //case BUTTON_A_DOWN:
                         //liftMotor.setPower(0.5);
-                        liftMotorOneStep(LIFT_DIRECTION_DOWN);
-                        break;
-                    case BUTTON_Y_DOWN:
+                        //liftMotorOneStep(LIFT_DIRECTION_DOWN);
+                        //break;
+                   // case BUTTON_Y_DOWN:
                         //liftMotor.setPower(0.0);
-                        liftMotorOneStep(LIFT_DIRECTION_UP);
-                        break;
+                        //liftMotorOneStep(LIFT_DIRECTION_UP);
+                       // break;
                     case DPAD_RIGHT_DOWN:
                         monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
                         break;
