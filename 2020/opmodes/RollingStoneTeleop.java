@@ -69,10 +69,10 @@ public class RollingStoneTeleop extends Robot {
     private Servo grabberServo;
     private DcMotor liftMotor;
 
-    private final double OPEN_LEFT_SERVO = (float)159 / (float)256;
-    private final double OPEN_RIGHT_SERVO = (float)250 / (float)256;
-    private final double CLOSE_LEFT_SERVO = (float)202 / (float)256;
-    private final double CLOSE_RIGHT_SERVO = (float)199 / (float)256;
+    private final double OPEN_LEFT_SERVO = (float)50 / (float)256;
+    private final double OPEN_RIGHT_SERVO = (float)171 / (float)256;
+    private final double CLOSE_LEFT_SERVO = (float)90 / (float)256;
+    private final double CLOSE_RIGHT_SERVO = (float)109 / (float)256;
     private final double OPEN_MONSTER_RETENTION_SERVO = 220 / 256;
     private final double CLOSE_MONSTER_RETENTION_SERVO = 117 / 256;
     private final double LIFT_POWER_UP = -0.5;
