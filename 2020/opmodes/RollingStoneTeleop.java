@@ -75,6 +75,8 @@ public class RollingStoneTeleop extends Robot {
     private final double CLOSE_RIGHT_SERVO = (float)109 / (float)256;
     private final double OPEN_MONSTER_RETENTION_SERVO = 220 / 256;
     private final double CLOSE_MONSTER_RETENTION_SERVO = 117 / 256;
+    private final double DOWN_GRABBER_SERVO = (float)1/(float)256.0;
+    private final double UP_GRABBER_SERVO = (float)80/(float)256.0;
     private final double LIFT_POWER_UP = -0.5;
     private final double LIFT_POWER_DOWN = 0.5;
     DeadmanMotorTask liftLinearUp;
@@ -157,7 +159,6 @@ public class RollingStoneTeleop extends Robot {
         liftLinearUp.setMinMotorPosition(MIN_LINEAR_HEIGHT);
     }
 
-
     public void liftMotorOneStep(DcMotorSimple.Direction direction)
     {
         if (direction == DcMotorSimple.Direction.REVERSE) {
@@ -199,6 +200,7 @@ public class RollingStoneTeleop extends Robot {
 
         leftServo.setPosition(OPEN_LEFT_SERVO);
         rightServo.setPosition(OPEN_RIGHT_SERVO);
+        grabberServo.setPosition(UP_GRABBER_SERVO);
 
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
             //@Override
@@ -213,6 +215,12 @@ public class RollingStoneTeleop extends Robot {
                     case RIGHT_TRIGGER_DOWN:
                         foundationHookLeft.setPosition(0.54296875);
                         foundationHookRight.setPosition(0.83984375);
+                        break;
+                    case BUTTON_B_DOWN:
+                        grabberServo.setPosition(UP_GRABBER_SERVO);
+                        break;
+                    case BUTTON_X_DOWN:
+                        grabberServo.setPosition(DOWN_GRABBER_SERVO);
                         break;
                     default:
                         break;
