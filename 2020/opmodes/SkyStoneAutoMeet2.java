@@ -15,7 +15,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.StoneDetectionTask;
 
-@Autonomous(name = "AutoMeet3", group = "Team 25")
+@Autonomous(name = "AutoMeet4", group = "Team 25")
 public class SkyStoneAutoMeet2 extends Robot {
 
 
@@ -78,6 +78,7 @@ public class SkyStoneAutoMeet2 extends Robot {
     private DeadReckonPath blueSkyStoneUnderBridge;
     private DeadReckonPath redSkyStoneUnderBridge;
     private DeadReckonPath skyStoneUnderBridge;
+    private DeadReckonPath getCloserPath;
 
 
     private double confidence;
@@ -271,7 +272,25 @@ public class SkyStoneAutoMeet2 extends Robot {
         });
     }
 
+    public void getCloserPath()
+    {
+        //FIXME
+        RobotLog.i("Move to Foundation");
 
+
+        //starts when you find a skystone
+        this.addTask(new DeadReckonTask(this, getCloserPath, drivetrain1){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("move towards skyStone");
+                    startStrafing();
+                }
+            }
+        });
+    }
     public void moveFoundation(final DeadReckonPath foundationPath)
     {
         //FIXME
@@ -387,15 +406,17 @@ public class SkyStoneAutoMeet2 extends Robot {
 
         blueSkyStoneUnderBridge = new DeadReckonPath();
         redSkyStoneUnderBridge = new DeadReckonPath();
+
+        getCloserPath = new DeadReckonPath();
         //add path to get to bridge
 
         blueDepotPath.stop();
         blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,2, STRAIGHT_SPEED);  //left
-        blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, -STRAIGHT_SPEED); //forward
+        blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,2, -STRAIGHT_SPEED); //forward
 
         redDepotPath.stop();
         redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,3, STRAIGHT_SPEED); //left
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,7, -STRAIGHT_SPEED); //forward
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,2, -STRAIGHT_SPEED); //forward
 
         bmoveAcross.stop();
         bmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3 ,STRAIGHT_SPEED);
@@ -434,6 +455,9 @@ public class SkyStoneAutoMeet2 extends Robot {
 
         redSkyStoneUnderBridge.stop();
         redSkyStoneUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 2.8, STRAIGHT_SPEED);
+
+        getCloserPath.stop();
+        getCloserPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, -STRAIGHT_SPEED);
 
 
 
@@ -507,20 +531,10 @@ public class SkyStoneAutoMeet2 extends Robot {
         loggingTlm.setValue("startStrafing:after starting to strafe");
     }
 
-    public void parkUnderBridge()
-    {
-        this.addTask(new DeadReckonTask(this, path, drivetrain1));
-    }
-
 
     @Override
     public void start()
     {
-
-
-        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2.5, -1.0);
-
-
 
         loggingTlm = telemetry.addData("log", "unknown");
         handleEvntTlm = telemetry.addData("detecting","unknown");
@@ -543,7 +557,8 @@ public class SkyStoneAutoMeet2 extends Robot {
             RobotLog.i("start: before startStrafing");
             loggingTlm.setValue("start:in DEPOT about to startStrafing");
 
-            startStrafing();
+            //startStrafing();
+            getCloserPath();
         }
 
     }
