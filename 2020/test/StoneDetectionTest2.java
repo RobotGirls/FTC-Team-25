@@ -12,8 +12,8 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.StoneDetectionTask;
 
-@Autonomous(name = "SkyStones Detection Unit Test", group = "Team 25")
-public class StoneDetectionTest extends Robot {
+@Autonomous(name = "SkyStones Detection Test", group = "Team 25")
+public class StoneDetectionTest2 extends Robot {
 
     private final static String TAG = "holly";
     private Telemetry.Item stonePositionTlm;
@@ -38,6 +38,8 @@ public class StoneDetectionTest extends Robot {
     private float previousSkystoneLeft = FIRST_SKYSTONE_SEEN;
     private float currentSkystoneLeft = FIRST_SKYSTONE_SEEN;
     private int index = NO_STONES_SEEN_INT;
+
+
     StoneDetectionTask mdTask;
     private String depotColor = "RED";
 
