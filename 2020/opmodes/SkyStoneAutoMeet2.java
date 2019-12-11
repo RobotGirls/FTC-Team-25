@@ -15,7 +15,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.StoneDetectionTask;
 
-@Autonomous(name = "AutoMeet4", group = "Team 25")
+@Autonomous(name = "AutoMeET5", group = "Team 25")
 public class SkyStoneAutoMeet2 extends Robot {
 
 
@@ -30,14 +30,14 @@ public class SkyStoneAutoMeet2 extends Robot {
     private Servo foundationHookRightServo;
     private Servo foundationHookLeftServo;
 
-    private final double DOWN_GRABBER_SERVO = (float) 1/ (float)256.0;
+    private final double DOWN_GRABBER_SERVO = (float) 0/ (float)256.0;
     private final double UP_GRABBER_SERVO = (float)80 / (float)256.0;
-    private final double OPEN_FOUNDATION_HOOK_RIGHT_SERVO = (float)89 / (float)256.0;
-    private final double OPEN_FOUNDATION_HOOK_LEFT_SERVO  = (float)10 / (float)256.0;
-    private final double CLOSE_FOUNDATION_HOOK_RIGHT_SERVO  = (float)215/ (float)256.0;  //FIX ALL FOUNDATION SERVO
-    private final double CLOSE_FOUNDATION_HOOK_LEFT_SERVO = (float)139 / (float)256.0;
+    private final double OPEN_FOUNDATION_HOOK_RIGHT_SERVO = (float)129 / (float)256.0;
+    private final double OPEN_FOUNDATION_HOOK_LEFT_SERVO  = (float)230 / (float)256.0;
+    private final double CLOSE_FOUNDATION_HOOK_RIGHT_SERVO  = (float)218/ (float)256.0;  //FIX ALL FOUNDATION SERVO
+    private final double CLOSE_FOUNDATION_HOOK_LEFT_SERVO = (float)128 / (float)256.0;
 
-    private final int NUM_PIXELS_PER_INCH = 10;
+    private final int NUM_PIXELS_PER_INCH = 10;  //10 original
     private final int STONE_LENGTH_IN_INCHES = 8;
 
     private final float HALF_STONE_LENGTH_IN_PIXELS = Math.round(STONE_LENGTH_IN_INCHES/2 * NUM_PIXELS_PER_INCH); //FINDING THE MIDDLE OF THE ROBOT AND WHEN THE SKYSTONE LINES UP WITH THE MIDDLE OF
@@ -56,6 +56,8 @@ public class SkyStoneAutoMeet2 extends Robot {
     private Telemetry.Item deltaTlm;
     private Telemetry.Item numStonesSeenTlm;
     private Telemetry.Item pathTlm;
+    private Telemetry.Item widthTlm;
+    private Telemetry.Item imageWidthTlm;
 
     private int numStonesSeen;
     private double numPixelsBtwImgMidptAndStoneLeft;
@@ -87,8 +89,10 @@ public class SkyStoneAutoMeet2 extends Robot {
     private double imageMidpoint;
     private double stoneMidpoint;
     private double delta;
-    private double margin = 50;
+    private double margin = 25;
     private double setColor;
+    private double width;
+    private int imageWidth;
     private boolean inCenter;
 
     private String stoneType;
@@ -231,7 +235,7 @@ public class SkyStoneAutoMeet2 extends Robot {
     }
     public void moveUnderBridgeFromBuildSiteFoundation()
     {
-        RobotLog.i("move Under bridge from bu");
+        RobotLog.i("move Under bridge from build");
 
 
         //starts when you have stone and want to move
@@ -330,6 +334,8 @@ public class SkyStoneAutoMeet2 extends Robot {
 
                 imageMidpoint = event.stones.get(0).getImageWidth() / 2.0;
                 stoneMidpoint = (event.stones.get(0).getWidth() / 2.0) + left;
+                width = event.stones.get(0).getWidth();
+                imageWidth = event.stones.get(0).getImageWidth();
 
                 stoneType = event.stones.get(0).getLabel();
                 stoneKind = event.kind;
@@ -344,6 +350,8 @@ public class SkyStoneAutoMeet2 extends Robot {
                 stoneTlm.setValue(stoneKind);
                 deltaTlm.setValue(delta);
                 pathTlm.setValue(setColor);
+                widthTlm.setValue(width);
+                imageWidthTlm.setValue(imageWidth);
 
                 numStonesSeen = event.stones.size();
                 numStonesSeenTlm.setValue(numStonesSeen);
@@ -411,20 +419,20 @@ public class SkyStoneAutoMeet2 extends Robot {
         //add path to get to bridge
 
         blueDepotPath.stop();
-        blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,2, STRAIGHT_SPEED);  //left
-        blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,2, -STRAIGHT_SPEED); //forward
+        blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,2.2, STRAIGHT_SPEED);  //
+        blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.6, -STRAIGHT_SPEED); //
 
         redDepotPath.stop();
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,3, STRAIGHT_SPEED); //left
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,2, -STRAIGHT_SPEED); //forward
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,2.2, STRAIGHT_SPEED);  //might increase
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.6, -STRAIGHT_SPEED);  //2
 
         bmoveAcross.stop();
-        bmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3 ,STRAIGHT_SPEED);
-        bmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, STRAIGHT_SPEED);
+        bmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,2.8 ,STRAIGHT_SPEED);
+        bmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,18, STRAIGHT_SPEED);
 
         rmoveAcross.stop();
-        rmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3 ,STRAIGHT_SPEED);
-        rmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, -STRAIGHT_SPEED);
+        rmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,2.9 ,STRAIGHT_SPEED);
+        rmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, -STRAIGHT_SPEED);  //needs change
 
         redFoundationPath.stop();
         redFoundationPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 6, STRAIGHT_SPEED);
@@ -435,7 +443,7 @@ public class SkyStoneAutoMeet2 extends Robot {
 
         redFoundationUnderBridge.stop();
         redFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 9, -STRAIGHT_SPEED);
-        redFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, STRAIGHT_SPEED);
+        redFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, STRAIGHT_SPEED);
         redFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, -STRAIGHT_SPEED);
 
         blueFoundationPath.stop();
@@ -447,17 +455,17 @@ public class SkyStoneAutoMeet2 extends Robot {
 
         blueFoundationUnderBridge.stop();
         blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 7.5, STRAIGHT_SPEED);
-        blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.STRAIGHT,4.5, STRAIGHT_SPEED);
+        blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.STRAIGHT,6, STRAIGHT_SPEED);
         blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,4, STRAIGHT_SPEED);
 
         blueSkyStoneUnderBridge.stop();
         blueSkyStoneUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3.4, -STRAIGHT_SPEED);
 
         redSkyStoneUnderBridge.stop();
-        redSkyStoneUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 2.8, STRAIGHT_SPEED);
+        redSkyStoneUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, STRAIGHT_SPEED);
 
         getCloserPath.stop();
-        getCloserPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, -STRAIGHT_SPEED);
+        getCloserPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5.5, -STRAIGHT_SPEED);
 
 
 
@@ -469,9 +477,9 @@ public class SkyStoneAutoMeet2 extends Robot {
     public void init()
     {
 
-        frontLeft = hardwareMap.dcMotor.get("frontLeft");
+        frontLeft = hardwareMap.dcMotor.get("frontleft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
-        rearLeft = hardwareMap.dcMotor.get("rearLeft");
+        rearLeft = hardwareMap.dcMotor.get("rearleft");
         rearRight = hardwareMap.dcMotor.get("rearRight");
 
         grabberServo = hardwareMap.servo.get("grabberServo");
@@ -493,6 +501,8 @@ public class SkyStoneAutoMeet2 extends Robot {
         deltaTlm = telemetry.addData("delta", "unknown");
         numStonesSeenTlm = telemetry.addData("numStones",-1);
         pathTlm = telemetry.addData("AllianceClr", "unknown");
+        widthTlm = telemetry.addData("stoneWidth", "unknown");
+        imageWidthTlm = telemetry.addData("imageWidth", -1);
 
         RobotLog.ii(TAG,  "delta: " + delta);
 
