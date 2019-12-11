@@ -37,8 +37,8 @@ public class SkyStoneAutoMeet2 extends Robot {
     private final double CLOSE_FOUNDATION_HOOK_RIGHT_SERVO  = (float)218/ (float)256.0;  //FIX ALL FOUNDATION SERVO
     private final double CLOSE_FOUNDATION_HOOK_LEFT_SERVO = (float)128 / (float)256.0;
 
-    private final int NUM_PIXELS_PER_INCH = 10;  //10 original
-    private final int STONE_LENGTH_IN_INCHES = 8;
+    private final int NUM_PIXELS_PER_INCH = 10;  //10 original 63
+    private final int STONE_LENGTH_IN_INCHES = 8; //14in
 
     private final float HALF_STONE_LENGTH_IN_PIXELS = Math.round(STONE_LENGTH_IN_INCHES/2 * NUM_PIXELS_PER_INCH); //FINDING THE MIDDLE OF THE ROBOT AND WHEN THE SKYSTONE LINES UP WITH THE MIDDLE OF
     private final float PIXELS_FROM_IMG_MIDPT_TO_LEFT_STONE = 15 * NUM_PIXELS_PER_INCH - HALF_STONE_LENGTH_IN_PIXELS;
