@@ -37,11 +37,11 @@ public class SkyStoneAutoMeet2 extends Robot {
     private final double CLOSE_FOUNDATION_HOOK_RIGHT_SERVO  = (float)218/ (float)256.0;  //FIX ALL FOUNDATION SERVO
     private final double CLOSE_FOUNDATION_HOOK_LEFT_SERVO = (float)128 / (float)256.0;
 
-    private final int NUM_PIXELS_PER_INCH = 10;  //10 original 63
+    private final double NUM_PIXELS_PER_INCH = 72.25;  //10 original 63
     private final int STONE_LENGTH_IN_INCHES = 8; //14in
 
     private final float HALF_STONE_LENGTH_IN_PIXELS = Math.round(STONE_LENGTH_IN_INCHES/2 * NUM_PIXELS_PER_INCH); //FINDING THE MIDDLE OF THE ROBOT AND WHEN THE SKYSTONE LINES UP WITH THE MIDDLE OF
-    private final float PIXELS_FROM_IMG_MIDPT_TO_LEFT_STONE = 15 * NUM_PIXELS_PER_INCH - HALF_STONE_LENGTH_IN_PIXELS;
+    private final double PIXELS_FROM_IMG_MIDPT_TO_LEFT_STONE = 4 * NUM_PIXELS_PER_INCH;
 
     private MechanumGearedDrivetrain drivetrain1;
 
@@ -419,19 +419,19 @@ public class SkyStoneAutoMeet2 extends Robot {
         //add path to get to bridge
 
         blueDepotPath.stop();
-        blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,2.2, STRAIGHT_SPEED);  //
+        blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,1.2, STRAIGHT_SPEED);  //
         blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.6, -STRAIGHT_SPEED); //
 
         redDepotPath.stop();
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,2.2, STRAIGHT_SPEED);  //might increase
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.6, -STRAIGHT_SPEED);  //2
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,1.2, STRAIGHT_SPEED);  //might increase 2
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.8, -STRAIGHT_SPEED);  //2
 
         bmoveAcross.stop();
-        bmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,2.8 ,STRAIGHT_SPEED);
-        bmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,18, STRAIGHT_SPEED);
+        bmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3.2 ,STRAIGHT_SPEED);
+        bmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, STRAIGHT_SPEED);
 
         rmoveAcross.stop();
-        rmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,2.9 ,STRAIGHT_SPEED);
+        rmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3.2 ,STRAIGHT_SPEED);
         rmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, -STRAIGHT_SPEED);  //needs change
 
         redFoundationPath.stop();
@@ -462,10 +462,10 @@ public class SkyStoneAutoMeet2 extends Robot {
         blueSkyStoneUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3.4, -STRAIGHT_SPEED);
 
         redSkyStoneUnderBridge.stop();
-        redSkyStoneUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, STRAIGHT_SPEED);
+        redSkyStoneUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3.4, STRAIGHT_SPEED);
 
         getCloserPath.stop();
-        getCloserPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5.5, -STRAIGHT_SPEED);
+        getCloserPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5.9, -STRAIGHT_SPEED);
 
 
 
