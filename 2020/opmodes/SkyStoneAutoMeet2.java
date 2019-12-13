@@ -431,7 +431,7 @@ public class SkyStoneAutoMeet2 extends Robot {
         bmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, STRAIGHT_SPEED);
 
         rmoveAcross.stop();
-        rmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,3.2 ,STRAIGHT_SPEED);
+        rmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,4.5 ,STRAIGHT_SPEED);
         rmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, -STRAIGHT_SPEED);  //needs change
 
         redFoundationPath.stop();
