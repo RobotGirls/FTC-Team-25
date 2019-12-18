@@ -49,7 +49,7 @@ import team25core.TankMechanumControlSchemeBackwards;
 import team25core.TankMechanumControlSchemeReverse;
 import team25core.TeleopDriveTask;
 
-@TeleOp(name = "LM2 CODE")
+@TeleOp(name = "LM3 CODE")
 //@Disabled
 public class RollingStoneTeleop extends Robot {
 

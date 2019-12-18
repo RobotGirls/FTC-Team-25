@@ -32,16 +32,16 @@ public class SkyStoneAutoMeet2 extends Robot {
 
     private final double DOWN_GRABBER_SERVO = (float) 0/ (float)256.0;
     private final double UP_GRABBER_SERVO = (float)80 / (float)256.0;
-    private final double OPEN_FOUNDATION_HOOK_RIGHT_SERVO = (float)129 / (float)256.0;
-    private final double OPEN_FOUNDATION_HOOK_LEFT_SERVO  = (float)230 / (float)256.0;
-    private final double CLOSE_FOUNDATION_HOOK_RIGHT_SERVO  = (float)218/ (float)256.0;  //FIX ALL FOUNDATION SERVO
-    private final double CLOSE_FOUNDATION_HOOK_LEFT_SERVO = (float)128 / (float)256.0;
+    private final double OPEN_FOUNDATION_HOOK_RIGHT_SERVO = (float)91 / (float)256.0;
+    private final double OPEN_FOUNDATION_HOOK_LEFT_SERVO  = (float)113 / (float)256.0;
+    private final double CLOSE_FOUNDATION_HOOK_RIGHT_SERVO  = (float)216/ (float)256.0;  //FIX ALL FOUNDATION SERVO
+    private final double CLOSE_FOUNDATION_HOOK_LEFT_SERVO = (float)238/ (float)256.0;
 
-    private final double NUM_PIXELS_PER_INCH = 72.25;  //10 original 63
+    private final double NUM_PIXELS_PER_INCH = 10;  //10 original 63
     private final int STONE_LENGTH_IN_INCHES = 8; //14in
 
     private final float HALF_STONE_LENGTH_IN_PIXELS = Math.round(STONE_LENGTH_IN_INCHES/2 * NUM_PIXELS_PER_INCH); //FINDING THE MIDDLE OF THE ROBOT AND WHEN THE SKYSTONE LINES UP WITH THE MIDDLE OF
-    private final double PIXELS_FROM_IMG_MIDPT_TO_LEFT_STONE = 4 * NUM_PIXELS_PER_INCH;
+    private final double PIXELS_FROM_IMG_MIDPT_TO_LEFT_STONE = 15 * NUM_PIXELS_PER_INCH - HALF_STONE_LENGTH_IN_PIXELS ;
 
     private MechanumGearedDrivetrain drivetrain1;
 
@@ -89,7 +89,7 @@ public class SkyStoneAutoMeet2 extends Robot {
     private double imageMidpoint;
     private double stoneMidpoint;
     private double delta;
-    private double margin = 25;
+    private double margin = 100;
     private double setColor;
     private double width;
     private int imageWidth;
@@ -431,7 +431,7 @@ public class SkyStoneAutoMeet2 extends Robot {
         bmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, STRAIGHT_SPEED);
 
         rmoveAcross.stop();
-        rmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,4.5 ,STRAIGHT_SPEED);
+        rmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,4.5  ,STRAIGHT_SPEED);
         rmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14, -STRAIGHT_SPEED);  //needs change
 
         redFoundationPath.stop();
