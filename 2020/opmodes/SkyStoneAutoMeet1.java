@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -16,6 +17,7 @@ import team25core.RobotEvent;
 import team25core.StoneDetectionTask;
 
 @Autonomous(name = "AutoMeet2", group = "Team 25")
+@Disabled
 public class SkyStoneAutoMeet1 extends Robot {
 
 
