@@ -471,7 +471,7 @@ public class SkyStoneAutoMeet3 extends Robot {
         blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 7.5, STRAIGHT_SPEED);
         blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.STRAIGHT,6, STRAIGHT_SPEED);
         blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, -STRAIGHT_SPEED);
-        blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,7.5 , STRAIGHT_SPEED);
+        blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,7.5  , STRAIGHT_SPEED);
 
         blueSkyStoneUnderBridge.stop();
         blueSkyStoneUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, -STRAIGHT_SPEED);

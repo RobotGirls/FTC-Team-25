@@ -47,7 +47,6 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
-import team25core.TankMechanumControlSchemeBackwards;
 import team25core.TankMechanumControlSchemeReverse;
 import team25core.TeleopDriveTask;
 
@@ -217,7 +216,7 @@ public class RollingStoneTeleop extends Robot {
         addTask(liftLinearUp);
         addTask(liftLinearDown);
 
-        TankMechanumControlSchemeBackwards scheme = new TankMechanumControlSchemeBackwards(gamepad1);
+        TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
         // added lines 146 and 148
         drivetask = new TeleopDriveTask(this, scheme, frontLeft, frontRight, rearLeft, rearRight);
 
