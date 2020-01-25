@@ -47,17 +47,13 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
+import team25core.StandardFourMotorRobot;
 import team25core.TankMechanumControlSchemeReverse;
 import team25core.TeleopDriveTask;
 
 @TeleOp(name = "LM2 CODE")
 //@Disabled
-public class RollingStoneTeleop extends Robot {
-
-    private DcMotor frontLeft;
-    private DcMotor frontRight;
-    private DcMotor rearLeft;
-    private DcMotor rearRight;
+public class RollingStoneTeleop extends StandardFourMotorRobot {
 
     //amory's
     private Servo foundationHookLeft;
@@ -125,6 +121,8 @@ public class RollingStoneTeleop extends Robot {
     @Override
     public void init() {
 
+        super.init();
+
         foundationHookLeft = hardwareMap.servo.get("foundationHookLeftServo");
         foundationHookRight = hardwareMap.servo.get("foundationHookRightServo");
         grabberServo = hardwareMap.servo.get("grabberServo");
@@ -133,10 +131,6 @@ public class RollingStoneTeleop extends Robot {
         //foundationHookLeft.setPosition(UP_FOUNDATION_LEFT_SERVO);
         //foundationHookRight.setPosition(0.34765625);
 
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        rearLeft = hardwareMap.get(DcMotor.class, "rearLeft");
-        rearRight = hardwareMap.get(DcMotor.class, "rearRight");
         leftIntake = hardwareMap.get(DcMotor.class, "leftIntake");
         rightIntake = hardwareMap.get(DcMotor.class, "rightIntake");
         rackAndPinion = hardwareMap.get(CRServo.class, "rackAndPinion");
@@ -144,8 +138,8 @@ public class RollingStoneTeleop extends Robot {
         rackAndPinion.setPower(INTAKE_STOP);
 
         //added following 4 lines
-        rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -218,7 +212,7 @@ public class RollingStoneTeleop extends Robot {
 
         TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
         // added lines 146 and 148
-        drivetask = new TeleopDriveTask(this, scheme, frontLeft, frontRight, rearLeft, rearRight);
+        drivetask = new TeleopDriveTask(this, scheme, frontLeft, frontRight, backLeft, backRight);
 
         this.addTask(drivetask);
         //this.addTask(new TankDriveTask(this, drivetrain));

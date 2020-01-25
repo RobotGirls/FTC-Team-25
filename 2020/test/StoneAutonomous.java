@@ -1,7 +1,6 @@
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -11,20 +10,16 @@ import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
-import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.StandardFourMotorRobot;
 import team25core.StoneDetectionTask;
 
 @Autonomous(name = "SkyStone Autonomous2", group = "Team 25")
-public class StoneAutonomous extends Robot {
+public class StoneAutonomous extends StandardFourMotorRobot {
 
 
     private final static String TAG = "Margarita";
 
-    private DcMotor frontLeft;
-    private DcMotor frontRight;
-    private DcMotor rearLeft;
-    private DcMotor rearRight;
     //for mechanism
     //private DcMotor intakeR
     //private DcMotor intakeL
@@ -178,10 +173,6 @@ public class StoneAutonomous extends Robot {
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         rearLeft = hardwareMap.get(DcMotor.class, "rearLeft");
         rearRight = hardwareMap.get(DcMotor.class, "rearRight");*/
-        frontLeft = hardwareMap.dcMotor.get("frontLeft");
-        frontRight = hardwareMap.dcMotor.get("frontRight");
-        rearLeft = hardwareMap.dcMotor.get("rearLeft");
-        rearRight = hardwareMap.dcMotor.get("rearRight");
 
         //caption: what appears on the phone
         stonePositionTlm = telemetry.addData("LeftOrigin", "unknown");
@@ -195,7 +186,7 @@ public class StoneAutonomous extends Robot {
         RobotLog.ii(TAG,  "delta: " + delta);
 
 
-        drivetrain = new MechanumGearedDrivetrain(360, frontRight, rearRight, frontLeft, rearLeft);
+        drivetrain = new MechanumGearedDrivetrain(frontRight, backRight, frontLeft, backLeft);
         drivetrain.resetEncoders();
         drivetrain.encodersOn();
         RobotLog.i("start moving");

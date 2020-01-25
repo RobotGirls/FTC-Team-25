@@ -1,7 +1,6 @@
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -12,20 +11,16 @@ import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
-import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.StandardFourMotorRobot;
 import team25core.StoneDetectionTask;
 
 @Autonomous(name = "AutoMeet3", group = "Team 25")
-public class SkyStoneAutoBackUp extends Robot {
+public class SkyStoneAutoBackUp extends StandardFourMotorRobot {
 
 
     private final static String TAG = "STONEZ";
 
-    private DcMotor frontLeft;
-    private DcMotor frontRight;
-    private DcMotor rearLeft;
-    private DcMotor rearRight;
     //for mechanism
     private Servo grabberServo;
     private Servo foundationHookRightServo;
@@ -430,11 +425,6 @@ public class SkyStoneAutoBackUp extends Robot {
     public void init()
     {
 
-        frontLeft = hardwareMap.dcMotor.get("frontLeft");
-        frontRight = hardwareMap.dcMotor.get("frontRight");
-        rearLeft = hardwareMap.dcMotor.get("rearLeft");
-        rearRight = hardwareMap.dcMotor.get("rearRight");
-
         grabberServo = hardwareMap.servo.get("grabberServo");
         grabberServo.setPosition(UP_GRABBER_SERVO);
 
@@ -458,7 +448,7 @@ public class SkyStoneAutoBackUp extends Robot {
         RobotLog.ii(TAG,  "delta: " + delta);
 
 
-        drivetrain1 = new MechanumGearedDrivetrain(360, frontRight, rearRight, frontLeft, rearLeft);
+        drivetrain1 = new MechanumGearedDrivetrain(frontRight, backRight, frontLeft, backLeft);
         drivetrain1.resetEncoders();
         drivetrain1.encodersOn();
         RobotLog.i("start moving");

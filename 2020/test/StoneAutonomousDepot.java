@@ -10,12 +10,12 @@ import opmodes.SkyStoneConstants25;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.MechanumGearedDrivetrain;
-import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.StandardFourMotorRobot;
 import team25core.StoneDetectionTask;
 
 @Autonomous(name = "Stone Autonomous", group = "Team 25")
-public class StoneAutonomousDepot extends Robot {
+public class StoneAutonomousDepot extends StandardFourMotorRobot {
 
 
     private final static String TAG = "Margarita";
@@ -107,12 +107,8 @@ public class StoneAutonomousDepot extends Robot {
     @Override
         public void init()
         {
-            frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-            frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-            rearLeft = hardwareMap.get(DcMotor.class, "rearLeft");
-            rearRight = hardwareMap.get(DcMotor.class, "rearRight");
 
-            drivetrain = new MechanumGearedDrivetrain(360, frontLeft, rearLeft, frontRight, rearRight);
+            drivetrain = new MechanumGearedDrivetrain(frontLeft, backLeft, frontRight, backRight);
             drivetrain.encodersOn();
             drivetrain.resetEncoders();
 
