@@ -15,7 +15,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.StoneDetectionTask;
 
-@Autonomous(name = "AutoMeet9", group = "Team 25")
+@Autonomous(name = "TwoSkyStones", group = "Team 25") //AutoMeet9
 public class SkyStoneAutoMeet3 extends Robot {
 
 
@@ -62,6 +62,12 @@ public class SkyStoneAutoMeet3 extends Robot {
     private Telemetry.Item imageWidthTlm;
     private Telemetry.Item pixelsPerInchTlm;
     private Telemetry.Item distanceBtWWebcamAndGrabberTlm;
+    private Telemetry.Item currRobotPositionTlm;
+    private Telemetry.Item initialRobotPositionTlm;
+    private Telemetry.Item secondInitialRobotPositionTlm;
+    private Telemetry.Item targetRobotPositionTlm;
+    private Telemetry.Item deltaRobotPositionTlm;
+
 
     private int numStonesSeen;
     private double numPixelsBtwImgMidptAndStoneMidpt;
@@ -101,6 +107,11 @@ public class SkyStoneAutoMeet3 extends Robot {
     private double realNumPixelsPerInch;
     private final int DISTANCE_FROM_WEBCAM_TO_GRABBER =1;
     private double distance;
+    private int currRobotPosition;
+    private int initialRobotPosition;
+    private int secondInitialRobotPosition;
+    private int targetRobotPosition;
+    private int deltaRobotPosition;
 
     private String stoneType;
 
@@ -210,9 +221,13 @@ public class SkyStoneAutoMeet3 extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE)
                 {
+                    currRobotPosition = drivetrain1.getCurrentPosition();
+                    currRobotPositionTlm.setValue(currRobotPosition);
+
                     grabberServo.setPosition(MID_GRABBER_SERVO);
                     RobotLog.i("Done with taking stone to build");
-                    moveUnderBridgeFromBuildSiteSkyStoneBuild();
+                    //moveUnderBridgeFromBuildSiteSkyStoneBuild();
+                    startStrafing();
 
                 }
             }
@@ -297,6 +312,8 @@ public class SkyStoneAutoMeet3 extends Robot {
                 if (path.kind == EventKind.PATH_DONE)
                 {
                     RobotLog.i("move towards skyStone");
+                    initialRobotPosition = drivetrain1.getCurrentPosition();
+                    initialRobotPositionTlm.setValue(secondInitialRobotPosition);
                     startStrafing();
                 }
             }
@@ -382,6 +399,9 @@ public class SkyStoneAutoMeet3 extends Robot {
                         drivetrain1.stop();*/
 
                         if (allianceColor == AllianceColor.RED) {
+
+                            secondInitialRobotPosition = drivetrain1.getCurrentPosition();
+                            secondInitialRobotPositionTlm.setValue(secondInitialRobotPosition);
                             goPickupSkystone(redDepotPath);
                             RobotLog.i("506 chose red depot path");
                             pathTlm.setValue("taking red depot path");
@@ -522,6 +542,11 @@ public class SkyStoneAutoMeet3 extends Robot {
         pixelsPerInchTlm = telemetry.addData("pixelsPerInch", "unknown");
         distanceBtWWebcamAndGrabberTlm = telemetry.addData("distance BtW Webcam and Grabber","unknown");
         RobotLog.ii(TAG,  "delta: " + delta);
+        currRobotPositionTlm = telemetry.addData("currRobotPosition", -1);
+        initialRobotPositionTlm = telemetry.addData("initialRobotPosition", -1);
+        secondInitialRobotPositionTlm = telemetry.addData("secondInitialRobotPosition", -1);
+        targetRobotPositionTlm = telemetry.addData("targetRobotPosition", -1);
+        deltaRobotPositionTlm = telemetry.addData("deltaRobotPosition", -1);
 
 
         drivetrain1 = new MechanumGearedDrivetrain(360, frontRight, rearRight, frontLeft, rearLeft);
@@ -586,6 +611,8 @@ public class SkyStoneAutoMeet3 extends Robot {
             loggingTlm.setValue("start:in DEPOT about to startStrafing");
 
             //startStrafing();
+            //initialRobotPosition = drivetrain1.getCurrentPosition();
+            //initialRobotPositionTlm.setValue(initialRobotPosition);
             getCloserPath();
         }
 
