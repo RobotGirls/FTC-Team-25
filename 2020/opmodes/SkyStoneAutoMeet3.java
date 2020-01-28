@@ -82,7 +82,9 @@ public class SkyStoneAutoMeet3 extends Robot {
     private DeadReckonPath rmoveAcross;
     private DeadReckonPath moveAcross;
     private DeadReckonPath endRedFoundation;
-    private DeadReckonPath endBlueFoundation;
+    private DeadReckonPath endBlueFoundation;\
+
+
     private DeadReckonPath endFoundationPath;
     private DeadReckonPath foundationUnderBridge;
     private DeadReckonPath redFoundationUnderBridge;
@@ -91,6 +93,18 @@ public class SkyStoneAutoMeet3 extends Robot {
     private DeadReckonPath redSkyStoneUnderBridge;
     private DeadReckonPath skyStoneUnderBridge;
     private DeadReckonPath getCloserPath;
+    private DeadReckonPath secdCloserPath;
+    private DeadReckonPath redsecdCloserPath;
+    private DeadReckonPath bluesecdCloserPath;
+    private DeadReckonPath secdredDepotPath;
+    private DeadReckonPath secdblueDepotPath;
+    private DeadReckonPath secddepotPath;
+    private DeadReckonPath secdbmoveAcross;
+    private DeadReckonPath secdrmoveAcross;
+    private DeadReckonPath secdmoveAcross;
+
+
+
 
 
     private double confidence;
@@ -164,6 +178,9 @@ public class SkyStoneAutoMeet3 extends Robot {
                     moveAcross = bmoveAcross;
                     endFoundationPath = endBlueFoundation;
                     foundationUnderBridge = blueFoundationUnderBridge;
+                    secdCloserPath = bluesecdCloserPath;
+                    secddepotPath = secdblueDepotPath;
+                    secdmoveAcross = secdbmoveAcross
                     skyStoneUnderBridge = blueSkyStoneUnderBridge;
                     break;
                 case BUTTON_B_DOWN:
@@ -174,6 +191,9 @@ public class SkyStoneAutoMeet3 extends Robot {
                     moveAcross = rmoveAcross;
                     endFoundationPath = endRedFoundation;
                     foundationUnderBridge = redFoundationUnderBridge;
+                    secdCloserPath = redsecdCloserPath;
+                    secddepotPath = secdredDepotPath;
+                    secdmoveAcross = secdrmoveAcross
                     skyStoneUnderBridge = redSkyStoneUnderBridge;
                     break;
                 case BUTTON_Y_DOWN:
@@ -227,6 +247,7 @@ public class SkyStoneAutoMeet3 extends Robot {
                     grabberServo.setPosition(MID_GRABBER_SERVO);
                     RobotLog.i("Done with taking stone to build");
                     //moveUnderBridgeFromBuildSiteSkyStoneBuild();
+                    secdCloserPath();
                     startStrafing();
 
                 }
@@ -429,6 +450,10 @@ public class SkyStoneAutoMeet3 extends Robot {
     }
     public void initPath()
     {
+
+        bluesecdCloserPath = new DeadReckonPath();
+        redsecdCloserPath = new DeadReckonPath();
+
         blueDepotPath = new DeadReckonPath();
         redDepotPath = new DeadReckonPath();
 
@@ -447,6 +472,12 @@ public class SkyStoneAutoMeet3 extends Robot {
         blueSkyStoneUnderBridge = new DeadReckonPath();
         redSkyStoneUnderBridge = new DeadReckonPath();
 
+        secdredDepotPath = new DeadReckonPath();
+        secdblueDepotPath = new DeadReckonPath();
+
+        secdrmoveAcross = new DeadReckonPath();
+        secdbmoveAcross = new DeadReckonPath();
+
         getCloserPath = new DeadReckonPath();
         //add path to get to bridge
 
@@ -459,9 +490,7 @@ public class SkyStoneAutoMeet3 extends Robot {
         //redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.5, -0.4);  //2
         redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.4, -0.4);  //1.2
 
-        bmoveAcross.stop();
-        bmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,4.5 ,.2);
-        bmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,15.5, .4);
+
 
         rmoveAcross.stop();
         rmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,4.5  ,.3); //STRAIGHT_SPEED
@@ -498,6 +527,29 @@ public class SkyStoneAutoMeet3 extends Robot {
 
         redSkyStoneUnderBridge.stop();
         redSkyStoneUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, STRAIGHT_SPEED); //3.4 needs to be changed
+
+        redsecdCloserPath.stop();
+        redsecdCloserPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, STRAIGHT_SPEED); // needs testing
+
+        secdredDepotPath.stop();
+        secdredDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,0.4, STRAIGHT_SPEED);  //might change to .2 //original 1.2
+        //redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.5, -0.4);  //2
+        secdredDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.4, -0.4);  //1.2
+
+        secdrmoveAcross.stop();
+        secdrmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,4.5  ,.3); //STRAIGHT_SPEED
+        secdrmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,20 , -.4);  //STRAIGHT_SPEED needs change decrease 3.6/7
+
+        bluesecdCloserPath.stop();
+        bluesecdCloserPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, STRAIGHT_SPEED); // needs testing
+
+        secdblueDepotPath.stop();
+        secdblueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,0.2, -STRAIGHT_SPEED);  //
+        secdblueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.6, -0.4); //
+
+        secdbmoveAcross.stop();
+        secdbmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,4.5 ,.2);
+        secdbmoveAcross.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,20, .4);
 
         getCloserPath.stop();
         getCloserPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5.62, -STRAIGHT_SPEED);
@@ -569,6 +621,27 @@ public class SkyStoneAutoMeet3 extends Robot {
         setStoneDetection();
     }
 
+    public void secdCloserPath()
+    {
+        //get closer to stones to detect + pick up 2nd
+        RobotLog.i("Moving closer to stones ");
+
+
+        //starts when you find a skystone
+        this.addTask(new DeadReckonTask(this, secdCloserPath, drivetrain1){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+
+                    secdstartStrafing();
+                }
+            }
+        });
+
+    }
+
+
     public void startStrafing()
     {
         //start looking for Skystones
@@ -582,6 +655,22 @@ public class SkyStoneAutoMeet3 extends Robot {
         }
         loggingTlm.setValue("startStrafing:after starting to strafe");
         grabberServo.setPosition(MID_GRABBER_SERVO);
+    }
+
+    public void secdstartStrafing()
+    {
+        // start looking for secound skystone
+        RobotLog.i("startStrafing");
+        addTask(sdTask);
+        loggingTlm.setValue("startStrafing:before starting to strafe");
+        if (allianceColor == AllianceColor.RED) {
+            drivetrain1.strafe(SkyStoneConstants25.STRAFE_SPEED);
+        } else {
+            drivetrain1.strafe(-SkyStoneConstants25.STRAFE_SPEED);
+        }
+        loggingTlm.setValue("startStrafing:after starting to strafe");
+        grabberServo.setPosition(MID_GRABBER_SERVO);
+
     }
 
 
