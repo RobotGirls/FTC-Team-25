@@ -136,8 +136,8 @@ public class RollingStoneTeleop extends Robot {
 
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        rearLeft = hardwareMap.get(DcMotor.class, "rearLeft");
-        rearRight = hardwareMap.get(DcMotor.class, "rearRight");
+        rearLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        rearRight = hardwareMap.get(DcMotor.class, "backRight");
         leftIntake = hardwareMap.get(DcMotor.class, "leftIntake");
         rightIntake = hardwareMap.get(DcMotor.class, "rightIntake");
         rackAndPinion = hardwareMap.get(CRServo.class, "rackAndPinion");
@@ -173,10 +173,10 @@ public class RollingStoneTeleop extends Robot {
         //drivetrain.setNoncanonicalMotorDirection();
 
         liftLinearUp = new DeadmanMotorTask(this, liftMotor, LIFT_POWER_UP, GamepadTask.GamepadNumber. GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
-        liftLinearUp.setMaxMotorPosition(MAX_LINEAR_HEIGHT);
+        //liftLinearUp.setMaxMotorPosition(MAX_LINEAR_HEIGHT);
 
         liftLinearDown = new DeadmanMotorTask(this, liftMotor, LIFT_POWER_DOWN, GamepadTask.GamepadNumber. GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
-        liftLinearUp.setMinMotorPosition(MIN_LINEAR_HEIGHT);
+        //liftLinearUp.setMinMotorPosition(MIN_LINEAR_HEIGHT);
     }
 
     public void liftMotorOneStep(DcMotorSimple.Direction direction)
