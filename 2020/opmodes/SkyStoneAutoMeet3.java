@@ -30,9 +30,9 @@ public class SkyStoneAutoMeet3 extends Robot {
     private Servo foundationHookRightServo;
     private Servo foundationHookLeftServo;
 
-    private final double DOWN_GRABBER_SERVO = (float) 256/ (float)256.0;
-    private final double MID_GRABBER_SERVO = (float)  200/ (float)256.0;
-    private final double UP_GRABBER_SERVO = (float) 30/ (float)256.0;
+    private final double DOWN_GRABBER_SERVO = (float) 0/ (float)256.0;
+    private final double MID_GRABBER_SERVO = (float)  50/ (float)256.0;
+    private final double UP_GRABBER_SERVO = (float) 210/ (float)256.0;
     private final double OPEN_FOUNDATION_HOOK_RIGHT_SERVO = (float)216 / (float)256.0;
     private final double OPEN_FOUNDATION_HOOK_LEFT_SERVO  = (float)113 / (float)256.0;
     private final double CLOSE_FOUNDATION_HOOK_RIGHT_SERVO  = (float)91/ (float)256.0;  //FIX ALL FOUNDATION SERVO
@@ -82,7 +82,7 @@ public class SkyStoneAutoMeet3 extends Robot {
     private DeadReckonPath rmoveAcross;
     private DeadReckonPath moveAcross;
     private DeadReckonPath endRedFoundation;
-    private DeadReckonPath endBlueFoundation;\
+    private DeadReckonPath endBlueFoundation;
 
 
     private DeadReckonPath endFoundationPath;
@@ -180,7 +180,7 @@ public class SkyStoneAutoMeet3 extends Robot {
                     foundationUnderBridge = blueFoundationUnderBridge;
                     secdCloserPath = bluesecdCloserPath;
                     secddepotPath = secdblueDepotPath;
-                    secdmoveAcross = secdbmoveAcross
+                    secdmoveAcross = secdbmoveAcross;
                     skyStoneUnderBridge = blueSkyStoneUnderBridge;
                     break;
                 case BUTTON_B_DOWN:
@@ -193,7 +193,7 @@ public class SkyStoneAutoMeet3 extends Robot {
                     foundationUnderBridge = redFoundationUnderBridge;
                     secdCloserPath = redsecdCloserPath;
                     secddepotPath = secdredDepotPath;
-                    secdmoveAcross = secdrmoveAcross
+                    secdmoveAcross = secdrmoveAcross;
                     skyStoneUnderBridge = redSkyStoneUnderBridge;
                     break;
                 case BUTTON_Y_DOWN:
@@ -566,8 +566,8 @@ public class SkyStoneAutoMeet3 extends Robot {
 
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
-        rearLeft = hardwareMap.dcMotor.get("rearLeft");
-        rearRight = hardwareMap.dcMotor.get("rearRight");
+        rearLeft = hardwareMap.dcMotor.get("backLeft");
+        rearRight = hardwareMap.dcMotor.get("backRight");
 
         grabberServo = hardwareMap.servo.get("grabberServo");
         grabberServo.setPosition(UP_GRABBER_SERVO);
