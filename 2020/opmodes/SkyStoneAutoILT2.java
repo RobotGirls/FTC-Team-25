@@ -516,7 +516,7 @@ public class SkyStoneAutoILT2 extends StandardFourMotorRobot {
         endBlueFoundation.stop();
         endBlueFoundation.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, -0.5); // pull foundation back
         endBlueFoundation.addSegment(DeadReckonPath.SegmentType.TURN, 130, 0.7); // turn the foundation into the building site
-        
+
         blueFoundationUnderBridge.stop();
         blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, 0.8); // push foundation against wall
         blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 11, -0.8); // backs up to skybridge
