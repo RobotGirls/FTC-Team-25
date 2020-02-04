@@ -435,9 +435,9 @@ public class SkyStoneAuto_OneSkystone extends Robot {
         blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.6, -0.4); //
 
         redDepotPath.stop();
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,0.4, STRAIGHT_SPEED);  //might change to .2 //original 1.2
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,0.1, STRAIGHT_SPEED);  //might change to .2 //original 1.2
         //redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.5, -0.4);  //2
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.4, -0.4);  //1.2
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.5, -0.4);  //1.2
 
         bmoveAcross.stop();
         bmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,4.5 ,.2);
