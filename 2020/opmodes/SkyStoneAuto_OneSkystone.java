@@ -15,7 +15,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.StoneDetectionTask;
 
-@Autonomous(name = "AutoMeet9", group = "Team 25")
+@Autonomous(name = "AutoILT_OneStone", group = "Team 25")
 public class SkyStoneAuto_OneSkystone extends Robot {
 
 
@@ -30,9 +30,9 @@ public class SkyStoneAuto_OneSkystone extends Robot {
     private Servo foundationHookRightServo;
     private Servo foundationHookLeftServo;
 
-    private final double DOWN_GRABBER_SERVO = (float) 256/ (float)256.0;
-    private final double MID_GRABBER_SERVO = (float)  200/ (float)256.0;
-    private final double UP_GRABBER_SERVO = (float) 30/ (float)256.0;
+    private final double DOWN_GRABBER_SERVO = (float) 0/ (float)256.0;
+    private final double MID_GRABBER_SERVO = (float)  50/ (float)256.0;
+    private final double UP_GRABBER_SERVO = (float) 210/ (float)256.0;
     private final double OPEN_FOUNDATION_HOOK_RIGHT_SERVO = (float)216 / (float)256.0;
     private final double OPEN_FOUNDATION_HOOK_LEFT_SERVO  = (float)113 / (float)256.0;
     private final double CLOSE_FOUNDATION_HOOK_RIGHT_SERVO  = (float)91/ (float)256.0;  //FIX ALL FOUNDATION SERVO
@@ -494,8 +494,8 @@ public class SkyStoneAuto_OneSkystone extends Robot {
 
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
-        rearLeft = hardwareMap.dcMotor.get("rearLeft");
-        rearRight = hardwareMap.dcMotor.get("rearRight");
+        rearLeft = hardwareMap.dcMotor.get("backLeft");
+        rearRight = hardwareMap.dcMotor.get("backRight");
 
         grabberServo = hardwareMap.servo.get("grabberServo");
         grabberServo.setPosition(UP_GRABBER_SERVO);
