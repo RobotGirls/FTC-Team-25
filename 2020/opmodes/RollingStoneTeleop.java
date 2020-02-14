@@ -80,8 +80,8 @@ public class RollingStoneTeleop extends Robot {
     private final double OPEN_RIGHT_SERVO = (float) 145.0 / 256.0;
     private final double CLOSE_LEFT_SERVO = (float) 159.0 / 256.0;
     private final double CLOSE_RIGHT_SERVO = (float) 62.0 / 256.0;
-    private final double OPEN_MONSTER_RETENTION_SERVO = (float) 70.0 / 256.0;  //220
-    private final double CLOSE_MONSTER_RETENTION_SERVO = (float) 119.0 / 256.0; //117
+    private final double OPEN_MONSTER_RETENTION_SERVO = (float) 135.0 / 256.0;  //220
+    private final double CLOSE_MONSTER_RETENTION_SERVO = (float) 208.0 / 256.0; //117
     private final double DOWN_GRABBER_SERVO = (float)255/256.0;
     private final double UP_GRABBER_SERVO = (float) 30/256.0;
     private final double UP_FOUNDATION_LEFT_SERVO = (float) 118/ 256.0;
@@ -224,7 +224,7 @@ public class RollingStoneTeleop extends Robot {
         this.addTask(drivetask);
         //this.addTask(new TankDriveTask(this, drivetrain));
 
-        monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
+        //monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
 
         //grabberServo.setPosition(UP_GRABBER_SERVO);
 

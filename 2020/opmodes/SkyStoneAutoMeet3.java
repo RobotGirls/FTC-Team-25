@@ -102,6 +102,9 @@ public class SkyStoneAutoMeet3 extends Robot {
     private DeadReckonPath secdbmoveAcross;
     private DeadReckonPath secdrmoveAcross;
     private DeadReckonPath secdmoveAcross;
+    private DeadReckonPath leftRedSideways;
+    private DeadReckonPath rightBlueSideways;
+    private DeadReckonPath sidewaysPath;
 
 
 
@@ -182,6 +185,7 @@ public class SkyStoneAutoMeet3 extends Robot {
                     secddepotPath = secdblueDepotPath;
                     secdmoveAcross = secdbmoveAcross;
                     skyStoneUnderBridge = blueSkyStoneUnderBridge;
+                    sidewaysPath = rightBlueSideways;
                     break;
                 case BUTTON_B_DOWN:
                     allianceColor = AllianceColor.RED;
@@ -195,6 +199,7 @@ public class SkyStoneAutoMeet3 extends Robot {
                     secddepotPath = secdredDepotPath;
                     secdmoveAcross = secdrmoveAcross;
                     skyStoneUnderBridge = redSkyStoneUnderBridge;
+                    sidewaysPath = leftRedSideways;
                     break;
                 case BUTTON_Y_DOWN:
                     robotPosition = RobotPosition.BUILD_SITE;
@@ -244,11 +249,11 @@ public class SkyStoneAutoMeet3 extends Robot {
                     currRobotPosition = drivetrain1.getCurrentPosition();
                     currRobotPositionTlm.setValue(currRobotPosition);
 
-                    grabberServo.setPosition(MID_GRABBER_SERVO);
+                    //grabberServo.setPosition(MID_GRABBER_SERVO);
                     RobotLog.i("Done with taking stone to build");
                     //moveUnderBridgeFromBuildSiteSkyStoneBuild();
                     secdCloserPath();
-                    startStrafing();
+                    //startStrafing();
 
                 }
             }
@@ -478,6 +483,9 @@ public class SkyStoneAutoMeet3 extends Robot {
         secdrmoveAcross = new DeadReckonPath();
         secdbmoveAcross = new DeadReckonPath();
 
+        rightBlueSideways = new DeadReckonPath();
+        leftRedSideways = new DeadReckonPath();
+
         getCloserPath = new DeadReckonPath();
         //add path to get to bridge
 
@@ -485,10 +493,16 @@ public class SkyStoneAutoMeet3 extends Robot {
         blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,0.2, -STRAIGHT_SPEED);  //
         blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.6, -0.4); //
 
+        rightBlueSideways.stop();
+        rightBlueSideways.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,10, STRAIGHT_SPEED);
+
         redDepotPath.stop();
         redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,0.25, -STRAIGHT_SPEED); // going right, might change to .2 //original 1.2
         //redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.5, -0.4);  //2
         redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.4, -0.4);  //1.2
+
+        leftRedSideways.stop();
+        leftRedSideways.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,10, STRAIGHT_SPEED);
 
 
 
@@ -638,6 +652,27 @@ public class SkyStoneAutoMeet3 extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
 
+                    //secdstartStrafing();
+                    sidewaysPath();
+                }
+            }
+        });
+
+    }
+
+    public void sidewaysPath()
+    {
+        //get closer to stones to detect + pick up 2nd
+        RobotLog.i("Moving closer to stones ");
+
+
+        //starts when you find a skystone
+        this.addTask(new DeadReckonTask(this, sidewaysPath, drivetrain1){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+
                     secdstartStrafing();
                 }
             }
@@ -663,7 +698,8 @@ public class SkyStoneAutoMeet3 extends Robot {
 
     public void secdstartStrafing()
     {
-        // start looking for secound skystone
+        setStoneDetection();
+        // start looking for second skystone
         RobotLog.i("startStrafing");
         addTask(sdTask);
         loggingTlm.setValue("startStrafing:before starting to strafe");
