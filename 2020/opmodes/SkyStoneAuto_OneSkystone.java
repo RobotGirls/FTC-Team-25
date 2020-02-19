@@ -23,8 +23,8 @@ public class SkyStoneAuto_OneSkystone extends Robot {
 
     private DcMotor frontLeft;
     private DcMotor frontRight;
-    private DcMotor rearLeft;
-    private DcMotor rearRight;
+    private DcMotor backLeft;
+    private DcMotor backRight;
     //for mechanism
     private Servo grabberServo;
     private Servo foundationHookRightServo;
@@ -494,8 +494,8 @@ public class SkyStoneAuto_OneSkystone extends Robot {
 
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
-        rearLeft = hardwareMap.dcMotor.get("backLeft");
-        rearRight = hardwareMap.dcMotor.get("backRight");
+        backLeft = hardwareMap.dcMotor.get("backLeft");
+        backRight = hardwareMap.dcMotor.get("backRight");
 
         grabberServo = hardwareMap.servo.get("grabberServo");
         grabberServo.setPosition(UP_GRABBER_SERVO);
@@ -524,7 +524,7 @@ public class SkyStoneAuto_OneSkystone extends Robot {
         RobotLog.ii(TAG,  "delta: " + delta);
 
 
-        drivetrain1 = new MechanumGearedDrivetrain(360, frontRight, rearRight, frontLeft, rearLeft);
+        drivetrain1 = new MechanumGearedDrivetrain(360, frontRight, backRight, frontLeft, backLeft);
         drivetrain1.resetEncoders();
         drivetrain1.encodersOn();
         RobotLog.i("start moving");
