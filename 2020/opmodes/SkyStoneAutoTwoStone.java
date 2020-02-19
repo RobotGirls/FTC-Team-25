@@ -175,9 +175,7 @@ public class SkyStoneAutoTwoStone extends Robot {
                 case BUTTON_X_DOWN:
                     allianceColor = AllianceColor.BLUE;
                     allianceTlm.setValue("BLUE");
-                    depotPath = blueDepotPath;
                     foundationPath = blueFoundationPath;
-                    moveAcross = bmoveAcross;
                     endFoundationPath = endBlueFoundation;
                     foundationUnderBridge = blueFoundationUnderBridge;
                     secdCloserPath = bluesecdCloserPath;
@@ -506,15 +504,15 @@ public class SkyStoneAutoTwoStone extends Robot {
 
     public DeadReckonPath getBlueDepotPath() {
         DeadReckonPath path = new DeadReckonPath();
-        path.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,0.2, -STRAIGHT_SPEED);  //
-        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.6, -0.4); //1.2
+        path.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,0.6, -STRAIGHT_SPEED);  //
+        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.3, -0.4); //1.2
         return path;
     }
 
     public DeadReckonPath getBlueMoveAcrossPath() {
         DeadReckonPath path = new DeadReckonPath();
         path.addSegment(DeadReckonPath.SegmentType.STRAIGHT,4.5 ,.2);
-        path.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,15.5, .4);
+        path.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,15.5, .50);
         return path;
 
     }
@@ -549,13 +547,9 @@ public class SkyStoneAutoTwoStone extends Robot {
         getCloserPath = new DeadReckonPath();
         //add path to get to bridge
 
-        blueDepotPath.stop();
-        blueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,0.2, -STRAIGHT_SPEED);  //
-        blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.6, -0.4); //
-
         rightBlueSideways.stop();
-        rightBlueSideways.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,10, .60);
-        rightBlueSideways.addSegment(DeadReckonPath.SegmentType.STRAIGHT,.5, -.60);
+        rightBlueSideways.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,11, -.80);
+        rightBlueSideways.addSegment(DeadReckonPath.SegmentType.STRAIGHT,2, -.60);
 
         leftRedSideways.stop();
         leftRedSideways.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,10, .60);
@@ -614,7 +608,7 @@ public class SkyStoneAutoTwoStone extends Robot {
 
         bluesecdCloserPath.stop();
         bluesecdCloserPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3.5, -STRAIGHT_SPEED);
-        bluesecdCloserPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.5, STRAIGHT_SPEED); // needs testing
+        bluesecdCloserPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.5, -STRAIGHT_SPEED); // needs testing
 
         secdblueDepotPath.stop();
         secdblueDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,0.2, -STRAIGHT_SPEED);  //
