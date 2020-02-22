@@ -490,14 +490,14 @@ public class SkyStoneAutoTwoStone extends Robot {
     public DeadReckonPath getRedDepotPath() {
         DeadReckonPath path = new DeadReckonPath();
         path.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 0.25, -STRAIGHT_SPEED); // going right, might change to .2 //original 1.2
-        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.4, -0.4);  //1.2
+        path.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.4, -0.45);  //1.2
         return path;
     }
 
     public DeadReckonPath getRedMoveAcrossPath() {
         DeadReckonPath path = new DeadReckonPath();
         path.addSegment(DeadReckonPath.SegmentType.STRAIGHT,4.5  ,.3); //STRAIGHT_SPEED
-        path.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,12.7 , -.4);  //STRAIGHT_SPEED needs change decrease 3.6/7
+        path.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,14 , -.70);  //STRAIGHT_SPEED needs change decrease 3.6/7
         return path;
 
     }
@@ -512,7 +512,7 @@ public class SkyStoneAutoTwoStone extends Robot {
     public DeadReckonPath getBlueMoveAcrossPath() {
         DeadReckonPath path = new DeadReckonPath();
         path.addSegment(DeadReckonPath.SegmentType.STRAIGHT,4.5 ,.2);
-        path.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,15.5, .50);
+        path.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,15.5, .70);
         return path;
 
     }
@@ -552,7 +552,7 @@ public class SkyStoneAutoTwoStone extends Robot {
         rightBlueSideways.addSegment(DeadReckonPath.SegmentType.STRAIGHT,2, -.60);
 
         leftRedSideways.stop();
-        leftRedSideways.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,10, .60);
+        leftRedSideways.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,10, .70);
         leftRedSideways.addSegment(DeadReckonPath.SegmentType.STRAIGHT,.5, -.60);
 
 
