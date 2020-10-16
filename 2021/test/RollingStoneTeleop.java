@@ -34,6 +34,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -42,59 +43,59 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import team25core.DeadmanMotorTask;
 import team25core.GamepadTask;
-import team25core.OneWheelDriveTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
+<<<<<<< HEAD
+import team25core.SingleShotTimerTask;
+import team25core.StandardFourMotorRobot;
+=======
 import team25core.TankMechanumControlSchemeBackwards;
+>>>>>>> e9267c9ba0d270f67b01209ab6f002bade287e76
 import team25core.TankMechanumControlSchemeReverse;
 import team25core.TeleopDriveTask;
 
-@TeleOp(name = "LM1 CODE")
+@TeleOp(name = "LM2 CODE")
 //@Disabled
-public class DesiTeleop extends Robot {
-
-    //amory's
-    private DcMotor leftIntake;
-    private DcMotor rightIntake;
-    private DcMotor rackAndPinion;
-
-    private boolean useLeftJoystick = true;
-
-    private DcMotor frontLeft;
-    private DcMotor frontRight;
-    private DcMotor rearLeft;
-    private DcMotor rearRight;
+public class RollingStoneTeleop extends StandardFourMotorRobot {
 
     //amory's
     private Servo foundationHookLeft;
     private Servo foundationHookRight;
+    private DcMotor leftIntake;
+    private DcMotor rightIntake;
+    private CRServo rackAndPinion; //change to servo
+
+    private boolean useLeftJoystick = true;
 
     //emily's code
     private Servo leftServo;
     private Servo rightServo;
-    private Servo monsterRetentionServo;
+    //private Servo monsterRetentionServo;
     private Servo grabberServo;
     private DcMotor liftMotor;
 
+    private Servo capstoneServo;
 
-    private final double OPEN_LEFT_SERVO = (float)52 / (float)256;
-    private final double OPEN_RIGHT_SERVO = (float)155 / (float)256;
-    private final double CLOSE_LEFT_SERVO = (float)85 / (float)256;
-    private final double CLOSE_RIGHT_SERVO = (float)123 / (float)256;
-    private final double OPEN_MONSTER_RETENTION_SERVO = 220 / 256;
-    private final double CLOSE_MONSTER_RETENTION_SERVO = 117 / 256;
-    private final double DOWN_GRABBER_SERVO = (float)1/(float)256.0;
-    private final double UP_GRABBER_SERVO = (float)80/(float)256.0;
+    private final double OPEN_LEFT_SERVO = (float) 11.0 / 256.0; //changed
+    private final double OPEN_RIGHT_SERVO = (float) 131.0 / 256.0;  //changed
+    private final double CLOSE_LEFT_SERVO = (float) 70.0 / 256.0;
+    private final double CLOSE_RIGHT_SERVO = (float) 62.0 / 256.0;
+    //private final double OPEN_MONSTER_RETENTION_SERVO = (float) 70.0 / 256.0;  //220
+    //private final double CLOSE_MONSTER_RETENTION_SERVO = (float) 119.0 / 256.0; //117
+    private final double DOWN_GRABBER_SERVO = (float)255/256.0;
+    private final double UP_GRABBER_SERVO = (float) 75/256.0;
+    private final double UP_FOUNDATION_LEFT_SERVO = (float) 118/ 256.0;
+    private final double DOWN_FOUNDATION_LEFT_SERVO = (float) 237/ 256.0;
+    private final double UP_FOUNDATION_RIGHT_SERVO = (float) 212/ 256.0;
+    private final double DOWN_FOUNDATION_RIGHT_SERVO = (float) 90/ 256.0;
     private final double LIFT_POWER_UP = -0.5;
     private final double LIFT_POWER_DOWN = 0.5;
-    private final double OPEN_foundationHookLeft = (float)230 / (float)256;
-    private final double OPEN_foundationHookRight = (float)129 / (float)256;
-    private final double CLOSE_foundationHookLeft = (float)128 / (float)256;
-    private final double CLOSE_foundationHookRight = (float)218 / (float)256;
-
-
-
+    private final double INTAKE_OUT = 1;
+    private final double INTAKE_IN = -1;
+    private final double INTAKE_STOP = 0;
+    private final double DOWN_CAPSTONE_SERVO = (float) 141.0 / 256.0;
+    private final double UP_CAPSTONE_SERVO = (float) 192.0 / 256.0;
 
     DeadmanMotorTask liftLinearUp;
     DeadmanMotorTask liftLinearDown;
@@ -123,54 +124,38 @@ public class DesiTeleop extends Robot {
 
     @Override
     public void handleEvent(RobotEvent e) {
-        // Nothing to do here...
-        if (e instanceof GamepadTask.GamepadEvent) {
-            GamepadTask.GamepadEvent event = (GamepadTask.GamepadEvent) e;
-            switch (event.kind) {
-                case LEFT_BUMPER_DOWN:
-                    leftIntake.setPower(1.0);
-                    rightIntake.setPower(-1.0);
-                    break;
-                case RIGHT_BUMPER_DOWN:
-                    leftIntake.setPower(-1.0);
-                    rightIntake.setPower(1.0);
-                case RIGHT_BUMPER_UP:
-                    leftIntake.setPower(0);
-                    rightIntake.setPower(0);
-                case LEFT_BUMPER_UP:
-                    leftIntake.setPower(0);
-                    rightIntake.setPower(0);
-            }
-        }
     }
 
     @Override
     public void init() {
 
-        leftIntake = hardwareMap.get(DcMotor.class, "leftIntake");
-        rightIntake = hardwareMap.get(DcMotor.class, "rightIntake");
-        rackAndPinion = hardwareMap.get(DcMotor.class, "rackAndPinion");
-
-        //instantiates GamepadTask
-        GamepadTask gamepad = new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2);
-        this.addTask(gamepad);
-
+        super.init();
 
         foundationHookLeft = hardwareMap.servo.get("foundationHookLeftServo");
         foundationHookRight = hardwareMap.servo.get("foundationHookRightServo");
         grabberServo = hardwareMap.servo.get("grabberServo");
+        capstoneServo = hardwareMap.servo.get("capstoneServo");
 
-        foundationHookLeft.setPosition(0.0390625);
-        foundationHookRight.setPosition(0.34765625);
+        //grabberServo.setPosition(UP_GRABBER_SERVO);
+        //foundationHookLeft.setPosition(UP_FOUNDATION_LEFT_SERVO);
+        //foundationHookRight.setPosition(0.34765625);
 
+<<<<<<< HEAD
+=======
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        rearLeft = hardwareMap.get(DcMotor.class, "rearLeft");
-        rearRight = hardwareMap.get(DcMotor.class, "rearRight");
+        rearLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        rearRight = hardwareMap.get(DcMotor.class, "backRight");
+>>>>>>> e9267c9ba0d270f67b01209ab6f002bade287e76
+        leftIntake = hardwareMap.get(DcMotor.class, "leftIntake");
+        rightIntake = hardwareMap.get(DcMotor.class, "rightIntake");
+        rackAndPinion = hardwareMap.get(CRServo.class, "rackAndPinion");
+
+        rackAndPinion.setPower(INTAKE_STOP);
 
         //added following 4 lines
-        rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -178,8 +163,8 @@ public class DesiTeleop extends Robot {
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         leftServo = hardwareMap.servo.get("leftServo");
         rightServo = hardwareMap.servo.get("rightServo");
-        monsterRetentionServo = hardwareMap.servo.get("monsterRetentionServo");
-        monsterRetentionServo.setPosition(CLOSE_MONSTER_RETENTION_SERVO);
+        //monsterRetentionServo = hardwareMap.servo.get("monsterRetentionServo");
+        //monsterRetentionServo.setPosition(CLOSE_MONSTER_RETENTION_SERVO);
 
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         liftMotor.setPower(0.0);
@@ -197,12 +182,11 @@ public class DesiTeleop extends Robot {
         //drivetrain.setNoncanonicalMotorDirection();
 
         liftLinearUp = new DeadmanMotorTask(this, liftMotor, LIFT_POWER_UP, GamepadTask.GamepadNumber. GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
-        liftLinearUp.setMaxMotorPosition(MAX_LINEAR_HEIGHT);
+        //liftLinearUp.setMaxMotorPosition(MAX_LINEAR_HEIGHT);
 
         liftLinearDown = new DeadmanMotorTask(this, liftMotor, LIFT_POWER_DOWN, GamepadTask.GamepadNumber. GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
-        liftLinearUp.setMinMotorPosition(MIN_LINEAR_HEIGHT);
+        //liftLinearUp.setMinMotorPosition(MIN_LINEAR_HEIGHT);
     }
-
 
     public void liftMotorOneStep(DcMotorSimple.Direction direction)
     {
@@ -227,29 +211,40 @@ public class DesiTeleop extends Robot {
         this.addTask(new RunToEncoderValueTask(this,  liftMotor, currentHeight, .75));
     }
 
+    public void clawOpen()
+    {
+        //opening claw servos
+        leftServo.setPosition(OPEN_LEFT_SERVO);
+        rightServo.setPosition(OPEN_RIGHT_SERVO);
+    }
+
+
     @Override
     public void start() {
-
-        //amory's
-        OneWheelDriveTask rackAndPinionDrive = new OneWheelDriveTask(this, rackAndPinion, useLeftJoystick);
-        this.addTask(rackAndPinionDrive);
 
        //switch (gamepadEvent.kind)
         addTask(liftLinearUp);
         addTask(liftLinearDown);
 
-        TankMechanumControlSchemeBackwards scheme = new TankMechanumControlSchemeBackwards(gamepad1);
+        TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
         // added lines 146 and 148
-        drivetask = new TeleopDriveTask(this, scheme, frontLeft, frontRight, rearLeft, rearRight);
+        drivetask = new TeleopDriveTask(this, scheme, frontLeft, frontRight, backLeft, backRight);
 
         this.addTask(drivetask);
         //this.addTask(new TankDriveTask(this, drivetrain));
 
-        monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
+        //monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
 
-        leftServo.setPosition(OPEN_LEFT_SERVO);
-        rightServo.setPosition(OPEN_RIGHT_SERVO);
-        grabberServo.setPosition(UP_GRABBER_SERVO);
+        //grabberServo.setPosition(UP_GRABBER_SERVO);
+
+        /*addTask(new SingleShotTimerTask(this, 2000) //2000 milliseconds == 2 seconds
+        {
+            @Override
+            public void handleEvent(RobotEvent e){
+                clawOpen();
+            }
+
+        });*/
 
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
             //@Override
@@ -258,19 +253,24 @@ public class DesiTeleop extends Robot {
 
                 switch (gamepadEvent.kind) {
                     case RIGHT_BUMPER_DOWN:
-                        foundationHookLeft.setPosition(OPEN_foundationHookLeft); //open 0.0390625
-                        foundationHookRight.setPosition(OPEN_foundationHookRight); //0.34765625
+                        foundationHookLeft.setPosition(UP_FOUNDATION_LEFT_SERVO); //open
+                        foundationHookRight.setPosition(UP_FOUNDATION_RIGHT_SERVO);
                         break;
                     case RIGHT_TRIGGER_DOWN:
-                        foundationHookLeft.setPosition(CLOSE_foundationHookLeft); //0.54296875
-                        foundationHookRight.setPosition(CLOSE_foundationHookRight); //0.83984375
+                        foundationHookLeft.setPosition(DOWN_FOUNDATION_LEFT_SERVO);
+                        foundationHookRight.setPosition(DOWN_FOUNDATION_RIGHT_SERVO);
                         break;
-                    case BUTTON_B_DOWN:
+                    case BUTTON_Y_DOWN:
                         grabberServo.setPosition(UP_GRABBER_SERVO);
-                    case BUTTON_X_DOWN:
+                        break;
+                    case BUTTON_A_DOWN:
                         grabberServo.setPosition(DOWN_GRABBER_SERVO);
                         break;
-                    default:
+                    case BUTTON_X_DOWN:
+                        capstoneServo.setPosition(DOWN_CAPSTONE_SERVO);
+                        break;
+                    case BUTTON_B_DOWN:
+                        capstoneServo.setPosition(UP_CAPSTONE_SERVO);
                         break;
                 }
             }
@@ -301,11 +301,34 @@ public class DesiTeleop extends Robot {
                         //liftMotor.setPower(0.0);
                         //liftMotorOneStep(LIFT_DIRECTION_UP);
                        // break;
-                    case DPAD_RIGHT_DOWN:
+                    /*case DPAD_RIGHT_DOWN:
                         monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
-                        break;
-                    case DPAD_LEFT_DOWN:
+                        break;*/
+                    /*case DPAD_LEFT_DOWN:
                         monsterRetentionServo.setPosition(CLOSE_MONSTER_RETENTION_SERVO);
+                        break; */
+                    case LEFT_BUMPER_DOWN:
+                        rackAndPinion.setPower(INTAKE_IN);
+                        break;
+                    case LEFT_BUMPER_UP:
+                    case LEFT_TRIGGER_UP:
+                        rackAndPinion.setPower(INTAKE_STOP);
+                        break;
+                    case LEFT_TRIGGER_DOWN:
+                        rackAndPinion.setPower(INTAKE_OUT);
+                        break;
+                    case RIGHT_BUMPER_DOWN:
+                        leftIntake.setPower(-1.0);
+                        rightIntake.setPower(1.0);
+                        break;
+                    case RIGHT_TRIGGER_DOWN:
+                        leftIntake.setPower(1.0);
+                        rightIntake.setPower(-1.0);
+                        break;
+                    case RIGHT_TRIGGER_UP:
+                    case RIGHT_BUMPER_UP:
+                        leftIntake.setPower(0);
+                        rightIntake.setPower(0);
                         break;
                 }
             }
