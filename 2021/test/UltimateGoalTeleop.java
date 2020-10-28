@@ -55,60 +55,10 @@ import team25core.TeleopDriveTask;
 //@Disabled
 public class UltimateGoalTeleop extends StandardFourMotorRobot {
 
-    //amory's
-    private Servo foundationHookLeft;
-    private Servo foundationHookRight;
-    private DcMotor leftIntake;
-    private DcMotor rightIntake;
-    private CRServo rackAndPinion; //change to servo
-
     private boolean useLeftJoystick = true;
 
-    //emily's code
-    private Servo leftServo;
-    private Servo rightServo;
-    //private Servo monsterRetentionServo;
-    private Servo grabberServo;
-    private DcMotor liftMotor;
-
-    private Servo capstoneServo;
-
-    private final double OPEN_LEFT_SERVO = (float) 11.0 / 256.0; //changed
-    private final double OPEN_RIGHT_SERVO = (float) 131.0 / 256.0;  //changed
-    private final double CLOSE_LEFT_SERVO = (float) 70.0 / 256.0;
-    private final double CLOSE_RIGHT_SERVO = (float) 62.0 / 256.0;
-    //private final double OPEN_MONSTER_RETENTION_SERVO = (float) 70.0 / 256.0;  //220
-    //private final double CLOSE_MONSTER_RETENTION_SERVO = (float) 119.0 / 256.0; //117
-    private final double DOWN_GRABBER_SERVO = (float)255/256.0;
-    private final double UP_GRABBER_SERVO = (float) 75/256.0;
-    private final double UP_FOUNDATION_LEFT_SERVO = (float) 118/ 256.0;
-    private final double DOWN_FOUNDATION_LEFT_SERVO = (float) 237/ 256.0;
-    private final double UP_FOUNDATION_RIGHT_SERVO = (float) 212/ 256.0;
-    private final double DOWN_FOUNDATION_RIGHT_SERVO = (float) 90/ 256.0;
-    private final double LIFT_POWER_UP = -0.5;
-    private final double LIFT_POWER_DOWN = 0.5;
-    private final double INTAKE_OUT = 1;
-    private final double INTAKE_IN = -1;
-    private final double INTAKE_STOP = 0;
-    private final double DOWN_CAPSTONE_SERVO = (float) 141.0 / 256.0;
-    private final double UP_CAPSTONE_SERVO = (float) 192.0 / 256.0;
-
-    DeadmanMotorTask liftLinearUp;
-    DeadmanMotorTask liftLinearDown;
-
-    private final int DELTA_HEIGHT = 180;
-    private final int LINEAR_INITIAL_POS = 100;
-    private final int MAX_LINEAR_HEIGHT = 50;
-    private final int MIN_LINEAR_HEIGHT = 500;
-
-    private final DcMotorSimple.Direction LIFT_DIRECTION_UP = DcMotorSimple.Direction.FORWARD;
-    private final DcMotorSimple.Direction LIFT_DIRECTION_DOWN = DcMotorSimple.Direction.REVERSE;
-    private int currentHeight =  LINEAR_INITIAL_POS;
-
     private Telemetry.Item linearPos;
-
     private Telemetry.Item linearEncoderVal;
-    //emily's code
 
     private TeleopDriveTask drivetask;
 
@@ -116,7 +66,6 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
     //private MechanumGearedDrivetrain drivetrain;
 
     private static final int TICKS_PER_INCH = 79;
-
 
     @Override
     public void handleEvent(RobotEvent e) {
@@ -127,16 +76,7 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
 
         super.init();
 
-        foundationHookLeft = hardwareMap.servo.get("foundationHookLeftServo");
-        foundationHookRight = hardwareMap.servo.get("foundationHookRightServo");
-        grabberServo = hardwareMap.servo.get("grabberServo");
-        capstoneServo = hardwareMap.servo.get("capstoneServo");
-
-        //grabberServo.setPosition(UP_GRABBER_SERVO);
-        //foundationHookLeft.setPosition(UP_FOUNDATION_LEFT_SERVO);
-        //foundationHookRight.setPosition(0.34765625);
-
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+       frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         rearLeft = hardwareMap.get(DcMotor.class, "backLeft");
         rearRight = hardwareMap.get(DcMotor.class, "backRight");
@@ -144,192 +84,52 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
         rightIntake = hardwareMap.get(DcMotor.class, "rightIntake");
         rackAndPinion = hardwareMap.get(CRServo.class, "rackAndPinion");
 
-        rackAndPinion.setPower(INTAKE_STOP);
-
-        //added following 4 lines
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        //emily's
-        liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
-        leftServo = hardwareMap.servo.get("leftServo");
-        rightServo = hardwareMap.servo.get("rightServo");
-        //monsterRetentionServo = hardwareMap.servo.get("monsterRetentionServo");
-        //monsterRetentionServo.setPosition(CLOSE_MONSTER_RETENTION_SERVO);
-
-        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        liftMotor.setPower(0.0);
-
-        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        linearPos = telemetry.addData("linearpos", 0);
-
-        //linearEncoderVal.addData("linearpos", "unknown");
-        //emily's
-
         TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
 
-       //drivetrain = new MechanumGearedDrivetrain(360, frontRight, rearRight, frontLeft, rearLeft);
-        //drivetrain.setNoncanonicalMotorDirection();
-
-        liftLinearUp = new DeadmanMotorTask(this, liftMotor, LIFT_POWER_UP, GamepadTask.GamepadNumber. GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_Y);
-        //liftLinearUp.setMaxMotorPosition(MAX_LINEAR_HEIGHT);
-
-        liftLinearDown = new DeadmanMotorTask(this, liftMotor, LIFT_POWER_DOWN, GamepadTask.GamepadNumber. GAMEPAD_2, DeadmanMotorTask.DeadmanButton.BUTTON_A);
-        //liftLinearUp.setMinMotorPosition(MIN_LINEAR_HEIGHT);
+        //code for forward mechanum drivetrain:
+        //drivetrain = new MechanumGearedDrivetrain(360, frontRight, rearRight, frontLeft, rearLeft);
     }
-
-    public void liftMotorOneStep(DcMotorSimple.Direction direction)
-    {
-        if (direction == DcMotorSimple.Direction.REVERSE) {
-
-            currentHeight -=  DELTA_HEIGHT;
-            if(currentHeight < 50) {
-                currentHeight = 50;
-            }
-
-        } else {
-            currentHeight += DELTA_HEIGHT;
-            if (currentHeight > 500) {
-                currentHeight = 500;
-            }
-
-        }
-        linearPos.setValue(currentHeight);
-
-        liftMotor.setDirection(direction);
-        //linearEncoderVal.setValue(currentHeight);
-        this.addTask(new RunToEncoderValueTask(this,  liftMotor, currentHeight, .75));
-    }
-
-    public void clawOpen()
-    {
-        //opening claw servos
-        leftServo.setPosition(OPEN_LEFT_SERVO);
-        rightServo.setPosition(OPEN_RIGHT_SERVO);
-    }
-
 
     @Override
     public void start() {
 
-       //switch (gamepadEvent.kind)
-        addTask(liftLinearUp);
-        addTask(liftLinearDown);
-
         TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
-        // added lines 146 and 148
         drivetask = new TeleopDriveTask(this, scheme, frontLeft, frontRight, backLeft, backRight);
 
         this.addTask(drivetask);
-        //this.addTask(new TankDriveTask(this, drivetrain));
 
-        //monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
-
-        //grabberServo.setPosition(UP_GRABBER_SERVO);
-
-        /*addTask(new SingleShotTimerTask(this, 2000) //2000 milliseconds == 2 seconds
-        {
-            @Override
-            public void handleEvent(RobotEvent e){
-                clawOpen();
-            }
-
-        });*/
-
+        //gamepad 1
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
             //@Override
             public void handleEvent(RobotEvent e) {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
 
                 switch (gamepadEvent.kind) {
-                    case RIGHT_BUMPER_DOWN:
-                        foundationHookLeft.setPosition(UP_FOUNDATION_LEFT_SERVO); //open
-                        foundationHookRight.setPosition(UP_FOUNDATION_RIGHT_SERVO);
-                        break;
-                    case RIGHT_TRIGGER_DOWN:
-                        foundationHookLeft.setPosition(DOWN_FOUNDATION_LEFT_SERVO);
-                        foundationHookRight.setPosition(DOWN_FOUNDATION_RIGHT_SERVO);
-                        break;
-                    case BUTTON_Y_DOWN:
-                        grabberServo.setPosition(UP_GRABBER_SERVO);
-                        break;
-                    case BUTTON_A_DOWN:
-                        grabberServo.setPosition(DOWN_GRABBER_SERVO);
-                        break;
-                    case BUTTON_X_DOWN:
-                        capstoneServo.setPosition(DOWN_CAPSTONE_SERVO);
-                        break;
-                    case BUTTON_B_DOWN:
-                        capstoneServo.setPosition(UP_CAPSTONE_SERVO);
-                        break;
+                    //case RIGHT_BUMPER_DOWN:, etc.
                 }
             }
         });
 
         
 
-        //emily's
+        //Gamepad 2
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             //@Override
             public void handleEvent(RobotEvent e) {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
 
                 switch (gamepadEvent.kind) {
-                    case BUTTON_B_DOWN:
-                        leftServo.setPosition(OPEN_LEFT_SERVO);
-                        rightServo.setPosition(OPEN_RIGHT_SERVO);
-                        break;
-                    case BUTTON_X_DOWN:
-                        leftServo.setPosition(CLOSE_LEFT_SERVO);
-                        rightServo.setPosition(CLOSE_RIGHT_SERVO);
-                        break;
-                    //case BUTTON_A_DOWN:
-                        //liftMotor.setPower(0.5);
-                        //liftMotorOneStep(LIFT_DIRECTION_DOWN);
-                        //break;
-                   // case BUTTON_Y_DOWN:
-                        //liftMotor.setPower(0.0);
-                        //liftMotorOneStep(LIFT_DIRECTION_UP);
-                       // break;
-                    /*case DPAD_RIGHT_DOWN:
-                        monsterRetentionServo.setPosition(OPEN_MONSTER_RETENTION_SERVO);
-                        break;*/
-                    /*case DPAD_LEFT_DOWN:
-                        monsterRetentionServo.setPosition(CLOSE_MONSTER_RETENTION_SERVO);
-                        break; */
-                    case LEFT_BUMPER_DOWN:
-                        rackAndPinion.setPower(INTAKE_IN);
-                        break;
-                    case LEFT_BUMPER_UP:
-                    case LEFT_TRIGGER_UP:
-                        rackAndPinion.setPower(INTAKE_STOP);
-                        break;
-                    case LEFT_TRIGGER_DOWN:
-                        rackAndPinion.setPower(INTAKE_OUT);
-                        break;
-                    case RIGHT_BUMPER_DOWN:
-                        leftIntake.setPower(-1.0);
-                        rightIntake.setPower(1.0);
-                        break;
-                    case RIGHT_TRIGGER_DOWN:
-                        leftIntake.setPower(1.0);
-                        rightIntake.setPower(-1.0);
-                        break;
-                    case RIGHT_TRIGGER_UP:
-                    case RIGHT_BUMPER_UP:
-                        leftIntake.setPower(0);
-                        rightIntake.setPower(0);
-                        break;
+                    //case RIGHT_BUMPER_DOWN:, etc.
                 }
             }
         });
     }
 }
 
-
-
-
-
+//deleted mechanism specific code: access 2020 directory for RollingStone mechanism code; useful for examples and template usages
+//TO DO: integrate new mechanism codes/preferred buttons 
