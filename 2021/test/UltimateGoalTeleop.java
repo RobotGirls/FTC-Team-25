@@ -51,7 +51,7 @@ import team25core.StandardFourMotorRobot;
 import team25core.TankMechanumControlSchemeReverse;
 import team25core.TeleopDriveTask;
 
-@TeleOp(name = "LM2 CODE")
+@TeleOp(name = "Testing Teleop")
 //@Disabled
 public class UltimateGoalTeleop extends StandardFourMotorRobot {
 
