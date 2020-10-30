@@ -31,7 +31,7 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package opmodes;
+package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -51,16 +51,17 @@ import team25core.StandardFourMotorRobot;
 import team25core.TankMechanumControlSchemeReverse;
 import team25core.TeleopDriveTask;
 
-@TeleOp(name = "Testing Teleop")
+@TeleOp(name = "UltimateGoalTeleop")
 //@Disabled
 public class UltimateGoalTeleop extends StandardFourMotorRobot {
 
-    private boolean useLeftJoystick = true;
 
     private Telemetry.Item linearPos;
     private Telemetry.Item linearEncoderVal;
 
     private TeleopDriveTask drivetask;
+    private DcMotor launchMech;
+    private DcMotor intakeMech;
 
     //private FourWheelDirectDrivetrain drivetrain;
     //private MechanumGearedDrivetrain drivetrain;
@@ -76,18 +77,24 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
 
         super.init();
 
-       frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+        //mapping the wheels
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        rearLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        rearRight = hardwareMap.get(DcMotor.class, "backRight");
-        leftIntake = hardwareMap.get(DcMotor.class, "leftIntake");
-        rightIntake = hardwareMap.get(DcMotor.class, "rightIntake");
-        rackAndPinion = hardwareMap.get(CRServo.class, "rackAndPinion");
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight = hardwareMap.get(DcMotor.class, "backRight");
 
+        //mapping the lauch mech and intake mech
+        launchMech = hardwareMap.get(DcMotor.class, "launchMech");
+        intakeMech = hardwareMap.get(DcMotor.class, "intakeMech");
+        //rackAndPinion = hardwareMap.get(CRServo.class, "rackAndPinion");
+
+        // using encoders to record ticks
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launchMech.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeMech.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
 
@@ -98,9 +105,9 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
     @Override
     public void start() {
 
-        TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
         drivetask = new TeleopDriveTask(this, scheme, frontLeft, frontRight, backLeft, backRight);
 
+        //=== continue from here ===
         this.addTask(drivetask);
 
         //gamepad 1
