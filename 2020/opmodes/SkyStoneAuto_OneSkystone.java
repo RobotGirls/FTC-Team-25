@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -10,29 +11,23 @@ import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
+import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.StandardFourMotorRobot;
 import team25core.StoneDetectionTask;
 
-<<<<<<< HEAD:2020/opmodes/SkyStoneAutoMeet3.java
-@Autonomous(name = "AutoMeet9", group = "Team 25")
-public class SkyStoneAutoMeet3 extends StandardFourMotorRobot {
-=======
+
 @Autonomous(name = "AutoILT_OneStone", group = "Team 25")
 public class SkyStoneAuto_OneSkystone extends Robot {
->>>>>>> e9267c9ba0d270f67b01209ab6f002bade287e76:2020/opmodes/SkyStoneAuto_OneSkystone.java
+
 
 
     private final static String TAG = "STONEZ";
 
-<<<<<<< HEAD:2020/opmodes/SkyStoneAutoMeet3.java
-=======
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
->>>>>>> e9267c9ba0d270f67b01209ab6f002bade287e76:2020/opmodes/SkyStoneAuto_OneSkystone.java
-    //for mechanism
     private Servo grabberServo;
     private Servo foundationHookRightServo;
     private Servo foundationHookLeftServo;
@@ -499,14 +494,10 @@ public class SkyStoneAuto_OneSkystone extends Robot {
     public void init()
     {
 
-<<<<<<< HEAD:2020/opmodes/SkyStoneAutoMeet3.java
-=======
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
-
->>>>>>> e9267c9ba0d270f67b01209ab6f002bade287e76:2020/opmodes/SkyStoneAuto_OneSkystone.java
         grabberServo = hardwareMap.servo.get("grabberServo");
         grabberServo.setPosition(UP_GRABBER_SERVO);
 
@@ -534,11 +525,8 @@ public class SkyStoneAuto_OneSkystone extends Robot {
         RobotLog.ii(TAG,  "delta: " + delta);
 
 
-<<<<<<< HEAD:2020/opmodes/SkyStoneAutoMeet3.java
+
         drivetrain1 = new MechanumGearedDrivetrain(frontRight, backRight, frontLeft, backLeft);
-=======
-        drivetrain1 = new MechanumGearedDrivetrain(360, frontRight, backRight, frontLeft, backLeft);
->>>>>>> e9267c9ba0d270f67b01209ab6f002bade287e76:2020/opmodes/SkyStoneAuto_OneSkystone.java
         drivetrain1.resetEncoders();
         drivetrain1.encodersOn();
         RobotLog.i("start moving");

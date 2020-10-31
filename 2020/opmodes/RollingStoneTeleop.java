@@ -36,6 +36,7 @@ package opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -46,12 +47,8 @@ import team25core.GamepadTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
-<<<<<<< HEAD
 import team25core.SingleShotTimerTask;
 import team25core.StandardFourMotorRobot;
-=======
-import team25core.TankMechanumControlSchemeBackwards;
->>>>>>> e9267c9ba0d270f67b01209ab6f002bade287e76
 import team25core.TankMechanumControlSchemeReverse;
 import team25core.TeleopDriveTask;
 
@@ -140,13 +137,11 @@ public class RollingStoneTeleop extends StandardFourMotorRobot {
         //foundationHookLeft.setPosition(UP_FOUNDATION_LEFT_SERVO);
         //foundationHookRight.setPosition(0.34765625);
 
-<<<<<<< HEAD
-=======
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        rearLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        rearRight = hardwareMap.get(DcMotor.class, "backRight");
->>>>>>> e9267c9ba0d270f67b01209ab6f002bade287e76
+
+        frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
+        frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
+        backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
+        backRight = hardwareMap.get(DcMotorEx.class, "backRight");
         leftIntake = hardwareMap.get(DcMotor.class, "leftIntake");
         rightIntake = hardwareMap.get(DcMotor.class, "rightIntake");
         rackAndPinion = hardwareMap.get(CRServo.class, "rackAndPinion");

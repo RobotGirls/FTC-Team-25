@@ -15,7 +15,7 @@ import team25core.StoneDetectionTask;
 
 @Autonomous(name = "SkyStones Detection Unit Test", group = "Team 25")
 @Disabled
-public class Stonedetectiontest extends Robot {
+public class StoneDetectionTest extends Robot {
 
     private final static String TAG = "holly";
     private Telemetry.Item stonePositionTlm;
