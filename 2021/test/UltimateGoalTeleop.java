@@ -35,6 +35,7 @@ package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -43,6 +44,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import team25core.DeadmanMotorTask;
 import team25core.GamepadTask;
+import team25core.OneWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
@@ -78,10 +80,10 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
         super.init();
 
         //mapping the wheels
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        backRight = hardwareMap.get(DcMotor.class, "backRight");
+        frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
+        frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
+        backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
+        backRight = hardwareMap.get(DcMotorEx.class, "backRight");
 
         //mapping the lauch mech and intake mech
         launchMech = hardwareMap.get(DcMotor.class, "launchMech");
@@ -96,6 +98,17 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
         launchMech.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakeMech.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+       /* launch = new OneWheelDirectDrivetrain(launchMech);
+        launch.resetEncoders();
+        launch.encodersOn();
+
+        intake = new OneWheelDirectDrivetrain(intakeMech);
+        intake.resetEncoders();
+        intake.encodersOn();
+
+        */
+
+
         TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
 
         //code for forward mechanum drivetrain:
@@ -104,6 +117,8 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
 
     @Override
     public void start() {
+
+        TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
 
         drivetask = new TeleopDriveTask(this, scheme, frontLeft, frontRight, backLeft, backRight);
 
@@ -117,24 +132,34 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
 
                 switch (gamepadEvent.kind) {
-                    //case RIGHT_BUMPER_DOWN:, etc.
+                    case BUTTON_X_DOWN:
+                        // enable the launch mech
+                        launchMech.setPower(1);
+                        break;
+                    case BUTTON_X_UP:
+                        // stop the launch mech
+                        launchMech.setPower(0);
+                        break;
+                    case BUTTON_Y_DOWN:
+                        //enable the intake mech
+                        intakeMech.setPower(1);
+                    case BUTTON_Y_UP:
+                        // stop the intake mech
+                        intakeMech.setPower(0);
+                        break;
+                    case BUTTON_A_DOWN:
+                        //enable the outtake mech
+                        intakeMech.setPower(-1);
+                        break;
+                    case BUTTON_A_UP:
+                        // stop the outtake mech
+                        intakeMech.setPower(0);
+                        break;
                 }
             }
         });
 
-        
 
-        //Gamepad 2
-        this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
-            //@Override
-            public void handleEvent(RobotEvent e) {
-                GamepadEvent gamepadEvent = (GamepadEvent) e;
-
-                switch (gamepadEvent.kind) {
-                    //case RIGHT_BUMPER_DOWN:, etc.
-                }
-            }
-        });
     }
 }
 
