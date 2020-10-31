@@ -1,6 +1,7 @@
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -13,6 +14,7 @@ import team25core.RobotEvent;
 import team25core.StoneDetectionTask;
 
 @Autonomous(name = "SkyStones Detection Unit Test", group = "Team 25")
+@Disabled
 public class StoneDetectionTest extends Robot {
 
     private final static String TAG = "holly";

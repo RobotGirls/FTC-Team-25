@@ -1,6 +1,7 @@
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -10,24 +11,30 @@ import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
+import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.StandardFourMotorRobot;
 import team25core.StoneDetectionTask;
 
-@Autonomous(name = "AutoMeet9", group = "Team 25")
-public class SkyStoneAutoMeet3 extends StandardFourMotorRobot {
+
+@Autonomous(name = "AutoILT_OneStone", group = "Team 25")
+public class SkyStoneAuto_OneSkystone extends Robot {
+
 
 
     private final static String TAG = "STONEZ";
 
-    //for mechanism
+    private DcMotor frontLeft;
+    private DcMotor frontRight;
+    private DcMotor backLeft;
+    private DcMotor backRight;
     private Servo grabberServo;
     private Servo foundationHookRightServo;
     private Servo foundationHookLeftServo;
 
-    private final double DOWN_GRABBER_SERVO = (float) 256/ (float)256.0;
-    private final double MID_GRABBER_SERVO = (float)  200/ (float)256.0;
-    private final double UP_GRABBER_SERVO = (float) 30/ (float)256.0;
+    private final double DOWN_GRABBER_SERVO = (float) 0/ (float)256.0;
+    private final double MID_GRABBER_SERVO = (float)  50/ (float)256.0;
+    private final double UP_GRABBER_SERVO = (float) 210/ (float)256.0;
     private final double OPEN_FOUNDATION_HOOK_RIGHT_SERVO = (float)216 / (float)256.0;
     private final double OPEN_FOUNDATION_HOOK_LEFT_SERVO  = (float)113 / (float)256.0;
     private final double CLOSE_FOUNDATION_HOOK_RIGHT_SERVO  = (float)91/ (float)256.0;  //FIX ALL FOUNDATION SERVO
@@ -430,9 +437,9 @@ public class SkyStoneAutoMeet3 extends StandardFourMotorRobot {
         blueDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.6, -0.4); //
 
         redDepotPath.stop();
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,0.4, STRAIGHT_SPEED);  //might change to .2 //original 1.2
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,0.1, STRAIGHT_SPEED);  //might change to .2 //original 1.2
         //redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.5, -0.4);  //2
-        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.4, -0.4);  //1.2
+        redDepotPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.5, -0.4);  //1.2
 
         bmoveAcross.stop();
         bmoveAcross.addSegment(DeadReckonPath.SegmentType.STRAIGHT,4.5 ,.2);
@@ -487,6 +494,10 @@ public class SkyStoneAutoMeet3 extends StandardFourMotorRobot {
     public void init()
     {
 
+        frontLeft = hardwareMap.dcMotor.get("frontLeft");
+        frontRight = hardwareMap.dcMotor.get("frontRight");
+        backLeft = hardwareMap.dcMotor.get("backLeft");
+        backRight = hardwareMap.dcMotor.get("backRight");
         grabberServo = hardwareMap.servo.get("grabberServo");
         grabberServo.setPosition(UP_GRABBER_SERVO);
 
@@ -512,6 +523,7 @@ public class SkyStoneAutoMeet3 extends StandardFourMotorRobot {
         pixelsPerInchTlm = telemetry.addData("pixelsPerInch", "unknown");
         distanceBtWWebcamAndGrabberTlm = telemetry.addData("distance BtW Webcam and Grabber","unknown");
         RobotLog.ii(TAG,  "delta: " + delta);
+
 
 
         drivetrain1 = new MechanumGearedDrivetrain(frontRight, backRight, frontLeft, backLeft);
