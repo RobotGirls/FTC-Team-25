@@ -127,12 +127,7 @@ public class StoneDetectionTaskMargarita extends RobotTask {
     public void init(Telemetry telemetry, HardwareMap hardwareMap)
     {
         initVuforia(hardwareMap);
-
-        //if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTfod(hardwareMap);
-        //} else {
-        //    telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        //}
+        initTfod(hardwareMap);
     }
 
     public void rateLimit(int ms)
