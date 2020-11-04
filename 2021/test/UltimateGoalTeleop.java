@@ -65,6 +65,14 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
     private DcMotor launchMech;
     private DcMotor intakeMech;
 
+    private DcMotor wobbleLift;
+    private Servo wobbleGrab;
+    private boolean wobbleGrabIsOpen = true;
+
+    private final double OPEN_WOBBLE_SERVO = (float) 128.0 / 256.0;
+    private final double CLOSE_WOBBLE_SERVO = (float) 0.0 /256.0;
+    //^ these numbers ARE NOT CORRECT!
+
     //private FourWheelDirectDrivetrain drivetrain;
     //private MechanumGearedDrivetrain drivetrain;
 
@@ -85,10 +93,15 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
         backRight = hardwareMap.get(DcMotorEx.class, "backRight");
 
-        //mapping the lauch mech and intake mech
+        //mapping wobble grab servo
+        wobbleGrab = hardwareMap.servo.get("wobbleGrabServo");
+
+        //mapping the launch mech and intake mech
         launchMech = hardwareMap.get(DcMotor.class, "launchMech");
         intakeMech = hardwareMap.get(DcMotor.class, "intakeMech");
-        //rackAndPinion = hardwareMap.get(CRServo.class, "rackAndPinion");
+
+        //mapping wobble lift motor
+        wobbleLift = hardwareMap.get(DcMotor.class, "wobbleLift");
 
         // using encoders to record ticks
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -97,6 +110,7 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         launchMech.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakeMech.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wobbleLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
        /* launch = new OneWheelDirectDrivetrain(launchMech);
         launch.resetEncoders();
@@ -155,13 +169,31 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
                         // stop the outtake mech
                         intakeMech.setPower(0);
                         break;
+                    case BUTTON_B_DOWN:
+                        //wobble servo close OR open depending on boolean toggle;
+                        if (wobbleGrabIsOpen) {
+                            wobbleGrab.setPosition(CLOSE_WOBBLE_SERVO);
+                            wobbleGrabIsOpen = false;
+                        } else {
+                            wobbleGrab.setPosition(OPEN_WOBBLE_SERVO);
+                            wobbleGrabIsOpen = true;
+                        }
+                        break;
+                    case RIGHT_BUMPER_DOWN:
+                        //wobble lift up
+                        wobbleLift.setPower(1); //might have to be changed based on testing
+                        break;
+                    case RIGHT_TRIGGER_DOWN:
+                        //wobble lift down
+                        wobbleLift.setPower(-1); //might have to be changed based on testing
+                        break;
+                    case RIGHT_BUMPER_UP:
+                    case RIGHT_TRIGGER_UP:
+                        wobbleLift.setPower(0);
+                        break;
                 }
             }
         });
-
-
     }
 }
 
-//deleted mechanism specific code: access 2020 directory for RollingStone mechanism code; useful for examples and template usages
-//TO DO: integrate new mechanism codes/preferred buttons 
