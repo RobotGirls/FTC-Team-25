@@ -44,7 +44,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.TankDriveTask;
 
-@Autonomous(name = "FourWheelDriveTaskExample")
+@Autonomous(name = "ServoTestShot")
 //@Disabled
 public class ServoTestShot extends Robot {
 

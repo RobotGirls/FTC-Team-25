@@ -119,11 +119,11 @@ public class MineralDetectionTask extends RobotTask {
     {
         initVuforia(hardwareMap);
 
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+        //if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
             initTfod(hardwareMap);
-        } else {
-            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        }
+        //} else {
+        //    telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        //}
     }
 
     public void rateLimit(int ms)

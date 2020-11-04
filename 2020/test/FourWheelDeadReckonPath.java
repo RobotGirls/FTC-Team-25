@@ -43,7 +43,7 @@ import team25core.FourWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 
-@Autonomous(name = "DeadReckonExample")
+@Autonomous(name = "FourWheelDeadReckonExample")
 //@Disabled
 public class FourWheelDeadReckonPath extends Robot {
 
