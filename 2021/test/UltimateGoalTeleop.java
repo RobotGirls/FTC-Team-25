@@ -122,7 +122,6 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
 
         */
 
-
         TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
 
         //code for forward mechanum drivetrain:
