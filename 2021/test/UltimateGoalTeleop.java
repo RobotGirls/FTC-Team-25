@@ -173,11 +173,11 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
                         break;
                     case DPAD_UP_DOWN:
                         //wobble lift up
-                        wobbleLift.setPower(1); //might have to be changed based on testing
+                        wobbleLift.setPower(0.5); //might have to be changed based on testing
                         break;
                     case DPAD_DOWN_DOWN:
                         //wobble lift down
-                        wobbleLift.setPower(-1); //might have to be changed based on testing
+                        wobbleLift.setPower(-0.5); //might have to be changed based on testing
                         break;
                     case DPAD_UP_UP:
                     case DPAD_DOWN_UP:
