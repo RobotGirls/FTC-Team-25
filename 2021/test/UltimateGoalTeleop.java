@@ -34,21 +34,14 @@
 package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import team25core.DeadmanMotorTask;
 import team25core.GamepadTask;
-import team25core.OneWheelDirectDrivetrain;
-import team25core.Robot;
 import team25core.RobotEvent;
-import team25core.RunToEncoderValueTask;
-import team25core.SingleShotTimerTask;
 import team25core.StandardFourMotorRobot;
 import team25core.TankMechanumControlSchemeReverse;
 import team25core.TeleopDriveTask;
@@ -57,13 +50,13 @@ import team25core.TeleopDriveTask;
 //@Disabled
 public class UltimateGoalTeleop extends StandardFourMotorRobot {
 
-
     private Telemetry.Item linearPos;
     private Telemetry.Item linearEncoderVal;
 
     private TeleopDriveTask drivetask;
     private DcMotor launchMech;
-    private DcMotor intakeMech;
+    private DcMotor intakeMechLeft;
+    private DcMotor intakeMechRight;
 
     private DcMotor wobbleLift;
     private Servo wobbleGrab;
@@ -96,7 +89,8 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
 
         //mapping the launch mech and intake mech
         launchMech = hardwareMap.get(DcMotor.class, "launchMech");
-        intakeMech = hardwareMap.get(DcMotor.class, "intakeMech");
+        intakeMechLeft = hardwareMap.get(DcMotor.class, "intakeMechLeft");
+        intakeMechRight = hardwareMap.get(DcMotor.class, "intakeMechRight");
 
         //mapping wobble lift motor
         wobbleLift = hardwareMap.get(DcMotor.class, "wobbleLift");
@@ -107,7 +101,8 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         launchMech.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        intakeMech.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeMechLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeMechRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wobbleLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
        /* launch = new OneWheelDirectDrivetrain(launchMech);
@@ -153,18 +148,18 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
                         break;
                     case BUTTON_Y_DOWN:
                         //enable the intake mech
-                        intakeMech.setPower(1);
-                    case BUTTON_Y_UP:
-                        // stop the intake mech
-                        intakeMech.setPower(0);
-                        break;
+                        intakeMechLeft.setPower(-1); //lines 151+152 and 155+156 might need power vals to be switched (or reduced)
+                        intakeMechRight.setPower(1);
                     case BUTTON_A_DOWN:
                         //enable the outtake mech
-                        intakeMech.setPower(-1);
+                        intakeMechLeft.setPower(1);
+                        intakeMechRight.setPower(-1);
                         break;
+                    case BUTTON_Y_UP:
                     case BUTTON_A_UP:
-                        // stop the outtake mech
-                        intakeMech.setPower(0);
+                        // stop the intake/outtake mech
+                        intakeMechLeft.setPower(0);
+                        intakeMechRight.setPower(0);
                         break;
                     case BUTTON_B_DOWN:
                         //wobble servo close OR open depending on boolean toggle;
@@ -176,16 +171,16 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
                             wobbleGrabIsOpen = true;
                         }
                         break;
-                    case RIGHT_BUMPER_DOWN:
+                    case DPAD_UP_DOWN:
                         //wobble lift up
                         wobbleLift.setPower(1); //might have to be changed based on testing
                         break;
-                    case RIGHT_TRIGGER_DOWN:
+                    case DPAD_DOWN_DOWN:
                         //wobble lift down
                         wobbleLift.setPower(-1); //might have to be changed based on testing
                         break;
-                    case RIGHT_BUMPER_UP:
-                    case RIGHT_TRIGGER_UP:
+                    case DPAD_UP_UP:
+                    case DPAD_DOWN_UP:
                         wobbleLift.setPower(0);
                         break;
                 }
