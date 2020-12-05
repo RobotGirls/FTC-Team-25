@@ -69,14 +69,12 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
     private Servo wobbleGrab;
     private boolean wobbleGrabIsOpen = true;
 
-    private final double OPEN_WOBBLE_SERVO = (float) 128.0 / 256.0;
-    private final double CLOSE_WOBBLE_SERVO = (float) 0.0 /256.0;
-    //^ these numbers ARE NOT CORRECT!
+    private static final int TICKS_PER_INCH = 79;
+    private final double OPEN_WOBBLE_SERVO = (float) 244.0 / 256.0;
+    private final double CLOSE_WOBBLE_SERVO = (float) 140.0 / 256.0;
 
     //private FourWheelDirectDrivetrain drivetrain;
     //private MechanumGearedDrivetrain drivetrain;
-
-    private static final int TICKS_PER_INCH = 79;
 
     @Override
     public void handleEvent(RobotEvent e) {
