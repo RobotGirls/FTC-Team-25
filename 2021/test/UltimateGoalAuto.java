@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import opmodes.SkyStoneAutoTwoStone;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.GamepadTask;
@@ -16,6 +17,7 @@ import team25core.MechanumGearedDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.StandardFourMotorRobot;
+import team25core.StoneDetectionTask;
 
 
 @Autonomous(name = "Scrimmage2", group = "Team 25")
@@ -80,6 +82,87 @@ public class UltimateGoalAuto extends Robot {
         launchLinePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -STRAIGHT_SPEED);
     }
 
+    public void setStoneDetection()
+    {
+
+//        sdTask = new StoneDetectionTask(this, "Webcam1") {
+//            //starts when you find a skystone
+//            @Override
+//            public void handleEvent(RobotEvent e) {
+//                StoneDetectionTask.StoneDetectionEvent event = (StoneDetectionEvent) e;
+//                //0 gives you the first stone on list of stones
+//                confidence = event.stones.get(0).getConfidence();
+//                left = event.stones.get(0).getLeft();
+//
+//                RobotLog.ii(TAG, "Saw: " + event.kind + " Confidence: " + confidence);
+//                RobotLog.i("startHandleEvent");
+//
+//                imageMidpoint = event.stones.get(0).getImageWidth() / 2.0;
+//                stoneMidpoint = (event.stones.get(0).getWidth() / 2.0) + left;
+//                width = event.stones.get(0).getWidth();
+//                imageWidth = event.stones.get(0).getImageWidth();
+//
+//                stoneType = event.stones.get(0).getLabel();
+//                stoneKind = event.kind;
+//                delta = Math.abs(imageMidpoint - stoneMidpoint);
+//                RobotLog.i("type");
+//
+//                stonePositionTlm.setValue(left);
+//                stoneConfidTlm.setValue(confidence);
+//                imageMidpointTlm.setValue(imageMidpoint);
+//                stoneMidpointTlm.setValue(stoneMidpoint);
+//                stoneTypeTlm.setValue(stoneType);
+//                stoneTlm.setValue(stoneKind);
+//                deltaTlm.setValue(delta);
+//                pathTlm.setValue(setColor);
+//                widthTlm.setValue(width);
+//                imageWidthTlm.setValue(imageWidth);
+//
+//                numStonesSeen = event.stones.size();
+//                numStonesSeenTlm.setValue(numStonesSeen);
+//                RobotLog.ii(TAG,"numStonesSeen",numStonesSeen);
+//
+//                if (event.kind == EventKind.OBJECTS_DETECTED) {
+//
+//                    numPixelsBtwImgMidptAndStoneMidpt = stoneMidpoint - imageMidpoint;
+//                    realNumPixelsPerInch = (width/8.0);
+//                    pixelsPerInchTlm.setValue(realNumPixelsPerInch);
+//                    distance = (double)(DISTANCE_FROM_WEBCAM_TO_GRABBER * realNumPixelsPerInch);
+//                    distanceBtWWebcamAndGrabberTlm.setValue(distance);
+//
+//                    marginTlm.setValue(Math.abs(numPixelsBtwImgMidptAndStoneMidpt - distance));
+//                    if ((numPixelsBtwImgMidptAndStoneMidpt > 0)  &&
+//                            (Math.abs(numPixelsBtwImgMidptAndStoneMidpt - distance)  < margin)) {
+//                    /* old detection if (Math.abs(imageMidpoint - stoneMidpoint) < margin) {
+//                        inCenter = true
+//                        RobotLog.i("506 Found gold");
+//                        sdTask.stop();
+//                        drivetrain1.stop();*/
+//
+//                        if (allianceColor == SkyStoneAutoTwoStone.AllianceColor.RED) {
+//
+//                            secondInitialRobotPosition = drivetrain1.getCurrentPosition();
+//                            secondInitialRobotPositionTlm.setValue(secondInitialRobotPosition);
+//                            goPickupSkystone(getRedDepotPath());
+//                            sdTask.stop();
+//                            RobotLog.i("506 chose red depot path");
+//                            pathTlm.setValue("taking red depot path");
+//                        } else {
+//                            goPickupSkystone(getBlueDepotPath());
+//                            sdTask.stop();
+//                            RobotLog.i("506 chose blue depot path");
+//                            pathTlm.setValue("taking blue depot path" );
+//                        }
+//                    }
+//                }
+//            }
+//        };
+//
+//        sdTask.init(telemetry, hardwareMap);
+//        //later adbwill find skystone
+//        sdTask.setDetectionKind(StoneDetectionTask.DetectionKind.LARGEST_SKY_STONE_DETECTED);
+
+    }
 
     @Override
     public void init()
