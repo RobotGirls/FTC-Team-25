@@ -106,22 +106,6 @@ public class UltimateGoalAuto extends Robot {
         initPath();
     }
 
-
-//    public void startStrafing()
-//    {
-//        //start looking for Skystones
-//        RobotLog.i("startStrafing");
-//        addTask(sdTask);
-//        loggingTlm.setValue("startStrafing:before starting to strafe");
-//        if (allianceColor == AllianceColor.RED) {
-//            drivetrain1.strafe(opmodes.SkyStoneConstants25.STRAFE_SPEED);
-//        } else {
-//            drivetrain1.strafe(-opmodes.SkyStoneConstants25.STRAFE_SPEED);
-//        }
-//        loggingTlm.setValue("startStrafing:after starting to strafe");
-//    }
-
-
     @Override
     public void start()
     {
