@@ -115,8 +115,6 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
 
         */
 
-        TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
-
         //code for forward mechanum drivetrain:
         //drivetrain = new MechanumGearedDrivetrain(360, frontRight, rearRight, frontLeft, rearLeft);
     }
@@ -124,11 +122,10 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
     @Override
     public void start() {
 
-        TankMechanumControlSchemeReverse scheme = new TankMechanumControlSchemeReverse(gamepad1);
+        SingleGamepadControlSchemeTest scheme = new SingleGamepadControlSchemeTest(gamepad1);
 
         drivetask = new TeleopDriveTask(this, scheme, frontLeft, frontRight, backLeft, backRight);
 
-        //=== continue from here ===
         this.addTask(drivetask);
 
         //gamepad 1
