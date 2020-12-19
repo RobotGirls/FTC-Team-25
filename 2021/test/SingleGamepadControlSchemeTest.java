@@ -24,10 +24,12 @@ public class SingleGamepadControlSchemeTest implements JoystickDriveControlSchem
     protected double rightY;
     protected Gamepad gamepad;
 
-    protected double leftWheelForward;
-    protected double leftWheelBackward;
-    protected double rightWheelForward;
-    protected double rightWheelBackward;
+    //for use in cases where EITHER the left wheels or right wheels are mounted backward.
+    //currently: left wheels are mounted backward, so the left wheel forward/backward values are reversed from normal
+    protected final double LEFT_WHEEL_FORWARD = -1;
+    protected double LEFT_WHEEL_BACKWARD = 1;
+    protected double RIGHT_WHEEL_FORWARD = 1;
+    protected double RIGHT_WHEEL_BACKWARD = -1;
 
 
     public SingleGamepadControlSchemeTest(Gamepad gamepad)
@@ -42,51 +44,46 @@ public class SingleGamepadControlSchemeTest implements JoystickDriveControlSchem
         leftY = gamepad.left_stick_y;
         rightY = gamepad.right_stick_y;
 
-        leftWheelForward   = -1;
-        leftWheelBackward  = 1;
-        rightWheelForward  = -1;
-        rightWheelBackward = 1;
-
         // If left joystick are pointed left (negative joystick values), counter rotate wheels.
         // Threshold for joystick values in the x may vary.
 
-        if (leftX > 0.5 && rightY > 0.5) {          // forward diagonal to the left
-            fr = rightWheelForward;
-            bl = leftWheelForward;
-        } else if (leftX < -0.5 && rightY > 0.5) {          // forward diagonal to the right
-            fl = leftWheelForward;
-            br = rightWheelForward;
-        } else if (leftX > 0.5 && rightY < -0.5) {          //backward diagonal left
-            fl = leftWheelBackward;
-            br = rightWheelBackward;
-        } else if (leftX < -0.5 && rightY < -0.5) {          //backward diagonal right
-            fr = rightWheelBackward;
-            bl = leftWheelBackward;
-        } else if (leftX > 0.5) {          // left joy-stick sideways; strafe left
-            fl = leftWheelBackward;
-            bl = leftWheelForward;
-            fr = rightWheelForward;
-            br = rightWheelBackward;
-        } else if (leftX < -0.5) {          // left joy-stick sideways; strafe right
-            fl = leftWheelForward;
-            bl = leftWheelBackward;
-            fr = rightWheelBackward;
-            br = rightWheelForward;
-        } else if (rightX > 0.5) {          // turn around toward left (right joystick left)
-            fl = leftWheelBackward;
-            bl = leftWheelBackward;
-            fr = rightWheelForward;
-            br = rightWheelForward;
-        } else if (rightX < -0.5) {          // turn around toward right (right joystick right)
-            fl = leftWheelForward;
-            bl = leftWheelForward;
-            fr = rightWheelBackward;
-            br = rightWheelBackward;
-        } else if (leftY > 0.5 || leftY < -0.5) {          //forward and backward (left joystick forward and backward)
-            fl = leftY;
-            bl = leftY;
-            fr = leftY;
-            br = leftY;
+        if (leftX > 0.5) {          // left joystick to the right
+            fl = 1;
+            bl = -1;
+            fr = 1;
+            br = -1;
+        } else if (leftX < -0.5) {          //left joystick to the left
+            fl = -1;
+            bl = 1;
+            fr = -1;
+            br = 1;
+        } else if (rightX > 0.5) {          //right joystick right (turn right)
+            fl = 1;
+            bl = 1;
+            fr = 1;
+            br = 1;
+        } else if (rightX < -0.5) {          // right joystick left (turn left)
+            fl = -1;
+            bl = -1;
+            fr = -1;
+            br = -1;
+        } else if (leftY < -0.5) { //left joystick forward
+            fl = 1;
+            bl = 1;
+            fr = -1;
+            br = -1;
+        } else if (leftY > 0.5) { //left joystick backward
+            fl = -1;
+            bl = -1;
+            fr = 1;
+            br = 1;
+        } else {          //forward and backward (left joystick forward and backward)
+            //backwards
+
+            fl = 0;
+            bl = 0;
+            fr = 0;
+            br = 0;
         }
 
         return new MotorValues(fl, fr, bl, br);
