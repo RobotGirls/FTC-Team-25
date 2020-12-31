@@ -16,7 +16,7 @@ import team25core.RobotEvent;
 import team25core.StoneDetectionTask;
 
 @Autonomous(name = "AutoILT_OneStone", group = "Team 25")
-public class SkyStoneAuto_OneSkystone extends Robot {
+public class SkyStoneAuto_OneSkystone_sample extends Robot {
 
 
     private final static String TAG = "STONEZ";
@@ -524,7 +524,8 @@ public class SkyStoneAuto_OneSkystone extends Robot {
         RobotLog.ii(TAG,  "delta: " + delta);
 
 
-        drivetrain1 = new MechanumGearedDrivetrain(360, frontRight, backRight, frontLeft, backLeft);
+        //drivetrain1 = new MechanumGearedDrivetrain(360, frontRight, backRight, frontLeft, backLeft);
+        drivetrain1 = new MechanumGearedDrivetrain(frontRight, backRight, frontLeft, backLeft);
         drivetrain1.resetEncoders();
         drivetrain1.encodersOn();
         RobotLog.i("start moving");

@@ -17,7 +17,7 @@ import team25core.StandardFourMotorRobot;
 import team25core.StoneDetectionTask;
 
 
-@Autonomous(name = "AutoILT_OneStone", group = "Team 25")
+@Autonomous(name = "AutoILT_OneStone_sample", group = "Team 25")
 public class SkyStoneAuto_OneSkystone extends Robot {
 
 
