@@ -14,6 +14,7 @@ import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
+import team25core.RingDetectionTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.StandardFourMotorRobot;
@@ -40,6 +41,8 @@ public class UltimateGoalAuto extends Robot {
     // declaring gamepad variables
     //variables declarations have lowercase then uppercase
     private GamepadTask gamepad;
+
+    RingDetectionTask rdTask;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -82,14 +85,14 @@ public class UltimateGoalAuto extends Robot {
         launchLinePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -STRAIGHT_SPEED);
     }
 
-    public void setStoneDetection()
+    public void setRingDetection()
     {
 
-//        sdTask = new StoneDetectionTask(this, "Webcam1") {
-//            //starts when you find a skystone
-//            @Override
-//            public void handleEvent(RobotEvent e) {
-//                StoneDetectionTask.StoneDetectionEvent event = (StoneDetectionEvent) e;
+        rdTask = new RingDetectionTask(this, "Webcam1") {
+            //the handleEvent method is called when a ring is detected
+            @Override
+            public void handleEvent(RobotEvent e) {
+                RingDetectionTask.RingDetectionEvent event = (RingDetectionEvent) e;
 //                //0 gives you the first stone on list of stones
 //                confidence = event.stones.get(0).getConfidence();
 //                left = event.stones.get(0).getLeft();
@@ -155,12 +158,12 @@ public class UltimateGoalAuto extends Robot {
 //                        }
 //                    }
 //                }
-//            }
-//        };
-//
-//        sdTask.init(telemetry, hardwareMap);
+            }
+        };
+
+        rdTask.init(telemetry, hardwareMap);
 //        //later adbwill find skystone
-//        sdTask.setDetectionKind(StoneDetectionTask.DetectionKind.LARGEST_SKY_STONE_DETECTED);
+        rdTask.setDetectionKind(RingDetectionTask.DetectionKind.QUAD_RING_DETECTED);
 
     }
 
