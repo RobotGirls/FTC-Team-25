@@ -43,6 +43,7 @@ public class UltimateGoalAuto extends Robot {
     private GamepadTask gamepad;
 
     RingDetectionTask rdTask;
+    RingImageInfo ringImageInfo;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -93,12 +94,8 @@ public class UltimateGoalAuto extends Robot {
             @Override
             public void handleEvent(RobotEvent e) {
                 RingDetectionTask.RingDetectionEvent event = (RingDetectionEvent) e;
-//                //0 gives you the first stone on list of stones
-//                confidence = event.stones.get(0).getConfidence();
-//                left = event.stones.get(0).getLeft();
+                ringImageInfo.getImageInfo(event);
 //
-//                RobotLog.ii(TAG, "Saw: " + event.kind + " Confidence: " + confidence);
-//                RobotLog.i("startHandleEvent");
 //
 //                imageMidpoint = event.stones.get(0).getImageWidth() / 2.0;
 //                stoneMidpoint = (event.stones.get(0).getWidth() / 2.0) + left;
@@ -162,7 +159,7 @@ public class UltimateGoalAuto extends Robot {
         };
 
         rdTask.init(telemetry, hardwareMap);
-//        //later adbwill find skystone
+//      //FIXME update quad ring detection to look for single ring or quad ring
         rdTask.setDetectionKind(RingDetectionTask.DetectionKind.QUAD_RING_DETECTED);
 
     }
@@ -187,6 +184,8 @@ public class UltimateGoalAuto extends Robot {
         //initializing gamepad variables
         gamepad = new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1);
         addTask(gamepad);
+
+        ringImageInfo = new RingImageInfo(this);
 
         //initializing autonomous path
         initPath();

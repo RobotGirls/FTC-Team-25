@@ -1,4 +1,4 @@
-package opmodes;
+package test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -552,9 +552,9 @@ public class SkyStoneAuto_OneSkystone_sample extends Robot {
         addTask(sdTask);
         loggingTlm.setValue("startStrafing:before starting to strafe");
         if (allianceColor == AllianceColor.RED) {
-            drivetrain1.strafe(SkyStoneConstants25.STRAFE_SPEED);
+        //    drivetrain1.strafe(SkyStoneConstants25.STRAFE_SPEED);
         } else {
-            drivetrain1.strafe(-SkyStoneConstants25.STRAFE_SPEED);
+         //   drivetrain1.strafe(-SkyStoneConstants25.STRAFE_SPEED);
         }
         loggingTlm.setValue("startStrafing:after starting to strafe");
         grabberServo.setPosition(MID_GRABBER_SERVO);

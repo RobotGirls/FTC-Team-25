@@ -4,10 +4,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import team25core.RingDetectionTask;
 import team25core.Robot;
+import team25core.StoneDetectionTask;
 
 class RingImageInfo {
     private double confidence;
     private double left;
+    private String ringType;
+    private RingDetectionTask.EventKind ringKind;
     private double type;
     private double imageMidpoint;
     private double ringMidpoint;
@@ -62,9 +65,14 @@ class RingImageInfo {
     }
 
     protected void getImageInfo(RingDetectionTask.RingDetectionEvent event) {
-        //confidence is the likelihood that the object we detect is a ring in %
+        //confidence is the likelihood that the object we detect is a ring in percentage
+        //get(0) = gets the first item in the list of recognition objects pointed to by rings. rings = a variable in the ring detection event
         confidence = event.rings.get(0).getConfidence();
         //left is the left coordinate of the ring(s)
         left = event.rings.get(0).getLeft();
+
+        ringType = event.rings.get(0).getLabel(); //LABEL_QUAD_RINGS LABEL_SINGLE_RING
+        ringKind = event.kind; //QUAD_RING_DETECTED, SINGLE_RING_DETECTED etc.
     }
+
 }
