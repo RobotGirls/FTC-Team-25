@@ -24,6 +24,8 @@ class RingImageInfo {
     private final int DISTANCE_FROM_WEBCAM_TO_GRABBER =1;
     private double distance;
 
+    private int numObjectsSeen;
+
     private Telemetry.Item ringPositionTlm;
     private Telemetry.Item ringTlm;
     private Telemetry.Item ringConfidTlm;
@@ -33,7 +35,7 @@ class RingImageInfo {
     private Telemetry.Item loggingTlm;
     private Telemetry.Item handleEvntTlm;
     private Telemetry.Item deltaTlm;
-    private Telemetry.Item numRingsSeenTlm;
+    private Telemetry.Item numObjectsSeenTlm;
     private Telemetry.Item pathTlm;
     private Telemetry.Item widthTlm;
     private Telemetry.Item marginTlm;
@@ -55,7 +57,7 @@ class RingImageInfo {
         ringMidpointTlm = telemetry.addData("Ring Mdpt", "unknown");
         ringTlm = telemetry.addData("kind", "unknown");
         deltaTlm = telemetry.addData("delta", "unknown");
-        numRingsSeenTlm = telemetry.addData("numRings",-1);
+        numObjectsSeenTlm = telemetry.addData("numRings",-1);
         pathTlm = telemetry.addData("AllianceClr", "unknown");
         widthTlm = telemetry.addData("ringWidth", "unknown");
         imageWidthTlm = telemetry.addData("imageWidth", -1);
@@ -72,7 +74,15 @@ class RingImageInfo {
         left = event.rings.get(0).getLeft();
 
         ringType = event.rings.get(0).getLabel(); //LABEL_QUAD_RINGS LABEL_SINGLE_RING
-        ringKind = event.kind; //QUAD_RING_DETECTED, SINGLE_RING_DETECTED etc.
+        ringTypeTlm.setValue(ringType);
+
+        ringKind = event.kind; //OBJECTS_DETECTED
+
+        numObjectsSeen = event.rings.size();
+        numObjectsSeenTlm.setValue(numObjectsSeen);
+
     }
+    //CONTINUE HERE ********
+    //ADD METHOD TO RETURN THE RING TYPE
 
 }

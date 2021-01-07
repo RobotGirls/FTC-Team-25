@@ -122,7 +122,7 @@ public class UltimateGoalAuto extends Robot {
 //                numStonesSeenTlm.setValue(numStonesSeen);
 //                RobotLog.ii(TAG,"numStonesSeen",numStonesSeen);
 //
-//                if (event.kind == EventKind.OBJECTS_DETECTED) {
+                  if (event.kind == EventKind.OBJECTS_DETECTED) {
 //
 //                    numPixelsBtwImgMidptAndStoneMidpt = stoneMidpoint - imageMidpoint;
 //                    realNumPixelsPerInch = (width/8.0);
@@ -154,13 +154,13 @@ public class UltimateGoalAuto extends Robot {
 //                            pathTlm.setValue("taking blue depot path" );
 //                        }
 //                    }
-//                }
+               }
             }
         };
 
         rdTask.init(telemetry, hardwareMap);
 //      //FIXME update quad ring detection to look for single ring or quad ring
-        rdTask.setDetectionKind(RingDetectionTask.DetectionKind.QUAD_RING_DETECTED);
+        rdTask.setDetectionKind(RingDetectionTask.DetectionKind.EVERYTHING);
 
     }
 
