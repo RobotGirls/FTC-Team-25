@@ -42,8 +42,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import team25core.GamepadTask;
 import team25core.RobotEvent;
+import team25core.SingleGamepadControlScheme;
 import team25core.StandardFourMotorRobot;
-import team25core.TankMechanumControlSchemeReverse;
 import team25core.TeleopDriveTask;
 
 @TeleOp(name = "UltimateGoalTeleop")
@@ -122,7 +122,7 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
     @Override
     public void start() {
 
-        SingleGamepadControlSchemeTest scheme = new SingleGamepadControlSchemeTest(gamepad1);
+        SingleGamepadControlScheme scheme = new SingleGamepadControlScheme(gamepad1);
 
         drivetask = new TeleopDriveTask(this, scheme, frontLeft, frontRight, backLeft, backRight);
 
