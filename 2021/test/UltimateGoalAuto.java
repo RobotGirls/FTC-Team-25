@@ -21,7 +21,7 @@ import team25core.StandardFourMotorRobot;
 import team25core.StoneDetectionTask;
 
 
-@Autonomous(name = "Scrimmage2", group = "Team 25")
+@Autonomous(name = "Scrimmage3", group = "Team 25")
 // @Disabled
 public class UltimateGoalAuto extends Robot {
 
@@ -35,6 +35,9 @@ public class UltimateGoalAuto extends Robot {
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
+    private Telemetry.Item currentLocationTlm;
+    private Telemetry.Item handleEventTlm;
+    private int numTimesInHandleEvent = 0;
 
     DeadReckonPath path = new DeadReckonPath();
 
@@ -95,6 +98,10 @@ public class UltimateGoalAuto extends Robot {
             public void handleEvent(RobotEvent e) {
                 RingDetectionTask.RingDetectionEvent event = (RingDetectionEvent) e;
                 ringImageInfo.getImageInfo(event);
+                currentLocationTlm.setValue("in RingDetectionTask handleEvent");
+                numTimesInHandleEvent++;
+                handleEventTlm.setValue(numTimesInHandleEvent);
+
 //
 //
 //                imageMidpoint = event.stones.get(0).getImageWidth() / 2.0;
@@ -157,7 +164,7 @@ public class UltimateGoalAuto extends Robot {
                }
             }
         };
-
+        currentLocationTlm.setValue("in setRingDetection");
         rdTask.init(telemetry, hardwareMap);
 //      //FIXME update quad ring detection to look for single ring or quad ring
         rdTask.setDetectionKind(RingDetectionTask.DetectionKind.EVERYTHING);
@@ -174,6 +181,9 @@ public class UltimateGoalAuto extends Robot {
 
         //caption: what appears on the phone
         loggingTlm = telemetry.addData("distance traveled", "unknown");
+        currentLocationTlm = telemetry.addData("current location", "in init" );
+        handleEventTlm = telemetry.addData("num times in handle event", "0");
+
 
         //initializing drivetrain
         drivetrain1 = new MechanumGearedDrivetrain(frontRight, backRight, frontLeft, backLeft);
@@ -186,6 +196,7 @@ public class UltimateGoalAuto extends Robot {
         addTask(gamepad);
 
         ringImageInfo = new RingImageInfo(this);
+        setRingDetection();
 
         //initializing autonomous path
         initPath();
@@ -211,6 +222,9 @@ public class UltimateGoalAuto extends Robot {
     public void start()
     {
         loggingTlm = telemetry.addData("log", "unknown");
-        parkOnLaunchLine();
+        currentLocationTlm.setValue("in start");
+        addTask(rdTask);
+
+        //parkOnLaunchLine();
     }
 }

@@ -25,7 +25,7 @@ class RingImageInfo {
     private double distance;
 
     private int numObjectsSeen;
-
+    private Telemetry.Item currLocationTlm;
     private Telemetry.Item ringPositionTlm;
     private Telemetry.Item ringTlm;
     private Telemetry.Item ringConfidTlm;
@@ -44,6 +44,7 @@ class RingImageInfo {
     private Telemetry.Item distanceBtWWebcamAndGrabberTlm;
     private Robot myRobot;
     private Telemetry telemetry;
+
 
     public RingImageInfo(Robot robot) {
         myRobot = robot;
@@ -64,6 +65,7 @@ class RingImageInfo {
         marginTlm = telemetry.addData("margin" , "unknown");
         pixelsPerInchTlm = telemetry.addData("pixelsPerInch", "unknown");
         distanceBtWWebcamAndGrabberTlm = telemetry.addData("distance BtW Webcam and Grabber","unknown");
+        currLocationTlm = telemetry.addData("curr location", "in RingImageInfo constructor");
     }
 
     protected void getImageInfo(RingDetectionTask.RingDetectionEvent event) {
@@ -80,6 +82,7 @@ class RingImageInfo {
 
         numObjectsSeen = event.rings.size();
         numObjectsSeenTlm.setValue(numObjectsSeen);
+        currLocationTlm.setValue("in getImageInfo");
 
     }
     //CONTINUE HERE ********
