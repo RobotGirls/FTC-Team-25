@@ -21,7 +21,7 @@ import team25core.StandardFourMotorRobot;
 import team25core.StoneDetectionTask;
 
 
-@Autonomous(name = "Scrimmage3", group = "Team 25")
+@Autonomous(name = "Scrimmage4", group = "Team 25")
 // @Disabled
 public class UltimateGoalAuto extends Robot {
 
@@ -29,6 +29,7 @@ public class UltimateGoalAuto extends Robot {
     private final static String TAG = "auto code for first scrimmage";
     private MechanumGearedDrivetrain drivetrain1;
     private Telemetry.Item loggingTlm;
+    private Telemetry.Item objectSeenTlm;
     private DeadReckonPath launchLinePath;
     private final double STRAIGHT_SPEED = 0.5;
     private DcMotor frontLeft;
@@ -38,6 +39,9 @@ public class UltimateGoalAuto extends Robot {
     private Telemetry.Item currentLocationTlm;
     private Telemetry.Item handleEventTlm;
     private int numTimesInHandleEvent = 0;
+    private double ringConfidence;
+   // private String ringType = "unknown";
+    private String ringType;
 
     DeadReckonPath path = new DeadReckonPath();
 
@@ -98,52 +102,23 @@ public class UltimateGoalAuto extends Robot {
             public void handleEvent(RobotEvent e) {
                 RingDetectionTask.RingDetectionEvent event = (RingDetectionEvent) e;
                 ringImageInfo.getImageInfo(event);
+                ringConfidence = ringImageInfo.getConfidence();
+                ringType = ringImageInfo.getRingType();
                 currentLocationTlm.setValue("in RingDetectionTask handleEvent");
                 numTimesInHandleEvent++;
                 handleEventTlm.setValue(numTimesInHandleEvent);
 
-//
-//
-//                imageMidpoint = event.stones.get(0).getImageWidth() / 2.0;
-//                stoneMidpoint = (event.stones.get(0).getWidth() / 2.0) + left;
-//                width = event.stones.get(0).getWidth();
-//                imageWidth = event.stones.get(0).getImageWidth();
-//
-//                stoneType = event.stones.get(0).getLabel();
-//                stoneKind = event.kind;
-//                delta = Math.abs(imageMidpoint - stoneMidpoint);
-//                RobotLog.i("type");
-//
-//                stonePositionTlm.setValue(left);
-//                stoneConfidTlm.setValue(confidence);
-//                imageMidpointTlm.setValue(imageMidpoint);
-//                stoneMidpointTlm.setValue(stoneMidpoint);
-//                stoneTypeTlm.setValue(stoneType);
-//                stoneTlm.setValue(stoneKind);
-//                deltaTlm.setValue(delta);
-//                pathTlm.setValue(setColor);
-//                widthTlm.setValue(width);
-//                imageWidthTlm.setValue(imageWidth);
-//
-//                numStonesSeen = event.stones.size();
-//                numStonesSeenTlm.setValue(numStonesSeen);
-//                RobotLog.ii(TAG,"numStonesSeen",numStonesSeen);
-//
-                  if (event.kind == EventKind.OBJECTS_DETECTED) {
-//
-//                    numPixelsBtwImgMidptAndStoneMidpt = stoneMidpoint - imageMidpoint;
-//                    realNumPixelsPerInch = (width/8.0);
-//                    pixelsPerInchTlm.setValue(realNumPixelsPerInch);
-//                    distance = (double)(DISTANCE_FROM_WEBCAM_TO_GRABBER * realNumPixelsPerInch);
-//                    distanceBtWWebcamAndGrabberTlm.setValue(distance);
-//
-//                    marginTlm.setValue(Math.abs(numPixelsBtwImgMidptAndStoneMidpt - distance));
-//                    if ((numPixelsBtwImgMidptAndStoneMidpt > 0)  &&
-//                            (Math.abs(numPixelsBtwImgMidptAndStoneMidpt - distance)  < margin)) {
-//                    /* old detection if (Math.abs(imageMidpoint - stoneMidpoint) < margin) {
-//                        inCenter = true
-//                        RobotLog.i("506 Found gold");
-//                        sdTask.stop();
+
+                if (event.kind == EventKind.OBJECTS_DETECTED) {
+                  /*   rdTask.stop();
+                      if (ringType == "Single"){
+                          objectSeenTlm.setValue("single ring");
+                      } else if (ringType == "Quad"){
+                          objectSeenTlm.setValue("quad rings");
+                      } else {
+                          objectSeenTlm.setValue("no rings");
+                      } */
+
 //                        drivetrain1.stop();*/
 //
 //                        if (allianceColor == SkyStoneAutoTwoStone.AllianceColor.RED) {
@@ -183,6 +158,7 @@ public class UltimateGoalAuto extends Robot {
         loggingTlm = telemetry.addData("distance traveled", "unknown");
         currentLocationTlm = telemetry.addData("current location", "in init" );
         handleEventTlm = telemetry.addData("num times in handle event", "0");
+        objectSeenTlm = telemetry.addData("saw", "unknown");
 
 
         //initializing drivetrain

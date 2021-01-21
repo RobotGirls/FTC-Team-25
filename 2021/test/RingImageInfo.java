@@ -29,7 +29,9 @@ class RingImageInfo {
     private Telemetry.Item ringPositionTlm;
     private Telemetry.Item ringTlm;
     private Telemetry.Item ringConfidTlm;
+    private Telemetry.Item ringConfidTlm2;
     private Telemetry.Item ringTypeTlm;
+    private Telemetry.Item ringTypeTlm2;
     private Telemetry.Item ringMidpointTlm;
     private Telemetry.Item imageMidpointTlm;
     private Telemetry.Item loggingTlm;
@@ -53,7 +55,9 @@ class RingImageInfo {
         //caption: what appears on the phone
         ringPositionTlm = telemetry.addData("LeftOrigin", "unknown");
         ringConfidTlm = telemetry.addData("Confidence", "N/A");
+        ringConfidTlm2 = telemetry.addData("Confidence2", "N/A");
         ringTypeTlm = telemetry.addData("RingType","unknown");
+        ringTypeTlm2 = telemetry.addData("RingType2","unknown");
         imageMidpointTlm = telemetry.addData("Image_Mdpt", "unknown");
         ringMidpointTlm = telemetry.addData("Ring Mdpt", "unknown");
         ringTlm = telemetry.addData("kind", "unknown");
@@ -67,11 +71,18 @@ class RingImageInfo {
         distanceBtWWebcamAndGrabberTlm = telemetry.addData("distance BtW Webcam and Grabber","unknown");
         currLocationTlm = telemetry.addData("curr location", "in RingImageInfo constructor");
     }
+    protected double getConfidence(){
+        return confidence;
+    }
+    protected String getRingType(){
+        return ringType;
+    }
 
     protected void getImageInfo(RingDetectionTask.RingDetectionEvent event) {
         //confidence is the likelihood that the object we detect is a ring in percentage
         //get(0) = gets the first item in the list of recognition objects pointed to by rings. rings = a variable in the ring detection event
         confidence = event.rings.get(0).getConfidence();
+        ringConfidTlm.setValue(confidence);
         //left is the left coordinate of the ring(s)
         left = event.rings.get(0).getLeft();
 
@@ -83,6 +94,12 @@ class RingImageInfo {
         numObjectsSeen = event.rings.size();
         numObjectsSeenTlm.setValue(numObjectsSeen);
         currLocationTlm.setValue("in getImageInfo");
+        if (numObjectsSeen > 1){
+            confidence = event.rings.get(1).getConfidence();
+            ringConfidTlm2.setValue(confidence);
+            ringType = event.rings.get(1).getLabel(); //LABEL_QUAD_RINGS LABEL_SINGLE_RING
+            ringTypeTlm2.setValue(ringType);
+        }
 
     }
     //CONTINUE HERE ********
