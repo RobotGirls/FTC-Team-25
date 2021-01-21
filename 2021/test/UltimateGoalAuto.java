@@ -110,14 +110,15 @@ public class UltimateGoalAuto extends Robot {
 
 
                 if (event.kind == EventKind.OBJECTS_DETECTED) {
-                  /*   rdTask.stop();
-                      if (ringType == "Single"){
+                    objectSeenTlm.setValue(ringType);
+                  //  rdTask.stop();
+                      if (ringType.equals("Single") ){
                           objectSeenTlm.setValue("single ring");
-                      } else if (ringType == "Quad"){
+                      } else if (ringType.equals("Quad")){
                           objectSeenTlm.setValue("quad rings");
                       } else {
                           objectSeenTlm.setValue("no rings");
-                      } */
+                      }
 
 //                        drivetrain1.stop();*/
 //
