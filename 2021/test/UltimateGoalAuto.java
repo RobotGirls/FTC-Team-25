@@ -17,6 +17,7 @@ import team25core.MechanumGearedDrivetrain;
 import team25core.RingDetectionTask;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.SingleShotTimerTask;
 import team25core.StandardFourMotorRobot;
 import team25core.StoneDetectionTask;
 
@@ -27,11 +28,13 @@ public class UltimateGoalAuto extends Robot {
 
 
     private final static String TAG = "auto code for first scrimmage";
+    private final static int RING_TIMER = 1000;
+    private final double STRAIGHT_SPEED = 0.5;
+    private final double TURN_SPEED = 0.25;
     private MechanumGearedDrivetrain drivetrain1;
     private Telemetry.Item loggingTlm;
     private Telemetry.Item objectSeenTlm;
-    private DeadReckonPath launchLinePath;
-    private final double STRAIGHT_SPEED = 0.5;
+
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor backLeft;
@@ -43,6 +46,11 @@ public class UltimateGoalAuto extends Robot {
    // private String ringType = "unknown";
     private String ringType;
 
+    private DeadReckonPath launchLinePath;
+    private DeadReckonPath targetZoneAPath;
+    private DeadReckonPath targetZoneBPath;
+    private DeadReckonPath targetZoneCPath;
+
     DeadReckonPath path = new DeadReckonPath();
 
     // declaring gamepad variables
@@ -51,6 +59,7 @@ public class UltimateGoalAuto extends Robot {
 
     RingDetectionTask rdTask;
     RingImageInfo ringImageInfo;
+    SingleShotTimerTask rtTask;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -79,6 +88,69 @@ public class UltimateGoalAuto extends Robot {
         });
     }
 
+    public void goToTargetZoneA()
+    {
+        RobotLog.i("drives to target goal A with wobble goal");
+
+        this.addTask(new DeadReckonTask(this, targetZoneAPath, drivetrain1){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("reached target zone A");
+                }
+            }
+        });
+    }
+
+    public void goToTargetZoneB()
+    {
+        RobotLog.i("drives to target goal B with wobble goal");
+
+        this.addTask(new DeadReckonTask(this, targetZoneBPath, drivetrain1){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("reached target zone B");
+                }
+            }
+        });
+    }
+
+    public void goToTargetZoneC()
+    {
+        RobotLog.i("drives to target goal C with wobble goal");
+
+        this.addTask(new DeadReckonTask(this, targetZoneCPath, drivetrain1){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("reached target zone C");
+                }
+            }
+        });
+    }
+
+    public void startRingTimer() {
+        rtTask = new SingleShotTimerTask(this, RING_TIMER) {
+            //the handleEvent method is called when timer expires
+            @Override
+            public void handleEvent(RobotEvent e) {
+                SingleShotTimerTask.SingleShotTimerEvent event = (SingleShotTimerEvent) e;
+
+                if (event.kind == EventKind.EXPIRED) {
+                    //if timer expires then no rings detected
+                }
+
+            }
+        };
+    }
+
 
     public void loop()
     {
@@ -89,8 +161,26 @@ public class UltimateGoalAuto extends Robot {
     public void initPath()
     {
         launchLinePath = new DeadReckonPath();
+        targetZoneAPath = new DeadReckonPath();
+        targetZoneBPath = new DeadReckonPath();
+        targetZoneCPath = new DeadReckonPath();
+
         launchLinePath.stop();
-        launchLinePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -STRAIGHT_SPEED);
+        targetZoneAPath.stop();
+        targetZoneBPath.stop();
+        targetZoneCPath.stop();
+
+        launchLinePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 70, -STRAIGHT_SPEED);
+
+        targetZoneAPath.addSegment(DeadReckonPath.SegmentType.TURN, 30, TURN_SPEED);
+        targetZoneAPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 75, -STRAIGHT_SPEED);
+
+        targetZoneBPath.addSegment(DeadReckonPath.SegmentType.TURN,10, TURN_SPEED);
+        targetZoneBPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 90,-STRAIGHT_SPEED);
+
+        targetZoneCPath.addSegment(DeadReckonPath.SegmentType.TURN,20, TURN_SPEED);
+        targetZoneCPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,105, -STRAIGHT_SPEED);
+
     }
 
     public void setRingDetection()
@@ -174,33 +264,23 @@ public class UltimateGoalAuto extends Robot {
 
         ringImageInfo = new RingImageInfo(this);
         setRingDetection();
+        startRingTimer();
 
         //initializing autonomous path
         initPath();
     }
 
-
-//    public void startStrafing()
-//    {
-//        //start looking for Skystones
-//        RobotLog.i("startStrafing");
-//        addTask(sdTask);
-//        loggingTlm.setValue("startStrafing:before starting to strafe");
-//        if (allianceColor == AllianceColor.RED) {
-//            drivetrain1.strafe(opmodes.SkyStoneConstants25.STRAFE_SPEED);
-//        } else {
-//            drivetrain1.strafe(-opmodes.SkyStoneConstants25.STRAFE_SPEED);
-//        }
-//        loggingTlm.setValue("startStrafing:after starting to strafe");
-//    }
-
-
     @Override
     public void start()
     {
         loggingTlm = telemetry.addData("log", "unknown");
+
         currentLocationTlm.setValue("in start");
+        //starting ring detection task
         addTask(rdTask);
+
+        //starting ring timer task
+        addTask(rtTask);
 
         //parkOnLaunchLine();
     }
