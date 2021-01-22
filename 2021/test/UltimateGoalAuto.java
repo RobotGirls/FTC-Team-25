@@ -15,6 +15,7 @@ import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.SingleShotTimerTask;
 import team25core.StandardFourMotorRobot;
 
 
@@ -24,6 +25,7 @@ public class UltimateGoalAuto extends Robot {
 
 
     private final static String TAG = "auto code for first scrimmage";
+    private final static int RING_TIMER = 1000;
     private MechanumGearedDrivetrain drivetrain1;
     private Telemetry.Item loggingTlm;
     private final double STRAIGHT_SPEED = 0.5;
@@ -43,6 +45,8 @@ public class UltimateGoalAuto extends Robot {
     // declaring gamepad variables
     //variables declarations have lowercase then uppercase
     private GamepadTask gamepad;
+
+    SingleShotTimerTask rtTask;
 
     @Override
     public void handleEvent(RobotEvent e)
@@ -119,6 +123,21 @@ public class UltimateGoalAuto extends Robot {
         });
     }
 
+    public void startRingTimer() {
+        rtTask = new SingleShotTimerTask(this, RING_TIMER) {
+            //the handleEvent method is called when timer expires
+            @Override
+            public void handleEvent(RobotEvent e) {
+                SingleShotTimerTask.SingleShotTimerEvent event = (SingleShotTimerEvent) e;
+
+                if (event.kind == EventKind.EXPIRED) {
+                    //if timer expires then no rings detected
+                }
+
+            }
+        };
+    }
+
 
     public void loop()
     {
@@ -173,6 +192,8 @@ public class UltimateGoalAuto extends Robot {
         gamepad = new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1);
         addTask(gamepad);
 
+        startRingTimer();
+
         //initializing autonomous path
         initPath();
     }
@@ -181,6 +202,9 @@ public class UltimateGoalAuto extends Robot {
     public void start()
     {
         loggingTlm = telemetry.addData("log", "unknown");
+        //starting ring timer task
+        addTask(rtTask);
+
         parkOnLaunchLine();
     }
 }
