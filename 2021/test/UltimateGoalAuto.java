@@ -28,7 +28,7 @@ public class UltimateGoalAuto extends Robot {
 
 
     private final static String TAG = "auto code for first scrimmage";
-    private final static int RING_TIMER = 1000;
+    private final static int RING_TIMER = 5000;
     private final double STRAIGHT_SPEED = 0.5;
     private final double TURN_SPEED = 0.25;
     private MechanumGearedDrivetrain drivetrain1;
@@ -83,6 +83,22 @@ public class UltimateGoalAuto extends Robot {
                 if (path.kind == EventKind.PATH_DONE)
                 {
                     RobotLog.i("finished parking");
+                }
+            }
+        });
+    }
+
+    public void goToTargetZone(DeadReckonPath zonePath, final String whichZone)
+    {
+
+        this.addTask(new DeadReckonTask(this, zonePath, drivetrain1){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("reached target zone");
+                    currentLocationTlm.setValue("in goToTargetZone " + whichZone);
                 }
             }
         });
@@ -144,7 +160,12 @@ public class UltimateGoalAuto extends Robot {
                 SingleShotTimerTask.SingleShotTimerEvent event = (SingleShotTimerEvent) e;
 
                 if (event.kind == EventKind.EXPIRED) {
+                    objectSeenTlm.setValue("no rings");
                     //if timer expires then no rings detected
+                    //stops ringDetectionTask
+                    rdTask.stop();
+                    currentLocationTlm.setValue("in SingleShotTimerTask handleEvent no ring");
+                    goToTargetZone(targetZoneAPath, "zone A" );
                 }
 
             }
@@ -204,29 +225,19 @@ public class UltimateGoalAuto extends Robot {
                   //  rdTask.stop();
                       if (ringType.equals("Single") ){
                           objectSeenTlm.setValue("single ring");
+                          currentLocationTlm.setValue("in RingDetectionTask handleEvent single ring");
+                          goToTargetZone(targetZoneBPath, "zone B" );
                       } else if (ringType.equals("Quad")){
                           objectSeenTlm.setValue("quad rings");
+                          currentLocationTlm.setValue("in RingDetectionTask handleEvent quad ring");
+                          goToTargetZone(targetZoneCPath, "zone C" );
                       } else {
                           objectSeenTlm.setValue("no rings");
                       }
-
-//                        drivetrain1.stop();*/
-//
-//                        if (allianceColor == SkyStoneAutoTwoStone.AllianceColor.RED) {
-//
-//                            secondInitialRobotPosition = drivetrain1.getCurrentPosition();
-//                            secondInitialRobotPositionTlm.setValue(secondInitialRobotPosition);
-//                            goPickupSkystone(getRedDepotPath());
-//                            sdTask.stop();
-//                            RobotLog.i("506 chose red depot path");
-//                            pathTlm.setValue("taking red depot path");
-//                        } else {
-//                            goPickupSkystone(getBlueDepotPath());
-//                            sdTask.stop();
-//                            RobotLog.i("506 chose blue depot path");
-//                            pathTlm.setValue("taking blue depot path" );
-//                        }
-//                    }
+                      //stops ring detection task
+                      rdTask.stop();
+                      //stops timer
+                      rtTask.stop();
                }
             }
         };
