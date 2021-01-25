@@ -14,6 +14,7 @@ import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
+import team25core.OneWheelDirectDrivetrain;
 import team25core.RingDetectionTask;
 import team25core.Robot;
 import team25core.RobotEvent;
@@ -35,10 +36,20 @@ public class UltimateGoalAuto extends Robot {
     private Telemetry.Item loggingTlm;
     private Telemetry.Item objectSeenTlm;
 
+    private OneWheelDirectDrivetrain single;
+
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
+
+    private DcMotor wobbleLift;
+    private Servo wobbleGrab;
+    private boolean wobbleGrabIsOpen = true;
+    private final double OPEN_WOBBLE_SERVO = (float) 244.0 / 256.0;
+    private final double CLOSE_WOBBLE_SERVO = (float) 140.0 / 256.0;
+
+
     private Telemetry.Item currentLocationTlm;
     private Telemetry.Item handleEventTlm;
     private int numTimesInHandleEvent = 0;
@@ -50,6 +61,7 @@ public class UltimateGoalAuto extends Robot {
     private DeadReckonPath targetZoneAPath;
     private DeadReckonPath targetZoneBPath;
     private DeadReckonPath targetZoneCPath;
+    private DeadReckonPath detachPath;
 
     DeadReckonPath path = new DeadReckonPath();
 
@@ -83,9 +95,30 @@ public class UltimateGoalAuto extends Robot {
                 if (path.kind == EventKind.PATH_DONE)
                 {
                     RobotLog.i("finished parking");
+
                 }
             }
         });
+    }
+
+    private void lowerWobbleGoal()
+    {
+        RobotLog.i("dropping wobble goal");
+        this.addTask(new DeadReckonTask(this, detachPath, single) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    RobotLog.i("finish lowering wobble goal");
+                }
+            }
+        });
+    }
+
+    public void dropWobbleGoal() {
+        //open wobble servo to drop wobble goal
+        wobbleGrab.setPosition(OPEN_WOBBLE_SERVO);
+        lowerWobbleGoal();
     }
 
     public void goToTargetZone(DeadReckonPath zonePath, final String whichZone)
@@ -99,6 +132,7 @@ public class UltimateGoalAuto extends Robot {
                 {
                     RobotLog.i("reached target zone");
                     currentLocationTlm.setValue("in goToTargetZone " + whichZone);
+                    dropWobbleGoal();
                 }
             }
         });
@@ -185,11 +219,15 @@ public class UltimateGoalAuto extends Robot {
         targetZoneAPath = new DeadReckonPath();
         targetZoneBPath = new DeadReckonPath();
         targetZoneCPath = new DeadReckonPath();
+        detachPath       = new DeadReckonPath();
 
         launchLinePath.stop();
         targetZoneAPath.stop();
         targetZoneBPath.stop();
         targetZoneCPath.stop();
+        detachPath.stop();
+
+        detachPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, STRAIGHT_SPEED);
 
         launchLinePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 70, -STRAIGHT_SPEED);
 
@@ -255,6 +293,15 @@ public class UltimateGoalAuto extends Robot {
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
+        //mapping wobble grab servo
+        wobbleGrab = hardwareMap.servo.get("wobbleGrabServo");
+        //mapping wobble lift motor
+        wobbleLift = hardwareMap.get(DcMotor.class, "wobbleLift");
+        wobbleLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        single     = new OneWheelDirectDrivetrain(wobbleLift);
+        single.resetEncoders();
+        single.encodersOn();
 
         //caption: what appears on the phone
         loggingTlm = telemetry.addData("distance traveled", "unknown");
