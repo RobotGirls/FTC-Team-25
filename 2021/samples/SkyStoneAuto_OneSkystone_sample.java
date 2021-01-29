@@ -1,4 +1,4 @@
-package opmodes;
+package samples;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,13 +13,10 @@ import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
-import team25core.StandardFourMotorRobot;
 import team25core.StoneDetectionTask;
 
-
-@Autonomous(name = "AutoILT_OneStone_sample", group = "Team 25")
-public class SkyStoneAuto_OneSkystone extends Robot {
-
+@Autonomous(name = "AutoILT_OneStone", group = "Team 25")
+public class SkyStoneAuto_OneSkystone_sample extends Robot {
 
 
     private final static String TAG = "STONEZ";
@@ -28,6 +25,7 @@ public class SkyStoneAuto_OneSkystone extends Robot {
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
+    //for mechanism
     private Servo grabberServo;
     private Servo foundationHookRightServo;
     private Servo foundationHookLeftServo;
@@ -473,7 +471,7 @@ public class SkyStoneAuto_OneSkystone extends Robot {
         blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 7.5, STRAIGHT_SPEED);
         blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.STRAIGHT,6, STRAIGHT_SPEED);
         blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4, -STRAIGHT_SPEED);
-        blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,7.5  , STRAIGHT_SPEED);
+        blueFoundationUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,7.5 , STRAIGHT_SPEED);
 
         blueSkyStoneUnderBridge.stop();
         blueSkyStoneUnderBridge.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, -STRAIGHT_SPEED);
@@ -498,6 +496,7 @@ public class SkyStoneAuto_OneSkystone extends Robot {
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
+
         grabberServo = hardwareMap.servo.get("grabberServo");
         grabberServo.setPosition(UP_GRABBER_SERVO);
 
@@ -525,7 +524,7 @@ public class SkyStoneAuto_OneSkystone extends Robot {
         RobotLog.ii(TAG,  "delta: " + delta);
 
 
-
+        //drivetrain1 = new MechanumGearedDrivetrain(360, frontRight, backRight, frontLeft, backLeft);
         drivetrain1 = new MechanumGearedDrivetrain(frontRight, backRight, frontLeft, backLeft);
         drivetrain1.resetEncoders();
         drivetrain1.encodersOn();
@@ -553,9 +552,9 @@ public class SkyStoneAuto_OneSkystone extends Robot {
         addTask(sdTask);
         loggingTlm.setValue("startStrafing:before starting to strafe");
         if (allianceColor == AllianceColor.RED) {
-            drivetrain1.strafe(SkyStoneConstants25.STRAFE_SPEED);
+        //    drivetrain1.strafe(SkyStoneConstants25.STRAFE_SPEED);
         } else {
-            drivetrain1.strafe(-SkyStoneConstants25.STRAFE_SPEED);
+         //   drivetrain1.strafe(-SkyStoneConstants25.STRAFE_SPEED);
         }
         loggingTlm.setValue("startStrafing:after starting to strafe");
         grabberServo.setPosition(MID_GRABBER_SERVO);
