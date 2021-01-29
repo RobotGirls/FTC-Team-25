@@ -1,4 +1,4 @@
-package test;
+package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-//import opmodes.SkyStoneAutoTwoStone;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.GamepadTask;
@@ -20,13 +19,12 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
 import team25core.StandardFourMotorRobot;
-import team25core.StoneDetectionTask;
+import team25core.RingImageInfo;
 
 
 @Autonomous(name = "Scrimmage4", group = "Team 25")
 // @Disabled
 public class UltimateGoalAuto extends Robot {
-
 
     private final static String TAG = "auto code for first scrimmage";
     private final static int RING_TIMER = 5000;
@@ -308,8 +306,7 @@ public class UltimateGoalAuto extends Robot {
         currentLocationTlm = telemetry.addData("current location", "in init" );
         handleEventTlm = telemetry.addData("num times in handle event", "0");
         objectSeenTlm = telemetry.addData("saw", "unknown");
-
-
+        
         //initializing drivetrain
         drivetrain1 = new MechanumGearedDrivetrain(frontRight, backRight, frontLeft, backLeft);
         drivetrain1.resetEncoders();
@@ -320,7 +317,11 @@ public class UltimateGoalAuto extends Robot {
         gamepad = new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1);
         addTask(gamepad);
 
-        ringImageInfo = new RingImageInfo(this);
+        //instantiate ringImageInfo class and display telemetry
+        ringImageInfo = new RingImageInfo();
+        ringImageInfo.displayTelemetry(this.telemetry);
+
+        //starting ring detection
         setRingDetection();
         startRingTimer();
 
