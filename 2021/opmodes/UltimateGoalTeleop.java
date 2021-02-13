@@ -95,8 +95,8 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
         wobbleLift = hardwareMap.get(DcMotor.class, "wobbleLift");
 
         //mapping the intake mech
-        launchMechLeft = hardwareMap.get(DcMotor.class, "intakeMechLeft");
-        launchMechRight = hardwareMap.get(DcMotor.class, "intakeMechRight");
+        launchMechLeft = hardwareMap.get(DcMotor.class, "launchMechLeft");
+        launchMechRight = hardwareMap.get(DcMotor.class, "launchMechRight");
 
         //mapping the ring elevator mechanism
         ringLift = hardwareMap.get(DcMotor.class, "ringLift");
@@ -156,6 +156,7 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
                         //activate launching mech
                         launchMechLeft.setPower(0.5);
                         launchMechRight.setPower(-0.15);
+                        break;
                     case BUTTON_Y_UP:
                         // stop the launching mech
                         launchMechLeft.setPower(0);
