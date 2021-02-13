@@ -47,8 +47,6 @@ import team25core.SingleShotTimerTask;
 import team25core.StandardFourMotorRobot;
 import team25core.TeleopDriveTask;
 
-//TO DO: TEST LAUNCHING & RING ELEVATOR 
-
 @TeleOp(name = "UltimateGoalTeleop")
 //@Disabled
 public class UltimateGoalTeleop extends StandardFourMotorRobot {
@@ -65,7 +63,7 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
     private boolean wobbleGrabIsOpen = true;
 
     private DcMotor ringLift; //hd hex 40
-    private Servo ringDispenser; //continuous servo
+    private Servo ringDispenser; //regular servo
     private boolean ringDispenserExtended = false;
 
     private static final int TICKS_PER_INCH = 79;
@@ -92,17 +90,15 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
         backRight = hardwareMap.get(DcMotorEx.class, "backRight");
 
-        //mapping wobble grab servo
+        //mapping wobble goal mechanism
         wobbleGrab = hardwareMap.servo.get("wobbleGrabServo");
+        wobbleLift = hardwareMap.get(DcMotor.class, "wobbleLift");
 
-        //mapping the launch mech and intake mech
+        //mapping the intake mech
         launchMechLeft = hardwareMap.get(DcMotor.class, "intakeMechLeft");
         launchMechRight = hardwareMap.get(DcMotor.class, "intakeMechRight");
 
-        //mapping wobble lift motor
-        wobbleLift = hardwareMap.get(DcMotor.class, "wobbleLift");
-
-        //mapping the ring elevator motor
+        //mapping the ring elevator mechanism
         ringLift = hardwareMap.get(DcMotor.class, "ringLift");
         ringDispenser = hardwareMap.servo.get("ringDispenser");
 
@@ -139,7 +135,6 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
 
         this.addTask(drivetask);
 
-        //gamepad 1
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
             //@Override
             public void handleEvent(RobotEvent e) {
@@ -168,11 +163,11 @@ public class UltimateGoalTeleop extends StandardFourMotorRobot {
                         break;
                     case LEFT_TRIGGER_DOWN:
                         //lift ring elevator UP
-                        ringLift.setPower(1);
+                        ringLift.setPower(0.1);
                         break;
                     case RIGHT_TRIGGER_DOWN:
                         //ring elevator DOWN
-                        ringLift.setPower(-1); //might have to switch 190 and 194 during testing
+                        ringLift.setPower(-0.1);
                         break;
                     case LEFT_TRIGGER_UP:
                     case RIGHT_TRIGGER_UP:
