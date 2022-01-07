@@ -48,7 +48,7 @@ import team25core.OneWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 
-@Autonomous(name = "lm3newauto")
+@Autonomous(name = "lm3NewAuto")
 //@Disabled
 //red side
 public class lm3AutoDetect extends Robot {
