@@ -48,7 +48,7 @@ import team25core.OneWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 
-@Autonomous(name = "lm3NewAutoWB")
+@Autonomous(name = "lm3NewAutoBW")
 //@Disabled
 //red side
 public class lm3AutoWB extends Robot {
@@ -126,15 +126,15 @@ public class lm3AutoWB extends Robot {
     public void initPath() {
         // 1
         goToShippingHubPath = new DeadReckonPath();
-        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 14, 0.25);
+        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 14, -0.25);
         goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3.5, -0.25); //red
 
 
         goParkInWareHousePath = new DeadReckonPath();
         goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, 0.25);
         goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.7, -0.25);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 20, -0.3);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, -0.7);
+        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 20, 0.3);
+        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, 0.7);
 
 
         //outtaking object
@@ -144,7 +144,7 @@ public class lm3AutoWB extends Robot {
 
         // move sideways to shipping hub after detection
         moveToShippingHub = new DeadReckonPath();
-        moveToShippingHub.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 7, 1.0);
+        moveToShippingHub.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 7, -1.0);
 
 
         // 6.35 - top  5- middle  3.5 - bottom
