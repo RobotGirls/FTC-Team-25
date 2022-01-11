@@ -127,14 +127,14 @@ public class lm3AutoWR extends Robot {
         // 1
         goToShippingHubPath = new DeadReckonPath();
         goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 14, 0.25);
-        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3.5, -0.25); //red
+        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, -0.25); //red
 
 
         goParkInWareHousePath = new DeadReckonPath();
         goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, 0.25);
         goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.7, -0.25);
         goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 20, -0.3);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, -0.7);
+        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 7, -0.7);
 
 
         //outtaking object
@@ -156,7 +156,7 @@ public class lm3AutoWR extends Robot {
         //top
 
         liftMechPathTop = new DeadReckonPath();
-        liftMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, -0.25);
+        liftMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, -0.25);
 
         lowerMechPathTop = new DeadReckonPath();
         lowerMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.25);
