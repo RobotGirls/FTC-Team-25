@@ -48,7 +48,7 @@ public class FrenzyQT1Teleop extends StandardFourMotorRobot {
 
     public static int DEGREES_DOWN = 550;
     public static int DEGREES_UP = 180;
-    public static double GRAVELLIFT_POWER = 0.07;
+    public static double GRAVELLIFT_POWER = -0.07;
 
     TankMechanumControlSchemeFrenzy scheme;
 
@@ -130,18 +130,18 @@ public class FrenzyQT1Teleop extends StandardFourMotorRobot {
                 locationTlm.setValue("in gamepad2 handler");
                 switch (gamepadEvent.kind) {
                     //launching system
-                    case RIGHT_BUMPER_DOWN:
+                    case BUTTON_Y_DOWN:
                         //moving flaps forward
                         freightIntake.setPower(1);
                         break;
-                    case RIGHT_BUMPER_UP:
+                    case BUTTON_Y_UP:
                         freightIntake.setPower(0);
                         break;
-                    case LEFT_BUMPER_DOWN:
+                    case BUTTON_A_DOWN:
                         //moving flaps backward
                         freightIntake.setPower(-1);
                         break;
-                    case LEFT_BUMPER_UP:
+                    case BUTTON_A_UP:
                         freightIntake.setPower(0);
                         break;
                 }

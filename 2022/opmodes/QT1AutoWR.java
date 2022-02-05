@@ -48,8 +48,9 @@ import team25core.ObjectImageInfo;
 import team25core.OneWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.SingleShotTimerTask;
 
-@Autonomous(name = "QT1NewAutoWR")
+@Autonomous(name = "QT1NewAutoWR2")
 //@Disabled
 //red side
 public class QT1AutoWR extends Robot {
@@ -62,6 +63,7 @@ public class QT1AutoWR extends Robot {
 
     private static double INTAKEDROP_OPEN = 180 / 256.0;
     private static double INTAKEDROP_OUT = 1 / 256.0;
+    private final static int PAUSE_TIMER = 100;
 
     //private Servo teamElementServo;
     private OneWheelDirectDrivetrain carouselDriveTrain;
@@ -88,11 +90,14 @@ public class QT1AutoWR extends Robot {
     private DeadReckonPath liftMechPathMiddle;
     private DeadReckonPath lowerMechPathMiddle;
 
-
     private DeadReckonPath liftMechPathBottom;
     private DeadReckonPath lowerMechPathBottom;
 
     private DeadReckonPath goliftMechInitalPath;
+
+    SingleShotTimerTask rtTask;
+
+    private String whichPause = "unknown";
 
 
     //detection
@@ -129,26 +134,23 @@ public class QT1AutoWR extends Robot {
     }
 
     public void initPath() {
-        // 1
+        // going to shipping hub
         goToShippingHubPath = new DeadReckonPath();
-        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 14, 0.25);
-        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 9, -0.25); //red
+        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 16, 0.25);
+        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 9.5, -0.25); //red
 
         //outtaking object
         outTakePath = new DeadReckonPath();
         outTakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, 1.0);
 
-
-        // move sideways to shipping hub after detection
+        // strafe to shipping hub after detection
         moveToShippingHub = new DeadReckonPath();
         moveToShippingHub.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 7, 1.0);
 
-
-        // 6.35 - top  5- middle  3.5 - bottom
+        // forward to shipping hub
 
         goliftMechInitalPath = new DeadReckonPath();
         goliftMechInitalPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -0.25);
-
 
         //top
 
@@ -157,39 +159,34 @@ public class QT1AutoWR extends Robot {
         goMoveForwardTopPath.addSegment(DeadReckonPath.SegmentType.TURN, 6, 0.25);
         goMoveForwardTopPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, -0.25);
 
-
         liftMechPathTop = new DeadReckonPath();
-        liftMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 11, 0.07);
+        liftMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, 0.07);
 
-//        lowerMechPathTop = new DeadReckonPath();
-//        lowerMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.25);
-
+        lowerMechPathTop = new DeadReckonPath();
+        lowerMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, -0.07);
 
         //middle
 
         liftMechPathMiddle = new DeadReckonPath();
-        liftMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7, 0.07);
+        liftMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, 0.07);
 
-//        lowerMechPathMiddle = new DeadReckonPath();
-//        lowerMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, 1.0);
+        lowerMechPathMiddle = new DeadReckonPath();
+        lowerMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3.5, -0.07);
 
         //bottom
 
         liftMechPathBottom = new DeadReckonPath();
         liftMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, 0.07);
 
-//        lowerMechPathBottom = new DeadReckonPath();
-//        lowerMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3.5, 1.0);
+        lowerMechPathBottom = new DeadReckonPath();
+        lowerMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -0.07);
 
         //end parking in warehouse
 
         goParkInWareHousePath = new DeadReckonPath();
         goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 13, 0.25);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.7, 0.25);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 20, -0.3);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 7, -0.7);
-
-
+        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.TURN, 20, 0.5);
+        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.7);
 
     }
 
@@ -248,6 +245,19 @@ public class QT1AutoWR extends Robot {
 
     }
 
+//    public void startPauseTimer() {
+//        rtTask = new SingleShotTimerTask(this, PAUSE_TIMER){
+//            @Override
+//            public void handleEvent(RobotEvent e) {
+//                SingleShotTimerEvent event = (SingleShotTimerEvent) e;
+//
+//                if(event.kind == EventKind.EXPIRED) {
+//                    goParkInWareHouse();
+//                }
+//            }
+//        };
+//    }
+
     public void setObjectDetection() {
         rdTask = new ObjectDetectionTask(this, "Webcam1") {
             @Override
@@ -276,6 +286,7 @@ public class QT1AutoWR extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("arrived at carousel");
+                    intakeDrop.setPosition(INTAKEDROP_OPEN);
 
                     if ( capPosition == "bottom")
                     {
@@ -323,8 +334,8 @@ public class QT1AutoWR extends Robot {
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lifting");
                     intakeDrop.setPosition(INTAKEDROP_OUT);
-                    goParkInWareHouse();
-
+                    intakeDrop.setPosition(INTAKEDROP_OPEN);
+                    golowerMechTop();
 
                 }
             }
@@ -340,27 +351,26 @@ public class QT1AutoWR extends Robot {
                     pathTlm.setValue("arrived at carousel");
                     goliftMechTop();
 
-
                 }
             }
         });
 
     }
 
-//    private void golowerMechTop() {
-//        this.addTask(new DeadReckonTask(this, lowerMechPathTop, intakeMechDriveTrain) {
-//            @Override
-//            public void handleEvent(RobotEvent e) {
-//                DeadReckonEvent path = (DeadReckonEvent) e;
-//                if (path.kind == EventKind.PATH_DONE) {
-//                    pathTlm.setValue("done lowering");
-//                    goParkInWareHouse();
-//
-//
-//                }
-//            }
-//        });
-//    }
+    private void golowerMechTop() {
+        this.addTask(new DeadReckonTask(this, lowerMechPathTop, gravelLiftDriveTrain) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    pathTlm.setValue("done lowering");
+                    goParkInWareHouse();
+
+
+                }
+            }
+        });
+    }
 
     /////////////////////////////////////////////////// Middle Methods /////////////////////////////////////////////////////////////////
 
@@ -373,7 +383,8 @@ public class QT1AutoWR extends Robot {
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lifting");
                     intakeDrop.setPosition(INTAKEDROP_OUT);
-                    goParkInWareHouse();
+                    intakeDrop.setPosition(INTAKEDROP_OPEN);
+                    golowerMechMiddle();
 
 
                 }
@@ -381,19 +392,21 @@ public class QT1AutoWR extends Robot {
         });
     }
 
-//    private void golowerMechMiddle() {
-//        this.addTask(new DeadReckonTask(this, lowerMechPathMiddle, intakeMechDriveTrain) {
-//            @Override
-//            public void handleEvent(RobotEvent e) {
-//                DeadReckonEvent path = (DeadReckonEvent) e;
-//                if (path.kind == EventKind.PATH_DONE) {
-//                    pathTlm.setValue("done lowering");
-//
-//
-//                }
-//            }
-//        });
-//    }
+    private void golowerMechMiddle() {
+        this.addTask(new DeadReckonTask(this, lowerMechPathMiddle, gravelLiftDriveTrain) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    pathTlm.setValue("done lowering");
+                    goParkInWareHouse();
+
+
+
+                }
+            }
+        });
+    }
 
     /////////////////////////////////////////////////// Bottom Methods /////////////////////////////////////////////////////////////////
 
@@ -421,6 +434,21 @@ public class QT1AutoWR extends Robot {
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lifting");
                     intakeDrop.setPosition(INTAKEDROP_OUT);
+                    golowerMechBottom();
+
+                }
+            }
+        });
+    }
+
+    private void golowerMechBottom() {
+        this.addTask(new DeadReckonTask(this, lowerMechPathBottom, gravelLiftDriveTrain) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    pathTlm.setValue("done lowering");
+                    intakeDrop.setPosition(INTAKEDROP_OPEN);
                     goParkInWareHouse();
 
 
@@ -428,21 +456,6 @@ public class QT1AutoWR extends Robot {
             }
         });
     }
-
-//    private void golowerMechBottom() {
-//        this.addTask(new DeadReckonTask(this, lowerMechPathBottom, intakeMechDriveTrain) {
-//            @Override
-//            public void handleEvent(RobotEvent e) {
-//                DeadReckonEvent path = (DeadReckonEvent) e;
-//                if (path.kind == EventKind.PATH_DONE) {
-//                    pathTlm.setValue("done lowering");
-//                    goParkInWareHouse();
-//
-//
-//                }
-//            }
-//        });
-//    }
 
 
 
