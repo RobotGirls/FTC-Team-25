@@ -7,7 +7,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import team25core.GamepadTask;
+import team25core.RunToEncoderValueTask;
 import team25core.MechanumGearedDrivetrain;
+import team25core.OneWheelDirectDrivetrain;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import team25core.RobotEvent;
 import team25core.StandardFourMotorRobot;
 import team25core.TankMechanumControlSchemeFrenzy;
@@ -31,7 +34,7 @@ public class FrenzyQT1Teleop extends StandardFourMotorRobot {
     //freight intake
     private DcMotor freightIntake;
     private Servo intakeDrop;
-
+    private OneWheelDirectDrivetrain gravelLiftDrivetrain;
 
     private Telemetry.Item locationTlm;
     private Telemetry.Item buttonTlm;
@@ -42,6 +45,11 @@ public class FrenzyQT1Teleop extends StandardFourMotorRobot {
     private static double INTAKEDROP_OPEN = 180 / 256.0;
     private static double INTAKEDROP_OUT = 1 / 256.0;
     private boolean rotateDown = true;
+
+    public static int DEGREES_DOWN = 550;
+    public static int DEGREES_UP = 180;
+    public static double GRAVELLIFT_POWER = 0.07;
+
     TankMechanumControlSchemeFrenzy scheme;
 
 
@@ -49,6 +57,28 @@ public class FrenzyQT1Teleop extends StandardFourMotorRobot {
 
     @Override
     public void handleEvent(RobotEvent e) {
+    }
+
+    //flipover positions for bottom and top positions for intake and placing on hubs
+    private void rotateGravelLift(Direction direction) {
+        if (direction == FrenzyQT1Teleop.Direction.CLOCKWISE) {
+            gravelLift.setDirection(DcMotorSimple.Direction.REVERSE);
+        } else {
+            gravelLift.setDirection(DcMotorSimple.Direction.FORWARD);
+        }
+        this.addTask(new RunToEncoderValueTask(this, gravelLift, DEGREES_DOWN, GRAVELLIFT_POWER));
+    }
+
+    //alternates between down and up positions.
+    private void alternateRotate() {
+        if (rotateDown) {       // happens first
+            rotateGravelLift(FrenzyQT1Teleop.Direction.CLOCKWISE);
+            rotateDown = false;
+
+        } else {
+            rotateGravelLift(FrenzyQT1Teleop.Direction.COUNTERCLOCKWISE);
+            rotateDown = true;
+        }
     }
 
 
@@ -75,6 +105,8 @@ public class FrenzyQT1Teleop extends StandardFourMotorRobot {
 
         // scheme = new TankMechanumControlSchemeReverse(gamepad1);
         scheme = new TankMechanumControlSchemeFrenzy(gamepad1);
+
+        gravelLiftDrivetrain = new OneWheelDirectDrivetrain(gravelLift);
 
 
         //code for forward mechanum drivetrain:
@@ -142,17 +174,16 @@ public class FrenzyQT1Teleop extends StandardFourMotorRobot {
                         break;
                     case BUTTON_Y_DOWN:
                         //gravellift moves forward
-                        gravelLift.setPower(0.07);
-                        buttonTlm.setValue("button B down");
+                        alternateRotate();
                         break;
-                    case BUTTON_Y_UP:
-                        buttonTlm.setValue("button B up");
-                        gravelLift.setPower(0);
-                        break;
+//                    case BUTTON_Y_UP:
+//                        buttonTlm.setValue("button B up");
+//                        gravelLift.setPower(0);
+//                        break;
                     case BUTTON_A_DOWN:
                         //gravellife moves backward
                         buttonTlm.setValue("button X down");
-                        gravelLift.setPower(-0.04);
+                        gravelLift.setPower(-0.07);
                         break;
                     case BUTTON_A_UP:
                         buttonTlm.setValue("button X up");

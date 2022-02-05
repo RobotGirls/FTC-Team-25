@@ -132,7 +132,7 @@ public class QT1AutoWR extends Robot {
         // 1
         goToShippingHubPath = new DeadReckonPath();
         goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 14, 0.25);
-        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, -0.25); //red
+        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 9, -0.25); //red
 
         //outtaking object
         outTakePath = new DeadReckonPath();
