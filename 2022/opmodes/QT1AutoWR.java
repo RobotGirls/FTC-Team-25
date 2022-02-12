@@ -160,10 +160,10 @@ public class QT1AutoWR extends Robot {
         goMoveForwardTopPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, -0.25);
 
         liftMechPathTop = new DeadReckonPath();
-        liftMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, 0.07);
+        liftMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7.5, 0.07);
 
         lowerMechPathTop = new DeadReckonPath();
-        lowerMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, -0.07);
+        lowerMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7.5, -0.07);
 
         //middle
 
@@ -176,10 +176,10 @@ public class QT1AutoWR extends Robot {
         //bottom
 
         liftMechPathBottom = new DeadReckonPath();
-        liftMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, 0.07);
+        liftMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, 0.07);
 
         lowerMechPathBottom = new DeadReckonPath();
-        lowerMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -0.07);
+        lowerMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, -0.07);
 
         //end parking in warehouse
 
@@ -333,8 +333,6 @@ public class QT1AutoWR extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lifting");
-                    intakeDrop.setPosition(INTAKEDROP_OUT);
-                    intakeDrop.setPosition(INTAKEDROP_OPEN);
                     golowerMechTop();
 
                 }
@@ -434,6 +432,7 @@ public class QT1AutoWR extends Robot {
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lifting");
                     intakeDrop.setPosition(INTAKEDROP_OUT);
+                    intakeDrop.setPosition(INTAKEDROP_OPEN);
                     golowerMechBottom();
 
                 }
@@ -448,7 +447,6 @@ public class QT1AutoWR extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lowering");
-                    intakeDrop.setPosition(INTAKEDROP_OPEN);
                     goParkInWareHouse();
 
 
@@ -486,6 +484,7 @@ public class QT1AutoWR extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("parked in Warehouse");
+
 
 
                 }

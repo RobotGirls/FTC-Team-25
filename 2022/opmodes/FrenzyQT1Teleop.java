@@ -16,7 +16,7 @@ import team25core.StandardFourMotorRobot;
 import team25core.TankMechanumControlSchemeFrenzy;
 import team25core.TeleopDriveTask;
 
-@TeleOp(name = "FreightFrenzyTeleopQT1")
+@TeleOp(name = "FreightFrenzyTeleopQT2")
 //@Disabled
 public class FrenzyQT1Teleop extends StandardFourMotorRobot {
 
@@ -46,9 +46,9 @@ public class FrenzyQT1Teleop extends StandardFourMotorRobot {
     private static double INTAKEDROP_OUT = 1 / 256.0;
     private boolean rotateDown = true;
 
-    public static int DEGREES_DOWN = 550;
+    public static int DEGREES_DOWN = 575;
     public static int DEGREES_UP = 180;
-    public static double GRAVELLIFT_POWER = -0.07;
+    public static double GRAVELLIFT_POWER = -0.13;
 
     TankMechanumControlSchemeFrenzy scheme;
 
@@ -127,22 +127,21 @@ public class FrenzyQT1Teleop extends StandardFourMotorRobot {
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
             public void handleEvent(RobotEvent e) {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
-                locationTlm.setValue("in gamepad2 handler");
+                locationTlm.setValue("in gamepad1 handler");
                 switch (gamepadEvent.kind) {
                     //launching system
                     case BUTTON_Y_DOWN:
-                        //moving flaps forward
-                        freightIntake.setPower(1);
-                        break;
-                    case BUTTON_Y_UP:
-                        freightIntake.setPower(0);
+                        //gravellift moves forward
+                        alternateRotate();
                         break;
                     case BUTTON_A_DOWN:
-                        //moving flaps backward
-                        freightIntake.setPower(-1);
+                        //gravellife moves backward
+                        buttonTlm.setValue("button A down");
+                        gravelLift.setPower(-0.07);
                         break;
                     case BUTTON_A_UP:
-                        freightIntake.setPower(0);
+                        buttonTlm.setValue("button A up");
+                        gravelLift.setPower(0);
                         break;
                 }
             }
@@ -173,21 +172,18 @@ public class FrenzyQT1Teleop extends StandardFourMotorRobot {
                         carouselMech.setPower(0);
                         break;
                     case BUTTON_Y_DOWN:
-                        //gravellift moves forward
-                        alternateRotate();
+                        //moving flaps forward
+                        freightIntake.setPower(1);
                         break;
-//                    case BUTTON_Y_UP:
-//                        buttonTlm.setValue("button B up");
-//                        gravelLift.setPower(0);
-//                        break;
+                    case BUTTON_Y_UP:
+                        freightIntake.setPower(0);
+                        break;
                     case BUTTON_A_DOWN:
-                        //gravellife moves backward
-                        buttonTlm.setValue("button X down");
-                        gravelLift.setPower(-0.07);
+                        //moving flaps backward
+                        freightIntake.setPower(-1);
                         break;
                     case BUTTON_A_UP:
-                        buttonTlm.setValue("button X up");
-                        gravelLift.setPower(0);
+                        freightIntake.setPower(0);
                         break;
                     case RIGHT_BUMPER_DOWN:
                         //lets freight fall from gravellift
