@@ -33,50 +33,64 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package opmodes;
 
-import com.qualcomm.robotcore.
-        eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
-import team25core.
-        FourWheelDirectDrivetrain;
+import team25core.FourWheelDirectDrivetrain;
 import team25core.ObjectDetectionTask;
 import team25core.ObjectImageInfo;
 import team25core.OneWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.SingleShotTimerTask;
 
-@Autonomous(name = "lm3NewAutoWHB")
+@Autonomous(name = "QT1AutoCR")
 //@Disabled
 //red side
-public class lm3AutoWB extends Robot {
+public class QT1AutoCR extends Robot {
 
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor rearLeft;
     private DcMotor rearRight;
+    private Servo intakeDrop;
+
+
+    // for timer
+    private static double INTAKEDROP_OPEN = 180 / 256.0;
+    private static double INTAKEDROP_OUT = 1 / 256.0;
+    private final static int PAUSE_TIMER = 1000;
+    SingleShotTimerTask rtTask;
+    private String whichPause = "unknown";
 
     //private Servo teamElementServo;
     private OneWheelDirectDrivetrain carouselDriveTrain;
     private DcMotor carouselMech;
 
-    private OneWheelDirectDrivetrain flipOverDriveTrain;
-    private DcMotor flipOver;
+    private OneWheelDirectDrivetrain gravelLiftDriveTrain;
+    private DcMotor gravelLift;
 
     private OneWheelDirectDrivetrain intakeMechDriveTrain;
     private DcMotor freightIntake;
 
 
-    private DeadReckonPath goToShippingHubPath;
+
 
     private DeadReckonPath outTakePath;
-    private DeadReckonPath goParkInWareHousePath;
+    private DeadReckonPath goToCarouselPath;
+
 
     private DeadReckonPath moveToShippingHub;
+    private DeadReckonPath turningCarouselPath;
+    private DeadReckonPath goStrafeLeftPath;
+    private DeadReckonPath goParkPath;
+
 
     private DeadReckonPath liftMechPathTop;
     private DeadReckonPath lowerMechPathTop;
@@ -88,8 +102,12 @@ public class lm3AutoWB extends Robot {
     private DeadReckonPath liftMechPathBottom;
     private DeadReckonPath lowerMechPathBottom;
     private DeadReckonPath goMoveForwardBottomPath;
+    private DeadReckonPath goMoveForwardTopPath;
 
     private DeadReckonPath goliftMechInitalPath;
+    private DeadReckonPath goliftDownMechInitalPath;
+
+
 
 
     //detection
@@ -127,19 +145,36 @@ public class lm3AutoWB extends Robot {
 
     public void initPath() {
         // 1
-        goToShippingHubPath = new DeadReckonPath();
-        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 9, -0.25);
-        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3.5, -0.25); //red
+        goToCarouselPath = new DeadReckonPath();
+        //goToCarouselPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 6, -1.0);
+        goToCarouselPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8.5, -0.5);
+        goToCarouselPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 12, 0.5);
+        goToCarouselPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8.25, 0.25);
 
 
-        goParkInWareHousePath = new DeadReckonPath();
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, 0.25);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -0.25);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.TURN, 17,-0.5);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5, -0.25);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 27, 0.5);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5, 0.25);
 
+        // 2
+        turningCarouselPath = new DeadReckonPath();
+        turningCarouselPath.stop();
+        turningCarouselPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 60, 1.0);
+
+        //3
+//        goBackOriginalLocationPath = new DeadReckonPath();
+//        goBackOriginalLocationPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7.5, 1.0);
+
+        goStrafeLeftPath = new DeadReckonPath();
+        //goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.TURN, 5, -0.5);
+        goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12.5, -0.25);
+        goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4.3, -0.25);
+        goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.TURN, 27, -0.25);
+        goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.5);
+        goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10.7, -0.25);
+
+
+        goParkPath = new DeadReckonPath();
+        goParkPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6.5, 0.5);
+        goParkPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8 , -0.25);
+        goParkPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, 0.5);
 
 
         //outtaking object
@@ -161,30 +196,32 @@ public class lm3AutoWB extends Robot {
         //top
 
         liftMechPathTop = new DeadReckonPath();
-        liftMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, -0.25);
+        liftMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7.5, 0.07);
 
         lowerMechPathTop = new DeadReckonPath();
-        lowerMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.25);
-
+        lowerMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7.5, -0.07);
 
         //middle
 
         liftMechPathMiddle = new DeadReckonPath();
-        liftMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4.5, -0.25);
+        liftMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, 0.07);
 
         lowerMechPathMiddle = new DeadReckonPath();
-        lowerMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, 1.0);
-
+        lowerMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -0.07);
         // bottom
 
         goMoveForwardBottomPath = new DeadReckonPath();
         goMoveForwardBottomPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.5, -0.25);
 
         liftMechPathBottom = new DeadReckonPath();
-        liftMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0, -0.25);
+        liftMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, 0.07);
 
         lowerMechPathBottom = new DeadReckonPath();
-        lowerMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3.5, 1.0);
+        lowerMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, -0.07);
+
+
+        goliftDownMechInitalPath = new DeadReckonPath();
+        goliftDownMechInitalPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4.5, 0.25);
 
 
 
@@ -206,13 +243,17 @@ public class lm3AutoWB extends Robot {
         carouselDriveTrain.resetEncoders();
         carouselDriveTrain.encodersOn();
 
-        flipOver = hardwareMap.get(DcMotor.class, "flipOver");
-        flipOverDriveTrain = new OneWheelDirectDrivetrain(flipOver);
-        flipOverDriveTrain.resetEncoders();
-        flipOverDriveTrain.encodersOn();
+        gravelLift = hardwareMap.get(DcMotor.class, "gravelLift");
+        gravelLiftDriveTrain = new OneWheelDirectDrivetrain(gravelLift);
+        gravelLiftDriveTrain.resetEncoders();
+        gravelLiftDriveTrain.encodersOn();
+
+        intakeDrop = hardwareMap.servo.get("intakeDrop");
+        intakeDrop.setPosition(INTAKEDROP_OPEN);
 
         //break for flipover
-        flipOver.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        gravelLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
 
         freightIntake = hardwareMap.get(DcMotor.class, "freightIntake");
@@ -242,6 +283,44 @@ public class lm3AutoWB extends Robot {
 
     }
 
+    public void startPauseTimer() {
+        pathTlm.setValue("in starting timer");
+        rtTask = new SingleShotTimerTask(this, PAUSE_TIMER)
+        {
+            @Override
+            public void handleEvent(RobotEvent e)
+            {
+                SingleShotTimerEvent event = (SingleShotTimerEvent) e;
+
+                if(event.kind == EventKind.EXPIRED)
+                {
+
+                    pathTlm.setValue("timer expired");
+                    intakeDrop.setPosition(INTAKEDROP_OPEN);
+                    if ( capStonePos == "bottom")
+                    {
+
+                        golowerMechBottom();
+                    }
+                    else if ( capStonePos == "middle")
+                    {
+
+
+                        golowerMechMiddle();
+
+                    }
+
+
+                    //no need for servo timer for top pos
+
+
+                }
+            }
+        };
+
+        addTask(rtTask);
+    }
+
     public void setObjectDetection() {
         rdTask = new ObjectDetectionTask(this, "Webcam1") {
             @Override
@@ -263,75 +342,49 @@ public class lm3AutoWB extends Robot {
 
     }
 
-    public void goToShippingHub(String capPosition) {
-        this.addTask(new DeadReckonTask(this, goToShippingHubPath, drivetrain) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE) {
-                    pathTlm.setValue("arrived at carousel");
-
-                    if ( capPosition == "bottom")
-                    {
-                        goMoveForwardBottom();
-                    }
-                    else if ( capPosition == "middle")
-                    {
-                        goliftMechMiddle();
-                    }
-                    else if ( capPosition == "top")
-                    {
-                        goliftMechTop();
-                    }
 
 
-                }
-            }
-        });
-
-    }
-
-    private void goliftMechInital() {
-        this.addTask(new DeadReckonTask(this, goliftMechInitalPath, flipOverDriveTrain) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE) {
-                    pathTlm.setValue("done lifting");
-                    goToShippingHub(capStonePos);
-
-
-                }
-            }
-        });
-    }
 
     /////////////////////////////////////////////////// Top Methods /////////////////////////////////////////////////////////////////
 
 
     private void goliftMechTop() {
-        this.addTask(new DeadReckonTask(this, liftMechPathTop, flipOverDriveTrain) {
+        this.addTask(new DeadReckonTask(this, liftMechPathTop, gravelLiftDriveTrain) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lifting");
-                    goOuttakePreloaded();
-
+                    golowerMechTop();
 
                 }
             }
         });
     }
 
+    public void goMoveForwardTop() {
+        this.addTask(new DeadReckonTask(this, goMoveForwardTopPath, drivetrain) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    pathTlm.setValue("arrived at carousel");
+                    goliftMechTop();
+
+                }
+            }
+        });
+
+    }
+
     private void golowerMechTop() {
-        this.addTask(new DeadReckonTask(this, lowerMechPathTop, intakeMechDriveTrain) {
+        this.addTask(new DeadReckonTask(this, lowerMechPathTop, gravelLiftDriveTrain) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lowering");
-                    goParkInWareHouse();
+                    //goParkInWareHouse();
 
 
                 }
@@ -343,13 +396,16 @@ public class lm3AutoWB extends Robot {
 
 
     private void goliftMechMiddle() {
-        this.addTask(new DeadReckonTask(this, liftMechPathMiddle, flipOverDriveTrain) {
+        this.addTask(new DeadReckonTask(this, liftMechPathMiddle, gravelLiftDriveTrain) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lifting");
-                    goOuttakePreloaded();
+                    intakeDrop.setPosition(INTAKEDROP_OUT);
+                    startPauseTimer();
+
+
 
 
                 }
@@ -358,12 +414,14 @@ public class lm3AutoWB extends Robot {
     }
 
     private void golowerMechMiddle() {
-        this.addTask(new DeadReckonTask(this, lowerMechPathMiddle, intakeMechDriveTrain) {
+        this.addTask(new DeadReckonTask(this, lowerMechPathMiddle, gravelLiftDriveTrain) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lowering");
+                    // goParkInWareHouse();
+
 
 
                 }
@@ -373,30 +431,31 @@ public class lm3AutoWB extends Robot {
 
     /////////////////////////////////////////////////// Bottom Methods /////////////////////////////////////////////////////////////////
 
-    public void goMoveForwardBottom() {
-        this.addTask(new DeadReckonTask(this, goMoveForwardBottomPath, drivetrain) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE) {
-                    pathTlm.setValue("arrived at carousel");
-                    goliftMechBottom();
-
-
-                }
-            }
-        });
-
-    }
+//    public void goMoveForwardBottom() {
+//        this.addTask(new DeadReckonTask(this, goMoveForwardBottomPath, drivetrain) {
+//            @Override
+//            public void handleEvent(RobotEvent e) {
+//                DeadReckonEvent path = (DeadReckonEvent) e;
+//                if (path.kind == EventKind.PATH_DONE) {
+//                    pathTlm.setValue("arrived at carousel");
+//                    goliftMechBottom();
+//
+//
+//                }
+//            }
+//        });
+//
+//    }
 
     private void goliftMechBottom() {
-        this.addTask(new DeadReckonTask(this, liftMechPathBottom, flipOverDriveTrain) {
+        this.addTask(new DeadReckonTask(this, liftMechPathBottom, gravelLiftDriveTrain) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lifting");
-                    goOuttakePreloaded();
+                    intakeDrop.setPosition(INTAKEDROP_OUT);
+                    startPauseTimer();
 
 
                 }
@@ -405,13 +464,13 @@ public class lm3AutoWB extends Robot {
     }
 
     private void golowerMechBottom() {
-        this.addTask(new DeadReckonTask(this, lowerMechPathBottom, intakeMechDriveTrain) {
+        this.addTask(new DeadReckonTask(this, lowerMechPathBottom, gravelLiftDriveTrain) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lowering");
-                    goParkInWareHouse();
+                    //goParkInWareHouse();
 
 
                 }
@@ -423,14 +482,72 @@ public class lm3AutoWB extends Robot {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void goOuttakePreloaded() {
-        this.addTask(new DeadReckonTask(this, outTakePath, intakeMechDriveTrain) {
+
+
+
+
+
+
+    public void goToCarousel()
+    {
+        this.addTask(new DeadReckonTask(this, goToCarouselPath, drivetrain){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    pathTlm.setValue("arrived at carousel");
+                    spinCarousel();
+
+                }
+            }
+        });
+
+    }
+
+    private void spinCarousel()
+    {
+        this.addTask(new DeadReckonTask(this, turningCarouselPath, carouselDriveTrain) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
-                    pathTlm.setValue("done lifting");
-                    goParkInWareHouse();
+                    pathTlm.setValue("done spinning carousel");
+                    //goBackOriginalLocation();
+                    goStrafeLeft(capStonePos);
+
+                }
+            }
+        });
+    }
+
+    public void goStrafeLeft(String capPosition)
+    {
+        this.addTask(new DeadReckonTask(this, goStrafeLeftPath, drivetrain){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    pathTlm.setValue("strafe left done");
+                    if (path.kind == EventKind.PATH_DONE) {
+                        pathTlm.setValue("arrived at carousel");
+
+                        if ( capPosition == "bottom")
+                        {
+                            goliftMechBottom();
+                        }
+                        else if ( capPosition == "middle")
+                        {
+                            goliftMechMiddle();
+                        }
+                        else if ( capPosition == "top")
+                        {
+                            goliftMechTop();
+                        }
+
+
+                    }
 
 
 
@@ -438,16 +555,20 @@ public class lm3AutoWB extends Robot {
                 }
             }
         });
+
     }
 
-
-    public void goParkInWareHouse() {
-        this.addTask(new DeadReckonTask(this, goParkInWareHousePath, drivetrain) {
+    public void goPark()
+    {
+        this.addTask(new DeadReckonTask(this, goParkPath, drivetrain){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE) {
-                    pathTlm.setValue("parked in Warehouse");
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    pathTlm.setValue("strafe left done");
+                    //goliftdDownMechInital();
+
 
 
                 }
@@ -455,6 +576,37 @@ public class lm3AutoWB extends Robot {
         });
 
     }
+
+//    private void goliftMechInital() {
+//        this.addTask(new DeadReckonTask(this, goliftMechInitalPath, flipOverDriveTrain) {
+//            @Override
+//            public void handleEvent(RobotEvent e) {
+//                DeadReckonEvent path = (DeadReckonEvent) e;
+//                if (path.kind == EventKind.PATH_DONE) {
+//                    pathTlm.setValue("done lifting");
+//                    goToCarousel();
+//
+//
+//                }
+//            }
+//        });
+//    }
+//
+//    private void goliftdDownMechInital() {
+//        this.addTask(new DeadReckonTask(this, goliftDownMechInitalPath, flipOverDriveTrain) {
+//            @Override
+//            public void handleEvent(RobotEvent e) {
+//                DeadReckonEvent path = (DeadReckonEvent) e;
+//                if (path.kind == EventKind.PATH_DONE) {
+//                    pathTlm.setValue("done lifting");
+//                    goToCarousel();
+//
+//
+//                }
+//            }
+//        });
+//    }
+
 
 
     @Override
@@ -474,7 +626,7 @@ public class lm3AutoWB extends Robot {
             capStonePos = "top";
         }
 
-        goliftMechInital();
+        goToCarousel();
 
 
 
