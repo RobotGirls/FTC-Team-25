@@ -50,7 +50,7 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
 
-@Autonomous(name = "QT1NewAutoWR2")
+@Autonomous(name = "QT1NewAutoWR3")
 //@Disabled
 //red side
 public class QT1AutoWR extends Robot {
@@ -63,7 +63,7 @@ public class QT1AutoWR extends Robot {
 
     private static double INTAKEDROP_OPEN = 180 / 256.0;
     private static double INTAKEDROP_OUT = 1 / 256.0;
-    private final static int PAUSE_TIMER = 100;
+    private final static int PAUSE_TIMER = 1000;
 
     //private Servo teamElementServo;
     private OneWheelDirectDrivetrain carouselDriveTrain;
@@ -137,7 +137,7 @@ public class QT1AutoWR extends Robot {
         // going to shipping hub
         goToShippingHubPath = new DeadReckonPath();
         goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 16, 0.25);
-        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 9.5, -0.25); //red
+        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, -0.25); //red
 
         //outtaking object
         outTakePath = new DeadReckonPath();
@@ -171,7 +171,7 @@ public class QT1AutoWR extends Robot {
         liftMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, 0.07);
 
         lowerMechPathMiddle = new DeadReckonPath();
-        lowerMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3.5, -0.07);
+        lowerMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -0.07);
 
         //bottom
 
@@ -245,18 +245,43 @@ public class QT1AutoWR extends Robot {
 
     }
 
-//    public void startPauseTimer() {
-//        rtTask = new SingleShotTimerTask(this, PAUSE_TIMER){
-//            @Override
-//            public void handleEvent(RobotEvent e) {
-//                SingleShotTimerEvent event = (SingleShotTimerEvent) e;
-//
-//                if(event.kind == EventKind.EXPIRED) {
-//                    goParkInWareHouse();
-//                }
-//            }
-//        };
-//    }
+    public void startPauseTimer() {
+        pathTlm.setValue("in starting timer");
+        rtTask = new SingleShotTimerTask(this, PAUSE_TIMER)
+        {
+            @Override
+            public void handleEvent(RobotEvent e)
+            {
+                SingleShotTimerTask.SingleShotTimerEvent event = (SingleShotTimerEvent) e;
+
+                if(event.kind == EventKind.EXPIRED)
+                {
+
+                    pathTlm.setValue("timer expired");
+                    intakeDrop.setPosition(INTAKEDROP_OPEN);
+                    if ( capStonePos == "bottom")
+                    {
+
+                        golowerMechBottom();
+                    }
+                    else if ( capStonePos == "middle")
+                    {
+
+
+                        golowerMechMiddle();
+
+                    }
+
+
+                    //no need for servo timer for top pos
+
+
+                }
+            }
+        };
+
+        addTask(rtTask);
+    }
 
     public void setObjectDetection() {
         rdTask = new ObjectDetectionTask(this, "Webcam1") {
@@ -295,6 +320,7 @@ public class QT1AutoWR extends Robot {
                     else if ( capPosition == "middle")
                     {
                         goliftMechMiddle();
+
                     }
                     else if ( capPosition == "top")
                     {
@@ -362,7 +388,7 @@ public class QT1AutoWR extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lowering");
-                    goParkInWareHouse();
+                    //goParkInWareHouse();
 
 
                 }
@@ -381,8 +407,9 @@ public class QT1AutoWR extends Robot {
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lifting");
                     intakeDrop.setPosition(INTAKEDROP_OUT);
-                    intakeDrop.setPosition(INTAKEDROP_OPEN);
-                    golowerMechMiddle();
+                    startPauseTimer();
+
+
 
 
                 }
@@ -397,7 +424,7 @@ public class QT1AutoWR extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lowering");
-                    goParkInWareHouse();
+                   // goParkInWareHouse();
 
 
 
@@ -432,8 +459,8 @@ public class QT1AutoWR extends Robot {
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lifting");
                     intakeDrop.setPosition(INTAKEDROP_OUT);
-                    intakeDrop.setPosition(INTAKEDROP_OPEN);
-                    golowerMechBottom();
+                    startPauseTimer();
+
 
                 }
             }
@@ -447,7 +474,7 @@ public class QT1AutoWR extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lowering");
-                    goParkInWareHouse();
+                    //goParkInWareHouse();
 
 
                 }
