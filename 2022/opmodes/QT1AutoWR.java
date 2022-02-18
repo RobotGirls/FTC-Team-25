@@ -136,8 +136,8 @@ public class QT1AutoWR extends Robot {
     public void initPath() {
         // going to shipping hub
         goToShippingHubPath = new DeadReckonPath();
-        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 16, 0.25);
-        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, -0.25); //red
+        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 17, 0.25);
+        goToShippingHubPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 9, -0.25); //red
 
         //outtaking object
         outTakePath = new DeadReckonPath();
@@ -151,16 +151,15 @@ public class QT1AutoWR extends Robot {
 
         goliftMechInitalPath = new DeadReckonPath();
         goliftMechInitalPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -0.25);
-
         //top
 
         //turning drivetrain for top position of hub
         goMoveForwardTopPath = new DeadReckonPath();
-        goMoveForwardTopPath.addSegment(DeadReckonPath.SegmentType.TURN, 6, 0.25);
-        goMoveForwardTopPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, -0.25);
+        goMoveForwardTopPath.addSegment(DeadReckonPath.SegmentType.TURN, 8, 0.25);
+        goMoveForwardTopPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, -0.25);
 
         liftMechPathTop = new DeadReckonPath();
-        liftMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7.5, 0.07);
+        liftMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7.5, 0.10);
 
         lowerMechPathTop = new DeadReckonPath();
         lowerMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7.5, -0.07);
@@ -168,25 +167,25 @@ public class QT1AutoWR extends Robot {
         //middle
 
         liftMechPathMiddle = new DeadReckonPath();
-        liftMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, 0.07);
+        liftMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3.7, 0.07);
 
         lowerMechPathMiddle = new DeadReckonPath();
-        lowerMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -0.07);
+        lowerMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3.7, -0.07);
 
         //bottom
 
         liftMechPathBottom = new DeadReckonPath();
-        liftMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, 0.07);
+        liftMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.7, 0.07);
 
         lowerMechPathBottom = new DeadReckonPath();
-        lowerMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, -0.07);
+        lowerMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.7, -0.07);
 
         //end parking in warehouse
 
         goParkInWareHousePath = new DeadReckonPath();
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 13, 0.25);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.TURN, 20, 0.5);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.7);
+        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12, 0.25);
+        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.TURN, 27, 0.5);
+        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 30, 0.7);
 
     }
 
@@ -388,7 +387,7 @@ public class QT1AutoWR extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lowering");
-                    //goParkInWareHouse();
+                    goParkInWareHouse();
 
 
                 }
@@ -424,7 +423,7 @@ public class QT1AutoWR extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lowering");
-                   // goParkInWareHouse();
+                    goParkInWareHouse();
 
 
 
@@ -474,7 +473,7 @@ public class QT1AutoWR extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lowering");
-                    //goParkInWareHouse();
+                    goParkInWareHouse();
 
 
                 }

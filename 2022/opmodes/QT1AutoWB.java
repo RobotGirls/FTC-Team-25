@@ -158,8 +158,8 @@ public class QT1AutoWB extends Robot {
 
         //turning drivetrain for top position of hub
         goMoveForwardTopPath = new DeadReckonPath();
-        goMoveForwardTopPath.addSegment(DeadReckonPath.SegmentType.TURN, 6, 0.25);
-        goMoveForwardTopPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, -0.25);
+        goMoveForwardTopPath.addSegment(DeadReckonPath.SegmentType.TURN, 5.5, 0.25);
+        goMoveForwardTopPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.3, -0.25);
 
         liftMechPathTop = new DeadReckonPath();
         liftMechPathTop.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 7.5, 0.07);
@@ -186,8 +186,8 @@ public class QT1AutoWB extends Robot {
         //end parking in warehouse
 
         goParkInWareHousePath = new DeadReckonPath();
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 13, 0.25);
-        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.TURN, 20, 0.5);
+        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, 0.25);
+        goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.TURN, 18, 0.5);
         goParkInWareHousePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.7);
 
     }
