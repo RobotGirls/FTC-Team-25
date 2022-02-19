@@ -80,8 +80,6 @@ public class QT1AutoCB extends Robot {
     private DcMotor freightIntake;
 
 
-
-
     private DeadReckonPath outTakePath;
     private DeadReckonPath goToCarouselPath;
 
@@ -91,9 +89,10 @@ public class QT1AutoCB extends Robot {
     private DeadReckonPath goStrafeLeftPath;
     private DeadReckonPath goParkPath;
 
-
+    private DeadReckonPath goMoveForwardTopPath;
     private DeadReckonPath liftMechPathTop;
     private DeadReckonPath lowerMechPathTop;
+    private DeadReckonPath goParkTopPath;
 
     private DeadReckonPath liftMechPathMiddle;
     private DeadReckonPath lowerMechPathMiddle;
@@ -102,7 +101,6 @@ public class QT1AutoCB extends Robot {
     private DeadReckonPath liftMechPathBottom;
     private DeadReckonPath lowerMechPathBottom;
     private DeadReckonPath goMoveForwardBottomPath;
-    private DeadReckonPath goMoveForwardTopPath;
 
     private DeadReckonPath goliftMechInitalPath;
     private DeadReckonPath goliftDownMechInitalPath;
@@ -147,10 +145,10 @@ public class QT1AutoCB extends Robot {
         // 1
         goToCarouselPath = new DeadReckonPath();
         //goToCarouselPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 6, -1.0);
-        goToCarouselPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8.5, -0.5);
-        goToCarouselPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 12, -0.5);
-        goToCarouselPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8.5, 0.25);
-        goToCarouselPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, 0.15);
+        goToCarouselPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4.5, -0.35);
+        goToCarouselPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 16, -0.5);
+        //goToCarouselPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8.5, 0.25);
+        goToCarouselPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, 0.15);
 
 
 
@@ -165,18 +163,23 @@ public class QT1AutoCB extends Robot {
 
         goStrafeLeftPath = new DeadReckonPath();
         //goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.TURN, 5, -0.5);
-        goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12.5, -0.25);
+        goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -0.25);
         goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4.3, 0.25);
-        goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.TURN, 27, 0.25);
-        goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.5);
-        goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10.7, -0.25);
+        goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.TURN, 24, 0.25);
+        goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.3);
+        goStrafeLeftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 16, -0.25);
 
+        goMoveForwardTopPath = new DeadReckonPath();
+        goMoveForwardTopPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -0.25);
+        goMoveForwardTopPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, -0.5);
+
+        goParkTopPath = new DeadReckonPath();
+        goParkTopPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8 , 0.5);
+        goParkTopPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, -1);
 
         goParkPath = new DeadReckonPath();
-        goParkPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6.5, 0.5);
-        goParkPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8 , 0.25);
-        goParkPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, 0.5);
-
+        goParkPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, 1);
+        goParkPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 4 , 0.5);
 
         //outtaking object
         outTakePath = new DeadReckonPath();
@@ -193,7 +196,6 @@ public class QT1AutoCB extends Robot {
         goliftMechInitalPath = new DeadReckonPath();
         goliftMechInitalPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -0.25);
 
-
         //top
 
         liftMechPathTop = new DeadReckonPath();
@@ -205,20 +207,21 @@ public class QT1AutoCB extends Robot {
         //middle
 
         liftMechPathMiddle = new DeadReckonPath();
-        liftMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, 0.07);
+        liftMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3.5, 0.07);
 
         lowerMechPathMiddle = new DeadReckonPath();
-        lowerMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -0.07);
+        lowerMechPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3.5, -0.07);
+
         // bottom
 
         goMoveForwardBottomPath = new DeadReckonPath();
         goMoveForwardBottomPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.5, -0.25);
 
         liftMechPathBottom = new DeadReckonPath();
-        liftMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, 0.07);
+        liftMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.7, 0.07);
 
         lowerMechPathBottom = new DeadReckonPath();
-        lowerMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, -0.07);
+        lowerMechPathBottom.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.7, -0.07);
 
 
         goliftDownMechInitalPath = new DeadReckonPath();
@@ -348,6 +351,22 @@ public class QT1AutoCB extends Robot {
 
     /////////////////////////////////////////////////// Top Methods /////////////////////////////////////////////////////////////////
 
+    public void goMovetoHubTop()
+    {
+        this.addTask(new DeadReckonTask(this, goMoveForwardTopPath, drivetrain){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    pathTlm.setValue("arrived at hub");
+                    goliftMechTop();
+
+                }
+            }
+        });
+
+    }
 
     private void goliftMechTop() {
         this.addTask(new DeadReckonTask(this, liftMechPathTop, gravelLiftDriveTrain) {
@@ -363,21 +382,6 @@ public class QT1AutoCB extends Robot {
         });
     }
 
-    public void goMoveForwardTop() {
-        this.addTask(new DeadReckonTask(this, goMoveForwardTopPath, drivetrain) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE) {
-                    pathTlm.setValue("arrived at carousel");
-                    goliftMechTop();
-
-                }
-            }
-        });
-
-    }
-
     private void golowerMechTop() {
         this.addTask(new DeadReckonTask(this, lowerMechPathTop, gravelLiftDriveTrain) {
             @Override
@@ -385,7 +389,7 @@ public class QT1AutoCB extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lowering");
-                    //goParkInWareHouse();
+                    goPark();
 
 
                 }
@@ -421,7 +425,7 @@ public class QT1AutoCB extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lowering");
-                    // goParkInWareHouse();
+                    goPark();
 
 
 
@@ -471,7 +475,7 @@ public class QT1AutoCB extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done lowering");
-                    //goParkInWareHouse();
+                    goParkTop();
 
 
                 }
@@ -479,6 +483,23 @@ public class QT1AutoCB extends Robot {
         });
     }
 
+    public void goParkTop()
+    {
+        this.addTask(new DeadReckonTask(this, goParkTopPath, drivetrain){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    pathTlm.setValue("strafe left done");
+
+
+
+                }
+            }
+        });
+
+    }
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -498,7 +519,7 @@ public class QT1AutoCB extends Robot {
                 if (path.kind == EventKind.PATH_DONE)
                 {
                     pathTlm.setValue("arrived at carousel");
-                    spinCarousel();
+                    spinCarousel(capStonePos);
 
                 }
             }
@@ -506,7 +527,7 @@ public class QT1AutoCB extends Robot {
 
     }
 
-    private void spinCarousel()
+    private void spinCarousel(String capPosition)
     {
         this.addTask(new DeadReckonTask(this, turningCarouselPath, carouselDriveTrain) {
             @Override
@@ -514,8 +535,18 @@ public class QT1AutoCB extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     pathTlm.setValue("done spinning carousel");
-                    //goBackOriginalLocation();
-                    goStrafeLeft(capStonePos);
+                    if ( capPosition == "bottom")
+                    {
+                        goStrafeLeft(capStonePos);
+                    }
+                    else if ( capPosition == "middle")
+                    {
+                        goStrafeLeft(capStonePos);
+                    }
+                    else if ( capPosition == "top")
+                    {
+                        goMovetoHubTop();
+                    }
 
                 }
             }
@@ -542,15 +573,8 @@ public class QT1AutoCB extends Robot {
                         {
                             goliftMechMiddle();
                         }
-                        else if ( capPosition == "top")
-                        {
-                            goliftMechTop();
-                        }
-
 
                     }
-
-
 
 
                 }
@@ -568,7 +592,7 @@ public class QT1AutoCB extends Robot {
                 if (path.kind == EventKind.PATH_DONE)
                 {
                     pathTlm.setValue("strafe left done");
-                    //goliftdDownMechInital();
+
 
 
 
@@ -577,36 +601,6 @@ public class QT1AutoCB extends Robot {
         });
 
     }
-
-//    private void goliftMechInital() {
-//        this.addTask(new DeadReckonTask(this, goliftMechInitalPath, flipOverDriveTrain) {
-//            @Override
-//            public void handleEvent(RobotEvent e) {
-//                DeadReckonEvent path = (DeadReckonEvent) e;
-//                if (path.kind == EventKind.PATH_DONE) {
-//                    pathTlm.setValue("done lifting");
-//                    goToCarousel();
-//
-//
-//                }
-//            }
-//        });
-//    }
-//
-//    private void goliftdDownMechInital() {
-//        this.addTask(new DeadReckonTask(this, goliftDownMechInitalPath, flipOverDriveTrain) {
-//            @Override
-//            public void handleEvent(RobotEvent e) {
-//                DeadReckonEvent path = (DeadReckonEvent) e;
-//                if (path.kind == EventKind.PATH_DONE) {
-//                    pathTlm.setValue("done lifting");
-//                    goToCarousel();
-//
-//
-//                }
-//            }
-//        });
-//    }
 
 
 
