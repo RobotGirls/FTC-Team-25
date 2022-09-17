@@ -1,15 +1,21 @@
-package team25core;
+package opmodes;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+import team25core.JoystickDriveControlScheme;
+import team25core.MotorValues;
 
 /**
  * Created by Ruchi Bondre on 9/3/22.
  */
 
 
-public class MechanumFieldCentricDriveScheme implements JoystickDriveControlScheme {
+public class MecanumFieldCentricDriveScheme implements JoystickDriveControlScheme {
 
     /*
      * An Andymark 40 native spin direction is counterclockwise.
@@ -34,26 +40,45 @@ public class MechanumFieldCentricDriveScheme implements JoystickDriveControlSche
     protected double x;
     protected double y;
 
+    protected BNO055IMU imu;
+
     protected Gamepad gamepad;
     protected MotorDirection motorDirection;
+    private Telemetry telemetry;
+    private Telemetry.Item fLpowerTlm;
+    private Telemetry.Item bLpowerTlm;
+    private Telemetry.Item fRpowerTlm;
+    private Telemetry.Item bRpowerTlm;
 
-    public TankMechanumControlScheme(Gamepad gamepad)
+
+
+
+    public MecanumFieldCentricDriveScheme(Gamepad gamepad, BNO055IMU imu,  Telemetry telemetry  )
     {
         this.gamepad = gamepad;
         this.motorDirection = MotorDirection.CANONICAL;
+        this.imu = imu;
+
+        fLpowerTlm = telemetry.addData("FL Power","unknown");
+        fRpowerTlm = telemetry.addData("FR Power","unknown");
+        bLpowerTlm = telemetry.addData("BL Power","unknown");
+        bRpowerTlm = telemetry.addData("BR Power","unknown");
+
     }
 
-    public TankMechanumControlScheme(Gamepad gamepad, MotorDirection motorDirection)
+    public MecanumFieldCentricDriveScheme(Gamepad gamepad, MotorDirection motorDirection, BNO055IMU imu)
     {
         this.gamepad = gamepad;
         this.motorDirection = motorDirection;
+        this.imu = imu;
+        this.telemetry = telemetry;
     }
 
     public MotorValues getMotorPowers()
     {
-        y = -gamepad1.left_stick_y; // Remember, this is reversed!
-        x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
-        rx = gamepad1.right_stick_x;
+        y = -gamepad.left_stick_y; // Remember, this is reversed!
+        x = gamepad.left_stick_x * 1.1; // Counteract imperfect strafing
+        rx = gamepad.right_stick_x;
 
         // If joysticks are pointed left (negative joystick values), counter rotate wheels.
         // Threshold for joystick values in the x may vary.
@@ -72,6 +97,14 @@ public class MechanumFieldCentricDriveScheme implements JoystickDriveControlSche
         double backLeftPower = (rotY - rotX + rx) / denominator;
         double frontRightPower = (rotY - rotX - rx) / denominator;
         double backRightPower = (rotY + rotX - rx) / denominator;
+
+        fLpowerTlm.setValue(frontLeftPower);
+        fRpowerTlm.setValue(frontRightPower);
+        bLpowerTlm.setValue(backLeftPower);
+        bRpowerTlm.setValue(backRightPower);
+
+
+
 
 
 
