@@ -2,6 +2,7 @@ package opmodes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -37,18 +38,19 @@ public class PowerPlayTeleop extends StandardFourMotorRobot {
 
     //freight intake
     private DcMotor freightIntake;
-    private Servo intakeDrop;
+
+    //mechanisms
+    private DcMotor linearLift;
+    private CRServo umbrella;
+
     private OneWheelDirectDrivetrain gravelLiftDrivetrain;
 
     private Telemetry.Item locationTlm;
     private Telemetry.Item buttonTlm;
 
 
-    //changing direction for gravelLift mechanism
-    private DcMotor gravelLift;
-    //private OneWheelDirectDrivetrain flipOverDrivetrain;
-    private static double INTAKEDROP_OPEN = 180 / 256.0;
-    private static double INTAKEDROP_OUT = 1 / 256.0;
+
+
     private boolean rotateDown = true;
 
     public static int DEGREES_DOWN = 575;
@@ -64,10 +66,6 @@ public class PowerPlayTeleop extends StandardFourMotorRobot {
     public void handleEvent(RobotEvent e) {
     }
 
-    //flipover positions for bottom and top positions for intake and placing on hubs
-
-
-    //alternates between down and up positions.
 
 
 
@@ -77,10 +75,11 @@ public class PowerPlayTeleop extends StandardFourMotorRobot {
         super.init();
         initIMU();
 
+        //mechs
+        linearLift = hardwareMap.get(DcMotor.class, "linearLift");
+        umbrella = hardwareMap.crservo.get("umbrella");
 
         scheme = new MecanumFieldCentricDriveScheme(gamepad1,imu, this.telemetry);
-
-        gravelLiftDrivetrain = new OneWheelDirectDrivetrain(gravelLift);
 
 
         //code for forward mechanum drivetrain:
@@ -119,7 +118,6 @@ public class PowerPlayTeleop extends StandardFourMotorRobot {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
                 locationTlm.setValue("in gamepad1 handler");
                 switch (gamepadEvent.kind) {
-//                    launching system
 
                 }
             }
@@ -132,6 +130,30 @@ public class PowerPlayTeleop extends StandardFourMotorRobot {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
                 locationTlm.setValue("in gamepad2 handler");
                 switch (gamepadEvent.kind) {
+                    case LEFT_BUMPER_DOWN:
+                        linearLift.setPower(0.5);
+                        break;
+                    case LEFT_BUMPER_UP:
+                        linearLift.setPower(0);
+                        break;
+                    case RIGHT_BUMPER_DOWN:
+                        linearLift.setPower(-0.5);
+                        break;
+                    case RIGHT_BUMPER_UP:
+                        linearLift.setPower(0);
+                        break;
+                    case RIGHT_TRIGGER_DOWN:
+                        umbrella.setPower(0.5);
+                        break;
+                    case RIGHT_TRIGGER_UP:
+                        umbrella.setPower(0);
+                        break;
+                    case LEFT_TRIGGER_DOWN:
+                        umbrella.setPower(-0.5);
+                        break;
+                    case LEFT_TRIGGER_UP:
+                        umbrella.setPower(0);
+                        break;
 
                 }
             }

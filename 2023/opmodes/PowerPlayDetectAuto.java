@@ -46,7 +46,7 @@ import team25core.SingleShotTimerTask;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "aprilTagsAuto")
+@Autonomous(name = "aprilTagsAuto1.1")
 //@Disabled
 public class PowerPlayDetectAuto extends Robot {
 
@@ -55,22 +55,22 @@ public class PowerPlayDetectAuto extends Robot {
     private DcMotor backLeft;
     private DcMotor backRight;
 
-    private DcMotor carouselMech;
-    private OneWheelDirectDrivetrain singleMotorDrivetrain;
-    private DcMotor liftMotor;
-    private DcMotor intakeMotor;
-
     private FourWheelDirectDrivetrain drivetrain;
 
-    DeadReckonPath firstPath;
-    DeadReckonPath secondPath;
-    DeadReckonPath carouselPath;
+    private DeadReckonPath leftPath;
+    private DeadReckonPath middlePath;
+    private DeadReckonPath rightPath;
 
+    //variables for constants
+    static final double FORWARD_DISTANCE = 6;
+    static final double DRIVE_SPEED = -0.5;
+
+    // apriltags detection
     private Telemetry.Item tagIdTlm;
-
     AprilTagDetection tagObject;
     private AprilTagDetectionTask detectionTask;
 
+    //telemetry
     private Telemetry.Item whereAmI;
 
     /*
@@ -97,52 +97,132 @@ public class PowerPlayDetectAuto extends Robot {
                 tagObject = event.tagObject;
                 tagIdTlm.setValue(tagObject.id);
                 whereAmI.setValue("in handleEvent");
+
+                if (tagObject.id == 0)
+                {
+                    gotoLeftPark();
+                }
+                if (tagObject.id == 6)
+                {
+                    gotoRightPark();
+                }
+                if (tagObject.id == 19)
+                {
+                    gotoMiddlePark();
+                }
+
             }
         };
         whereAmI.setValue("setAprilTagDetection");
         detectionTask.init(telemetry, hardwareMap);
     }
 
+
+
     public void initPaths()
     {
-        firstPath = new DeadReckonPath();
-        secondPath = new DeadReckonPath();
-        carouselPath = new DeadReckonPath();
+        leftPath = new DeadReckonPath();
+        middlePath = new DeadReckonPath();
+        rightPath= new DeadReckonPath();
 
-        firstPath.stop();
-        secondPath.stop();
-        carouselPath.stop();
 
-        firstPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -0.3); // comes off the wall
-        firstPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, -0.3);
-        firstPath.addSegment(DeadReckonPath.SegmentType.TURN, 20, 0.3);
-        secondPath.addSegment(DeadReckonPath.SegmentType.TURN, 15, -0.3);
-        secondPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 9, -0.5);
-        carouselPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -0.2);
+        leftPath.stop();
+        middlePath.stop();
+        rightPath.stop();
+
+        //going forward then to the left
+        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, DRIVE_SPEED);
+        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, FORWARD_DISTANCE, -DRIVE_SPEED);
+        //going forward
+        middlePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, DRIVE_SPEED);
+        //going forward then right
+        rightPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,FORWARD_DISTANCE,DRIVE_SPEED);
+        rightPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,FORWARD_DISTANCE,DRIVE_SPEED);
     }
 
     @Override
     public void init()
     {
-//        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-//        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-//        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-//        backRight = hardwareMap.get(DcMotor.class, "backRight");
-//
-//        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//
-//        drivetrain = new FourWheelDirectDrivetrain(frontRight, backRight, frontLeft, backLeft);
-//        drivetrain.resetEncoders();
-//        drivetrain.encodersOn();
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight = hardwareMap.get(DcMotor.class, "backRight");
+
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        drivetrain = new FourWheelDirectDrivetrain(frontRight, backRight, frontLeft, backLeft);
+        drivetrain.resetEncoders();
+        drivetrain.encodersOn();
 
         whereAmI = telemetry.addData("location in code", "init");
         tagIdTlm = telemetry.addData("tagId","none");
         //initPaths();
 
 
+    }
+
+
+// parking paths -----------------------------------
+
+    public void gotoRightPark()
+    {
+
+        // whereAmI.setValue("went to right target zone");
+
+        this.addTask(new DeadReckonTask(this, rightPath,drivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("went to right target zone");
+                    whereAmI.setValue("went to right target zone");
+
+                }
+            }
+        });
+    }
+
+    public void gotoMiddlePark()
+    {
+        // whereAmI.setValue("went to middle target zone");
+
+        this.addTask(new DeadReckonTask(this, middlePath,drivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("went to middle target zone");
+                    whereAmI.setValue("went to middle target zone");
+
+                }
+            }
+        });
+    }
+
+    public void gotoLeftPark()
+    {
+
+
+        //whereAmI.setValue("went to left target zone");
+
+
+        this.addTask(new DeadReckonTask(this, leftPath,drivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("went to left target zone");
+                    whereAmI.setValue("went to left target zone");
+
+                }
+            }
+        });
     }
 
     @Override
