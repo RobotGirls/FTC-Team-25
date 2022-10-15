@@ -103,17 +103,8 @@ public class MecanumFieldCentricDriveScheme implements JoystickDriveControlSchem
         bLpowerTlm.setValue(backLeftPower);
         bRpowerTlm.setValue(backRightPower);
 
-
-
-
-
-
         return new MotorValues(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
-
-
-
-
-
 
     }
 }
+
