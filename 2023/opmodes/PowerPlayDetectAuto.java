@@ -67,6 +67,7 @@ public class PowerPlayDetectAuto extends Robot {
 
     // apriltags detection
     private Telemetry.Item tagIdTlm;
+    private Telemetry.Item parkingLocationTlm;
     AprilTagDetection tagObject;
     private AprilTagDetectionTask detectionTask;
 
@@ -89,7 +90,6 @@ public class PowerPlayDetectAuto extends Robot {
     }
 
     public void setAprilTagDetection() {
-        whereAmI.setValue("before detectionTask");
         detectionTask = new AprilTagDetectionTask(this, "Webcam 1") {
             @Override
             public void handleEvent(RobotEvent e) {
@@ -98,16 +98,13 @@ public class PowerPlayDetectAuto extends Robot {
                 tagIdTlm.setValue(tagObject.id);
                 whereAmI.setValue("in handleEvent");
 
-                if (tagObject.id == 0)
-                {
+                if (tagObject.id == 0) {
                     gotoLeftPark();
                 }
-                if (tagObject.id == 6)
-                {
+                if (tagObject.id == 6) {
                     gotoRightPark();
                 }
-                if (tagObject.id == 19)
-                {
+                if (tagObject.id == 19) {
                     gotoMiddlePark();
                 }
 
@@ -159,6 +156,8 @@ public class PowerPlayDetectAuto extends Robot {
 
         whereAmI = telemetry.addData("location in code", "init");
         tagIdTlm = telemetry.addData("tagId","none");
+        parkingLocationTlm = telemetry.addData("parking location: ","none");
+
         //initPaths();
 
 
@@ -170,9 +169,9 @@ public class PowerPlayDetectAuto extends Robot {
     public void gotoRightPark()
     {
 
-        // whereAmI.setValue("went to right target zone");
+         parkingLocationTlm.setValue("went to right target zone");
 
-        this.addTask(new DeadReckonTask(this, rightPath,drivetrain ){
+       /* this.addTask(new DeadReckonTask(this, rightPath,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -183,14 +182,14 @@ public class PowerPlayDetectAuto extends Robot {
 
                 }
             }
-        });
+        });*/
     }
 
     public void gotoMiddlePark()
     {
-        // whereAmI.setValue("went to middle target zone");
+         parkingLocationTlm.setValue("went to middle target zone");
 
-        this.addTask(new DeadReckonTask(this, middlePath,drivetrain ){
+        /*this.addTask(new DeadReckonTask(this, middlePath,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -201,17 +200,17 @@ public class PowerPlayDetectAuto extends Robot {
 
                 }
             }
-        });
+        });*/
     }
 
     public void gotoLeftPark()
     {
 
 
-        //whereAmI.setValue("went to left target zone");
+        parkingLocationTlm.setValue("went to left target zone");
 
 
-        this.addTask(new DeadReckonTask(this, leftPath,drivetrain ){
+        /*this.addTask(new DeadReckonTask(this, leftPath,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -222,7 +221,7 @@ public class PowerPlayDetectAuto extends Robot {
 
                 }
             }
-        });
+        });*/
     }
 
     @Override

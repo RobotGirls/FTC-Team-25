@@ -122,10 +122,10 @@ public class PowerPlayTeleopV2 extends StandardFourMotorRobot {
                 locationTlm.setValue("in gamepad2 handler");
                 switch (gamepadEvent.kind) {
                     case LEFT_BUMPER_DOWN:
-                        linearLift.setPower(0.5);
+                        linearLift.setPower(1);
                         break;
                     case RIGHT_BUMPER_DOWN:
-                        linearLift.setPower(-0.5);
+                        linearLift.setPower(-1);
                         break;
                     case LEFT_BUMPER_UP:
                     case RIGHT_BUMPER_UP:
