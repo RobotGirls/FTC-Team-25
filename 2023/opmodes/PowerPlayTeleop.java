@@ -77,7 +77,7 @@ public class PowerPlayTeleop extends StandardFourMotorRobot {
 
         //mechs
         linearLift = hardwareMap.get(DcMotor.class, "linearLift");
-        umbrella = hardwareMap.crservo.get("umbrella");
+//        umbrella = hardwareMap.crservo.get("umbrella");
 
         scheme = new MecanumFieldCentricDriveScheme(gamepad1,imu, this.telemetry);
 
@@ -142,18 +142,18 @@ public class PowerPlayTeleop extends StandardFourMotorRobot {
                     case RIGHT_BUMPER_UP:
                         linearLift.setPower(0);
                         break;
-                    case RIGHT_TRIGGER_DOWN:
-                        umbrella.setPower(0.5);
-                        break;
-                    case RIGHT_TRIGGER_UP:
-                        umbrella.setPower(0);
-                        break;
-                    case LEFT_TRIGGER_DOWN:
-                        umbrella.setPower(-0.5);
-                        break;
-                    case LEFT_TRIGGER_UP:
-                        umbrella.setPower(0);
-                        break;
+//                    case RIGHT_TRIGGER_DOWN:
+//                        umbrella.setPower(0.5);
+//                        break;
+//                    case RIGHT_TRIGGER_UP:
+//                        umbrella.setPower(0);
+//                        break;
+//                    case LEFT_TRIGGER_DOWN:
+//                        umbrella.setPower(-0.5);
+//                        break;
+//                    case LEFT_TRIGGER_UP:
+//                        umbrella.setPower(0);
+//                        break;
 
                 }
             }

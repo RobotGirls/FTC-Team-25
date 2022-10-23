@@ -9,8 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import team25core.GamepadTask;
 import team25core.Robot;
 import team25core.RobotEvent;
-import team25core.Team25UltrasonicSensor;
-import team25core.UltrasonicSensorHighAvailabilityTask;
 
 @Autonomous(name="HA US Test")
 @Disabled

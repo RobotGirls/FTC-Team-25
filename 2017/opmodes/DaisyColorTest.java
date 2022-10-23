@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.I2cDeviceImpl;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import team25core.AMSColorSensorImproved;
 import team25core.ColorSensorTask;
 import team25core.Robot;
 import team25core.RobotEvent;

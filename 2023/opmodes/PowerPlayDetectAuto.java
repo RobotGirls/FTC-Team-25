@@ -46,7 +46,7 @@ import team25core.SingleShotTimerTask;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "aprilTagsAuto1.1")
+@Autonomous(name = "aprilTagsAuto1.2")
 //@Disabled
 public class PowerPlayDetectAuto extends Robot {
 
@@ -98,16 +98,13 @@ public class PowerPlayDetectAuto extends Robot {
                 tagIdTlm.setValue(tagObject.id);
                 whereAmI.setValue("in handleEvent");
 
-                if (tagObject.id == 0)
-                {
+                if (tagObject.id == 0) {
                     gotoLeftPark();
                 }
-                if (tagObject.id == 6)
-                {
+                if (tagObject.id == 6) {
                     gotoRightPark();
                 }
-                if (tagObject.id == 19)
-                {
+                if (tagObject.id == 19) {
                     gotoMiddlePark();
                 }
 
@@ -150,6 +147,7 @@ public class PowerPlayDetectAuto extends Robot {
 
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -170,59 +168,59 @@ public class PowerPlayDetectAuto extends Robot {
     public void gotoRightPark()
     {
 
-        // whereAmI.setValue("went to right target zone");
+         whereAmI.setValue("went to right target zone");
 
-        this.addTask(new DeadReckonTask(this, rightPath,drivetrain ){
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE)
-                {
-                    RobotLog.i("went to right target zone");
-                    whereAmI.setValue("went to right target zone");
-
-                }
-            }
-        });
+//        this.addTask(new DeadReckonTask(this, rightPath,drivetrain ){
+//            @Override
+//            public void handleEvent(RobotEvent e) {
+//                DeadReckonEvent path = (DeadReckonEvent) e;
+//                if (path.kind == EventKind.PATH_DONE)
+//                {
+//                    RobotLog.i("went to right target zone");
+//                    whereAmI.setValue("went to right target zone");
+//
+//                }
+//            }
+//        });
     }
 
     public void gotoMiddlePark()
     {
-        // whereAmI.setValue("went to middle target zone");
+         whereAmI.setValue("went to middle target zone");
 
-        this.addTask(new DeadReckonTask(this, middlePath,drivetrain ){
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE)
-                {
-                    RobotLog.i("went to middle target zone");
-                    whereAmI.setValue("went to middle target zone");
-
-                }
-            }
-        });
+//        this.addTask(new DeadReckonTask(this, middlePath,drivetrain ){
+//            @Override
+//            public void handleEvent(RobotEvent e) {
+//                DeadReckonEvent path = (DeadReckonEvent) e;
+//                if (path.kind == EventKind.PATH_DONE)
+//                {
+//                    RobotLog.i("went to middle target zone");
+//                    whereAmI.setValue("went to middle target zone");
+//
+//                }
+//            }
+//        });
     }
 
     public void gotoLeftPark()
     {
 
 
-        //whereAmI.setValue("went to left target zone");
+        whereAmI.setValue("went to left target zone");
 
 
-        this.addTask(new DeadReckonTask(this, leftPath,drivetrain ){
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE)
-                {
-                    RobotLog.i("went to left target zone");
-                    whereAmI.setValue("went to left target zone");
-
-                }
-            }
-        });
+//        this.addTask(new DeadReckonTask(this, leftPath,drivetrain ){
+//            @Override
+//            public void handleEvent(RobotEvent e) {
+//                DeadReckonEvent path = (DeadReckonEvent) e;
+//                if (path.kind == EventKind.PATH_DONE)
+//                {
+//                    RobotLog.i("went to left target zone");
+//                    whereAmI.setValue("went to left target zone");
+//
+//                }
+//            }
+//        });
     }
 
     @Override

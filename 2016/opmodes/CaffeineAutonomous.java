@@ -25,8 +25,6 @@ import team25core.ServoOscillateTask;
 import team25core.SingleShotTimerTask;
 import team25core.Team25DcMotor;
 import team25core.TwoWheelGearedDriveDeadReckon;
-import team25core.UltrasonicAveragingTask;
-import team25core.UltrasonicSensorCriteria;
 
 /*
  * FTC Team 5218: izzielau, February 17, 2016
