@@ -27,6 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -34,15 +35,16 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.openftc.apriltag.AprilTagDetection;
 
 
+import team25core.DeadReckonTask;
+import team25core.OneWheelDirectDrivetrain;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 import team25core.DeadReckonPath;
-import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 
 
-@Autonomous(name = "aprilTagsAuto1.1")
+@Autonomous(name = "aprilTagsAuto1.2")
 //@Disabled
 public class PowerPlayDetectAuto extends Robot {
 
@@ -51,15 +53,26 @@ public class PowerPlayDetectAuto extends Robot {
     private DcMotor backLeft;
     private DcMotor backRight;
 
+    private CRServo umbrella;
+
     private FourWheelDirectDrivetrain drivetrain;
+
+    private OneWheelDirectDrivetrain liftDriveTrain;
+    private DcMotor linearLift;
+    private DeadReckonPath liftMech;
+
+
+
 
     private DeadReckonPath leftPath;
     private DeadReckonPath middlePath;
     private DeadReckonPath rightPath;
 
+    private DeadReckonPath deliverConePath;
+
     //variables for constants
-    static final double FORWARD_DISTANCE = 6;
-    static final double DRIVE_SPEED = -0.5;
+    static final double FORWARD_DISTANCE = 11.5;
+    static final double DRIVE_SPEED = 0.25;
 
     // apriltags detection
     private Telemetry.Item tagIdTlm;
@@ -123,6 +136,12 @@ public class PowerPlayDetectAuto extends Robot {
         middlePath.stop();
         rightPath.stop();
 
+        liftMech = new DeadReckonPath();
+        liftMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.5, 0.01);
+
+        deliverConePath  = new DeadReckonPath();
+        deliverConePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5,  -DRIVE_SPEED);
+
         //going forward then to the left
         leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, DRIVE_SPEED);
         leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, FORWARD_DISTANCE, -DRIVE_SPEED);
@@ -141,6 +160,9 @@ public class PowerPlayDetectAuto extends Robot {
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
 
+        umbrella=hardwareMap.crservo.get("umbrella");
+
+
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -154,7 +176,15 @@ public class PowerPlayDetectAuto extends Robot {
         tagIdTlm = telemetry.addData("tagId","none");
         parkingLocationTlm = telemetry.addData("parking location: ","none");
 
-        //initPaths();
+        linearLift=hardwareMap.get(DcMotor.class, "linearLift");
+        liftDriveTrain = new OneWheelDirectDrivetrain(linearLift);
+        liftDriveTrain.resetEncoders();
+        liftDriveTrain.encodersOn();
+
+        umbrella.setPower(0.5);
+
+
+        initPaths();
 
 
     }
@@ -162,12 +192,26 @@ public class PowerPlayDetectAuto extends Robot {
 
 // parking paths -----------------------------------
 
-    public void gotoRightPark()
+    private void goliftMech() {
+        this.addTask(new DeadReckonTask(this, liftMech, liftDriveTrain) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    whereAmI.setValue("lifted linear lift");
+
+
+
+                }
+            }
+        });
+    }
+    public void goDeliverCone()
     {
 
         parkingLocationTlm.setValue("went to right target zone");
 
-       /* this.addTask(new DeadReckonTask(this, rightPath,drivetrain ){
+        this.addTask(new DeadReckonTask(this, deliverConePath ,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -178,14 +222,33 @@ public class PowerPlayDetectAuto extends Robot {
 
                 }
             }
-        });*/
+        });
+    }
+
+    public void gotoRightPark()
+    {
+
+        parkingLocationTlm.setValue("went to right target zone");
+
+       this.addTask(new DeadReckonTask(this, rightPath,drivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("went to right target zone");
+                    whereAmI.setValue("went to right target zone");
+
+                }
+            }
+        });
     }
 
     public void gotoMiddlePark()
     {
         parkingLocationTlm.setValue("went to middle target zone");
 
-        /*this.addTask(new DeadReckonTask(this, middlePath,drivetrain ){
+        this.addTask(new DeadReckonTask(this, middlePath,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -193,10 +256,11 @@ public class PowerPlayDetectAuto extends Robot {
                 {
                     RobotLog.i("went to middle target zone");
                     whereAmI.setValue("went to middle target zone");
+                    goliftMech();
 
                 }
             }
-        });*/
+        });
     }
 
     public void gotoLeftPark()
@@ -206,7 +270,7 @@ public class PowerPlayDetectAuto extends Robot {
         parkingLocationTlm.setValue("went to left target zone");
 
 
-        /*this.addTask(new DeadReckonTask(this, leftPath,drivetrain ){
+        this.addTask(new DeadReckonTask(this, leftPath,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -217,7 +281,7 @@ public class PowerPlayDetectAuto extends Robot {
 
                 }
             }
-        });*/
+        });
     }
 
     @Override
