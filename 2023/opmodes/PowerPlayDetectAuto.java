@@ -256,7 +256,7 @@ public class PowerPlayDetectAuto extends Robot {
                 {
                     RobotLog.i("went to middle target zone");
                     whereAmI.setValue("went to middle target zone");
-                    goliftMech();
+                    //goliftMech();
 
                 }
             }
