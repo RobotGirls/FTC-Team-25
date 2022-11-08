@@ -38,7 +38,6 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 
 import team25core.DeadReckon;
-import team25core.DeadReckonTask;
 import team25core.MonitorGyroTask;
 import team25core.MonitorMotorTask;
 import team25core.Robot;

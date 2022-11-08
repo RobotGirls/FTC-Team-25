@@ -38,7 +38,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 
 import team25core.DeadReckonPath;
-import team25core.DeadReckonTask;
 import team25core.MRLightSensor;
 import team25core.OpticalDistanceSensorCriteria;
 import team25core.PersistentTelemetryTask;

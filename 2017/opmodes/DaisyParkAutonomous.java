@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import team25core.DeadReckonPath;
-import team25core.DeadReckonTask;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
 import team25core.PersistentTelemetryTask;

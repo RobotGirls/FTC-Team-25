@@ -15,7 +15,6 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.AutonomousEvent;
 import team25core.DeadReckon;
-import team25core.DeadReckonTask;
 import team25core.GamepadTask;
 import team25core.LightSensorCriteria;
 import team25core.PersistentTelemetryTask;

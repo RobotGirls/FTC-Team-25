@@ -12,7 +12,6 @@ import com.qualcomm.robotcore.util.RobotLog;
 import team25core.AutonomousEvent;
 import team25core.ColorSensorTask;
 import team25core.DeadReckon;
-import team25core.DeadReckonTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;

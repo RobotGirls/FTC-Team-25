@@ -206,24 +206,24 @@ public class PowerPlayDetectAuto extends Robot {
             }
         });
     }
-    public void goDeliverCone()
-    {
-
-        parkingLocationTlm.setValue("went to right target zone");
-
-        this.addTask(new DeadReckonTask(this, deliverConePath ,drivetrain ){
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE)
-                {
-                    RobotLog.i("went to right target zone");
-                    whereAmI.setValue("went to right target zone");
-
-                }
-            }
-        });
-    }
+//    public void goDeliverCone()
+//    {
+//
+//        parkingLocationTlm.setValue("went to right target zone");
+//
+//        this.addTask(new DeadReckonTask(this, deliverConePath ,drivetrain ){
+//            @Override
+//            public void handleEvent(RobotEvent e) {
+//                DeadReckonEvent path = (DeadReckonEvent) e;
+//                if (path.kind == EventKind.PATH_DONE)
+//                {
+//                    RobotLog.i("went to right target zone");
+//                    whereAmI.setValue("went to right target zone");
+//
+//                }
+//            }
+//        });
+//    }
 
     public void gotoRightPark()
     {
