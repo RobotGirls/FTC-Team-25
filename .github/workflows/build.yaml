@@ -1,0 +1,36 @@
+name: Build
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout terkel
+        uses: actions/checkout@v2
+        with:
+          repository: RobotGirls/terkel
+          ref: master
+          path: ws/terkel
+
+      - name: Checkout 25
+        uses: actions/checkout@v2
+        with:
+          path: ws/FTC-Team-25
+
+      - name: Checkout RC
+        uses: actions/checkout@v2
+        with:
+          repository: RobotGirls/FtcRobotController
+          ref: master-25-rr
+          path: ws/FtcRobotController
+
+      - name: Show dir
+        run: pwd && ls
+
+      - name: Change dir
+        run: cd ws/FtcRobotController
+        
+      - name: Working dir
+        run: pwd
+        
+      - name: build
+        run: ./ws/FtcRobotController/gradlew --project-dir ./ws/FtcRobotController assemble
