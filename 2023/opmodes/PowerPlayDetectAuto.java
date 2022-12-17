@@ -72,7 +72,7 @@ public class PowerPlayDetectAuto extends Robot {
     private DeadReckonPath deliverConePath;
 
     //variables for constants
-    static final double FORWARD_DISTANCE = 8.7;
+    static final double FORWARD_DISTANCE = 9.5;
     static final double DRIVE_SPEED = 0.25;
 
     // apriltags detection
