@@ -100,15 +100,15 @@ public class PowerPlayTeleopNoFieldCentric extends StandardFourMotorRobot {
 
         locationTlm = telemetry.addData("location","init");
 
-        initPaths();
+        //initPaths();
 
 
     }
 
-    private void initPaths() {
-        turretTurn = new DeadReckonPath();
-        turretTurn.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.2, 0.01);
-    }
+//    private void initPaths() {
+//        turretTurn = new DeadReckonPath();
+//        turretTurn.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.2, 0.01);
+//    }
 
     private void setTurretTurn() {
         this.addTask(new DeadReckonTask(this, turretTurn, turretDrivetrain) {
@@ -153,13 +153,13 @@ public class PowerPlayTeleopNoFieldCentric extends StandardFourMotorRobot {
                     case BUTTON_X_DOWN:
                         turret.setPower(0.5);
                         break;
-                    case BUTTON_B_DOWN:
+                    case BUTTON_Y_DOWN:
                         turret.setPower(-0.5);
                         break;
                     case BUTTON_X_UP:
                         turret.setPower(0);
                         break;
-                    case BUTTON_B_UP:
+                    case BUTTON_Y_UP:
                         turret.setPower(0);
                         break;
 
@@ -210,12 +210,12 @@ public class PowerPlayTeleopNoFieldCentric extends StandardFourMotorRobot {
                     case BUTTON_Y_UP:
                         linearLift.setPower(0);
                         break;
-                    case BUTTON_X_DOWN:
-                        setTurretTurn();
-                        break;
-                    case BUTTON_X_UP:
-                        linearLift.setPower(0);
-                        break;
+//                    case BUTTON_X_DOWN:
+//                        setTurretTurn();
+//                        break;
+//                    case BUTTON_X_UP:
+//                        linearLift.setPower(0);
+//                        break;
 
 
 
