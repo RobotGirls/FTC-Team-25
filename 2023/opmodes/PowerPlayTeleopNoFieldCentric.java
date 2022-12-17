@@ -17,6 +17,7 @@ import team25core.OneWheelDirectDrivetrain;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import team25core.RobotEvent;
 import team25core.StandardFourMotorRobot;
+import team25core.TankMechanumControlScheme;
 import team25core.TankMechanumControlSchemeFrenzy;
 import team25core.TeleopDriveTask;
 import opmodes.MecanumFieldCentricDriveScheme;
@@ -43,9 +44,9 @@ public class PowerPlayTeleopNoFieldCentric extends StandardFourMotorRobot {
 
 
 
-    TankMechanumControlSchemeFrenzy scheme;
+    //TankMechanumControlSchemeFrenzy scheme;
 
-
+    TankMechanumControlScheme scheme;
 
     private MechanumGearedDrivetrain drivetrain;
 
@@ -89,8 +90,8 @@ public class PowerPlayTeleopNoFieldCentric extends StandardFourMotorRobot {
 
         umbrella=hardwareMap.crservo.get("umbrella");
 
-        scheme = new TankMechanumControlSchemeFrenzy(gamepad1);
-
+       // scheme = new TankMechanumControlSchemeFrenzy(gamepad1);
+        scheme = new TankMechanumControlScheme(gamepad1);
 
 
         //code for forward mechanum drivetrain:
@@ -100,7 +101,7 @@ public class PowerPlayTeleopNoFieldCentric extends StandardFourMotorRobot {
 
         locationTlm = telemetry.addData("location","init");
 
-        //initPaths();
+//        initPaths();
 
 
     }
@@ -110,20 +111,20 @@ public class PowerPlayTeleopNoFieldCentric extends StandardFourMotorRobot {
 //        turretTurn.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.2, 0.01);
 //    }
 
-    private void setTurretTurn() {
-        this.addTask(new DeadReckonTask(this, turretTurn, turretDrivetrain) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE) {
-
-
-
-
-                }
-            }
-        });
-    }
+//    private void setTurretTurn() {
+//        this.addTask(new DeadReckonTask(this, turretTurn, turretDrivetrain) {
+//            @Override
+//            public void handleEvent(RobotEvent e) {
+//                DeadReckonEvent path = (DeadReckonEvent) e;
+//                if (path.kind == EventKind.PATH_DONE) {
+//
+//
+//
+//
+//                }
+//            }
+//        });
+//    }
 
     public void initIMU()
     {
@@ -149,21 +150,21 @@ public class PowerPlayTeleopNoFieldCentric extends StandardFourMotorRobot {
             public void handleEvent(RobotEvent e) {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
                 locationTlm.setValue("in gamepad1 handler");
-                switch (gamepadEvent.kind) {
-                    case BUTTON_X_DOWN:
-                        turret.setPower(0.5);
-                        break;
-                    case BUTTON_Y_DOWN:
-                        turret.setPower(-0.5);
-                        break;
-                    case BUTTON_X_UP:
-                        turret.setPower(0);
-                        break;
-                    case BUTTON_Y_UP:
-                        turret.setPower(0);
-                        break;
-
-                }
+//                switch (gamepadEvent.kind) {
+//                    case BUTTON_X_DOWN:
+//                        turret.setPower(0.5);
+//                        break;
+//                    case BUTTON_Y_DOWN:
+//                        turret.setPower(-0.5);
+//                        break;
+//                    case BUTTON_X_UP:
+//                        turret.setPower(0);
+//                        break;
+//                    case BUTTON_Y_UP:
+//                        turret.setPower(0);
+//                        break;
+//
+//                }
             }
 
         });
@@ -210,11 +211,23 @@ public class PowerPlayTeleopNoFieldCentric extends StandardFourMotorRobot {
                     case BUTTON_Y_UP:
                         linearLift.setPower(0);
                         break;
+                    case BUTTON_B_DOWN:
+                        turret.setPower(0.5);
+                        break;
+                    case BUTTON_X_DOWN:
+                        turret.setPower(-0.5);
+                        break;
+                    case BUTTON_B_UP:
+                        turret.setPower(0);
+                        break;
+                    case BUTTON_X_UP:
+                        turret.setPower(0);
+                        break;
 //                    case BUTTON_X_DOWN:
 //                        setTurretTurn();
 //                        break;
 //                    case BUTTON_X_UP:
-//                        linearLift.setPower(0);
+//                        turret.setPower(0);
 //                        break;
 
 
