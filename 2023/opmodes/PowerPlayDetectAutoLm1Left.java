@@ -34,19 +34,18 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.openftc.apriltag.AprilTagDetection;
 
-
-import team25core.DeadReckonTask;
-import team25core.OneWheelDirectDrivetrain;
-import team25core.vision.apriltags.AprilTagDetectionTask;
 import team25core.DeadReckonPath;
+import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
+import team25core.OneWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "aprilTagsAuto1.5")
+@Autonomous(name = "aprilTagsAutoLeft")
 //@Disabled
-public class PowerPlayDetectAuto extends Robot {
+public class PowerPlayDetectAutoLm1Left extends Robot {
 
     private DcMotor frontLeft;
     private DcMotor frontRight;
@@ -68,11 +67,16 @@ public class PowerPlayDetectAuto extends Robot {
     private DeadReckonPath leftPath;
     private DeadReckonPath middlePath;
     private DeadReckonPath rightPath;
+    private DeadReckonPath gorightparkpath;
 
     private DeadReckonPath deliverConePath;
 
+    private DeadReckonPath goforwardtoDrop;
+
+
+
     //variables for constants
-    static final double FORWARD_DISTANCE = 8.7;
+    static final double FORWARD_DISTANCE = 8.5;
     static final double DRIVE_SPEED = 0.25;
 
     // apriltags detection
@@ -137,8 +141,9 @@ public class PowerPlayDetectAuto extends Robot {
         middlePath.stop();
         rightPath.stop();
 
+
         liftMech = new DeadReckonPath();
-        liftMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 68, -0.5);
+        liftMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 55, -0.5);
 
         lowerMech =  new DeadReckonPath();
         lowerMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.5, -0.01);
@@ -157,8 +162,15 @@ public class PowerPlayDetectAuto extends Robot {
 
 
         //going forward then right
-        rightPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,FORWARD_DISTANCE,DRIVE_SPEED);
-        rightPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,10.5,DRIVE_SPEED);
+        rightPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,10,0.15);
+        rightPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,7.3,0.15);
+
+        goforwardtoDrop = new DeadReckonPath();
+        goforwardtoDrop.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.8,0.15);
+
+        gorightparkpath = new DeadReckonPath();
+        gorightparkpath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,1.8,-0.15);
+        gorightparkpath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,5,0.15);
 
     }
 
@@ -213,7 +225,7 @@ public class PowerPlayDetectAuto extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     whereAmI.setValue("lifted linear lift");
-                   // dropCone();
+                    goforward();
 
 
 
@@ -221,10 +233,30 @@ public class PowerPlayDetectAuto extends Robot {
             }
         });
     }
+    public void goforward()
+    {
+
+        parkingLocationTlm.setValue("went to right target zone");
+
+        this.addTask(new DeadReckonTask(this, goforwardtoDrop ,drivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("went to right target zone");
+                    whereAmI.setValue("went to right target zone");
+                    dropCone();
+
+                }
+            }
+        });
+    }
+
 
     private void dropCone() {
         umbrella.setPower(-0.5);
-        golowerMech();
+        goParkRightAfterCone();
 
     }
 
@@ -276,6 +308,27 @@ public class PowerPlayDetectAuto extends Robot {
                 {
                     RobotLog.i("went to right target zone");
                     whereAmI.setValue("went to right target zone");
+                    goliftMech();
+
+                }
+            }
+        });
+    }
+
+    public void goParkRightAfterCone()
+    {
+
+        parkingLocationTlm.setValue("went to right target zone");
+
+        this.addTask(new DeadReckonTask(this, gorightparkpath,drivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("went to right target zone");
+                    whereAmI.setValue("went to right target zone");
+
 
                 }
             }
@@ -326,8 +379,8 @@ public class PowerPlayDetectAuto extends Robot {
     public void start()
     {
         whereAmI.setValue("in Start");
-        setAprilTagDetection();
-        addTask(detectionTask);
+     setAprilTagDetection();
+      addTask(detectionTask);
 
 
     }
