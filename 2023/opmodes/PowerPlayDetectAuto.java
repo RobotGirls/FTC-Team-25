@@ -26,53 +26,73 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package opmodes;
 
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.openftc.apriltag.AprilTagDetection;
 
-
-import team25core.DeadReckonTask;
-import team25core.OneWheelDirectDrivetrain;
-import team25core.vision.apriltags.AprilTagDetectionTask;
 import team25core.DeadReckonPath;
+import team25core.DeadReckonTask;
+import team25core.DistanceSensorCriteria;
 import team25core.FourWheelDirectDrivetrain;
+import team25core.OneWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
+import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "aprilTagsAuto1.5")
+@Autonomous(name = "ONLYPARKAUTO")
 //@Disabled
 public class PowerPlayDetectAuto extends Robot {
 
+
+    //wheels
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
-
-    private CRServo umbrella;
-
     private FourWheelDirectDrivetrain drivetrain;
 
-    private OneWheelDirectDrivetrain liftDriveTrain;
+
+    //mechs
+    private Servo umbrella;
+
     private DcMotor linearLift;
-    private DeadReckonPath liftMech;
-    private DeadReckonPath  lowerMech;
+    private OneWheelDirectDrivetrain liftDriveTrain;
+
+    private DcMotor turret;
+    private OneWheelDirectDrivetrain turretDrivetrain;
 
 
+    //sensors
+    private DistanceSensor alignerDistanceSensor;
+    private DistanceSensorCriteria distanceSensorCriteria;
+    private ColorSensor linearColorSensor;
 
 
+    //paths
     private DeadReckonPath leftPath;
     private DeadReckonPath middlePath;
     private DeadReckonPath rightPath;
 
+
+    private DeadReckonPath liftMech;
+    private DeadReckonPath  lowerMech;
+
+    private DeadReckonPath turretTurnOrangePath;
+    private DeadReckonPath turretTurnBluePath;
+
     private DeadReckonPath deliverConePath;
 
     //variables for constants
-    static final double FORWARD_DISTANCE = 9.5;
+    static final double FORWARD_DISTANCE = 12;
     static final double DRIVE_SPEED = 0.25;
 
     // apriltags detection
@@ -147,18 +167,18 @@ public class PowerPlayDetectAuto extends Robot {
         deliverConePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5,  -DRIVE_SPEED);
 
         //going forward then to the left
-        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, DRIVE_SPEED);
-        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10.5, -DRIVE_SPEED);
+        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, -DRIVE_SPEED);
+        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10.5, DRIVE_SPEED);
 
 
 
         //going forward
-        middlePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, DRIVE_SPEED);
+        middlePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 17, -DRIVE_SPEED);
 
 
         //going forward then right
-        rightPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,FORWARD_DISTANCE,DRIVE_SPEED);
-        rightPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,10.5,DRIVE_SPEED);
+        rightPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,FORWARD_DISTANCE,-DRIVE_SPEED);
+        rightPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,10.5,-DRIVE_SPEED);
 
     }
 
@@ -170,7 +190,7 @@ public class PowerPlayDetectAuto extends Robot {
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
 
-        umbrella=hardwareMap.crservo.get("umbrella");
+        umbrella=hardwareMap.servo.get("umbrella");
 
 
 
@@ -188,14 +208,25 @@ public class PowerPlayDetectAuto extends Robot {
         parkingLocationTlm = telemetry.addData("parking location: ","none");
 
         linearLift=hardwareMap.get(DcMotor.class, "linearLift");
+        linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         liftDriveTrain = new OneWheelDirectDrivetrain(linearLift);
         liftDriveTrain.resetEncoders();
         liftDriveTrain.encodersOn();
 
-        linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turret = hardwareMap.get(DcMotor.class, "turret");
+        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        turretDrivetrain = new OneWheelDirectDrivetrain(turret);
+        turretDrivetrain.resetEncoders();
+        turretDrivetrain.encodersOn();
 
         //open umbrella & lock cone
-        umbrella.setPower(0.5);
+        umbrella.setPosition(0.5);
+
+
+        linearColorSensor = hardwareMap.get(RevColorSensorV3.class, "liftColorSensor");
+        alignerDistanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "alignerDistanceSensor");
 
 
         initPaths();
@@ -204,7 +235,9 @@ public class PowerPlayDetectAuto extends Robot {
     }
 
 
-// parking paths -----------------------------------
+
+
+    //  lifting & dropping paths --------------------------------------
 
     private void goliftMech() {
         this.addTask(new DeadReckonTask(this, liftMech, liftDriveTrain) {
@@ -223,7 +256,7 @@ public class PowerPlayDetectAuto extends Robot {
     }
 
     private void dropCone() {
-        umbrella.setPower(-0.5);
+        umbrella.setPosition(0);
         golowerMech();
 
     }
@@ -262,6 +295,8 @@ public class PowerPlayDetectAuto extends Robot {
             }
         });
     }
+
+    // parking paths -----------------------------------
 
     public void gotoRightPark()
     {
@@ -320,6 +355,8 @@ public class PowerPlayDetectAuto extends Robot {
                 }
             }
         });
+
+
     }
 
     @Override

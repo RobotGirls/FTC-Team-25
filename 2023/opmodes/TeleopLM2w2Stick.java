@@ -1,29 +1,31 @@
 package opmodes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
+import team25core.DistanceSensorCriteria;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
 import team25core.OneWheelDirectDrivetrain;
 import team25core.RobotEvent;
 import team25core.StandardFourMotorRobot;
-import team25core.TankMechanumControlScheme;
 import team25core.TeleopDriveTask;
+import team25core.TwoStickMechanumControlScheme;
 
-@TeleOp(name = "testingServo")
+@TeleOp(name = "testingServo1.1")
 //@Disabled
-public class testingServo extends StandardFourMotorRobot {
+public class TeleopLM2w2Stick extends StandardFourMotorRobot {
 
 
     private TeleopDriveTask drivetask;
@@ -45,7 +47,9 @@ public class testingServo extends StandardFourMotorRobot {
 
     //TankMechanumControlSchemeFrenzy scheme;
 
-    TankMechanumControlScheme scheme;
+    TwoStickMechanumControlScheme scheme;
+
+   // private RunToEncoderValueTask turrtTask;
 
     private MechanumGearedDrivetrain drivetrain;
 
@@ -55,10 +59,15 @@ public class testingServo extends StandardFourMotorRobot {
     private DeadReckonPath turretTurnOrangePath;
     private DeadReckonPath turretTurnBluePath;
     private OneWheelDirectDrivetrain turretDrivetrain;
+
+    private DistanceSensor alignerDistanceSensor;
+    private DistanceSensorCriteria distanceSensorCriteria;
     private ColorSensor linearColorSensor;
 
     private final double ORANGE_DISTANCE = 5;
     private final double BLUE_DISTANCE = 5;
+    private final double turretPower = 0.5;
+
 
 
     //what does CR stand for
@@ -81,36 +90,32 @@ public class testingServo extends StandardFourMotorRobot {
         initIMU();
 
         linearLift=hardwareMap.get(DcMotor.class, "linearLift");
-        turret =hardwareMap.get(DcMotor.class, "turret");
+        linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        turret = hardwareMap.get(DcMotor.class, "turret");
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//
 
         turretDrivetrain = new OneWheelDirectDrivetrain(turret);
         turretDrivetrain.resetEncoders();
         turretDrivetrain.encodersOn();
 
+        umbrella = hardwareMap.servo.get("umbrella");
 
-
-        linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-
-//        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        turret.setTargetPosition(0);
-
-        linearColorSensor = hardwareMap.get(RevColorSensorV3.class, "leftColorSensor");
+        int initialturretPos = 5;
+        //turrtTask = new RunToEncoderValueTask(this,turret,initialturretPos,turretPower);
 
 
 
+        linearColorSensor = hardwareMap.get(RevColorSensorV3.class, "liftColorSensor");
+
+        alignerDistanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "alignerDistanceSensor");
 
 
-
-        umbrella=hardwareMap.servo.get("umbrella");
+        //distanceSensorCriteria = DistanceSensorCriteria(alignerDistanceSensor,2);
 
         // scheme = new TankMechanumControlSchemeFrenzy(gamepad1);
-        scheme = new TankMechanumControlScheme(gamepad1);
+        //scheme = new TankMechanumControlScheme(gamepad1);
+        scheme = new TwoStickMechanumControlScheme(gamepad1);
 
 
         //code for forward mechanum drivetrain:
@@ -151,6 +156,18 @@ public class testingServo extends StandardFourMotorRobot {
         });
     }
 
+
+//    private void turnTurret(int encodervalue) {
+//        this.addTask(new RunToEncoderValueTask(this, turret,encodervalue, turretPower)
+//        {
+//            @Override
+//            public void handleEvent(RobotEvent e) {
+//
+//
+//            }
+//        });
+//    }
+
     public void initIMU()
     {
         // Retrieve the IMU from the hardware map
@@ -169,6 +186,7 @@ public class testingServo extends StandardFourMotorRobot {
     public void start() {
 
         this.addTask(drivetask);
+       // addTask(turrtTask);
         locationTlm.setValue("in start");
 
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
@@ -192,6 +210,8 @@ public class testingServo extends StandardFourMotorRobot {
 
         });
 
+
+
         //gamepad2 w /nowheels only mechs
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e) {
@@ -199,7 +219,8 @@ public class testingServo extends StandardFourMotorRobot {
                 locationTlm.setValue("in gamepad2 handler");
                 switch (gamepadEvent.kind) {
                     case LEFT_BUMPER_DOWN:
-                        linearLift.setPower(1);
+                        double distance = alignerDistanceSensor.getDistance(DistanceUnit.CM);
+                        locationTlm.setValue( "distance: " + distance); //=3.3-3.4
                         break;
                     case RIGHT_BUMPER_DOWN:
                         linearLift.setPower(-1);
@@ -235,22 +256,17 @@ public class testingServo extends StandardFourMotorRobot {
                         linearLift.setPower(0);
                         break;
                     case BUTTON_B_DOWN:
-//                        turret.setPower(1);
-//                        turret.setTargetPosition(14);
-//                        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                        turret.setPower(0.1);
+                        turret.setPower(-0.5);
                         locationTlm.setValue("B button down");
 
-                        setTurretTurn(turretTurnOrangePath);
+                        //turnTurret(35);
+                        //setTurretTurn(turretTurnOrangePath);
 
                         break;
                     case BUTTON_X_DOWN:
-//                        turret.setPower(-0.5);
-//                        turret.setTargetPosition(14);
-//                        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                        turret.setPower(-0.1);
-
-                        setTurretTurn(turretTurnBluePath);
+                         turret.setPower(0.5);
+                       // turnTurret(0);
+                        //setTurretTurn(turretTurnBluePath);
 
 
                         break;
