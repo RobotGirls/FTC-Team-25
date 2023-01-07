@@ -92,7 +92,7 @@ public class PowerPlayDetectAuto extends Robot {
     private DeadReckonPath deliverConePath;
 
     //variables for constants
-    static final double FORWARD_DISTANCE = 12;
+    static final double FORWARD_DISTANCE = 13.5;
     static final double DRIVE_SPEED = 0.25;
 
     // apriltags detection
@@ -168,7 +168,8 @@ public class PowerPlayDetectAuto extends Robot {
 
         //going forward then to the left
         leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, -DRIVE_SPEED);
-        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10.5, DRIVE_SPEED);
+        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 13.5, DRIVE_SPEED);
+        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -DRIVE_SPEED);
 
 
 
@@ -177,8 +178,8 @@ public class PowerPlayDetectAuto extends Robot {
 
 
         //going forward then right
-        rightPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,FORWARD_DISTANCE,-DRIVE_SPEED);
-        rightPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,10.5,-DRIVE_SPEED);
+        rightPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,FORWARD_DISTANCE+1.5,-DRIVE_SPEED);
+        rightPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,13.5,-DRIVE_SPEED);
 
     }
 
