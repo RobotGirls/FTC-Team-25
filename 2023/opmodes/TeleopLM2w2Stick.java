@@ -19,11 +19,12 @@ import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
 import team25core.OneWheelDirectDrivetrain;
 import team25core.RobotEvent;
+import team25core.RunToEncoderValueTask;
 import team25core.StandardFourMotorRobot;
 import team25core.TeleopDriveTask;
 import team25core.TwoStickMechanumControlScheme;
 
-@TeleOp(name = "testingServo1.1")
+@TeleOp(name = "LM2TELEOP")
 //@Disabled
 public class TeleopLM2w2Stick extends StandardFourMotorRobot {
 
@@ -42,6 +43,7 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
 
 
     private Telemetry.Item locationTlm;
+    private Telemetry.Item targetPositionTlm;
 
 
 
@@ -67,6 +69,8 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
     private final double ORANGE_DISTANCE = 5;
     private final double BLUE_DISTANCE = 5;
     private final double turretPower = 0.5;
+
+    private RunToEncoderValueTask turretTask;
 
 
 
@@ -94,10 +98,15 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
 
         turret = hardwareMap.get(DcMotor.class, "turret");
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
 
         turretDrivetrain = new OneWheelDirectDrivetrain(turret);
         turretDrivetrain.resetEncoders();
         turretDrivetrain.encodersOn();
+
 
         umbrella = hardwareMap.servo.get("umbrella");
 
@@ -124,6 +133,12 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
         drivetask.slowDown(true);
 
         locationTlm = telemetry.addData("location","init");
+        targetPositionTlm = telemetry.addData("target Pos","init");
+
+
+        turret.setTargetPosition(0);
+        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turret.setPower(0.5);
 
 
         initPaths();
@@ -156,17 +171,6 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
         });
     }
 
-
-//    private void turnTurret(int encodervalue) {
-//        this.addTask(new RunToEncoderValueTask(this, turret,encodervalue, turretPower)
-//        {
-//            @Override
-//            public void handleEvent(RobotEvent e) {
-//
-//
-//            }
-//        });
-//    }
 
     public void initIMU()
     {
@@ -232,7 +236,7 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
                         linearLift.setPower(0);
                         break;
                     case RIGHT_TRIGGER_DOWN:
-                        umbrella.setPosition(0.3);
+                        umbrella.setPosition(0.55);
                         break;
                     case LEFT_TRIGGER_DOWN:
                         umbrella.setPosition(0);
@@ -246,8 +250,11 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
                     case BUTTON_A_DOWN:
                         linearLift.setPower(1);
                         break;
-                    case BUTTON_Y_DOWN:
-                        linearLift.setPower(-1);
+                    case DPAD_UP_DOWN:
+                        turret.setTargetPosition(0);
+                        turret.setPower(0.5);
+                        locationTlm.setValue(turret.getCurrentPosition());
+                        targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
                     case BUTTON_A_UP:
                         linearLift.setPower(0);
@@ -255,20 +262,17 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
                     case BUTTON_Y_UP:
                         linearLift.setPower(0);
                         break;
-                    case BUTTON_B_DOWN:
-                        turret.setPower(-0.5);
-                        locationTlm.setValue("B button down");
-
-                        //turnTurret(35);
-                        //setTurretTurn(turretTurnOrangePath);
-
+                    case DPAD_RIGHT_DOWN:
+                        turret.setTargetPosition(-500);
+                        turret.setPower(0.5);
+                        locationTlm.setValue(turret.getCurrentPosition());
+                        targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
-                    case BUTTON_X_DOWN:
-                         turret.setPower(0.5);
-                       // turnTurret(0);
-                        //setTurretTurn(turretTurnBluePath);
-
-
+                    case DPAD_LEFT_DOWN:
+                        turret.setTargetPosition(500);
+                        turret.setPower(0.5);
+                        locationTlm.setValue(turret.getCurrentPosition());
+                        targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
                     case BUTTON_B_UP:
                         turret.setPower(0);

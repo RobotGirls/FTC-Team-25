@@ -45,13 +45,12 @@ import team25core.FourWheelDirectDrivetrain;
 import team25core.OneWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
-import team25core.RunToEncoderValueTask;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "LM2AUTO")
+@Autonomous(name = "ONLYSTACK")
 //@Disabled
-public class PowerPlayDetectAuto extends Robot {
+public class onlystack extends Robot {
 
 
     //wheels
@@ -61,6 +60,7 @@ public class PowerPlayDetectAuto extends Robot {
     private DcMotor backRight;
     private FourWheelDirectDrivetrain drivetrain;
 
+    static final double TURRET_TURN90 = 5;
 
     //mechs
     private Servo umbrella;
@@ -79,33 +79,29 @@ public class PowerPlayDetectAuto extends Robot {
 
 
     //paths
-    private DeadReckonPath leftPath;
-    private DeadReckonPath middlePath;
-    private DeadReckonPath rightPath;
+    private DeadReckonPath goStraightPath;
+    private DeadReckonPath goBackPath;
+
 
 
     private DeadReckonPath liftMech;
     private DeadReckonPath  lowerMech;
 
-    private DeadReckonPath turretTurnOrangePath;
-    private DeadReckonPath turretTurnBluePath;
+    private DeadReckonPath turretTurn90CW;
+    private DeadReckonPath turretTurn90CCW;
+
 
     private DeadReckonPath deliverConePath;
 
     //variables for constants
-    static final double FORWARD_DISTANCE = 13.5;
-    static final double DRIVE_SPEED = 0.25;
 
-    // apriltags detection
-    private Telemetry.Item tagIdTlm;
-    private Telemetry.Item parkingLocationTlm;
-    AprilTagDetection tagObject;
-    private AprilTagDetectionTask detectionTask;
+    private int condition;
+
+
+
 
     //telemetry
     private Telemetry.Item whereAmI;
-
-    private RunToEncoderValueTask linearLiftTask;
 
     /*
      * The default event handler for the robot.
@@ -122,46 +118,20 @@ public class PowerPlayDetectAuto extends Robot {
         }
     }
 
-    public void setAprilTagDetection() {
-        detectionTask = new AprilTagDetectionTask(this, "Webcam 1") {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                TagDetectionEvent event = (TagDetectionEvent) e;
-                tagObject = event.tagObject;
-                tagIdTlm.setValue(tagObject.id);
-                whereAmI.setValue("in handleEvent");
 
-                if (tagObject.id == 0) {
-                    addTask(linearLiftTask);
-                    gotoLeftPark();
-                }
-                if (tagObject.id == 6) {
-                    addTask(linearLiftTask);
-                    gotoRightPark();
-                }
-                if (tagObject.id == 19) {
-                    addTask(linearLiftTask);
-                    gotoMiddlePark();
-                }
-
-            }
-        };
-        whereAmI.setValue("setAprilTagDetection");
-        detectionTask.init(telemetry, hardwareMap);
-    }
 
 
 
     public void initPaths()
     {
-        leftPath = new DeadReckonPath();
-        middlePath = new DeadReckonPath();
-        rightPath= new DeadReckonPath();
+        goStraightPath = new DeadReckonPath();
+        goStraightPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 34, -0.5);
+        goStraightPath.stop();
 
+        goBackPath = new DeadReckonPath();
+        goBackPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 38, 0.5);
+        goBackPath.stop();
 
-        leftPath.stop();
-        middlePath.stop();
-        rightPath.stop();
 
         liftMech = new DeadReckonPath();
         liftMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 68, -0.5);
@@ -169,28 +139,12 @@ public class PowerPlayDetectAuto extends Robot {
         lowerMech =  new DeadReckonPath();
         lowerMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.5, -0.01);
 
-        deliverConePath  = new DeadReckonPath();
-        deliverConePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5,  -DRIVE_SPEED);
-
-        //going forward then to the left
-        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, -DRIVE_SPEED);
-        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 13.5, DRIVE_SPEED);
-        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -DRIVE_SPEED);
+        turretTurn90CW.addSegment(DeadReckonPath.SegmentType.STRAIGHT,TURRET_TURN90, 0.5);
+        turretTurn90CCW.addSegment(DeadReckonPath.SegmentType.STRAIGHT,TURRET_TURN90, -0.5);
 
 
 
-        //going forward
-        middlePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 17, -DRIVE_SPEED);
 
-
-        //going forward then right
-        rightPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,FORWARD_DISTANCE+1.5,-DRIVE_SPEED);
-        rightPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,13.5,-DRIVE_SPEED);
-<<<<<<< Updated upstream
-=======
-
-        linearLiftTask = new RunToEncoderValueTask(this,linearLift,5000,-0.3);
->>>>>>> Stashed changes
 
     }
 
@@ -205,7 +159,6 @@ public class PowerPlayDetectAuto extends Robot {
         umbrella=hardwareMap.servo.get("umbrella");
 
 
-
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -216,8 +169,7 @@ public class PowerPlayDetectAuto extends Robot {
         drivetrain.encodersOn();
 
         whereAmI = telemetry.addData("location in code", "init");
-        tagIdTlm = telemetry.addData("tagId","none");
-        parkingLocationTlm = telemetry.addData("parking location: ","none");
+
 
         linearLift=hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -228,23 +180,17 @@ public class PowerPlayDetectAuto extends Robot {
 
         turret = hardwareMap.get(DcMotor.class, "turret");
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         turretDrivetrain = new OneWheelDirectDrivetrain(turret);
         turretDrivetrain.resetEncoders();
         turretDrivetrain.encodersOn();
 
         //open umbrella & lock cone
-        umbrella.setPosition(0.55);
+        umbrella.setPosition(0.5);
 
 
         linearColorSensor = hardwareMap.get(RevColorSensorV3.class, "liftColorSensor");
         alignerDistanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "alignerDistanceSensor");
-
-        turret.setTargetPosition(0);
-        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        turret.setPower(0.5);
 
 
         initPaths();
@@ -257,6 +203,12 @@ public class PowerPlayDetectAuto extends Robot {
 
     //  lifting & dropping paths --------------------------------------
 
+    private void lockCone() {
+        umbrella.setPosition(0.5);
+        goliftMech();
+
+    }
+
     private void goliftMech() {
         this.addTask(new DeadReckonTask(this, liftMech, liftDriveTrain) {
             @Override
@@ -264,7 +216,24 @@ public class PowerPlayDetectAuto extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     whereAmI.setValue("lifted linear lift");
-                    // dropCone();
+                    condition = 2;
+                    goDrive(goBackPath);
+
+
+
+                }
+            }
+        });
+    }
+
+    private void goTurnTurret90(DeadReckonPath turnpath) {
+        this.addTask(new DeadReckonTask(this, turnpath, turretDrivetrain) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    whereAmI.setValue("turned turret");
+                    dropCone();
 
 
 
@@ -275,9 +244,10 @@ public class PowerPlayDetectAuto extends Robot {
 
     private void dropCone() {
         umbrella.setPosition(0);
-        //gopark();
+        goTurnTurret90(turretTurn90CCW);
 
     }
+
 
     private void golowerMech() {
         this.addTask(new DeadReckonTask(this, lowerMech, liftDriveTrain) {
@@ -286,6 +256,10 @@ public class PowerPlayDetectAuto extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     whereAmI.setValue("lifted linear lift");
+                    lockCone();
+
+
+
 
 
 
@@ -295,106 +269,53 @@ public class PowerPlayDetectAuto extends Robot {
         });
     }
 
-    public void goDeliverCone()
-    {
 
-        parkingLocationTlm.setValue("went to right target zone");
-
-        this.addTask(new DeadReckonTask(this, deliverConePath ,drivetrain ){
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE)
-                {
-                    RobotLog.i("went to right target zone");
-                    whereAmI.setValue("went to right target zone");
-
-                }
-            }
-        });
-    }
 
     // parking paths -----------------------------------
 
-    public void gotoRightPark()
+
+    public void goDrive(DeadReckonPath detectedZonePark)
     {
 
-        parkingLocationTlm.setValue("went to right target zone");
 
-        this.addTask(new DeadReckonTask(this, rightPath,drivetrain ){
+
+        this.addTask(new DeadReckonTask(this, detectedZonePark ,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE)
                 {
-                    RobotLog.i("went to right target zone");
-                    whereAmI.setValue("went to right target zone");
+                    whereAmI.setValue("went to park");
+                    if ( distanceSensorCriteria.equals(3.6) )
+                    {
+                        golowerMech();
+                    }
+                    if (  condition == 2)
+                    {
+                        goTurnTurret90(turretTurn90CW);
+                    }
+
 
                 }
             }
         });
     }
 
-    public void gotoMiddlePark()
-    {
-        parkingLocationTlm.setValue("went to middle target zone");
-
-        this.addTask(new DeadReckonTask(this, middlePath,drivetrain ){
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE)
-                {
-                    RobotLog.i("went to middle target zone");
-                    whereAmI.setValue("went to middle target zone");
-                    goTurnTurret();
-
-                }
-            }
-        });
-    }
-    public void goTurnTurret()
-    {
-        turret.setTargetPosition(500);
-        turret.setPower(0.5);
-
-        dropCone();
-
-
-
-    }
-
-
-
-    public void gotoLeftPark()
-    {
-
-
-        parkingLocationTlm.setValue("went to left target zone");
-
-
-        this.addTask(new DeadReckonTask(this, leftPath,drivetrain ){
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE)
-                {
-                    RobotLog.i("went to left target zone");
-                    whereAmI.setValue("went to left target zone");
-
-                }
-            }
-        });
-
-
-    }
 
     @Override
     public void start()
     {
         whereAmI.setValue("in Start");
-        setAprilTagDetection();
-        addTask(detectionTask);
+
+        int value = 5;
+
+        while ( value > 0 )
+        {
+            goDrive(goStraightPath);
+            value--;
+        }
+
+
 
 
     }
