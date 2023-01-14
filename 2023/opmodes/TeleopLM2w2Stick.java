@@ -124,7 +124,7 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
 
         // scheme = new TankMechanumControlSchemeFrenzy(gamepad1);
         //scheme = new TankMechanumControlScheme(gamepad1);
-        scheme = new TwoStickMechanumControlScheme(gamepad1);
+       scheme = new TwoStickMechanumControlScheme(gamepad1);
 
 
         //code for forward mechanum drivetrain:

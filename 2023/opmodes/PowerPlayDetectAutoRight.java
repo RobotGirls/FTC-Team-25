@@ -49,9 +49,9 @@ import team25core.RunToEncoderValueTask;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "LM2AUTO")
+@Autonomous(name = "LM2AUTORIGHT")
 //@Disabled
-public class PowerPlayDetectAuto extends Robot {
+public class PowerPlayDetectAutoRight extends Robot {
 
 
     //wheels
@@ -89,6 +89,8 @@ public class PowerPlayDetectAuto extends Robot {
 
     private DeadReckonPath turretTurnOrangePath;
     private DeadReckonPath turretTurnBluePath;
+
+    private DeadReckonPath randompath;
 
     private DeadReckonPath deliverConePath;
 
@@ -132,7 +134,7 @@ public class PowerPlayDetectAuto extends Robot {
                 whereAmI.setValue("in handleEvent");
 
                 if (tagObject.id == 0) {
-                    addTask(linearLiftTask);
+                   addTask(linearLiftTask);
                     gotoLeftPark();
                 }
                 if (tagObject.id == 6) {
@@ -158,10 +160,14 @@ public class PowerPlayDetectAuto extends Robot {
         middlePath = new DeadReckonPath();
         rightPath= new DeadReckonPath();
 
+        randompath = new DeadReckonPath();
+
 
         leftPath.stop();
         middlePath.stop();
         rightPath.stop();
+
+        randompath.stop();
 
         liftMech = new DeadReckonPath();
         liftMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 68, -0.5);
@@ -174,23 +180,26 @@ public class PowerPlayDetectAuto extends Robot {
 
         //going forward then to the left
         leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, -DRIVE_SPEED);
-        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 13.5, DRIVE_SPEED);
+        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 14, DRIVE_SPEED);
         leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -DRIVE_SPEED);
 
 
 
         //going forward
-        middlePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 17, -DRIVE_SPEED);
+        middlePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 37, -DRIVE_SPEED);
+        middlePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, 0.2);
 
 
         //going forward then right
         rightPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,FORWARD_DISTANCE+1.5,-DRIVE_SPEED);
-        rightPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,13.5,-DRIVE_SPEED);
-<<<<<<< Updated upstream
-=======
+        rightPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,15,-DRIVE_SPEED);
 
-        linearLiftTask = new RunToEncoderValueTask(this,linearLift,5000,-0.3);
->>>>>>> Stashed changes
+        randompath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,5,0);
+
+
+
+        linearLiftTask = new RunToEncoderValueTask(this,linearLift,5300,-0.5);
+
 
     }
 
@@ -347,7 +356,8 @@ public class PowerPlayDetectAuto extends Robot {
                 {
                     RobotLog.i("went to middle target zone");
                     whereAmI.setValue("went to middle target zone");
-                    goTurnTurret();
+                    //goTurnTurret();
+
 
                 }
             }
@@ -358,7 +368,30 @@ public class PowerPlayDetectAuto extends Robot {
         turret.setTargetPosition(500);
         turret.setPower(0.5);
 
-        dropCone();
+
+        random();
+
+
+
+
+    }
+
+    public void  random()
+    {
+
+
+
+        this.addTask(new DeadReckonTask(this, randompath,drivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    dropCone();
+
+                }
+            }
+        });
 
 
 
