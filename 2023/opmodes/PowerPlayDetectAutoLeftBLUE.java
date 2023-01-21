@@ -49,9 +49,9 @@ import team25core.RunToEncoderValueTask;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "LM2AUTOLEFTRED")
+@Autonomous(name = "LM2AUTOLEFTBLUE")
 //@Disabled
-public class PowerPlayDetectAutoLeft extends Robot {
+public class PowerPlayDetectAutoLeftBLUE extends Robot {
 
 
     //wheels

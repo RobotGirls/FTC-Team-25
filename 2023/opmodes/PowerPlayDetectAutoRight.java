@@ -49,7 +49,7 @@ import team25core.RunToEncoderValueTask;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "LM2AUTORIGHT")
+@Autonomous(name = "LM2AUTORIGHTRED")
 //@Disabled
 public class PowerPlayDetectAutoRight extends Robot {
 
@@ -186,8 +186,8 @@ public class PowerPlayDetectAutoRight extends Robot {
 
 
         //going forward
-        middlePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 37, -DRIVE_SPEED);
-        middlePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, 0.2);
+        middlePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE+6, -DRIVE_SPEED); //og37
+       // middlePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, 0.2);
 
 
         //going forward then right
@@ -198,7 +198,7 @@ public class PowerPlayDetectAutoRight extends Robot {
 
 
 
-        linearLiftTask = new RunToEncoderValueTask(this,linearLift,5300,-0.5);
+        linearLiftTask = new RunToEncoderValueTask(this,linearLift,3000,-0.5);
 
 
     }

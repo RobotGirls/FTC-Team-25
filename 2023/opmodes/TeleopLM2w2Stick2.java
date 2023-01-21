@@ -18,15 +18,16 @@ import team25core.DistanceSensorCriteria;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
 import team25core.OneWheelDirectDrivetrain;
+import team25core.OneWheelDriveTask;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
 import team25core.StandardFourMotorRobot;
 import team25core.TeleopDriveTask;
 import team25core.TwoStickMechanumControlScheme;
 
-@TeleOp(name = "LM2TELEOP")
+@TeleOp(name = "LM2TELEOP2")
 //@Disabled
-public class TeleopLM2w2Stick extends StandardFourMotorRobot {
+public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
 
 
     private TeleopDriveTask drivetask;
@@ -71,6 +72,8 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
     private final double turretPower = 0.5;
 
     private RunToEncoderValueTask turretTask;
+
+    private OneWheelDriveTask liftMotorTask;
 
 
 
@@ -139,6 +142,9 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
         turret.setTargetPosition(0);
         turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turret.setPower(0.5);
+
+        liftMotorTask = new OneWheelDriveTask(this, linearLift, true);
+        liftMotorTask.slowDown(false);
 
 
         initPaths();
@@ -214,6 +220,8 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
 
         });
 
+        this.addTask(liftMotorTask);
+
 
 
         //gamepad2 w /nowheels only mechs
@@ -237,58 +245,55 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
                         break;
                     case RIGHT_TRIGGER_DOWN:
                         umbrella.setPosition(0.55);
+//                        if ( umbrella.getPosition() == 0.55)
+//                        {
+//                            turret.setTargetPosition(0);
+//                            turret.setPower(0.5);
+//                        }
                         break;
                     case LEFT_TRIGGER_DOWN:
                         umbrella.setPosition(0);
                         break;
-//                    case RIGHT_TRIGGER_UP:
-//                        umbrella.setPower(0);
-//                        break;
-//                    case LEFT_TRIGGER_UP:
-//                        umbrella.setPower(0);
-//                        break;
-                    case BUTTON_Y_DOWN:
+                    case DPAD_UP_DOWN:
                         linearLift.setPower(-1);
                         break;
-                    case BUTTON_A_DOWN:
-                        linearLift.setPower(1);
+                    case DPAD_DOWN_DOWN:
+                        linearLift.setPower(0.5);
                         break;
-                    case DPAD_UP_DOWN:
-                        turret.setTargetPosition(0);
-                        turret.setPower(0.5);
-                        locationTlm.setValue(turret.getCurrentPosition());
-                        targetPositionTlm.setValue(turret.getTargetPosition());
-                        break;
-                    case BUTTON_A_UP:
+                    case DPAD_UP_UP:
                         linearLift.setPower(0);
                         break;
-                    case BUTTON_Y_UP:
+                    case DPAD_DOWN_UP:
                         linearLift.setPower(0);
                         break;
-                    case DPAD_RIGHT_DOWN:
+                    case BUTTON_B_DOWN:
                         turret.setTargetPosition(-485);
                         turret.setPower(0.5);
                         locationTlm.setValue(turret.getCurrentPosition());
                         targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
-                    case DPAD_LEFT_DOWN:
+                    case BUTTON_X_DOWN:
                         turret.setTargetPosition(475);
                         turret.setPower(0.5);
                         locationTlm.setValue(turret.getCurrentPosition());
                         targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
-                    case BUTTON_B_UP:
-                        turret.setPower(0);
+                    case BUTTON_Y_DOWN:
+                        turret.setTargetPosition(0);
+                        turret.setPower(0.5);
+                        locationTlm.setValue(turret.getCurrentPosition());
+                        targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
                     case BUTTON_X_UP:
                         turret.setPower(0);
                         break;
-//                    case BUTTON_X_DOWN:
-//                        setTurretTurn();
-//                        break;
-//                    case BUTTON_X_UP:
-//                        turret.setPower(0);
-//                        break;
+                    case BUTTON_B_UP:
+                        turret.setPower(0);
+                        break;
+                    case BUTTON_Y_UP:
+                        turret.setPower(0);
+                        break;
+
 
 
 

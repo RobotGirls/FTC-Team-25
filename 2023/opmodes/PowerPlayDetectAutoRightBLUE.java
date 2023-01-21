@@ -49,9 +49,9 @@ import team25core.RunToEncoderValueTask;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "LM2AUTOLEFTRED")
+@Autonomous(name = "LM2AUTORIGHTBLUE")
 //@Disabled
-public class PowerPlayDetectAutoLeft extends Robot {
+public class PowerPlayDetectAutoRightBLUE extends Robot {
 
 
     //wheels
@@ -134,7 +134,7 @@ public class PowerPlayDetectAutoLeft extends Robot {
                 whereAmI.setValue("in handleEvent");
 
                 if (tagObject.id == 0) {
-                    addTask(linearLiftTask);
+                   addTask(linearLiftTask);
                     gotoLeftPark();
                 }
                 if (tagObject.id == 6) {
@@ -179,7 +179,7 @@ public class PowerPlayDetectAutoLeft extends Robot {
         deliverConePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5,  -DRIVE_SPEED);
 
         //going forward then to the left
-        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, -DRIVE_SPEED);
+        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, -DRIVE_SPEED);
         leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 14, DRIVE_SPEED);
         leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -DRIVE_SPEED);
 
@@ -197,7 +197,7 @@ public class PowerPlayDetectAutoLeft extends Robot {
         randompath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,5,0);
 
 
-//5300
+
         linearLiftTask = new RunToEncoderValueTask(this,linearLift,3000,-0.5);
 
 
