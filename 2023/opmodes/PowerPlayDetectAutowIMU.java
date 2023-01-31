@@ -26,6 +26,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package opmodes;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -40,19 +41,20 @@ import org.openftc.apriltag.AprilTagDetection;
 
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
+import team25core.DeadReckonTaskWithIMU;
 import team25core.DistanceSensorCriteria;
 import team25core.FourWheelDirectDrivetrain;
+import team25core.FourWheelDirectIMUDrivetrain;
 import team25core.OneWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
-import team25core.SingleShotTimerTask;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "LM2AUTOLEFTRED")
+@Autonomous(name = "ILTAUTOWIMU2.1")
 //@Disabled
-public class PowerPlayDetectAutoLeft extends Robot {
+public class PowerPlayDetectAutowIMU extends Robot {
 
 
     //wheels
@@ -60,7 +62,22 @@ public class PowerPlayDetectAutoLeft extends Robot {
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
-    private FourWheelDirectDrivetrain drivetrain;
+    private FourWheelDirectIMUDrivetrain drivetrain;
+
+    //imu
+    private BNO055IMU imu;
+    private Telemetry.Item gyroItemTlm;
+    private DeadReckonTaskWithIMU gyroTask;
+
+
+    private int i = 0;
+
+
+    private boolean debug = false;
+    private Telemetry.Item headingTlm;
+    private static final double TARGET_YAW_FOR_DRIVING_STRAIGHT = 0.0;
+    private boolean showHeading = true;
+
 
 
     //mechs
@@ -110,8 +127,6 @@ public class PowerPlayDetectAutoLeft extends Robot {
 
     private RunToEncoderValueTask linearLiftTask;
 
-    private static final int DELAY = 5000;
-
     /*
      * The default event handler for the robot.
      */
@@ -138,7 +153,7 @@ public class PowerPlayDetectAutoLeft extends Robot {
 
                 if (tagObject.id == 0) {
                     addTask(linearLiftTask);
-                    gotoLeftPark();
+                    gotoLeftPark(leftPath);
                 }
                 if (tagObject.id == 6) {
                     addTask(linearLiftTask);
@@ -182,13 +197,16 @@ public class PowerPlayDetectAutoLeft extends Robot {
         deliverConePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5,  -DRIVE_SPEED);
 
         //going forward then to the left
-        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, -DRIVE_SPEED);
-        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 14, DRIVE_SPEED);
-        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -DRIVE_SPEED);
+        //leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, 1);
+        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 50, 0.65);
+        //leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, 1);
+
+
 
         //going forward
-        middlePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE+6, -DRIVE_SPEED); //og37
+       // middlePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE+6, -DRIVE_SPEED); //og37
        // middlePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, 0.2);
+
 
         //going forward then right
         rightPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,FORWARD_DISTANCE+1.5,-DRIVE_SPEED);
@@ -198,7 +216,7 @@ public class PowerPlayDetectAutoLeft extends Robot {
 
 
 //5300
-        linearLiftTask = new RunToEncoderValueTask(this,linearLift,3000,-0.5);
+       // linearLiftTask = new RunToEncoderValueTask(this,linearLift,3000,-0.5);
 
 
     }
@@ -206,6 +224,9 @@ public class PowerPlayDetectAutoLeft extends Robot {
     @Override
     public void init()
     {
+
+        super.init();
+
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
@@ -214,15 +235,17 @@ public class PowerPlayDetectAutoLeft extends Robot {
         umbrella=hardwareMap.servo.get("umbrella");
 
 
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
 
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        drivetrain = new FourWheelDirectDrivetrain(frontRight, backRight, frontLeft, backLeft);
+        drivetrain = new FourWheelDirectIMUDrivetrain(frontRight, backRight, frontLeft, backLeft);
         drivetrain.resetEncoders();
         drivetrain.encodersOn();
+        drivetrain.setTarget(TARGET_YAW_FOR_DRIVING_STRAIGHT);
 
         whereAmI = telemetry.addData("location in code", "init");
         tagIdTlm = telemetry.addData("tagId","none");
@@ -251,6 +274,8 @@ public class PowerPlayDetectAutoLeft extends Robot {
         linearColorSensor = hardwareMap.get(RevColorSensorV3.class, "liftColorSensor");
         alignerDistanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "alignerDistanceSensor");
 
+        headingTlm = telemetry.addData("Current/target heading is: ", "0.0");
+
         turret.setTargetPosition(0);
         turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turret.setPower(0.5);
@@ -273,33 +298,17 @@ public class PowerPlayDetectAutoLeft extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     whereAmI.setValue("lifted linear lift");
-                    //delayAndDrop(DELAY);
+                    // dropCone();
 
 
 
                 }
             }
         });
-    }
-
-    private void delayAndDrop(int delayInMsec) {
-        this.addTask(new SingleShotTimerTask(this, delayInMsec) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                SingleShotTimerEvent event = (SingleShotTimerEvent) e;
-                if (event.kind == EventKind.EXPIRED ) {
-                    whereAmI.setValue("in delay task");
-                    dropCone();
-
-                }
-            }
-        });
-
     }
 
     private void dropCone() {
         umbrella.setPosition(0);
-        whereAmI.setValue("dropped the cone");
         //gopark();
 
     }
@@ -325,7 +334,7 @@ public class PowerPlayDetectAutoLeft extends Robot {
 
         parkingLocationTlm.setValue("went to right target zone");
 
-        this.addTask(new DeadReckonTask(this, deliverConePath ,drivetrain ){
+        this.addTask(new DeadReckonTaskWithIMU(this, deliverConePath ,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -346,7 +355,7 @@ public class PowerPlayDetectAutoLeft extends Robot {
 
         parkingLocationTlm.setValue("went to right target zone");
 
-        this.addTask(new DeadReckonTask(this, rightPath,drivetrain ){
+        this.addTask(new DeadReckonTaskWithIMU(this, rightPath,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -364,7 +373,7 @@ public class PowerPlayDetectAutoLeft extends Robot {
     {
         parkingLocationTlm.setValue("went to middle target zone");
 
-        this.addTask(new DeadReckonTask(this, middlePath,drivetrain ){
+        this.addTask(new DeadReckonTaskWithIMU(this, middlePath,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -372,7 +381,7 @@ public class PowerPlayDetectAutoLeft extends Robot {
                 {
                     RobotLog.i("went to middle target zone");
                     whereAmI.setValue("went to middle target zone");
-                    delayAndDrop(DELAY);
+                    //goTurnTurret();
 
 
                 }
@@ -397,7 +406,7 @@ public class PowerPlayDetectAutoLeft extends Robot {
 
 
 
-        this.addTask(new DeadReckonTask(this, randompath,drivetrain ){
+        this.addTask(new DeadReckonTaskWithIMU(this, randompath,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -415,14 +424,14 @@ public class PowerPlayDetectAutoLeft extends Robot {
 
 
 
-    public void gotoLeftPark()
+    public void gotoLeftPark(DeadReckonPath leftPath)
     {
 
 
         parkingLocationTlm.setValue("went to left target zone");
 
 
-        this.addTask(new DeadReckonTask(this, leftPath,drivetrain ){
+        gyroTask = new DeadReckonTaskWithIMU(this, leftPath,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -433,7 +442,10 @@ public class PowerPlayDetectAutoLeft extends Robot {
 
                 }
             }
-        });
+        };
+        gyroTask.initializeImu(imu, (double) TARGET_YAW_FOR_DRIVING_STRAIGHT, showHeading, headingTlm);
+        gyroTask.initTelemetry(this.telemetry);
+        addTask(gyroTask);
 
 
     }
@@ -441,9 +453,10 @@ public class PowerPlayDetectAutoLeft extends Robot {
     @Override
     public void start()
     {
+        gotoLeftPark(leftPath);
         whereAmI.setValue("in Start");
-        setAprilTagDetection();
-        addTask(detectionTask);
+        //setAprilTagDetection();
+        //addTask(detectionTask);
 
 
     }
