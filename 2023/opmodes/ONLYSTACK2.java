@@ -171,7 +171,7 @@ public class ONLYSTACK2 extends Robot {
 
         linearLiftTaskJunction = new RunToEncoderValueTask(this,linearLift,3100,-0.5);
 
-        linearLiftTaskStack = new RunToEncoderValueTask(this,linearLift,2000,0.5);
+        linearLiftTaskStack = new RunToEncoderValueTask(this,linearLift,3500,0.5);
 
 
         strafeOutPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,2,0.25);
@@ -353,7 +353,7 @@ public class ONLYSTACK2 extends Robot {
                 {
                     RobotLog.i("went to middle target zone");
                     whereAmI.setValue("went to middle target zone");
-                    delayAndDrop2(3000);
+                    delayAndDrop2(1300);
 
                 }
             }
@@ -380,7 +380,7 @@ public class ONLYSTACK2 extends Robot {
         umbrella.setPosition(0);
         whereAmI.setValue("dropped the cone");
 
-        delayAndDrop3(1000);
+        delayAndDrop3(1300);
 
 
 
@@ -425,12 +425,28 @@ public class ONLYSTACK2 extends Robot {
                 {
                     RobotLog.i("went to middle target zone");
                     whereAmI.setValue("went to middle target zone");
-                    golowerMech();
+                    golowerMech2();
 
                 }
             }
         });
     }
+
+    private void golowerMech2() {
+        this.addTask(new DeadReckonTask(this, lowerMech, liftDriveTrain) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    whereAmI.setValue("lifted linear lift");
+
+
+                }
+            }
+        });
+    }
+
+
 
 
 
