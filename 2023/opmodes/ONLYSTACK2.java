@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.openftc.apriltag.AprilTagDetection;
 
+import team25core.ColorSensorTask;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.DistanceSensorCriteria;
@@ -113,6 +114,8 @@ public class ONLYSTACK2 extends Robot {
     private RunToEncoderValueTask linearLiftTaskStack;
 
     private static final int DELAY = 5000;
+
+    private ColorSensor bottomColorsensor;
 
     /*
      * The default event handler for the robot.

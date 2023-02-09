@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -51,9 +52,9 @@ import team25core.SingleShotTimerTask;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "drive + detect")
+@Autonomous(name = "STaCK + Preload")
 //@Disabled
-public class ONLYSTACK2WithDetect extends Robot {
+public class ONLYSTACK2WPRELOAD extends Robot {
 
 
     //wheels
@@ -78,9 +79,12 @@ public class ONLYSTACK2WithDetect extends Robot {
     private DistanceSensor alignerDistanceSensor;
     private DistanceSensorCriteria distanceSensorCriteria;
     private ColorSensor linearColorSensor;
+    private ColorSensorTask linearColorSensorTask;
+
 
 
     //paths
+    private DeadReckonPath goDropPreLoadPath;
     private DeadReckonPath goToJunctionPath;
     private DeadReckonPath goToStackPath;
     private DeadReckonPath goStrafeToJunction;
@@ -91,7 +95,6 @@ public class ONLYSTACK2WithDetect extends Robot {
 
 
     private DeadReckonPath strafeOutPath;
-
     private DeadReckonPath deliverConePath;
 
     //variables for constants
@@ -115,13 +118,7 @@ public class ONLYSTACK2WithDetect extends Robot {
 
     private static final int DELAY = 5000;
 
-    private ColorSensor bottomColorSensor;
-
-    private ColorSensorTask bottomColorSensorTask;
-
-
     public String detectValue = "";
-
 
     /*
      * The default event handler for the robot.
@@ -148,6 +145,8 @@ public class ONLYSTACK2WithDetect extends Robot {
         goToStackPath = new DeadReckonPath();
         goStrafeToJunction= new DeadReckonPath();
 
+        goDropPreLoadPath= new DeadReckonPath();
+
         strafeOutPath = new DeadReckonPath();
 
         goToJunctionPath.stop();
@@ -163,23 +162,23 @@ public class ONLYSTACK2WithDetect extends Robot {
         lowerMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.5);
 
         deliverConePath  = new DeadReckonPath();
-        deliverConePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5,  -0.5);
+        deliverConePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5,  -DRIVE_SPEED);
 
+
+        goDropPreLoadPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 32, DRIVE_SPEED);
 
 
         //drive path 1
         goToStackPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 32, DRIVE_SPEED);
-        goToStackPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 14.5, -0.25);
-
-        linearLiftTask = new RunToEncoderValueTask(this,linearLift,2000,-0.5);
-
+        goToStackPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, -0.25);
 
         //drive path 2
-        goToJunctionPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20.5, 0.5);
+        goToJunctionPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 7, DRIVE_SPEED);
 
         //drive path 3
         goStrafeToJunction.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,1.75,-0.25);
 
+        linearLiftTask = new RunToEncoderValueTask(this,linearLift,2000,-0.5);
 
         linearLiftTaskJunction = new RunToEncoderValueTask(this,linearLift,3100,-0.5);
 
@@ -200,6 +199,9 @@ public class ONLYSTACK2WithDetect extends Robot {
         backRight = hardwareMap.get(DcMotor.class, "backRight");
 
         umbrella=hardwareMap.servo.get("umbrella");
+
+
+
 
 
 
@@ -250,6 +252,21 @@ public class ONLYSTACK2WithDetect extends Robot {
 
     }
 
+
+    //method will be called in start
+    public void stafeToStackwColor()
+    {
+        while ( linearColorSensor.red() < 287 ) {
+
+            drivetrain.strafe(-0.15);
+        }
+        drivetrain.stop();
+        whereAmI.setValue("detected red line near stack");
+        gotoStack();
+    }
+
+
+
     public void setAprilTagDetection() {
         detectionTask = new AprilTagDetectionTask(this, "Webcam 1") {
             @Override
@@ -260,7 +277,7 @@ public class ONLYSTACK2WithDetect extends Robot {
                 whereAmI.setValue("in handleEvent");
 
                 if (tagObject.id == 0) {
-                   detectValue = "leftpark";
+                    detectValue = "leftpark";
                 }
                 if (tagObject.id == 6) {
                     detectValue = "rightpark";
@@ -268,8 +285,9 @@ public class ONLYSTACK2WithDetect extends Robot {
                 if (tagObject.id == 19) {
                     detectValue = "middlepark";
                 }
-                goToStack();
-                addTask(linearLiftTask);
+                goDropPreLoad();
+
+
 
             }
         };
@@ -277,7 +295,46 @@ public class ONLYSTACK2WithDetect extends Robot {
         detectionTask.init(telemetry, hardwareMap);
     }
 
-    public void goToStack()
+    public void goDropPreLoad()
+    {
+        parkingLocationTlm.setValue("went to middle target zone");
+
+        this.addTask(new DeadReckonTask(this, goDropPreLoadPath,drivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("went to middle target zone");
+                    whereAmI.setValue("went to middle target zone");
+                    delayAndDrop0(2000);
+
+
+                }
+            }
+        });
+    }
+
+    private void delayAndDrop0(int delayInMsec) {
+        this.addTask(new SingleShotTimerTask(this, delayInMsec) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                SingleShotTimerEvent event = (SingleShotTimerEvent) e;
+                if (event.kind == EventKind.EXPIRED ) {
+                    whereAmI.setValue("in delay task");
+                    dropCone0();
+
+                }
+            }
+        });
+
+    }
+    private void dropCone0() {
+        umbrella.setPosition(0);
+        gotoStack();
+    }
+
+    public void gotoStack()
     {
         parkingLocationTlm.setValue("went to middle target zone");
 
@@ -296,6 +353,8 @@ public class ONLYSTACK2WithDetect extends Robot {
             }
         });
     }
+
+
 
     private void delayAndDrop(int delayInMsec) {
         this.addTask(new SingleShotTimerTask(this, delayInMsec) {
@@ -464,7 +523,7 @@ public class ONLYSTACK2WithDetect extends Robot {
                 {
                     RobotLog.i("went to middle target zone");
                     whereAmI.setValue("went to middle target zone");
-                    //golowerMech();
+                    golowerMech();
 
                 }
             }
@@ -474,12 +533,15 @@ public class ONLYSTACK2WithDetect extends Robot {
 
 
 
+
+
     @Override
     public void start()
     {
         whereAmI.setValue("in Start");
         setAprilTagDetection();
-        addTask(detectionTask);
+        addTask(linearLiftTask);
+
 
 
     }
