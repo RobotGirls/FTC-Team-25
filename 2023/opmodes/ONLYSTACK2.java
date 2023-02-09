@@ -88,6 +88,7 @@ public class ONLYSTACK2 extends Robot {
 
     private DeadReckonPath liftMech;
     private DeadReckonPath  lowerMech;
+    private DeadReckonPath  lowerMech2;
 
 
     private DeadReckonPath strafeOutPath;
@@ -156,6 +157,8 @@ public class ONLYSTACK2 extends Robot {
         lowerMech =  new DeadReckonPath();
         lowerMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.5);
 
+        lowerMech2 =  new DeadReckonPath();
+        lowerMech2.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.5);
         deliverConePath  = new DeadReckonPath();
         deliverConePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5,  -DRIVE_SPEED);
 
@@ -174,8 +177,7 @@ public class ONLYSTACK2 extends Robot {
 
         linearLiftTaskJunction = new RunToEncoderValueTask(this,linearLift,3100,-0.5);
 
-        linearLiftTaskStack = new RunToEncoderValueTask(this,linearLift,2000,0.5);
-
+        linearLiftTaskStack = new RunToEncoderValueTask(this,linearLift,3280,0.5);
 
         strafeOutPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,2,0.25);
         strafeOutPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 23, -0.25);
@@ -356,7 +358,7 @@ public class ONLYSTACK2 extends Robot {
                 {
                     RobotLog.i("went to middle target zone");
                     whereAmI.setValue("went to middle target zone");
-                    delayAndDrop2(3000);
+                    delayAndDrop2(1300);
 
                 }
             }
@@ -383,7 +385,7 @@ public class ONLYSTACK2 extends Robot {
         umbrella.setPosition(0);
         whereAmI.setValue("dropped the cone");
 
-        delayAndDrop3(1000);
+        delayAndDrop3(1300);
 
 
 
@@ -428,12 +430,45 @@ public class ONLYSTACK2 extends Robot {
                 {
                     RobotLog.i("went to middle target zone");
                     whereAmI.setValue("went to middle target zone");
-                    golowerMech();
+                    delayAndDrop4(2000);
+
 
                 }
             }
         });
     }
+
+    private void delayAndDrop4(int delayInMsec) {
+        this.addTask(new SingleShotTimerTask(this, delayInMsec) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                SingleShotTimerEvent event = (SingleShotTimerEvent) e;
+                if (event.kind == EventKind.EXPIRED ) {
+                    whereAmI.setValue("in delay task");
+                    golowerMech2();
+
+                }
+            }
+        });
+
+    }
+
+    private void golowerMech2() {
+        this.addTask(new DeadReckonTask(this, lowerMech2, liftDriveTrain) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    whereAmI.setValue("lifted linear lift");
+                    grabcone();
+
+
+                }
+            }
+        });
+    }
+
+
 
 
 
