@@ -81,7 +81,6 @@ public class ONLYSTACK2 extends Robot {
 
 
     //paths
-    private DeadReckonPath goDropPreLoadPath;
     private DeadReckonPath goToJunctionPath;
     private DeadReckonPath goToStackPath;
     private DeadReckonPath goStrafeToJunction;
@@ -98,7 +97,7 @@ public class ONLYSTACK2 extends Robot {
 
     //variables for constants
     static final double FORWARD_DISTANCE = 13.5;
-    static final double DRIVE_SPEED = 0.4;
+    static final double DRIVE_SPEED = 0.5;
 
     // apriltags detection
     private Telemetry.Item tagIdTlm;
@@ -156,7 +155,7 @@ public class ONLYSTACK2 extends Robot {
         liftMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, -0.5);
 
         lowerMech =  new DeadReckonPath();
-        lowerMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, 0.5);
+        lowerMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.5);
 
         lowerMech2 =  new DeadReckonPath();
         lowerMech2.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.5);
@@ -164,13 +163,8 @@ public class ONLYSTACK2 extends Robot {
         deliverConePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5,  -DRIVE_SPEED);
 
 
-        goDropPreLoadPath= new DeadReckonPath();
-        goDropPreLoadPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 25, DRIVE_SPEED);
-        goDropPreLoadPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2.2, -DRIVE_SPEED);
-
         //drive path 1
-        goToStackPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, DRIVE_SPEED);
-        goToStackPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, DRIVE_SPEED);
+        goToStackPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 32, DRIVE_SPEED);
         goToStackPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, -0.25);
 
         //drive path 2
@@ -179,11 +173,11 @@ public class ONLYSTACK2 extends Robot {
         //drive path 3
         goStrafeToJunction.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,1.75,-0.25);
 
-        linearLiftTask = new RunToEncoderValueTask(this,linearLift,3200,-0.8);
+        linearLiftTask = new RunToEncoderValueTask(this,linearLift,2000,-0.5);
 
         linearLiftTaskJunction = new RunToEncoderValueTask(this,linearLift,3100,-0.5);
 
-        linearLiftTaskStack = new RunToEncoderValueTask(this,linearLift,3300,0.5);
+        linearLiftTaskStack = new RunToEncoderValueTask(this,linearLift,3280,0.5);
 
         strafeOutPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,2,0.25);
         strafeOutPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 23, -0.25);
@@ -233,7 +227,7 @@ public class ONLYSTACK2 extends Robot {
 
         //open umbrella & lock cone
         //umbrella.setPosition(0.55);
-        umbrella.setPosition(0.55);
+        umbrella.setPosition(0);
 
 
         linearColorSensor = hardwareMap.get(RevColorSensorV3.class, "liftColorSensor");
@@ -249,66 +243,7 @@ public class ONLYSTACK2 extends Robot {
 
     }
 
-
-
-    public void goDropPreLoad()
-    {
-        parkingLocationTlm.setValue("went to middle target zone");
-
-        this.addTask(new DeadReckonTask(this, goDropPreLoadPath,drivetrain ){
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE)
-                {
-                    RobotLog.i("went to middle target zone");
-                    whereAmI.setValue("went to middle target zone");
-                    delayAndDrop0(2000);
-
-
-                }
-            }
-        });
-    }
-
-    private void delayAndDrop0(int delayInMsec) {
-        this.addTask(new SingleShotTimerTask(this, delayInMsec) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                SingleShotTimerEvent event = (SingleShotTimerEvent) e;
-                if (event.kind == EventKind.EXPIRED ) {
-                    whereAmI.setValue("in delay task");
-                    dropCone0();
-
-                }
-            }
-        });
-
-    }
-
-    private void dropCone0() {
-        umbrella.setPosition(0);
-        delayAndDrop1(3000);
-    }
-
-    private void delayAndDrop1(int delayInMsec) {
-        this.addTask(new SingleShotTimerTask(this, delayInMsec) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                SingleShotTimerEvent event = (SingleShotTimerEvent) e;
-                if (event.kind == EventKind.EXPIRED ) {
-                    whereAmI.setValue("in delay task");
-                    gotoStack();
-
-                }
-            }
-        });
-
-    }
-
-
-
-    public void gotoStack()
+    public void gotoMiddlePark()
     {
         parkingLocationTlm.setValue("went to middle target zone");
 
@@ -342,7 +277,6 @@ public class ONLYSTACK2 extends Robot {
         });
 
     }
-
 
     private void golowerMech() {
         this.addTask(new DeadReckonTask(this, lowerMech, liftDriveTrain) {
@@ -405,7 +339,7 @@ public class ONLYSTACK2 extends Robot {
 
     public void goTurnTurret()
     {
-        turret.setTargetPosition(-800);
+        turret.setTargetPosition(-500);
         turret.setPower(0.5);
         goStrafeToJunction();
 
@@ -476,8 +410,8 @@ public class ONLYSTACK2 extends Robot {
     {
         turret.setTargetPosition(0);
         turret.setPower(0.5);
-        //goToStackAgain();
-        //addTask(linearLiftTaskStack);
+        goToStackAgain();
+        addTask(linearLiftTaskStack);
 
     }
 
@@ -543,7 +477,7 @@ public class ONLYSTACK2 extends Robot {
     public void start()
     {
         whereAmI.setValue("in Start");
-        goDropPreLoad();
+        gotoMiddlePark();
         addTask(linearLiftTask);
 
 

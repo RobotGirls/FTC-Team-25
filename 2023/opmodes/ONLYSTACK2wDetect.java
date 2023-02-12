@@ -154,17 +154,17 @@ public class ONLYSTACK2wDetect extends Robot {
         strafeOutPath = new DeadReckonPath();
 
         goParkPathRight  = new DeadReckonPath();
-        goParkPathRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, DRIVE_SPEED);
-        goParkPathRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 9, DRIVE_SPEED);
-        goParkPathRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, -0.25);
+        goParkPathRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, DRIVE_SPEED);
+        goParkPathRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, 0.3);
+        goParkPathRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE , -0.25);
 
 
-//        goParkPathMiddle  = new DeadReckonPath();
-//        goParkPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, 0);
+        goParkPathMiddle  = new DeadReckonPath();
+        goParkPathMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, DRIVE_SPEED);
 
         goParkPathLeft  = new DeadReckonPath();
-        goParkPathLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, DRIVE_SPEED);
-        goParkPathLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 9, DRIVE_SPEED);
+        goParkPathLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, DRIVE_SPEED);
+        goParkPathLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 6, DRIVE_SPEED);
         goParkPathLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, 0.25);
 
         goToJunctionPath.stop();
@@ -187,10 +187,10 @@ public class ONLYSTACK2wDetect extends Robot {
 
         goDropPreLoadPath= new DeadReckonPath();
         goDropPreLoadPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 25, DRIVE_SPEED);
-        goDropPreLoadPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2.2, -DRIVE_SPEED);
+        goDropPreLoadPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.5, -0.3);
 
         //drive path 1
-        goToStackPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, DRIVE_SPEED);
+        goToStackPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, 0.3);
         goToStackPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, DRIVE_SPEED);
         goToStackPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, -0.25);
 
@@ -199,7 +199,8 @@ public class ONLYSTACK2wDetect extends Robot {
 
         //drive path 3
         goStrafeToJunction.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,1.75,-0.25);
-        linearLiftTask = new RunToEncoderValueTask(this,linearLift,3200,-0.8);
+
+        linearLiftTask = new RunToEncoderValueTask(this,linearLift,2800,-0.8);
         linearLiftTaskJunction = new RunToEncoderValueTask(this,linearLift,3100,-0.5);
         linearLiftTaskStack = new RunToEncoderValueTask(this,linearLift,3300,0.5);
 
@@ -327,6 +328,10 @@ public class ONLYSTACK2wDetect extends Robot {
                         goPark(goParkPathLeft);
 
                     }
+                    if (parkpath == "middle") {
+                        goPark(goParkPathMiddle);
+
+                    }
 
 
                 }
@@ -363,8 +368,8 @@ public class ONLYSTACK2wDetect extends Robot {
         setAprilTagDetection();
         addTask(detectionTask);
 
-        goDropPreLoad();
-        addTask(linearLiftTask);
+//        goDropPreLoad();
+//        addTask(linearLiftTask);
 
 
 
@@ -382,16 +387,17 @@ public class ONLYSTACK2wDetect extends Robot {
 
                 switch (tagObject.id) {
                     case 0:
+                        parkpath = "left";
                         addTask(linearLiftTask);
                         goDropPreLoad();
-                        parkpath = "left";
                         break;
                     case 6:
+                        parkpath = "right";
                         addTask(linearLiftTask);
                         goDropPreLoad();
-                        parkpath = "right";
                         break;
                     case 19:
+                        parkpath = "middle";
                         addTask(linearLiftTask);
                         goDropPreLoad();
                         break;
