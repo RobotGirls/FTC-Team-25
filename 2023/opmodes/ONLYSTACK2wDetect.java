@@ -193,7 +193,7 @@ public class ONLYSTACK2wDetect extends Robot {
         goToStackPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, 0.3);
         goToStackPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, DRIVE_SPEED);
         goToStackPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, -0.25);
-//hello
+        //aaa hi
         //drive path 2
         goToJunctionPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 7, DRIVE_SPEED);
 
