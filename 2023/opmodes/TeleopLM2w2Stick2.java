@@ -74,6 +74,7 @@ public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
     private RunToEncoderValueTask turretTask;
 
     private OneWheelDriveTask liftMotorTask;
+    private OneWheelDriveTask turretMotorTask;
 
 
 
@@ -146,6 +147,9 @@ public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
         liftMotorTask = new OneWheelDriveTask(this, linearLift, true);
         liftMotorTask.slowDown(false);
 
+//        turretMotorTask = new OneWheelDriveTask(this, turret, false);
+//        turretMotorTask.slowDown(false);
+
 
         initPaths();
 
@@ -160,21 +164,6 @@ public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
         turretTurnOrangePath = new DeadReckonPath();
         turretTurnOrangePath.stop();
         turretTurnOrangePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, ORANGE_DISTANCE, 0.4);
-    }
-
-    private void setTurretTurn(DeadReckonPath blueOrangePath) {
-        this.addTask(new DeadReckonTask(this, blueOrangePath, turretDrivetrain) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE) {
-                    //RobotLog.i("Finished turret path");
-                    //locationTlm.setValue("finished path");
-
-
-                }
-            }
-        });
     }
 
 
@@ -221,6 +210,7 @@ public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
         });
 
         this.addTask(liftMotorTask);
+//        this.addTask(turretMotorTask);
 
 
 

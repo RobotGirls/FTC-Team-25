@@ -193,7 +193,7 @@ public class ONLYSTACK2wDetect extends Robot {
         goToStackPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, 0.3);
         goToStackPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, DRIVE_SPEED);
         goToStackPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, -0.25);
-
+//hello
         //drive path 2
         goToJunctionPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 7, DRIVE_SPEED);
 
@@ -239,6 +239,7 @@ public class ONLYSTACK2wDetect extends Robot {
 
         linearLift=hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linearLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         liftDriveTrain = new OneWheelDirectDrivetrain(linearLift);
         liftDriveTrain.resetEncoders();
