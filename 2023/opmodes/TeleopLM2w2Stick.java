@@ -266,21 +266,33 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
                         linearLift.setPower(0);
                         break;
                     case DPAD_RIGHT_DOWN:
-                        turret.setTargetPosition(-485);
+                        turret.setTargetPosition(-800);
                         turret.setPower(0.5);
                         locationTlm.setValue(turret.getCurrentPosition());
                         targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
                     case DPAD_LEFT_DOWN:
-                        turret.setTargetPosition(475);
+                        turret.setTargetPosition(800);
                         turret.setPower(0.5);
                         locationTlm.setValue(turret.getCurrentPosition());
                         targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
-                    case BUTTON_B_UP:
-                        turret.setPower(0);
+                    case BUTTON_B_DOWN:
+                        turret.setTargetPosition(-800);
+                        turret.setPower(0.5);
+                        locationTlm.setValue(turret.getCurrentPosition());
+                        targetPositionTlm.setValue(turret.getTargetPosition());
+                        break;
+                    case BUTTON_X_DOWN:
+                        turret.setTargetPosition(800);
+                        turret.setPower(0.5);
+                        locationTlm.setValue(turret.getCurrentPosition());
+                        targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
                     case BUTTON_X_UP:
+                        turret.setPower(0);
+                        break;
+                    case BUTTON_B_UP:
                         turret.setPower(0);
                         break;
 //                    case BUTTON_X_DOWN:

@@ -50,9 +50,9 @@ import team25core.SingleShotTimerTask;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "LM2AUTOLEFTRED")
+@Autonomous(name = "scrimmageAuto")
 //@Disabled
-public class PowerPlayDetectAutoLeft extends Robot {
+public class scrimmageAuto extends Robot {
 
 
     //wheels
@@ -182,9 +182,9 @@ public class PowerPlayDetectAutoLeft extends Robot {
         deliverConePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5,  -DRIVE_SPEED);
 
         //going forward then to the left
-        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, -DRIVE_SPEED);
-        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 14, DRIVE_SPEED);
-        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -DRIVE_SPEED);
+        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, FORWARD_DISTANCE + 1, DRIVE_SPEED);
+        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 14, -DRIVE_SPEED);
+        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, DRIVE_SPEED);
 
         //going forward
         middlePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE+6, -DRIVE_SPEED); //og37

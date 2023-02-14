@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.openftc.apriltag.AprilTagDetection;
 
+import team25core.ColorSensorTask;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.DistanceSensorCriteria;
@@ -50,9 +51,9 @@ import team25core.SingleShotTimerTask;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "LM2AUTOLEFTRED")
+@Autonomous(name = "ONLYDRIVESTACK")
 //@Disabled
-public class PowerPlayDetectAutoLeft extends Robot {
+public class ONLYSTACK2 extends Robot {
 
 
     //wheels
@@ -80,24 +81,23 @@ public class PowerPlayDetectAutoLeft extends Robot {
 
 
     //paths
-    private DeadReckonPath leftPath;
-    private DeadReckonPath middlePath;
-    private DeadReckonPath rightPath;
+    private DeadReckonPath goToJunctionPath;
+    private DeadReckonPath goToStackPath;
+    private DeadReckonPath goStrafeToJunction;
 
 
     private DeadReckonPath liftMech;
     private DeadReckonPath  lowerMech;
+    private DeadReckonPath  lowerMech2;
 
-    private DeadReckonPath turretTurnOrangePath;
-    private DeadReckonPath turretTurnBluePath;
 
-    private DeadReckonPath randompath;
+    private DeadReckonPath strafeOutPath;
 
     private DeadReckonPath deliverConePath;
 
     //variables for constants
     static final double FORWARD_DISTANCE = 13.5;
-    static final double DRIVE_SPEED = 0.25;
+    static final double DRIVE_SPEED = 0.5;
 
     // apriltags detection
     private Telemetry.Item tagIdTlm;
@@ -110,7 +110,13 @@ public class PowerPlayDetectAutoLeft extends Robot {
 
     private RunToEncoderValueTask linearLiftTask;
 
+    private RunToEncoderValueTask linearLiftTaskJunction;
+
+    private RunToEncoderValueTask linearLiftTaskStack;
+
     private static final int DELAY = 5000;
+
+    private ColorSensor bottomColorsensor;
 
     /*
      * The default event handler for the robot.
@@ -127,79 +133,54 @@ public class PowerPlayDetectAutoLeft extends Robot {
         }
     }
 
-    public void setAprilTagDetection() {
-        detectionTask = new AprilTagDetectionTask(this, "Webcam 1") {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                TagDetectionEvent event = (TagDetectionEvent) e;
-                tagObject = event.tagObject;
-                tagIdTlm.setValue(tagObject.id);
-                whereAmI.setValue("in handleEvent");
 
-                if (tagObject.id == 0) {
-                    addTask(linearLiftTask);
-                    gotoLeftPark();
-                }
-                if (tagObject.id == 6) {
-                    addTask(linearLiftTask);
-                    gotoRightPark();
-                }
-                if (tagObject.id == 19) {
-                    addTask(linearLiftTask);
-                    gotoMiddlePark();
-                }
-
-            }
-        };
-        whereAmI.setValue("setAprilTagDetection");
-        detectionTask.init(telemetry, hardwareMap);
-    }
 
 
 
     public void initPaths()
     {
-        leftPath = new DeadReckonPath();
-        middlePath = new DeadReckonPath();
-        rightPath= new DeadReckonPath();
+        goToJunctionPath = new DeadReckonPath();
+        goToStackPath = new DeadReckonPath();
+        goStrafeToJunction= new DeadReckonPath();
 
-        randompath = new DeadReckonPath();
+        strafeOutPath = new DeadReckonPath();
 
+        goToJunctionPath.stop();
+        goToStackPath.stop();
+        goStrafeToJunction.stop();
 
-        leftPath.stop();
-        middlePath.stop();
-        rightPath.stop();
-
-        randompath.stop();
+        strafeOutPath.stop();
 
         liftMech = new DeadReckonPath();
-        liftMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 68, -0.5);
+        liftMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, -0.5);
 
         lowerMech =  new DeadReckonPath();
-        lowerMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.5, -0.01);
+        lowerMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.5);
 
+        lowerMech2 =  new DeadReckonPath();
+        lowerMech2.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, 0.5);
         deliverConePath  = new DeadReckonPath();
         deliverConePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5,  -DRIVE_SPEED);
 
-        //going forward then to the left
-        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, -DRIVE_SPEED);
-        leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 14, DRIVE_SPEED);
-        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -DRIVE_SPEED);
 
-        //going forward
-        middlePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE+6, -DRIVE_SPEED); //og37
-       // middlePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, 0.2);
+        //drive path 1
+        goToStackPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 32, DRIVE_SPEED);
+        goToStackPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, -0.25);
 
-        //going forward then right
-        rightPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,FORWARD_DISTANCE+1.5,-DRIVE_SPEED);
-        rightPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,15,-DRIVE_SPEED);
+        //drive path 2
+        goToJunctionPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 7, DRIVE_SPEED);
 
-        randompath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,5,0);
+        //drive path 3
+        goStrafeToJunction.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,1.75,-0.25);
 
+        linearLiftTask = new RunToEncoderValueTask(this,linearLift,2000,-0.5);
 
-//5300
-        linearLiftTask = new RunToEncoderValueTask(this,linearLift,3000,-0.5);
+        linearLiftTaskJunction = new RunToEncoderValueTask(this,linearLift,3100,-0.5);
 
+        linearLiftTaskStack = new RunToEncoderValueTask(this,linearLift,3280,0.5);
+
+        strafeOutPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,2,0.25);
+        strafeOutPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 23, -0.25);
 
     }
 
@@ -245,7 +226,8 @@ public class PowerPlayDetectAutoLeft extends Robot {
         turretDrivetrain.encodersOn();
 
         //open umbrella & lock cone
-        umbrella.setPosition(0.55);
+        //umbrella.setPosition(0.55);
+        umbrella.setPosition(0);
 
 
         linearColorSensor = hardwareMap.get(RevColorSensorV3.class, "liftColorSensor");
@@ -261,20 +243,19 @@ public class PowerPlayDetectAutoLeft extends Robot {
 
     }
 
+    public void gotoMiddlePark()
+    {
+        parkingLocationTlm.setValue("went to middle target zone");
 
-
-
-    //  lifting & dropping paths --------------------------------------
-
-    private void goliftMech() {
-        this.addTask(new DeadReckonTask(this, liftMech, liftDriveTrain) {
+        this.addTask(new DeadReckonTask(this, goToStackPath,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE) {
-                    whereAmI.setValue("lifted linear lift");
-                    //delayAndDrop(DELAY);
-
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("went to middle target zone");
+                    whereAmI.setValue("went to middle target zone");
+                    delayAndDrop(2000);
 
 
                 }
@@ -289,18 +270,11 @@ public class PowerPlayDetectAutoLeft extends Robot {
                 SingleShotTimerEvent event = (SingleShotTimerEvent) e;
                 if (event.kind == EventKind.EXPIRED ) {
                     whereAmI.setValue("in delay task");
-                    dropCone();
+                    golowerMech();
 
                 }
             }
         });
-
-    }
-
-    private void dropCone() {
-        umbrella.setPosition(0);
-        whereAmI.setValue("dropped the cone");
-        //gopark();
 
     }
 
@@ -311,60 +285,42 @@ public class PowerPlayDetectAutoLeft extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     whereAmI.setValue("lifted linear lift");
-
-
-
+                    grabcone();
 
                 }
             }
         });
     }
 
-    public void goDeliverCone()
-    {
+    private void grabcone() {
+        umbrella.setPosition(0.55);
+        whereAmI.setValue("grabbed the cone");
+        goliftMech();
+    }
 
-        parkingLocationTlm.setValue("went to right target zone");
 
-        this.addTask(new DeadReckonTask(this, deliverConePath ,drivetrain ){
+    private void goliftMech() {
+        this.addTask(new DeadReckonTask(this, liftMech, liftDriveTrain) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE)
-                {
-                    RobotLog.i("went to right target zone");
-                    whereAmI.setValue("went to right target zone");
+                if (path.kind == EventKind.PATH_DONE) {
+                    whereAmI.setValue("lifted linear lift");
+                    goToJunction();
+                    addTask(linearLiftTaskJunction);
+
+
 
                 }
             }
         });
     }
 
-    // parking paths -----------------------------------
-
-    public void gotoRightPark()
-    {
-
-        parkingLocationTlm.setValue("went to right target zone");
-
-        this.addTask(new DeadReckonTask(this, rightPath,drivetrain ){
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE)
-                {
-                    RobotLog.i("went to right target zone");
-                    whereAmI.setValue("went to right target zone");
-
-                }
-            }
-        });
-    }
-
-    public void gotoMiddlePark()
+    public void goToJunction()
     {
         parkingLocationTlm.setValue("went to middle target zone");
 
-        this.addTask(new DeadReckonTask(this, middlePath,drivetrain ){
+        this.addTask(new DeadReckonTask(this, goToJunctionPath,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
@@ -372,83 +328,159 @@ public class PowerPlayDetectAutoLeft extends Robot {
                 {
                     RobotLog.i("went to middle target zone");
                     whereAmI.setValue("went to middle target zone");
-                    delayAndDrop(DELAY);
+                    goTurnTurret();
+
 
 
                 }
             }
         });
     }
+
     public void goTurnTurret()
     {
-        turret.setTargetPosition(500);
+        turret.setTargetPosition(-500);
         turret.setPower(0.5);
-
-
-        random();
-
-
-
+        goStrafeToJunction();
 
     }
 
-    public void  random()
+
+    public void goStrafeToJunction()
     {
+        parkingLocationTlm.setValue("went to middle target zone");
 
-
-
-        this.addTask(new DeadReckonTask(this, randompath,drivetrain ){
+        this.addTask(new DeadReckonTask(this, goStrafeToJunction,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE)
                 {
+                    RobotLog.i("went to middle target zone");
+                    whereAmI.setValue("went to middle target zone");
+                    delayAndDrop2(1300);
+
+                }
+            }
+        });
+    }
+
+
+
+    private void delayAndDrop2(int delayInMsec) {
+        this.addTask(new SingleShotTimerTask(this, delayInMsec) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                SingleShotTimerEvent event = (SingleShotTimerEvent) e;
+                if (event.kind == EventKind.EXPIRED ) {
+                    whereAmI.setValue("in delay task");
                     dropCone();
-
                 }
             }
         });
+
+    }
+
+    private void dropCone() {
+        umbrella.setPosition(0);
+        whereAmI.setValue("dropped the cone");
+
+        delayAndDrop3(1300);
 
 
 
     }
 
+    private void delayAndDrop3(int delayInMsec) {
+        this.addTask(new SingleShotTimerTask(this, delayInMsec) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                SingleShotTimerEvent event = (SingleShotTimerEvent) e;
+                if (event.kind == EventKind.EXPIRED ) {
+                    whereAmI.setValue("in delay task");
+                    goTurnTurretOG();
 
+                }
+            }
+        });
 
-    public void gotoLeftPark()
+    }
+
+    public void goTurnTurretOG()
     {
+        turret.setTargetPosition(0);
+        turret.setPower(0.5);
+        goToStackAgain();
+        addTask(linearLiftTaskStack);
+
+    }
 
 
-        parkingLocationTlm.setValue("went to left target zone");
 
 
-        this.addTask(new DeadReckonTask(this, leftPath,drivetrain ){
+    public void goToStackAgain()
+    {
+        parkingLocationTlm.setValue("went to middle target zone");
+
+        this.addTask(new DeadReckonTask(this, strafeOutPath,drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE)
                 {
-                    RobotLog.i("went to left target zone");
-                    whereAmI.setValue("went to left target zone");
+                    RobotLog.i("went to middle target zone");
+                    whereAmI.setValue("went to middle target zone");
+                    delayAndDrop4(2000);
+
+
+                }
+            }
+        });
+    }
+
+    private void delayAndDrop4(int delayInMsec) {
+        this.addTask(new SingleShotTimerTask(this, delayInMsec) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                SingleShotTimerEvent event = (SingleShotTimerEvent) e;
+                if (event.kind == EventKind.EXPIRED ) {
+                    whereAmI.setValue("in delay task");
+                    golowerMech2();
 
                 }
             }
         });
 
-
     }
+
+    private void golowerMech2() {
+        this.addTask(new DeadReckonTask(this, lowerMech2, liftDriveTrain) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    whereAmI.setValue("lifted linear lift");
+                    grabcone();
+
+
+                }
+            }
+        });
+    }
+
+
+
+
 
 
     @Override
     public void start()
     {
         whereAmI.setValue("in Start");
-        setAprilTagDetection();
-        addTask(detectionTask);
+        gotoMiddlePark();
+        addTask(linearLiftTask);
+
 
 
     }
-
-
-
 }
