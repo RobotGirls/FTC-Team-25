@@ -95,6 +95,8 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
 
         linearLift=hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linearLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         turret = hardwareMap.get(DcMotor.class, "turret");
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -224,7 +226,8 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
                 switch (gamepadEvent.kind) {
                     case LEFT_BUMPER_DOWN:
                         double distance = alignerDistanceSensor.getDistance(DistanceUnit.CM);
-                        locationTlm.setValue( "distance: " + distance); //=3.3-3.4
+//                        locationTlm.setValue( "distance: " + distance); //=3.3-3.4
+                        locationTlm.setValue( "liftencoder: " + linearLift.getCurrentPosition());
                         break;
                     case RIGHT_BUMPER_DOWN:
                         linearLift.setPower(-1);

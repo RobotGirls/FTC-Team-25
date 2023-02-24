@@ -19,13 +19,14 @@ import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
 import team25core.OneWheelDirectDrivetrain;
 import team25core.OneWheelDriveTask;
+import team25core.OneWheelDriveTaskRight;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
 import team25core.StandardFourMotorRobot;
 import team25core.TeleopDriveTask;
 import team25core.TwoStickMechanumControlScheme;
 
-@TeleOp(name = "LM2TELEOP2")
+@TeleOp(name = "ILTteleop")
 //@Disabled
 public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
 
@@ -75,6 +76,8 @@ public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
 
     private OneWheelDriveTask liftMotorTask;
 
+    private OneWheelDriveTaskRight turretMotorTask;
+
 
 
     //what does CR stand for
@@ -98,6 +101,8 @@ public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
 
         linearLift=hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linearLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         turret = hardwareMap.get(DcMotor.class, "turret");
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -116,6 +121,11 @@ public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
         int initialturretPos = 5;
         //turrtTask = new RunToEncoderValueTask(this,turret,initialturretPos,turretPower);
 
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
 
         linearColorSensor = hardwareMap.get(RevColorSensorV3.class, "liftColorSensor");
@@ -132,8 +142,9 @@ public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
 
         //code for forward mechanum drivetrain:
         drivetrain = new MechanumGearedDrivetrain(motorMap);
+
         drivetask = new TeleopDriveTask(this, scheme, frontLeft, frontRight, backLeft, backRight);
-        drivetask.slowDown(true);
+        drivetask.slowDown(false);
 
         locationTlm = telemetry.addData("location","init");
         targetPositionTlm = telemetry.addData("target Pos","init");
@@ -146,6 +157,8 @@ public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
         liftMotorTask = new OneWheelDriveTask(this, linearLift, true);
         liftMotorTask.slowDown(false);
 
+        turretMotorTask = new OneWheelDriveTaskRight(this, turret, true);
+        turretMotorTask.slowDown(false);
 
         initPaths();
 
@@ -224,6 +237,7 @@ public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
 
 
 
+
         //gamepad2 w /nowheels only mechs
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e) {
@@ -239,17 +253,13 @@ public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
                         break;
                     case LEFT_BUMPER_UP:
                         linearLift.setPower(0);
+                        locationTlm.setValue( "liftencoder: " + linearLift.getCurrentPosition());
                         break;
                     case RIGHT_BUMPER_UP:
                         linearLift.setPower(0);
                         break;
                     case RIGHT_TRIGGER_DOWN:
                         umbrella.setPosition(0.55);
-//                        if ( umbrella.getPosition() == 0.55)
-//                        {
-//                            turret.setTargetPosition(0);
-//                            turret.setPower(0.5);
-//                        }
                         break;
                     case LEFT_TRIGGER_DOWN:
                         umbrella.setPosition(0);
@@ -267,20 +277,20 @@ public class TeleopLM2w2Stick2 extends StandardFourMotorRobot {
                         linearLift.setPower(0);
                         break;
                     case BUTTON_B_DOWN:
-                        turret.setTargetPosition(-485);
-                        turret.setPower(0.5);
+                        turret.setTargetPosition(-800);
+                        turret.setPower(0.8);
                         locationTlm.setValue(turret.getCurrentPosition());
                         targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
                     case BUTTON_X_DOWN:
-                        turret.setTargetPosition(475);
-                        turret.setPower(0.5);
+                        turret.setTargetPosition(800);
+                        turret.setPower(0.8);
                         locationTlm.setValue(turret.getCurrentPosition());
                         targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
                     case BUTTON_Y_DOWN:
                         turret.setTargetPosition(0);
-                        turret.setPower(0.5);
+                        turret.setPower(0.8);
                         locationTlm.setValue(turret.getCurrentPosition());
                         targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
