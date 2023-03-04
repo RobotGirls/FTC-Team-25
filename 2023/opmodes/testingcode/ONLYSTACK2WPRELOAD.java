@@ -270,8 +270,6 @@ public class ONLYSTACK2WPRELOAD extends Robot {
     //method will be called in start
 
 
-
-
     public void setAprilTagDetection() {
         detectionTask = new AprilTagDetectionTask(this, "Webcam 1") {
             @Override
@@ -359,70 +357,7 @@ public class ONLYSTACK2WPRELOAD extends Robot {
         });
     }
 
-    public void strafetoColorLine()
-    {
 
-        handleColorSensor();
-        parkingLocationTlm.setValue("in strafetoColorLine Method");
-        this.addTask(new DeadReckonTask(this, strafetoColorLinePath,drivetrain ){
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE)
-                {
-
-                    whereAmI.setValue("after strafe path");
-                    // goTurnTurret();
-
-                }
-            }
-        });
-    }
-
-
-    public void handleColorSensor () {
-
-        whereAmI.setValue("in handleColorSensor");
-        colorSensorTask = new RGBColorSensorTask(this, bottomColorsensor) {
-            public void handleEvent(RobotEvent e) {
-
-                whereAmI.setValue("in handleColorSensor handle Event");
-                RGBColorSensorTask.ColorSensorEvent event = (RGBColorSensorTask.ColorSensorEvent) e;
-                // sets threshold for blue, red, and green to ten thousand
-                // FIXME seems redundant, possibly remove; said twice
-                colorArray = colorSensorTask.getColors();
-                // shows the values of blue, red, green on the telemetry
-                blueDetectedTlm.setValue(colorArray[0]);
-                redDetectedTlm.setValue(colorArray[1]);
-                switch(event.kind) {
-                    // red is at the end
-                    case RED_DETECTED:
-                        drivetrain.stop();
-                        robot.removeTask(colorSensorTask);
-                        this.resume();
-                        colorDetectedTlm.setValue("red");
-                        whereAmI.setValue("red");
-                        break;
-                    case BLUE_DETECTED:
-                        drivetrain.stop();
-                        robot.removeTask(colorSensorTask);
-                        this.resume();
-                        colorDetectedTlm.setValue("blue");
-                        whereAmI.setValue("blue");
-                        break;
-                    default:
-                        colorDetectedTlm.setValue("none");
-                        whereAmI.setValue("none");
-                        break;
-
-                }
-                whereAmI.setValue("detected strafeing color");
-            }
-        };
-        colorSensorTask.setThresholds(10000, 10000, 5000);
-        colorSensorTask.setDrivetrain(drivetrain);
-        addTask(colorSensorTask);
-    }
 
 
 
@@ -607,8 +542,75 @@ public class ONLYSTACK2WPRELOAD extends Robot {
 //        setAprilTagDetection();
 //        addTask(linearLiftTask);
 
-        strafetoColorLine();
+       strafetoColorLine();
 
 
     }
+
+
+    public void strafetoColorLine()
+    {
+
+        handleColorSensor();
+        parkingLocationTlm.setValue("in strafetoColorLine Method");
+        this.addTask(new DeadReckonTask(this, strafetoColorLinePath,drivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+
+                    whereAmI.setValue("after strafe path");
+                    // goTurnTurret();
+
+                }
+            }
+        });
+    }
+
+
+    public void handleColorSensor () {
+
+        whereAmI.setValue("in handleColorSensor");
+        colorSensorTask = new RGBColorSensorTask(this, bottomColorsensor) {
+            public void handleEvent(RobotEvent e) {
+
+                whereAmI.setValue("in handleColorSensor handle Event");
+                RGBColorSensorTask.ColorSensorEvent event = (RGBColorSensorTask.ColorSensorEvent) e;
+                // sets threshold for blue, red, and green to ten thousand
+                // FIXME seems redundant, possibly remove; said twice
+                colorArray = colorSensorTask.getColors();
+                // shows the values of blue, red, green on the telemetry
+                blueDetectedTlm.setValue(colorArray[0]);
+                redDetectedTlm.setValue(colorArray[1]);
+                switch(event.kind) {
+                    // red is at the end
+                    case RED_DETECTED:
+                        drivetrain.stop();
+                        robot.removeTask(colorSensorTask);
+                        this.resume();
+                        colorDetectedTlm.setValue("red");
+                        whereAmI.setValue("red");
+                        break;
+                    case BLUE_DETECTED:
+                        drivetrain.stop();
+                        robot.removeTask(colorSensorTask);
+                        this.resume();
+                        colorDetectedTlm.setValue("blue");
+                        whereAmI.setValue("blue");
+                        break;
+                    default:
+                        colorDetectedTlm.setValue("none");
+                        whereAmI.setValue("none");
+                        break;
+
+                }
+                whereAmI.setValue("detected strafeing color");
+            }
+        };
+        colorSensorTask.setThresholds(10000, 10000, 5000);
+        colorSensorTask.setDrivetrain(drivetrain);
+        addTask(colorSensorTask);
+    }
+
 }

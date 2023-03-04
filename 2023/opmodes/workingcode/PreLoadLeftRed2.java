@@ -24,7 +24,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package opmodes.testingcode;
+package opmodes.workingcode;
 
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -50,7 +50,7 @@ import team25core.SingleShotTimerTask;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "PRELOADLEFTRED2")
+@Autonomous(name = "PreLoadLeft")
 //@Disabled
 
 // PROGRAM THAT WILL ONLY DROP PRELOADED ON RED-LEFT SIDE WITH ONEWHEELDRIVTRAIN
@@ -90,6 +90,8 @@ public class PreLoadLeftRed2 extends Robot {
     private DeadReckonPath liftMech;
     private DeadReckonPath  lowerMech;
 
+    private DeadReckonTask linearTask;
+
     private DeadReckonPath turretTurnOrangePath;
     private DeadReckonPath turretTurnBluePath;
 
@@ -99,7 +101,7 @@ public class PreLoadLeftRed2 extends Robot {
 
     //variables for constants
     static final double FORWARD_DISTANCE = 13.5;
-    static final double DRIVE_SPEED = 0.25;
+    static final double DRIVE_SPEED = 0.4;
 
     // apriltags detection
     private Telemetry.Item tagIdTlm;
@@ -145,15 +147,25 @@ public class PreLoadLeftRed2 extends Robot {
 
                 if (tagObject.id == 0) {
                     detect = "left";
+                    lift();
+                    addTask(linearTask);
+                    goToJunction();
+
                 }
                 if (tagObject.id == 6) {
                     detect = "right";
+                    lift();
+                    addTask(linearTask);
+                    goToJunction();
                 }
                 if (tagObject.id == 19) {
-                    detect = "right";
+                    detect = "middle";
+                    lift();
+                    addTask(linearTask);
+                    goToJunction();
                 }
                //addTask(linearLiftTask);
-                goToJunction();
+
 
 
 
@@ -181,16 +193,16 @@ public class PreLoadLeftRed2 extends Robot {
         goToJunctionPath.stop();
 
         liftMech = new DeadReckonPath();
-        liftMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 68, 0.5);
+        liftMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 41, 0.8);
 
         lowerMech =  new DeadReckonPath();
-        lowerMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.5, -0.01);
+        lowerMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -0.8);
 
         deliverConePath  = new DeadReckonPath();
         deliverConePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5,  -DRIVE_SPEED);
 
         //going forward then to the left
-        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, DRIVE_SPEED);
+        leftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, DRIVE_SPEED);
         leftPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 23, DRIVE_SPEED);
 
 
@@ -304,10 +316,9 @@ public class PreLoadLeftRed2 extends Robot {
                 }
             }
         });
-
-
-
     }
+
+
 
 
     private void delayAndDrop(int delayInMsec) {
@@ -318,7 +329,7 @@ public class PreLoadLeftRed2 extends Robot {
                 if (event.kind == EventKind.EXPIRED ) {
                     whereAmI.setValue("in delay task");
 
-                        dropCone();
+                    dropCone();
 
                 }
             }
@@ -327,14 +338,12 @@ public class PreLoadLeftRed2 extends Robot {
     }
     private void dropCone() {
         umbrella.setPosition(0);
-
-
-        delayAndDrop2(4000);
-
+        delayAndDrop2(1000);
         whereAmI.setValue("dropped the cone");
 
 
     }
+
     private void delayAndDrop2(int delayInMsec) {
         this.addTask(new SingleShotTimerTask(this, delayInMsec) {
             @Override
@@ -342,30 +351,18 @@ public class PreLoadLeftRed2 extends Robot {
                 SingleShotTimerEvent event = (SingleShotTimerEvent) e;
                 if (event.kind == EventKind.EXPIRED ) {
                     whereAmI.setValue("in delay task");
-                    goliftMech();
-
-
-
-
-                }
-            }
-        });
-
-    }
-
-    private void goliftMech() {
-        this.addTask(new DeadReckonTask(this, liftMech, liftDriveTrain) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE) {
-                    whereAmI.setValue("lifted linear lift");
                     detectedBasedPathSelection();
 
+
+
+
+
                 }
             }
         });
+
     }
+
 
 
     private void detectedBasedPathSelection(){
@@ -456,6 +453,21 @@ public class PreLoadLeftRed2 extends Robot {
 
     }
 
+    public void lift()
+    {
+        linearTask = new DeadReckonTask(this, liftMech,liftDriveTrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    whereAmI.setValue("lifting lift");
+
+                }
+            }
+        };
+    }
+
 
     @Override
     public void start()
@@ -466,6 +478,8 @@ public class PreLoadLeftRed2 extends Robot {
 //
 //        addTask(linearLiftTask);
 //        goToJunction();
+//
+//        goliftMech();
 
 
 

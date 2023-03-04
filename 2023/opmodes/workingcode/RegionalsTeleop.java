@@ -195,10 +195,10 @@ public class RegionalsTeleop extends StandardFourMotorRobot {
                 locationTlm.setValue("in gamepad2 handler");
                 switch (gamepadEvent.kind) {
                     case LEFT_BUMPER_DOWN:
-                        turret.setPower(0.3);
+                        turret.setPower(0.5);
                         break;
                     case RIGHT_BUMPER_DOWN:
-                        turret.setPower(-0.3);
+                        turret.setPower(-0.5);
                         break;
                     case LEFT_BUMPER_UP:
                         turret.setPower(0);

@@ -264,7 +264,7 @@ public class ONLYSTACK2 extends Robot {
 
     }
 
-    public void gotoMiddlePark()
+    public void goToStack()
     {
         parkingLocationTlm.setValue("went to middle target zone");
 
@@ -497,12 +497,10 @@ public class ONLYSTACK2 extends Robot {
     @Override
     public void start()
     {
-//        whereAmI.setValue("in Start");
-//        gotoMiddlePark();
-       // addTask(linearLiftTask);
+         goToStack();
+         addTask(linearLiftTask);
 
         //gotoMiddlePark();
-
         strafetoColorLine();
 
 
