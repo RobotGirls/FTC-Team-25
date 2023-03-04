@@ -159,7 +159,6 @@ public class ONLYSTACK2 extends Robot {
         strafeOutPath = new DeadReckonPath();
 
 
-        strafetoColorLinePath = new DeadReckonPath();
 
         goToJunctionPath.stop();
         goToStackPath.stop();
@@ -178,7 +177,7 @@ public class ONLYSTACK2 extends Robot {
         deliverConePath  = new DeadReckonPath();
         deliverConePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5.5,  -DRIVE_SPEED);
 
-
+        strafetoColorLinePath = new DeadReckonPath();
         strafetoColorLinePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, 0.2);
         strafetoColorLinePath.stop();
 
@@ -367,57 +366,6 @@ public class ONLYSTACK2 extends Robot {
 
     }
 
-    public void strafetoColorLine()
-    {
-
-        handleColorSensor();
-        parkingLocationTlm.setValue("went to middle target zone");
-
-        this.addTask(new DeadReckonTask(this, strafetoColorLinePath,drivetrain ){
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE)
-                {
-                    RobotLog.i("went to middle target zone");
-                    whereAmI.setValue("went to middle target zone");
-                   // goTurnTurret();
-
-                }
-            }
-        });
-    }
-
-
-    public void handleColorSensor () {
-        colorSensorTask = new RGBColorSensorTask(this, bottomColorsensor) {
-            public void handleEvent(RobotEvent e) {
-                RGBColorSensorTask.ColorSensorEvent event = (RGBColorSensorTask.ColorSensorEvent) e;
-                // sets threshold for blue, red, and green to ten thousand
-                // FIXME seems redundant, possibly remove; said twice
-                colorArray = colorSensorTask.getColors();
-                // shows the values of blue, red, green on the telemetry
-                blueDetectedTlm.setValue(colorArray[0]);
-                redDetectedTlm.setValue(colorArray[1]);
-                switch(event.kind) {
-                    // red is at the end
-
-                    case RED_DETECTED:
-                        drivetrain.stop();
-                        colorDetectedTlm.setValue("red");
-                        break;
-                    case BLUE_DETECTED:
-                        drivetrain.stop();
-                        colorDetectedTlm.setValue("blue");
-                        break;
-                    default:
-                        colorDetectedTlm.setValue("none");
-                        break;
-                }
-            }
-        };
-    }
-
 
     public void goStrafeToJunction()
     {
@@ -560,4 +508,54 @@ public class ONLYSTACK2 extends Robot {
 
 
     }
+
+
+
+    public void strafetoColorLine() {
+
+        handleColorSensor();
+        parkingLocationTlm.setValue("went to middle target zone");
+
+        this.addTask(new DeadReckonTask(this, strafetoColorLinePath, drivetrain) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    RobotLog.i("went to middle target zone");
+                    whereAmI.setValue("went to middle target zone");
+                    // goTurnTurret();
+
+                }
+            }
+        });
+    }
+
+    public void handleColorSensor () {
+        colorSensorTask = new RGBColorSensorTask(this, bottomColorsensor) {
+            public void handleEvent(RobotEvent e) {
+                RGBColorSensorTask.ColorSensorEvent event = (RGBColorSensorTask.ColorSensorEvent) e;
+                // sets threshold for blue, red, and green to ten thousand
+                // FIXME seems redundant, possibly remove; said twice
+                colorArray = colorSensorTask.getColors();
+                // shows the values of blue, red, green on the telemetry
+                blueDetectedTlm.setValue(colorArray[0]);
+                redDetectedTlm.setValue(colorArray[1]);
+                switch(event.kind) {
+                    // red is at the end
+                    case RED_DETECTED:
+                        drivetrain.stop();
+                        colorDetectedTlm.setValue("red");
+                        break;
+                    case BLUE_DETECTED:
+                        drivetrain.stop();
+                        colorDetectedTlm.setValue("blue");
+                        break;
+                    default:
+                        colorDetectedTlm.setValue("none");
+                        break;
+                }
+            }
+        };
+    }
+
 }

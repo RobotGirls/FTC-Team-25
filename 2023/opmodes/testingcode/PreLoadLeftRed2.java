@@ -33,7 +33,6 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -51,11 +50,11 @@ import team25core.SingleShotTimerTask;
 import team25core.vision.apriltags.AprilTagDetectionTask;
 
 
-@Autonomous(name = "PRELOADLEFTRED")
+@Autonomous(name = "PRELOADLEFTRED2")
 //@Disabled
 
-// PROGRAM THAT WILL ONLY DROP PRELOADED ON RED-LEFT SIDE
-public class PRELOADLEFTRED extends Robot {
+// PROGRAM THAT WILL ONLY DROP PRELOADED ON RED-LEFT SIDE WITH ONEWHEELDRIVTRAIN
+public class PreLoadLeftRed2 extends Robot {
 
 
     //wheels
@@ -153,7 +152,7 @@ public class PRELOADLEFTRED extends Robot {
                 if (tagObject.id == 19) {
                     detect = "right";
                 }
-               addTask(linearLiftTask);
+               //addTask(linearLiftTask);
                 goToJunction();
 
 
@@ -182,7 +181,7 @@ public class PRELOADLEFTRED extends Robot {
         goToJunctionPath.stop();
 
         liftMech = new DeadReckonPath();
-        liftMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 68, -0.5);
+        liftMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 68, 0.5);
 
         lowerMech =  new DeadReckonPath();
         lowerMech.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.5, -0.01);
@@ -287,6 +286,28 @@ public class PRELOADLEFTRED extends Robot {
 
     //  lifting & dropping paths --------------------------------------
 
+    public void  goToJunction()
+    {
+
+        this.addTask(new DeadReckonTask(this, goToJunctionPath,drivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+
+                    delayAndDrop(3000);
+
+
+
+
+                }
+            }
+        });
+
+
+
+    }
 
 
     private void delayAndDrop(int delayInMsec) {
@@ -304,7 +325,16 @@ public class PRELOADLEFTRED extends Robot {
         });
 
     }
+    private void dropCone() {
+        umbrella.setPosition(0);
 
+
+        delayAndDrop2(4000);
+
+        whereAmI.setValue("dropped the cone");
+
+
+    }
     private void delayAndDrop2(int delayInMsec) {
         this.addTask(new SingleShotTimerTask(this, delayInMsec) {
             @Override
@@ -312,8 +342,9 @@ public class PRELOADLEFTRED extends Robot {
                 SingleShotTimerEvent event = (SingleShotTimerEvent) e;
                 if (event.kind == EventKind.EXPIRED ) {
                     whereAmI.setValue("in delay task");
+                    goliftMech();
 
-                        detectedBasedPathSelection();
+
 
 
                 }
@@ -321,6 +352,21 @@ public class PRELOADLEFTRED extends Robot {
         });
 
     }
+
+    private void goliftMech() {
+        this.addTask(new DeadReckonTask(this, liftMech, liftDriveTrain) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+                    whereAmI.setValue("lifted linear lift");
+                    detectedBasedPathSelection();
+
+                }
+            }
+        });
+    }
+
 
     private void detectedBasedPathSelection(){
 
@@ -342,17 +388,6 @@ public class PRELOADLEFTRED extends Robot {
     }
 
 
-
-    private void dropCone() {
-        umbrella.setPosition(0);
-
-
-         delayAndDrop2(4000);
-
-        whereAmI.setValue("dropped the cone");
-
-
-    }
 
 
     // parking paths -----------------------------------
@@ -394,35 +429,6 @@ public class PRELOADLEFTRED extends Robot {
                 }
             }
         });
-    }
-
-
-
-
-
- 
-
-    public void  goToJunction()
-    {
-
-        this.addTask(new DeadReckonTask(this, goToJunctionPath,drivetrain ){
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE)
-                {
-
-                   delayAndDrop(3000);
-
-
-
-
-                }
-            }
-        });
-
-
-
     }
 
 

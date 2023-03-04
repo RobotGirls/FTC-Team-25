@@ -10,12 +10,10 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.SensorDigitalTouch;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import team25core.DeadReckonPath;
-import team25core.DeadReckonTask;
 import team25core.DistanceSensorCriteria;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
@@ -27,10 +25,10 @@ import team25core.StandardFourMotorRobot;
 import team25core.TeleopDriveTask;
 import team25core.TwoStickMechanumControlScheme;
 
-@TeleOp(name = "ILT-TELEOP")
+@TeleOp(name = "RegionalTeleop")
 //@Disabled
-public class ILTteleop extends StandardFourMotorRobot {
-
+public class RegionalsTeleop extends StandardFourMotorRobot {
+//new teleop
 
     private TeleopDriveTask drivetask;
 
@@ -98,6 +96,7 @@ public class ILTteleop extends StandardFourMotorRobot {
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
         turretDrivetrain = new OneWheelDirectDrivetrain(turret);
