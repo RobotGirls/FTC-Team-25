@@ -192,8 +192,9 @@ public class ONLYSTACK2WPRELOAD extends Robot {
         linearLiftTaskStack = new RunToEncoderValueTask(this,linearLift,2000,0.5);
 
         strafetoColorLinePath = new DeadReckonPath();
-        strafetoColorLinePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, 0.2);
         strafetoColorLinePath.stop();
+        strafetoColorLinePath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 30, 0.2);
+
 
         strafeOutPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,2,0.25);
         strafeOutPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 23, -0.25);

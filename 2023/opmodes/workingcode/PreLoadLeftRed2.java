@@ -109,6 +109,9 @@ public class PreLoadLeftRed2 extends Robot {
     AprilTagDetection tagObject;
     private AprilTagDetectionTask detectionTask;
 
+    public static double EDITTHIS = 5;
+
+
     //telemetry
     private Telemetry.Item whereAmI;
 
@@ -215,9 +218,11 @@ public class PreLoadLeftRed2 extends Robot {
         rightPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS,8,-DRIVE_SPEED);
 
 
-        goToJunctionPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, -DRIVE_SPEED);
-        goToJunctionPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, -DRIVE_SPEED);
-        goToJunctionPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, -DRIVE_SPEED);
+       // goToJunctionPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE + 1, -DRIVE_SPEED);
+        goToJunctionPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE +6, -DRIVE_SPEED);
+        goToJunctionPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT,EDITTHIS , DRIVE_SPEED);
+        goToJunctionPath.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, -0.3);
+        goToJunctionPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, -0.3);
 
 
 

@@ -1,4 +1,4 @@
-package opmodes.workingcode;
+package opmodes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -18,16 +19,16 @@ import team25core.DistanceSensorCriteria;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
 import team25core.OneWheelDirectDrivetrain;
-import team25core.OneWheelDriveTask;
+import team25core.OneWheelDriveTaskwLimitSwitch;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
 import team25core.StandardFourMotorRobot;
 import team25core.TeleopDriveTask;
 import team25core.TwoStickMechanumControlScheme;
 
-@TeleOp(name = "RegionalTeleop")
+@TeleOp(name = "SCRIMMAGE")
 //@Disabled
-public class RegionalsTeleop extends StandardFourMotorRobot {
+public class scrimmageteleop extends StandardFourMotorRobot {
 //new teleop
 
     private TeleopDriveTask drivetask;
@@ -60,13 +61,14 @@ public class RegionalsTeleop extends StandardFourMotorRobot {
     private DistanceSensor alignerDistanceSensor;
     private DistanceSensorCriteria distanceSensorCriteria;
     private ColorSensor linearColorSensor;
+    private DigitalChannel umbrellaLimitSwitch;
 
     private final double ORANGE_DISTANCE = 5;
     private final double BLUE_DISTANCE = 5;
     private final double turretPower = 0.5;
 
     private RunToEncoderValueTask turretTask;
-    private OneWheelDriveTask liftMotorTask;
+    private OneWheelDriveTaskwLimitSwitch liftMotorTask;
 
     private RunToEncoderValueTask linearLiftTaskLow;
     private RunToEncoderValueTask linearLiftTaskMiddle;
@@ -76,7 +78,7 @@ public class RegionalsTeleop extends StandardFourMotorRobot {
 
 
 
-  //  @Override
+    //  @Override
     public void handleEvent(RobotEvent e) {
     }
 
@@ -96,11 +98,15 @@ public class RegionalsTeleop extends StandardFourMotorRobot {
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
         turretDrivetrain = new OneWheelDirectDrivetrain(turret);
         turretDrivetrain.resetEncoders();
         turretDrivetrain.encodersOn();
+
+        umbrellaLimitSwitch = hardwareMap.get(DigitalChannel.class, "umbrellaLimitSwitch");
+        umbrellaLimitSwitch.setMode(DigitalChannel.Mode.INPUT);
 
         umbrella = hardwareMap.servo.get("umbrella");
 
@@ -125,7 +131,7 @@ public class RegionalsTeleop extends StandardFourMotorRobot {
         turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turret.setPower(0.5);
 
-        liftMotorTask = new OneWheelDriveTask(this, linearLift, true);
+        liftMotorTask = new OneWheelDriveTaskwLimitSwitch(this, linearLift, true, umbrellaLimitSwitch, true);
         liftMotorTask.slowDown(false);
 
         locationTlm = telemetry.addData("location","init");
@@ -157,7 +163,7 @@ public class RegionalsTeleop extends StandardFourMotorRobot {
     public void start() {
 
         this.addTask(drivetask);
-       // addTask(turrtTask);
+        // addTask(turrtTask);
         locationTlm.setValue("in start");
 
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_1) {
@@ -165,9 +171,9 @@ public class RegionalsTeleop extends StandardFourMotorRobot {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
                 locationTlm.setValue("in gamepad1 handler");
                 switch (gamepadEvent.kind) {
-                      case BUTTON_X_DOWN:
-                          double distance = alignerDistanceSensor.getDistance(DistanceUnit.CM);
-                          locationTlm.setValue( "distance: " + distance);
+                    case BUTTON_X_DOWN:
+                        double distance = alignerDistanceSensor.getDistance(DistanceUnit.CM);
+                        locationTlm.setValue( "distance: " + distance);
                     case BUTTON_Y_DOWN:
                         linearLift.setPower(0);
                         locationTlm.setValue( "liftencoder: " + linearLift.getCurrentPosition());
@@ -182,7 +188,18 @@ public class RegionalsTeleop extends StandardFourMotorRobot {
 
         });
 
-        this.addTask(liftMotorTask);
+        this.addTask(new OneWheelDriveTaskwLimitSwitch(this, linearLift, true, umbrellaLimitSwitch, true)
+        {
+            public void handleEvent(RobotEvent e) {
+                OneWheelDriveTaskwLimitSwitch.OneWheelDriveTaskwLimitSwitchEvent switchEvent = (OneWheelDriveTaskwLimitSwitch.OneWheelDriveTaskwLimitSwitchEvent) e;
+                locationTlm.setValue("in gamepad1 handler");
+                switch (switchEvent.kind) {
+                    case PUSH:
+                        umbrella.setPosition(0.55);
+                        break;
+                }
+            }
+        });
 
 
 
@@ -194,10 +211,10 @@ public class RegionalsTeleop extends StandardFourMotorRobot {
                 locationTlm.setValue("in gamepad2 handler");
                 switch (gamepadEvent.kind) {
                     case LEFT_BUMPER_DOWN:
-                        turret.setPower(0.5);
+                        turret.setPower(0.3);
                         break;
                     case RIGHT_BUMPER_DOWN:
-                        turret.setPower(-0.5);
+                        turret.setPower(-0.3);
                         break;
                     case LEFT_BUMPER_UP:
                         turret.setPower(0);
