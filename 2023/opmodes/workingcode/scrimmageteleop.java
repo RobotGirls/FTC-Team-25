@@ -19,7 +19,7 @@ import team25core.DistanceSensorCriteria;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
 import team25core.OneWheelDirectDrivetrain;
-import team25core.OneWheelDriveTaskwLimitSwitch;
+//import team25core.OneWheelDriveTaskwLimitSwitch;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
 import team25core.StandardFourMotorRobot;
@@ -68,7 +68,7 @@ public class scrimmageteleop extends StandardFourMotorRobot {
     private final double turretPower = 0.5;
 
     private RunToEncoderValueTask turretTask;
-    private OneWheelDriveTaskwLimitSwitch liftMotorTask;
+    //private OneWheelDriveTaskwLimitSwitch liftMotorTask;
 
     private RunToEncoderValueTask linearLiftTaskLow;
     private RunToEncoderValueTask linearLiftTaskMiddle;
@@ -131,8 +131,8 @@ public class scrimmageteleop extends StandardFourMotorRobot {
         turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turret.setPower(0.5);
 
-        liftMotorTask = new OneWheelDriveTaskwLimitSwitch(this, linearLift, true, umbrellaLimitSwitch, true);
-        liftMotorTask.slowDown(false);
+        //liftMotorTask = new OneWheelDriveTaskwLimitSwitch(this, linearLift, true, umbrellaLimitSwitch, true);
+        //liftMotorTask.slowDown(false);
 
         locationTlm = telemetry.addData("location","init");
         targetPositionTlm = telemetry.addData("target Pos","init");
@@ -188,18 +188,18 @@ public class scrimmageteleop extends StandardFourMotorRobot {
 
         });
 
-        this.addTask(new OneWheelDriveTaskwLimitSwitch(this, linearLift, true, umbrellaLimitSwitch, true)
-        {
-            public void handleEvent(RobotEvent e) {
-                OneWheelDriveTaskwLimitSwitch.OneWheelDriveTaskwLimitSwitchEvent switchEvent = (OneWheelDriveTaskwLimitSwitch.OneWheelDriveTaskwLimitSwitchEvent) e;
-                locationTlm.setValue("in gamepad1 handler");
-                switch (switchEvent.kind) {
-                    case PUSH:
-                        umbrella.setPosition(0.55);
-                        break;
-                }
-            }
-        });
+//        this.addTask(new OneWheelDriveTaskwLimitSwitch(this, linearLift, true, umbrellaLimitSwitch, true)
+//        {
+//            public void handleEvent(RobotEvent e) {
+//                OneWheelDriveTaskwLimitSwitch.OneWheelDriveTaskwLimitSwitchEvent switchEvent = (OneWheelDriveTaskwLimitSwitch.OneWheelDriveTaskwLimitSwitchEvent) e;
+//                locationTlm.setValue("in gamepad1 handler");
+//                switch (switchEvent.kind) {
+//                    case PUSH:
+//                        umbrella.setPosition(0.55);
+//                        break;
+//                }
+//            }
+//        });
 
 
 
