@@ -30,6 +30,8 @@ public class RnRRKatelynBasicAuto extends StandardFourMotorRobot {
 
     private Telemetry.Item eventTlm;
 
+    private static String TAG = "KatelynAuto";
+
     @Override
     public void init() {
         super.init(); // taking parent's init (hardware mapping)
@@ -74,12 +76,12 @@ public class RnRRKatelynBasicAuto extends StandardFourMotorRobot {
                 DeadReckonEvent pathEvent = (DeadReckonEvent) e;
                 if (pathEvent.kind == EventKind.PATH_DONE)
                 {
-                    RobotLog.i("went forward");
+                    RobotLog.ii(TAG, "went forward");
                     eventTlm.setValue("path is done");
                     strafe();
                 }
                 else if (pathEvent.kind == EventKind.SEGMENT_DONE) {
-                    RobotLog.i("segment completed");
+                    RobotLog.ii(TAG, "segment completed");
                     eventTlm.setValue("segment is done");
                 }
             }
@@ -92,12 +94,12 @@ public class RnRRKatelynBasicAuto extends StandardFourMotorRobot {
             public void handleEvent (RobotEvent e) {
                 DeadReckonEvent pathEvent = (DeadReckonEvent) e;
                 if (pathEvent.kind == EventKind.PATH_DONE) {
-                    RobotLog.i("strafed");
+                    RobotLog.ii(TAG, "strafed");
                     eventTlm.setValue("path is done");
                     turnRight();
                 }
                 else if (pathEvent.kind == EventKind.SEGMENT_DONE) {
-                    RobotLog.i("segment completed");
+                    RobotLog.ii(TAG, "segment completed");
                     eventTlm.setValue("segment is done");
                 }
             }
@@ -110,11 +112,11 @@ public class RnRRKatelynBasicAuto extends StandardFourMotorRobot {
             public void handleEvent (RobotEvent e) {
                 DeadReckonEvent pathEvent = (DeadReckonEvent) e;
                 if (pathEvent.kind == EventKind.PATH_DONE) {
-                    RobotLog.i("turned");
+                    RobotLog.ii(TAG, "turned");
                     eventTlm.setValue("path is done");
                 }
                 else if (pathEvent.kind == EventKind.SEGMENT_DONE) {
-                    RobotLog.i("segment completed");
+                    RobotLog.ii(TAG, "segment completed");
                     eventTlm.setValue("segment is done");
                 }
             }
