@@ -65,18 +65,19 @@ public class autoTemplate extends Robot {
     private DcMotor backRight;
     private FourWheelDirectDrivetrain drivetrain;
 
-
-    //mechs
+    /**
+    //mechs - uncomment mechs needed for robot auto
     private Servo servoMech;
     private DcMotor motorMech;
     private OneWheelDirectDrivetrain motorDrivetrain;
+    **/
 
-
-    //sensors
+    /**
+    //sensors - uncomment sensors that are needed for robot auto
     private DistanceSensor distanceSensor;
     private DistanceSensorCriteria distanceSensorCriteria;
     private ColorSensor colorSensor;
-
+    **/
 
     //paths
     private DeadReckonPath path1;
@@ -151,8 +152,8 @@ public class autoTemplate extends Robot {
         path3.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, DRIVE_SPEED);
         path3.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, RIGHT_DISTANCE, DRIVE_SPEED);
 
-        //initializes motorMechTask
-        motorMechTask = new RunToEncoderValueTask(this, motorMech, 0, 0);
+       /** //initializes motorMechTask - uncomment if a motor is needed for one of the mechanisms
+        motorMechTask = new RunToEncoderValueTask(this, motorMech, 0, 0); **/
     }
 
     //initializes the declared motors and servos
@@ -165,9 +166,10 @@ public class autoTemplate extends Robot {
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
 
-        //initializes the servo
+      /**  //initializes the servo - uncomment if servo is needed for auto
         //servos are not in initPaths() because they do not get tasks unless a task is created for them in a specified method
         servoMech = hardwareMap.servo.get("servoMech");
+       **/
 
 
         //sets wheel motors to run using the encoders
@@ -186,6 +188,8 @@ public class autoTemplate extends Robot {
 
         //initializes motor mechanism, returns what motor would do if 0 power behavior was implemented on it,
         //rests encoder, and prepares motors to run on the encoders
+        /**UNCOMMENT IF MOTOR IS NEEDED FOR A MECHANISM
+
         motorMech = hardwareMap.get(DcMotor.class, "motorMech");
         motorMech.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorMech.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -195,11 +199,13 @@ public class autoTemplate extends Robot {
         motorDrivetrain = new OneWheelDirectDrivetrain(motorMech);
         motorDrivetrain.resetEncoders();
         motorDrivetrain.encodersOn();
+         **/
 
-
-        //initializes the color sensor and distance sensor for usage
+        /**
+        //initializes the color sensor and distance sensor for usage - uncomment if sensors are needed for auto
         colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
         distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
+         **/
 
         //calls method to start the initialization
         initPaths();
@@ -244,25 +250,27 @@ public class autoTemplate extends Robot {
 
     //provides a certain task movement for the motor mech and displays telemetry stating robot is
     //executing the motor mech task
-    private void goMoveMotorMech() {
-        this.addTask(new DeadReckonTask(this, motorMechPath, motorDrivetrain) {
-            @Override
-            public void handleEvent(RobotEvent e) {
-                DeadReckonEvent path = (DeadReckonEvent) e;
-                if (path.kind == EventKind.PATH_DONE) {
-                    whereAmI.setValue("moved motor mech");
-
-                }
-            }
-        });
-    }
+//    private void goMoveMotorMech() {
+//        this.addTask(new DeadReckonTask(this, motorMechPath, motorDrivetrain) {
+//            @Override
+//            public void handleEvent(RobotEvent e) {
+//                DeadReckonEvent path = (DeadReckonEvent) e;
+//                if (path.kind == EventKind.PATH_DONE) {
+//                    whereAmI.setValue("moved motor mech");
+//
+//                }
+//            }
+//        });
+//    }
 
     //provides certain movement for servo mechanism and displays telemetry stating robot
-    //executed the servo task
+    //executed the servo task - uncomment if servo is needed for the auto
+    /**
     private void setServoMech() {
         servoMech.setPosition(0);
         whereAmI.setValue("servo moved");
     }
+    **/
 
 
 
@@ -272,7 +280,8 @@ public class autoTemplate extends Robot {
     {
         whereAmI.setValue("in Start");
         goToPath1();
-        addTask(motorMechTask);
+//        addTask(motorMechTask);
+        //uncomment this motorMechTask if a motor mech is needed for the auto
 
 
 
