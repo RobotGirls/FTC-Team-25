@@ -719,7 +719,6 @@ public class ONLYSTACK2WithDetect extends Robot {
             }
         };
         colorSensorTask.setThresholds(10000, 10000, 5000);
-//        colorSensorTask.setDrivetrain(drivetrain);
         addTask(colorSensorTask);
     }
 
