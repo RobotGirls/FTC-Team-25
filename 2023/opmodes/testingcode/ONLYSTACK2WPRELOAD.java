@@ -610,7 +610,7 @@ public class ONLYSTACK2WPRELOAD extends Robot {
             }
         };
         colorSensorTask.setThresholds(10000, 10000, 5000);
-        colorSensorTask.setDrivetrain(drivetrain);
+//        colorSensorTask.setDrivetrain(drivetrain);
         addTask(colorSensorTask);
     }
 
