@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.openftc.apriltag.AprilTagDetection;
 
-import team25core.ColorSensorTask;
+import team25core.sensors.color.ColorSensorTask;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.DistanceSensorCriteria;

@@ -40,7 +40,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.openftc.apriltag.AprilTagDetection;
 
-import team25core.ColorSensorTask;
+import team25core.sensors.color.RGBColorSensorTask;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.DistanceSensorCriteria;
@@ -78,6 +78,7 @@ public class newAuto extends Robot {
     private DistanceSensor alignerDistanceSensor;
     private DistanceSensorCriteria distanceSensorCriteria;
     private ColorSensor linearColorSensor;
+    private RGBColorSensorTask colorSensorTask;
 
     //paths
     private DeadReckonPath liftMech;
@@ -103,6 +104,10 @@ public class newAuto extends Robot {
 
     //telemetry
     private Telemetry.Item whereAmI;
+
+    private Telemetry.Item colorDetectedTlm;
+    private Telemetry.Item blueDetectedTlm;
+    private Telemetry.Item redDetectedTlm;
 
     private RunToEncoderValueTask linearLiftTask;
     private RunToEncoderValueTask linearLiftTaskJunction;
@@ -517,5 +522,47 @@ public class newAuto extends Robot {
     }
 
 
+    public void handleColorSensor () {
 
+        whereAmI.setValue("in handleColorSensor");
+        colorSensorTask = new RGBColorSensorTask(this, linearColorSensor) {
+            public void handleEvent(RobotEvent e) {
+
+                whereAmI.setValue("in handleColorSensor handle Event");
+                RGBColorSensorTask.ColorSensorEvent event = (RGBColorSensorTask.ColorSensorEvent) e;
+                // sets threshold for blue, red, and green to ten thousand
+                // FIXME seems redundant, possibly remove; said twice
+                colorArray = colorSensorTask.getColors();
+                // shows the values of blue, red, green on the telemetry
+                blueDetectedTlm.setValue(colorArray[0]);
+                redDetectedTlm.setValue(colorArray[1]);
+                switch(event.kind) {
+                    // red is at the end
+                    case RED_DETECTED:
+                        drivetrain.stop();
+                        robot.removeTask(colorSensorTask);
+                        this.resume();
+                        colorDetectedTlm.setValue("red");
+                        whereAmI.setValue("red");
+                        break;
+                    case BLUE_DETECTED:
+                        drivetrain.stop();
+                        robot.removeTask(colorSensorTask);
+                        this.resume();
+                        colorDetectedTlm.setValue("blue");
+                        whereAmI.setValue("blue");
+                        break;
+                    default:
+                        colorDetectedTlm.setValue("none");
+                        whereAmI.setValue("none");
+                        break;
+
+                }
+                whereAmI.setValue("detected strafeing color");
+            }
+        };
+        colorSensorTask.setThresholds(10000, 10000, 5000);
+//        colorSensorTask.setDrivetrain(drivetrain);
+        addTask(colorSensorTask);
+    }
 }
