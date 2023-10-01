@@ -15,7 +15,6 @@ import opmodes.NeverlandLightConstants;
 import opmodes.NeverlandMotorConstants;
 import opmodes.NeverlandServoConstants;
 import team25core.DeadReckon;
-import team25core.DeadReckonTask;
 import team25core.LightSensorCriteria;
 import team25core.LineFollowerTask;
 import team25core.PersistentTelemetryTask;

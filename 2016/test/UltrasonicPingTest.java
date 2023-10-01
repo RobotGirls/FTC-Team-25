@@ -13,9 +13,6 @@ import java.util.HashSet;
 
 import team25core.Robot;
 import team25core.RobotEvent;
-import team25core.Team25UltrasonicSensor;
-import team25core.UltrasonicAveragingTask;
-import team25core.UltrasonicSensorArbitratorTask;
 
 @Autonomous(name = "TEST Ping")
 @Disabled

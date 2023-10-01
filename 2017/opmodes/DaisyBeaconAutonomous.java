@@ -16,10 +16,8 @@ import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
-import team25core.AMSColorSensorImproved;
 import team25core.Alliance;
 import team25core.DeadReckonPath;
-import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
 import team25core.MRLightSensor;

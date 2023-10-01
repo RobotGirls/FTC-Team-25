@@ -40,7 +40,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
 import team25core.DeadReckonPath;
-import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GamepadTask;
 import team25core.LimitSwitchCriteria;

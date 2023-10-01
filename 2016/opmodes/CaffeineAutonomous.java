@@ -15,7 +15,6 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.AutonomousEvent;
 import team25core.DeadReckon;
-import team25core.DeadReckonTask;
 import team25core.GamepadTask;
 import team25core.LightSensorCriteria;
 import team25core.PersistentTelemetryTask;
@@ -25,8 +24,6 @@ import team25core.ServoOscillateTask;
 import team25core.SingleShotTimerTask;
 import team25core.Team25DcMotor;
 import team25core.TwoWheelGearedDriveDeadReckon;
-import team25core.UltrasonicAveragingTask;
-import team25core.UltrasonicSensorCriteria;
 
 /*
  * FTC Team 5218: izzielau, February 17, 2016

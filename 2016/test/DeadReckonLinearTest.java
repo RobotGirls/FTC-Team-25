@@ -14,7 +14,6 @@ import opmodes.BeaconArms;
 import opmodes.NeverlandServoConstants;
 import team25core.DeadReckon;
 import team25core.DeadReckonGyroTask;
-import team25core.DeadReckonTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.Team25DcMotor;

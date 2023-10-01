@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.LightSensor;
 
 import opmodes.NeverlandMotorConstants;
 import team25core.DeadReckon;
-import team25core.DeadReckonTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.TwoWheelGearedDriveDeadReckon;

@@ -1,4 +1,4 @@
-package opmodes.testingcode;
+package opmodes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
@@ -70,13 +70,7 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
     private final double BLUE_DISTANCE = 5;
     private final double turretPower = 0.5;
 
-
     private RunToEncoderValueTask turretTask;
-
-    private RunToEncoderValueTask linearLiftTaskLow;
-    private RunToEncoderValueTask linearLiftTaskMiddle;
-    private RunToEncoderValueTask linearLiftTaskHigh;
-
 
 
 
@@ -101,9 +95,6 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
 
         linearLift=hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        linearLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
 
         turret = hardwareMap.get(DcMotor.class, "turret");
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -143,10 +134,6 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
 
         locationTlm = telemetry.addData("location","init");
         targetPositionTlm = telemetry.addData("target Pos","init");
-
-        linearLiftTaskLow = new RunToEncoderValueTask(this,linearLift,1000,0.5);
-        linearLiftTaskMiddle = new RunToEncoderValueTask(this,linearLift,2000,0.5);
-        linearLiftTaskHigh = new RunToEncoderValueTask(this,linearLift,3000,0.5);
 
 
         turret.setTargetPosition(0);
@@ -237,8 +224,7 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
                 switch (gamepadEvent.kind) {
                     case LEFT_BUMPER_DOWN:
                         double distance = alignerDistanceSensor.getDistance(DistanceUnit.CM);
-//                        locationTlm.setValue( "distance: " + distance); //=3.3-3.4
-                        locationTlm.setValue( "liftencoder: " + linearLift.getCurrentPosition());
+                        locationTlm.setValue( "distance: " + distance); //=3.3-3.4
                         break;
                     case RIGHT_BUMPER_DOWN:
                         linearLift.setPower(-1);
@@ -280,21 +266,33 @@ public class TeleopLM2w2Stick extends StandardFourMotorRobot {
                         linearLift.setPower(0);
                         break;
                     case DPAD_RIGHT_DOWN:
-                        turret.setTargetPosition(-485);
+                        turret.setTargetPosition(-800);
                         turret.setPower(0.5);
                         locationTlm.setValue(turret.getCurrentPosition());
                         targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
                     case DPAD_LEFT_DOWN:
-                        turret.setTargetPosition(475);
+                        turret.setTargetPosition(800);
                         turret.setPower(0.5);
                         locationTlm.setValue(turret.getCurrentPosition());
                         targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
-                    case BUTTON_B_UP:
-                        turret.setPower(0);
+                    case BUTTON_B_DOWN:
+                        turret.setTargetPosition(-800);
+                        turret.setPower(0.5);
+                        locationTlm.setValue(turret.getCurrentPosition());
+                        targetPositionTlm.setValue(turret.getTargetPosition());
+                        break;
+                    case BUTTON_X_DOWN:
+                        turret.setTargetPosition(800);
+                        turret.setPower(0.5);
+                        locationTlm.setValue(turret.getCurrentPosition());
+                        targetPositionTlm.setValue(turret.getTargetPosition());
                         break;
                     case BUTTON_X_UP:
+                        turret.setPower(0);
+                        break;
+                    case BUTTON_B_UP:
                         turret.setPower(0);
                         break;
 //                    case BUTTON_X_DOWN:

@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.I2cController;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.DeadReckonPath;
-import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.GyroTask;
 import team25core.MonitorGyroTask;

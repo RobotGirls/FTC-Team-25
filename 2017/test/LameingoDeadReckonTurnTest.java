@@ -37,7 +37,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import team25core.DeadReckonPath;
-import team25core.DeadReckonTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.TwoWheelDirectDrivetrain;
