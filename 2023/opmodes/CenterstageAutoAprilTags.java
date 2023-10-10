@@ -26,7 +26,7 @@ public class CenterstageAutoAprilTags extends Robot {
     public void detectProp()
     {
         RobotLog.ii(TAG, "Setup detectProp");
-        objDetectionTask = new ObjectDetectionNewTask(this){
+        objDetectionTask = new ObjectDetectionNewTask(this, telemetry){
             @Override
             public void handleEvent(RobotEvent e) {
                 ObjectDetectionEvent event = (ObjectDetectionEvent) e;
@@ -37,9 +37,8 @@ public class CenterstageAutoAprilTags extends Robot {
                 }
             }
         };
-        //FIXME figure out where we want to do the addTask
-        //addTask(new SkystoneDetectionTask(this, purpleColorSensor, purpleDistanceSensor) {
-
+        objDetectionTask.init(telemetry, hardwareMap);
+        addTask(objDetectionTask);
 }
 
 
@@ -50,6 +49,6 @@ public class CenterstageAutoAprilTags extends Robot {
    }
    @Override
    public void start(){
-       detectProp();
+        detectProp();
    }
 }
