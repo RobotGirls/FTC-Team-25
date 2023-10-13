@@ -181,6 +181,7 @@ public class CenterstageAprilTagDetect extends Robot {
     public void start()
     {
         setAprilTagDetection();
+        addTask(detectionTask);
 
 
     }
