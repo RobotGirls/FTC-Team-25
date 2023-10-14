@@ -199,8 +199,8 @@ public class CenterstageRedRightParking extends Robot {
 
         //initializes the motor drivetrain, resets encoders, and prepares motor(s) to run on the encoders
         outtakeDrivetrain = new OneWheelDirectDrivetrain(outtake);
-//        outtakeDrivetrain.resetEncoders();
-//        outtakeDrivetrain.encodersOn();
+        outtakeDrivetrain.resetEncoders();
+        outtakeDrivetrain.encodersOn();
 
 
         //initializes the color sensor and distance sensor for usage
