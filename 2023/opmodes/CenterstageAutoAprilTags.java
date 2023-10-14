@@ -23,10 +23,10 @@ public class CenterstageAutoAprilTags extends Robot {
         //}
     }
 
-    public void detectProp()
+    public void findAprilTag()
     {
-        RobotLog.ii(TAG, "Setup detectProp");
-        objDetectionTask = new ObjectDetectionNewTask(this, telemetry){
+        RobotLog.ii(TAG, "Setup findAprilTag");
+        objDetectionTask = new ObjectDetectionNewTask(this, telemetry, ObjectDetectionNewTask.DetectionKind.APRILTAG_DETECTED){
             @Override
             public void handleEvent(RobotEvent e) {
                 ObjectDetectionEvent event = (ObjectDetectionEvent) e;
@@ -38,8 +38,11 @@ public class CenterstageAutoAprilTags extends Robot {
             }
         };
         objDetectionTask.init(telemetry, hardwareMap);
+        objDetectionTask.rateLimit(1000); // currently calling objDetectionTask every second
+        objDetectionTask.start();
+        objDetectionTask.resumeStreaming();
         addTask(objDetectionTask);
-}
+    }
 
 
 
@@ -49,6 +52,6 @@ public class CenterstageAutoAprilTags extends Robot {
    }
    @Override
    public void start(){
-        detectProp();
+        findAprilTag();
    }
 }
