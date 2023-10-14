@@ -24,7 +24,6 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package opmodes;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -57,7 +56,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-import opmodes.testingcode.CenterstageBlueLeftDetect;
+//import CenterstageBlueLeftDetect;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
 import team25core.DistanceSensorCriteria;
@@ -98,8 +97,10 @@ public class CenterstageBlueRightParking extends Robot {
 
 
     //paths
-    private DeadReckonPath goToPark;
-    private DeadReckonPath goStraightToObject;
+    private DeadReckonPath goToParkFromMiddle;
+    private DeadReckonPath goToParkFromRight;
+    private DeadReckonPath goToParkFromLeft;
+    private DeadReckonPath goMiddleToObject;
     private DeadReckonPath goLeftToObject;
     private DeadReckonPath goRightToObject;
     private DeadReckonPath outtakePath;
@@ -119,6 +120,7 @@ public class CenterstageBlueRightParking extends Robot {
     //private RunToEncoderValueTask motorMechTask;
     private static final int DELAY = 5000;
     //integer 5000 represents 5000 milliseconds-change according to how long delay should be
+    public String objectDetectionDirection;
 
     //OPENCV DETECTION
 
@@ -155,14 +157,18 @@ public class CenterstageBlueRightParking extends Robot {
     //initializes declared paths/tasks for the robot to do
     public void initPaths()
     {   //initializes the paths
-        goToPark = new DeadReckonPath();
-        goStraightToObject = new DeadReckonPath();
+        goToParkFromMiddle = new DeadReckonPath();
+        goToParkFromLeft = new DeadReckonPath();
+        goToParkFromRight = new DeadReckonPath();
+        goMiddleToObject = new DeadReckonPath();
         goLeftToObject = new DeadReckonPath();
         goRightToObject = new DeadReckonPath();
 
         //removes or clears the action of the paths
-        goToPark.stop();
-        goStraightToObject.stop();
+        goToParkFromMiddle.stop();
+        goToParkFromLeft.stop();
+        goToParkFromRight.stop();
+        goMiddleToObject.stop();
         goLeftToObject.stop();
         goRightToObject.stop();
 
@@ -172,9 +178,21 @@ public class CenterstageBlueRightParking extends Robot {
 
         //addSegment adds a new segment or direction the robot moves into
 
-        //drive path goToPark
+        //drive path goToParkFromMiddle
         //drive path goToPark moves the robot forward and then strafes left
-        goToPark.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 14, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 56, -DRIVE_SPEED);
+
+        //drive path goToParkFromLeft
+        //drive path goToParkFromLeft moves the robot forward, strafes right, and then moves forward
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 42, DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 14, DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 14, DRIVE_SPEED);
+
+        //drive path goToParkFromRight
+        //drive path goToPark strafes the robot left and then moves backward
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 14, -DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 42, -DRIVE_SPEED);
 
         //drive path goRightToObject
         //drive path goRightToObject moves the robot forward and turns right
@@ -183,12 +201,12 @@ public class CenterstageBlueRightParking extends Robot {
 
         //drive path goLeftToObject
         //drive path goLeftToObject moves the robot forward and turns left
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12, DRIVE_SPEED);
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, -DRIVE_SPEED);
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12, DRIVE_SPEED);
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, -DRIVE_SPEED);
 
-        //drive path goStraightToObject
-        //drive path goStraightToObject moves the robot forward
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12, DRIVE_SPEED);
+        //drive path goMiddleToObject
+        //drive path goMiddleToObject moves the robot forward
+        goMiddleToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12, DRIVE_SPEED);
 
 
         //initializes outtakeTask
@@ -252,41 +270,54 @@ public class CenterstageBlueRightParking extends Robot {
 
 
     }
-    //method that turns robot positioning depending on results from openCV
-    /*public void objectDetectionPath()
+    //method that turns robot positioning depending on results from openCV and releases pixel
+    public void moveToObjectAndReleasePixel(DeadReckonPath path)
     {
-        if (findPosition().equals("right")) {
-            //drive path goRightToObject
-            //drive path goRightToObject turns the robot right and moves forward
-            goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, FORWARD_DISTANCE, DRIVE_SPEED);
-            goRightToObject.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, RIGHT_DISTANCE, -DRIVE_SPEED);
-        }
-        else if (findPosition().equals("left")) {
-            //drive path goLeftToObject
-            //drive path goLeftToObject turns the robot left and moves forward
-            goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, FORWARD_DISTANCE, -DRIVE_SPEED);
-            goLeftToObject.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, RIGHT_DISTANCE, DRIVE_SPEED);
-
-        }
-        else {
-            //drive path goStraightToObject
-            //drive path goStraightToObject moves the robot forward
-            goStraightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, DRIVE_SPEED);
-
-        }
-
-    }*/
-    //method that starts moving robot for goToPark indicated above
-    public void goToPark()
-    {
-        this.addTask(new DeadReckonTask(this, goToPark, drivetrain ){
+        this.addTask(new DeadReckonTask(this, path, drivetrain ){
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE)
                 {
-                    RobotLog.i("Drove to the left");
-                    whereAmI.setValue("Parked on the left");
+                    RobotLog.i("Drove to the object");
+                    whereAmI.setValue("At the object");
+                    releaseOuttake();
+                    delay(0);
+                }
+            }
+        });
+    }
+
+    public void detectObject()
+    {
+        if (objectDetectionDirection.equals("right"))
+        {
+            moveToObjectAndReleasePixel(goRightToObject);
+            goToPark(goToParkFromRight);
+        }
+        else if (objectDetectionDirection.equals("left"))
+        {
+            moveToObjectAndReleasePixel(goLeftToObject);
+            goToPark(goToParkFromLeft);
+        }
+        else
+        {
+            moveToObjectAndReleasePixel(goMiddleToObject);
+            goToPark(goToParkFromLeft);
+        }
+    }
+    //method that starts moving robot for goToPark indicated above
+    public void goToPark(DeadReckonPath path)
+    {
+        this.addTask(new DeadReckonTask(this, path, drivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("Drove to parking");
+                    whereAmI.setValue("At backdrop parking");
+                    releaseOuttake();
                     delay(0);
 
 
@@ -312,18 +343,18 @@ public class CenterstageBlueRightParking extends Robot {
 
     //provides a certain task movement for the motor mech and displays telemetry stating robot is
     //executing the motor mech task
-    /*private void goMoveMotorMech() {
-        this.addTask(new DeadReckonTask(this, outtake, outtakeDrivetrain) {
+    private void releaseOuttake() {
+        this.addTask(new DeadReckonTask(this, outtakePath, outtakeDrivetrain) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
-                    whereAmI.setValue("moved motor mech");
+                    whereAmI.setValue("released purple pixel");
 
                 }
             }
         });
-    }*/
+    }
 
     //provides certain movement for servo mechanism and displays telemetry stating robot
     //executed the servo task
@@ -339,8 +370,9 @@ public class CenterstageBlueRightParking extends Robot {
     public void start()
     {
         whereAmI.setValue("in Start");
-        goToPark();
-        //addTask(motorMechTask);
+        //detectObject();
+        moveToObjectAndReleasePixel(goRightToObject);
+        goToPark(goToParkFromRight);
 
         telemetry.addData("Coordinate", "(" + (int) cX + ", " + (int) cY + ")");
         telemetry.addData("Distance in Inch", (getDistance(width)));
