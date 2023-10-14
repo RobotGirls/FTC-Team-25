@@ -1,4 +1,4 @@
-package opmodes;
+//package opmodes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
@@ -148,18 +148,16 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         intake.setPower(0);
                         break;
                     case BUTTON_B_DOWN:
-                        shooter.setPosition(0.6); // need to test this
+                        shooter.setPosition(0.9); // need to test this
                         break;
-                        /*
-                    case BUTTON_X_DOWN:
-                        turret.setTargetPosition(800);
-                        turret.setPower(0.8);
-                        locationTlm.setValue(turret.getCurrentPosition());
-                        targetPositionTlm.setValue(turret.getTargetPosition());
+                    case BUTTON_A_DOWN:
+                        shooter.setPosition(0.55); // need to test this
                         break;
-                        */
                     case BUTTON_Y_DOWN:
-                        shooter.setPosition(0.6); // test this
+                        rotateShooter.setPosition(0.8); // test this
+                        break;
+                    case BUTTON_X_DOWN:
+                        rotateShooter.setPosition(0.6); // test this
                         break;
                 }
             }
