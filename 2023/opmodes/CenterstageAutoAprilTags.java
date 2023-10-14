@@ -1,5 +1,6 @@
 
 package opmodes;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import team25core.DeadReckonTask;
@@ -7,7 +8,7 @@ import team25core.ObjectDetectionNewTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 
-
+@Autonomous(name = "AprilTagAuto")
 public class CenterstageAutoAprilTags extends Robot {
     private ObjectDetectionNewTask objDetectionTask;
     private final static String TAG = "Prop";
