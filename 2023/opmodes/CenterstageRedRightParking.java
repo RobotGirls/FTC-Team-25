@@ -145,9 +145,19 @@ public class CenterstageRedRightParking extends Robot {
 
         //addSegment adds a new segment or direction the robot moves into
 
-        //drive path 1
-        //drive path 1 moves the robot forward and then strafes left
+        //robot moves to the right into the backstage parking area
         goToPark.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, RIGHT_DISTANCE, DRIVE_SPEED);
+
+        //robot moves to the object in the right
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, DRIVE_SPEED);
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 4, DRIVE_SPEED);
+
+        //robot moves to the object in the front
+        goStraightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, DRIVE_SPEED);
+
+        //robot moves to the object in the left
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, DRIVE_SPEED);
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, 4, -DRIVE_SPEED);
 
     }
 
@@ -203,23 +213,10 @@ public class CenterstageRedRightParking extends Robot {
 
     }
 
-    public void objectDetect()
-    {
-        if (objectDetectDirection.equals("right")) {
-            goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, DRIVE_SPEED);
-            goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 4, DRIVE_SPEED);
-        }
-        else if (objectDetectDirection.equals("center")) {
-            goStraightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, DRIVE_SPEED);
-        }
-        else {
-            goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, DRIVE_SPEED);
-            goStraightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 4, -DRIVE_SPEED);
-        }
-    }
 
-    //method that starts moving robot for going to parking location close to corner indicated above
-    public void goToPark()
+
+    //robot goes to the backstage parking in the corner and releases a pixel in backstage
+    public void goToParkAndReleasePixel()
     {
 
         this.addTask(new DeadReckonTask(this, goToPark, drivetrain ){
@@ -229,7 +226,7 @@ public class CenterstageRedRightParking extends Robot {
                 if (path.kind == EventKind.PATH_DONE)
                 {
                     RobotLog.i("Drove to the left");
-                    whereAmI.setValue("Parked on the left");
+                    whereAmI.setValue("Parked in the backstage");
                     releaseOuttake();
                    // delay(0);
 
@@ -278,12 +275,12 @@ public class CenterstageRedRightParking extends Robot {
 
 
 
-    //method that executes when the driver presses start on the driver station
+    //executes parking and releases pixel
     @Override
     public void start()
     {
         whereAmI.setValue("in Start");
-        goToPark();
+        goToParkAndReleasePixel();
 //        releaseOuttake();
 
 
