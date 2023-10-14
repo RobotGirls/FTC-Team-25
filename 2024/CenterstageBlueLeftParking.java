@@ -48,7 +48,7 @@ import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
 
-
+//@Config
 @Autonomous(name = "CenterstageBlueLeftParking")
 //@Disabled
 
@@ -89,10 +89,12 @@ public class CenterstageBlueLeftParking extends Robot {
 
     //variables for constants
     //these constants CANNOT be changed unless edited in this declaration and initialization
-    static final double FORWARD_DISTANCE = 60;
-    static final double RIGHT_DISTANCE = 60;
-    static final double LEFT_DISTANCE = 60;
-    static final double DRIVE_SPEED = 0.3;
+    static final double FORWARD_DISTANCE = 0;
+    static final double RIGHT_DISTANCE = 0;
+    static final double LEFT_DISTANCE = 28;
+    static final double DRIVE_SPEED = 0.6;
+    static final double OUTTAKE_DISTANCE = 1;
+    static final double OUTTAKE_SPEED = 0.6;
 
 
     //telemetry
@@ -136,16 +138,13 @@ public class CenterstageBlueLeftParking extends Robot {
 
 
         outtakePath = new DeadReckonPath();
-        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, -1, 0.75);
+        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, OUTTAKE_SPEED);
 
         //addSegment adds a new segment or direction the robot moves into
 
         //drive path goToPark
         //drive path goToPark moves the robot forward and then strafes left
-        goToPark.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, DRIVE_SPEED);
-        goToPark.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_DISTANCE, DRIVE_SPEED);
-        goToPark.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_DISTANCE, DRIVE_SPEED);
-        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, DRIVE_SPEED);
+        goToPark.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_DISTANCE, -DRIVE_SPEED);
 
         //drive path goStraightToObject
         //drive path goStraightToObject moves the robot forward
@@ -196,10 +195,10 @@ public class CenterstageBlueLeftParking extends Robot {
 
         //initializes motor mechanism, returns what motor would do if 0 power behavior was implemented on it,
         //rests encoder, and prepares motors to run on the encoders
-        //motorMech = hardwareMap.get(DcMotor.class, "motorMech");
-        //motorMech.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //motorMech.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //motorMech.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        outtake = hardwareMap.get(DcMotor.class, "outtake");
+        outtake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        outtake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        outtake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //initializes the outtake drivetrain, resets encoders, and prepares motor(s) to run on the encoders
         outtakeDrivetrain = new OneWheelDirectDrivetrain(outtake);
@@ -241,7 +240,7 @@ public class CenterstageBlueLeftParking extends Robot {
 
     }*/
     //method that starts moving robot for path1 indicated above
-    public void goToPark()
+    public void goToParkAndReleasePixel()
     {
         this.addTask(new DeadReckonTask(this, goToPark, drivetrain ){
             @Override
@@ -250,8 +249,9 @@ public class CenterstageBlueLeftParking extends Robot {
                 if (path.kind == EventKind.PATH_DONE)
                 {
                     RobotLog.i("Drove to the left");
-                    whereAmI.setValue("Parked on the left");
-                    delay(0);
+                    whereAmI.setValue("Parked in the backstage");
+                    releaseOuttake();
+                    //delay(0);
 
 
                 }
@@ -274,20 +274,20 @@ public class CenterstageBlueLeftParking extends Robot {
 
     }
 
-    //provides a certain task movement for the motor mech and displays telemetry stating robot is
-    //executing the motor mech task
-    /*private void goMoveMotorMech() {
-        this.addTask(new DeadReckonTask(this, outtake, motorDrivetrain) {
+    //provides a certain task movement for the outtake and displays telemetry stating robot is
+    //executing the outtake task by releasing the pixel
+    private void releaseOuttake() {
+        this.addTask(new DeadReckonTask(this, outtakePath, outtakeDrivetrain) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
-                    whereAmI.setValue("moved motor mech");
+                    whereAmI.setValue("released purple pixel");
 
                 }
             }
         });
-    }*/
+    }
 
     //provides certain movement for servo mechanism and displays telemetry stating robot
     //executed the servo task
@@ -303,10 +303,7 @@ public class CenterstageBlueLeftParking extends Robot {
     public void start()
     {
         whereAmI.setValue("in Start");
-        goToPark();
-        //addTask(motorMechTask);
-
-
+        goToParkAndReleasePixel();
 
     }
 }

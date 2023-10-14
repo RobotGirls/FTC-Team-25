@@ -107,9 +107,11 @@ public class CenterstageBlueRightParking extends Robot {
     //variables for constants
     //these constants CANNOT be changed unless edited in this declaration and initialization
     static final double FORWARD_DISTANCE = 28;
-    static final double RIGHT_DISTANCE = 60;
-    static final double LEFT_DISTANCE = 60;
-    static final double DRIVE_SPEED = 0.3;
+    static final double RIGHT_DISTANCE = 50;
+    static final double LEFT_DISTANCE = 7;
+    static final double DRIVE_SPEED = 0.6;
+    static final double OUTTAKE_DISTANCE = 3;
+    static final double OUTTAKE_SPEED = 0.1;
 
 
     //telemetry
@@ -173,14 +175,24 @@ public class CenterstageBlueRightParking extends Robot {
         //drive path goToPark
         //drive path goToPark moves the robot forward and then strafes left
         goToPark.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, DRIVE_SPEED);
-        goToPark.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_DISTANCE, DRIVE_SPEED);
-        goToPark.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_DISTANCE, DRIVE_SPEED);
-        goToPark.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_DISTANCE, DRIVE_SPEED);
-        goToPark.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_DISTANCE, DRIVE_SPEED);
-        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, DRIVE_SPEED);
 
-        //initializes motorMechTask
-        //motorMechTask = new RunToEncoderValueTask(this, motorMech, 0, 0);
+        //drive path goRightToObject
+        //drive path goRightToObject moves the robot forward and turns right
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12, DRIVE_SPEED);
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, DRIVE_SPEED);
+
+        //drive path goLeftToObject
+        //drive path goLeftToObject moves the robot forward and turns left
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12, DRIVE_SPEED);
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, -DRIVE_SPEED);
+
+        //drive path goStraightToObject
+        //drive path goStraightToObject moves the robot forward
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12, DRIVE_SPEED);
+
+
+        //initializes outtakeTask
+        //outtakeTask = new RunToEncoderValueTask(this, outtake, 0, 0);
     }
 
     //initializes the declared motors and servos
@@ -214,10 +226,10 @@ public class CenterstageBlueRightParking extends Robot {
 
         //initializes motor mechanism, returns what motor would do if 0 power behavior was implemented on it,
         //rests encoder, and prepares motors to run on the encoders
-        //motorMech = hardwareMap.get(DcMotor.class, "motorMech");
-        //motorMech.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //motorMech.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //motorMech.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        outtake = hardwareMap.get(DcMotor.class, "outtake");
+        outtake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        outtake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        outtake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //initializes the outtake drivetrain, resets encoders, and prepares motor(s) to run on the encoders
         outtakeDrivetrain = new OneWheelDirectDrivetrain(outtake);
