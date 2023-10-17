@@ -239,7 +239,7 @@ public class CenterstageBlueLeftDetect extends Robot {
         //distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
 
         //openCv
-        initOpenCV();
+        //initOpenCV();
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         FtcDashboard.getInstance().startCameraStream(controlHubCam, 30);
@@ -250,7 +250,7 @@ public class CenterstageBlueLeftDetect extends Robot {
 
     }
     //method that turns robot positioning depending on results from openCV
-    public void objectDetectionPath()
+    /*public void objectDetectionPath()
     {
         if (findPosition().equals("right")) {
             //drive path goRightToObject
@@ -272,7 +272,7 @@ public class CenterstageBlueLeftDetect extends Robot {
 
         }
 
-    }
+    }*/
     //method that starts moving robot for path1 indicated above
     public void goToPark()
     {
@@ -340,8 +340,8 @@ public class CenterstageBlueLeftDetect extends Robot {
         //addTask(motorMechTask);
 
         telemetry.addData("Coordinate", "(" + (int) cX + ", " + (int) cY + ")");
-        telemetry.addData("Distance in Inch", (getDistance(width)));
-        telemetry.addData("Position: ", findPosition());
+        //telemetry.addData("Distance in Inch", (getDistance(width)));
+        //telemetry.addData("Position: ", findPosition());
         telemetry.update();
 
 
@@ -352,7 +352,7 @@ public class CenterstageBlueLeftDetect extends Robot {
 
 
     /////////////////////////////////// OPENCV STUFF ///////////////////////////////////////////////
-
+/*
     private void initOpenCV() {
 
         // Create an instance of the camera
@@ -469,6 +469,6 @@ public class CenterstageBlueLeftDetect extends Robot {
             return "left";
         }
     }
-
+*/
 
 }
