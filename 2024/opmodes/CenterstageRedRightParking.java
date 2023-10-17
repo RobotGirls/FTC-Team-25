@@ -95,7 +95,7 @@ public class CenterstageRedRightParking extends Robot {
     public static final double RIGHT_DISTANCE = 28;
     public static final double LEFT_DISTANCE = 0;
     public static final double DRIVE_SPEED = 0.6;
-    public static final double OUTTAKE_DISTANCE = 1;
+    public static final double OUTTAKE_DISTANCE = 3;
     public static final double OUTTAKE_SPEED = 0.6;
 
 

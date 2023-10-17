@@ -97,10 +97,12 @@ public class CenterstageRedLeftParking extends Robot {
     //telemetry
     private Telemetry.Item whereAmI;
     private RunToEncoderValueTask outtakeTask;
+    //integer 5000 represents 5000 milliseconds-change according to how long delay should be
     private static final int DELAY = 5000;
 
     public String objectDetectDirection;
-    //integer 5000 represents 5000 milliseconds-change according to how long delay should be
+
+    private OpenCVRedDetectPipeline detectPipeline;
 
     /*
      * The default event handler for the robot.
@@ -205,6 +207,9 @@ public class CenterstageRedLeftParking extends Robot {
         drivetrain.resetEncoders();
         drivetrain.encodersOn();
 
+        //initializes pipeline for openCV
+        detectPipeline = new OpenCVRedDetectPipeline();
+
         //displays telemetry of robot location
         whereAmI = telemetry.addData("location in code", "init");
 
@@ -244,6 +249,18 @@ public class CenterstageRedLeftParking extends Robot {
                     RobotLog.i("Drove to the object");
                     whereAmI.setValue("At the object");
                     releaseOuttake();
+                    if(detectPipeline.findPosition().equals("center"))
+                    {
+                        goToPark(goToParkFromMiddle);
+                    }
+                    else if(detectPipeline.findPosition().equals("right"))
+                    {
+                        goToPark(goToParkFromRight);
+                    }
+                    else
+                    {
+                        goToPark(goToParkFromLeft);
+                    }
 //                    delay(0);
 
 
@@ -256,20 +273,17 @@ public class CenterstageRedLeftParking extends Robot {
 
     public void detectObject()
     {
-        if(objectDetectDirection.equals("right"))
+        if(detectPipeline.findPosition().equals("right"))
         {
             moveToObjectAndReleasePixel(goRightToObject);
-            goToPark(goToParkFromRight);
         }
-        else if(objectDetectDirection.equals("middle"))
+        else if(detectPipeline.findPosition().equals("center"))
         {
             moveToObjectAndReleasePixel(goMiddleToObject);
-            goToPark(goToParkFromMiddle);
         }
         else
         {
             moveToObjectAndReleasePixel(goLeftToObject);
-            goToPark(goToParkFromLeft);
         }
     }
 
@@ -337,9 +351,7 @@ public class CenterstageRedLeftParking extends Robot {
     public void start()
     {
         whereAmI.setValue("in Start");
-        moveToObjectAndReleasePixel(goRightToObject);
-//        detectObject();
-
+        detectObject();
 
 
     }
