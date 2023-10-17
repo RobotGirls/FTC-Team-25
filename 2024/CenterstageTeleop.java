@@ -154,10 +154,10 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         shooter.setPosition(0.55); // need to test this
                         break;
                     case BUTTON_Y_DOWN:
-                        rotateShooter.setPosition(0.8); // test this
+                        rotateShooter.setPosition(0.8); // down
                         break;
                     case BUTTON_X_DOWN:
-                        rotateShooter.setPosition(0.6); // test this
+                        rotateShooter.setPosition(0.55); // up
                         break;
                 }
             }
