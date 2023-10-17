@@ -1,5 +1,3 @@
-package opmodes.workingcode;
-
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.opencv.core.*;
@@ -17,7 +15,7 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-@TeleOp(name = "OpenCV Testing")
+@TeleOp(name = "OpenCVRed")
 
 public class OpenCVRedDetectPipeline extends OpenCvPipeline {
 
@@ -38,15 +36,15 @@ public class OpenCVRedDetectPipeline extends OpenCvPipeline {
 
 
         public Mat processFrame(Mat input) {
-            // Preprocess the frame to detect yellow regions
-            Mat yellowMask = preprocessFrame(input);
+            // Preprocess the frame to detect red regions
+            Mat redMask = preprocessFrame(input);
 
-            // Find contours of the detected yellow regions
+            // Find contours of the detected red regions
             List<MatOfPoint> contours = new ArrayList<>();
             Mat hierarchy = new Mat();
-            Imgproc.findContours(yellowMask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            Imgproc.findContours(redMask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-            // Find the largest yellow contour (blob)
+            // Find the largest red contour (blob)
             MatOfPoint largestContour = findLargestContour(contours);
 
             if (largestContour != null) {
@@ -80,18 +78,18 @@ public class OpenCVRedDetectPipeline extends OpenCvPipeline {
             Mat hsvFrame = new Mat();
             Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
 
-            Scalar lowerYellow = new Scalar(100, 100, 100);
-            Scalar upperYellow = new Scalar(180, 255, 255);
+            Scalar lowerRed = new Scalar(100, 100, 100);
+            Scalar upperRed = new Scalar(180, 255, 255);
 
 
-            Mat yellowMask = new Mat();
-            Core.inRange(hsvFrame, lowerYellow, upperYellow, yellowMask);
+            Mat redMask = new Mat();
+            Core.inRange(hsvFrame, lowerRed, upperRed, redMask);
 
             Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
-            Imgproc.morphologyEx(yellowMask, yellowMask, Imgproc.MORPH_OPEN, kernel);
-            Imgproc.morphologyEx(yellowMask, yellowMask, Imgproc.MORPH_CLOSE, kernel);
+            Imgproc.morphologyEx(redMask, redMask, Imgproc.MORPH_OPEN, kernel);
+            Imgproc.morphologyEx(redMask, redMask, Imgproc.MORPH_CLOSE, kernel);
 
-            return yellowMask;
+            return redMask;
         }
 
         private MatOfPoint findLargestContour(List<MatOfPoint> contours) {
@@ -130,9 +128,4 @@ public class OpenCVRedDetectPipeline extends OpenCvPipeline {
             return "left";
         }
     }
-
-
-
-
-
 }
