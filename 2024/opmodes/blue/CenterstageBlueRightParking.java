@@ -1,4 +1,4 @@
-/*
+package opmodes.blue;/*
 Copyright (c) September 2017 FTC Teams 25/5218
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification,
@@ -27,48 +27,25 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.hardware.motors.RevRoboticsCoreHexMotor;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.imgproc.Moments;
 import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvPipeline;
 
-import java.util.ArrayList;
-import java.util.List;
-
-//import CenterstageBlueLeftDetect;
+//import opmodes.blue.CenterstageBlueLeftDetect;
+import opmodes.other.OpenCVPipelineBlue;
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
-import team25core.DistanceSensorCriteria;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.OneWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
-import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
 
 
-@Autonomous(name = "CenterstageBlueRightParking")
+@Autonomous(name = "opmodes.blue.CenterstageBlueRightParking")
 //@Disabled
 
 //if any terms in the program are unknown to you, right click and press Go To > Declarations and Usages
@@ -259,7 +236,7 @@ public class CenterstageBlueRightParking extends Robot {
         //colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
         //distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
 
-        //initializes OpenCVPipelineBlue
+        //initializes opmodes.other.OpenCVPipelineBlue
         pipelineBlue = new OpenCVPipelineBlue();
 
         //openCv
@@ -409,7 +386,7 @@ public class CenterstageBlueRightParking extends Robot {
 //        controlHubCam = OpenCvCameraFactory.getInstance().createWebcam(
 //                hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 //
-//        controlHubCam.setPipeline(new CenterstageBlueLeftDetect.RedBlobDetectionPipeline());
+//        controlHubCam.setPipeline(new opmodes.blue.CenterstageBlueLeftDetect.RedBlobDetectionPipeline());
 //
 //        controlHubCam.openCameraDevice();
 //        controlHubCam.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);

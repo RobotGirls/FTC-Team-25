@@ -1,4 +1,4 @@
-/*
+package opmodes.blue;/*
 Copyright (c) September 2017 FTC Teams 25/5218
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification,
@@ -48,7 +48,7 @@ import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
 
 //@Config
-@Autonomous(name = "CenterstageBlueLeftParking")
+@Autonomous(name = "opmodes.blue.CenterstageBlueLeftParking")
 //@Disabled
 
 //if any terms in the program are unknown to you, right click and press Go To > Declarations and Usages

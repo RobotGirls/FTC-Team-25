@@ -1,4 +1,4 @@
-//import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+package opmodes.other;//import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;

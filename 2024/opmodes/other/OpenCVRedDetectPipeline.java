@@ -1,4 +1,4 @@
-package opmodes;
+package opmodes.other;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.opencv.core.*;
