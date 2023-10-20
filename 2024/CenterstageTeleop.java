@@ -1,5 +1,4 @@
 //package opmodes;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -22,6 +21,7 @@ import team25core.OneWheelDirectDrivetrain;
 import team25core.OneWheelDriveTaskwLimitSwitch;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
+import team25core.SingleShotTimerTask;
 import team25core.StandardFourMotorRobot;
 import team25core.TeleopDriveTask;
 import team25core.TwoStickMechanumControlScheme;
@@ -101,6 +101,14 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
     }
 
+    private void delay(int delayInMsec) {
+        this.addTask(new SingleShotTimerTask(this, delayInMsec) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                SingleShotTimerEvent event = (SingleShotTimerEvent) e;
+            }
+        });
+    }
     @Override
     public void start() {
 
@@ -148,16 +156,20 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         intake.setPower(0);
                         break;
                     case BUTTON_B_DOWN:
-                        shooter.setPosition(0.9); // need to test this
-                        break;
-                    case BUTTON_A_DOWN:
                         shooter.setPosition(0.55); // need to test this
                         break;
+                    case BUTTON_A_DOWN:
+                        shooter.setPosition(0.9); // need to test this
+                        break;
                     case BUTTON_Y_DOWN:
-                        rotateShooter.setPosition(0.8); // down
+                         // down
+                        for (int i = 5; i > -1; i--) {
+                            rotateShooter.setPosition(i/10);
+                            delay(500);
+                        }
                         break;
                     case BUTTON_X_DOWN:
-                        rotateShooter.setPosition(0.55); // up
+                        rotateShooter.setPosition(0.5); // up
                         break;
                 }
             }
