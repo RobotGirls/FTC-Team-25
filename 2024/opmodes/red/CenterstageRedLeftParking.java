@@ -272,6 +272,7 @@ public class CenterstageRedLeftParking extends Robot {
 
         telemetry.addData("Coordinate", "(" + (int) cX + ", " + (int) cY + ")");
         telemetry.addData("Distance in Inch", (getDistance(width)));
+        telemetry.addData("Position: ", findPosition());
         telemetry.update();
 
         //calls method to start the initialization
