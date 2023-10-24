@@ -1,8 +1,7 @@
-package opmodes;
+package opmodes.other;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -19,10 +18,11 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
+import team25core.DeadReckonTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 
-@Autonomous(name = "OpenCVBlue")
+@TeleOp(name = "OpenCVBlue")
 
 public class OpenCVPipelineBlue extends Robot {
 
@@ -41,13 +41,10 @@ public class OpenCVPipelineBlue extends Robot {
 
     public static final String detectionlocation = "";
 
-
     @Override
     public void handleEvent(RobotEvent e)
     {
-
     }
-
     public Mat processFrame(Mat input) {
         // Preprocess the frame to detect blue regions
         Mat blueMask = preprocessFrame(input);
