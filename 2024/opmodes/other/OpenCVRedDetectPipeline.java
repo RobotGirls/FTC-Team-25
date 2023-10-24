@@ -16,9 +16,12 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import team25core.Robot;
+import team25core.RobotEvent;
+
 @TeleOp(name = "OpenCVRed")
 
-public class OpenCVRedDetectPipeline extends OpenCvPipeline {
+public class OpenCVRedDetectPipeline extends Robot {
 
 
     double cX = 0;
@@ -35,6 +38,9 @@ public class OpenCVRedDetectPipeline extends OpenCvPipeline {
 
     public static String detectionlocation = "";
 
+    @Override
+    public void handleEvent(RobotEvent e)
+    {}
 
     public Mat processFrame(Mat input) {
         // Preprocess the frame to detect red regions
