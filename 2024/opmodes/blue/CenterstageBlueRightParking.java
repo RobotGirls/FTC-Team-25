@@ -60,7 +60,6 @@ import org.opencv.imgproc.Moments;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 @Config
@@ -446,22 +445,6 @@ public class CenterstageBlueRightParking extends Robot {
             Mat hierarchy = new Mat();
             Imgproc.findContours(blueMask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-            Point point = new Point(100, 100);
-            byte[] pixel = new byte[3];
-
-            color = new Scalar(0,0,255);
-            Imgproc.circle(blueMask, new Point(100, 100), 50, color, -1);
-
-        // Convert the pixel to HSV
-            float h = (float) pixel[0] / 255f;
-            float s = (float) pixel[1] / 255f;
-            float v = (float) pixel[2] / 255f;
-
-            // Print the HSV values
-            System.out.println("Hue: " + h);
-            System.out.println("Saturation: " + s);
-            System.out.println("Value: " + v);
-
             // Find the largest blue contour (blob)
             MatOfPoint largestContour = findLargestContour(contours);
 
@@ -505,8 +488,8 @@ public class CenterstageBlueRightParking extends Robot {
 
             //Scalar lowerBlue = new Scalar(90, 100, 100);
             //Scalar upperBlue = new Scalar(130, 255, 255);
-            Scalar lowerBlue = new Scalar(203, 0, 0);
-            Scalar upperBlue = new Scalar(130, 255, 255);
+            Scalar lowerBlue = new Scalar(175, 31, 34);
+            Scalar upperBlue = new Scalar(259, 100, 100);
 
             Mat blueMask = new Mat();
             Core.inRange(hsvFrame, lowerBlue, upperBlue, blueMask);
