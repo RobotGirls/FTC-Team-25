@@ -88,8 +88,8 @@ public class OpenCVPipelineBlue extends Robot {
         Mat hsvFrame = new Mat();
         Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
 
-        Scalar lowerBlue = new Scalar(120, 100, 100);
-        Scalar upperBlue = new Scalar(240, 255, 255);
+        Scalar lowerBlue = new Scalar(113, 29, 6);
+        Scalar upperBlue = new Scalar(213, 98.9, 36.5);
 
 
         Mat blueMask = new Mat();

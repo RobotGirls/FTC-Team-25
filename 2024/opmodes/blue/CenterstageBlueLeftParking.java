@@ -95,7 +95,6 @@ public class CenterstageBlueLeftParking extends Robot {
     static final double OUTTAKE_DISTANCE = 3;
     static final double OUTTAKE_SPEED = 0.6;
 
-
     //telemetry
     private Telemetry.Item whereAmI;
     private RunToEncoderValueTask motorMechTask;
