@@ -105,8 +105,8 @@ public class CenterstageBlueRightParking extends Robot {
     //variables for constants
     //these constants CANNOT be changed unless edited in this declaration and initialization
     public static double FORWARD_DISTANCE = 14;
-    public static double RIGHT_DISTANCE = 10;
-    public static double LEFT_DISTANCE = 9;
+    public static double RIGHT_DISTANCE = 9;
+    public static double LEFT_DISTANCE = 7;
     public static double DRIVE_SPEED = 0.6;
     public static double OUTTAKE_DISTANCE = 3;
     public static double OUTTAKE_SPEED = 0.1;
@@ -187,7 +187,9 @@ public class CenterstageBlueRightParking extends Robot {
         //robot moves to the object in the right
         //goRightToObject.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 1, -DRIVE_SPEED);
         goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 13, DRIVE_SPEED);
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 45, DRIVE_SPEED);
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, DRIVE_SPEED);
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, -DRIVE_SPEED);
+
         //goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
 
         //robot moves to the object in the middle
@@ -196,20 +198,20 @@ public class CenterstageBlueRightParking extends Robot {
         //robot moves to the object in the left
         goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12, DRIVE_SPEED);
         goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, -DRIVE_SPEED);
-        //goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
-
 
         //after robot places pixel in the middle position, drives to the parking spot in backstage
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 20, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 55, -DRIVE_SPEED);
 
         //after robot places pixel in the right position, drives to the parking spot in backstage
         goToParkFromRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_DISTANCE, -DRIVE_SPEED);
         goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, -DRIVE_SPEED);
 
         //after robot places pixel in the left position, drives to the parking spot in backstage
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, RIGHT_DISTANCE, DRIVE_SPEED);
-        //goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.TURN, 86, DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, -DRIVE_SPEED);
+
         //initializes motorMechTask
 //        outtakeTask = new RunToEncoderValueTask(this, outtake, 0, 0);
     }
@@ -311,25 +313,6 @@ public class CenterstageBlueRightParking extends Robot {
                     RobotLog.i("Drove to the object");
                     whereAmI.setValue("At the object");
                     releaseOuttake();
-                    /*
-                    if(findPosition().equals("center"))
-                    {
-                        delay(1000);
-                        goToPark(goToParkFromMiddle);
-                    }
-                    else if(findPosition().equals("right"))
-                    {
-                        delay(1000);
-                        goToPark(goToParkFromRight);
-                    }
-                    else
-                    {
-                        delay(1000);
-                        goToPark(goToParkFromLeft);
-                    }
-//                    delay(0);
-*/
-
                 }
             }
         });
@@ -389,21 +372,21 @@ public class CenterstageBlueRightParking extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     whereAmI.setValue("released purple pixel");
-//                    if(position.equals("right"))
-//                    {
-//                        delay(1000);
-//                        goToPark(goToParkFromRight);
-//                    }
-//                    else if(position.equals("center"))
-//                    {
-//                        delay(1000);
-//                        goToPark(goToParkFromMiddle);
-//                    }
-//                    else
-//                    {
-//                        delay(1000);
-//                        goToPark(goToParkFromLeft);
-//                    }
+                    if(position.equals("right"))
+                    {
+                        delay(1000);
+                        goToPark(goToParkFromRight);
+                    }
+                    else if(position.equals("center"))
+                    {
+                        delay(1000);
+                        goToPark(goToParkFromMiddle);
+                    }
+                    else
+                    {
+                        delay(1000);
+                        goToPark(goToParkFromLeft);
+                    }
 
                 }
             }
@@ -428,8 +411,8 @@ public class CenterstageBlueRightParking extends Robot {
     public void start()
     {
         whereAmI.setValue("in Start");
-        //detectObject();
-        goToPark(goToParkFromMiddle);
+        detectObject();
+        //goToPark(goToParkFromMiddle);
     }
 
 
@@ -486,10 +469,8 @@ public class CenterstageBlueRightParking extends Robot {
             Mat hsvFrame = new Mat();
             Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
 
-            //Scalar lowerBlue = new Scalar(90, 100, 100);
-            //Scalar upperBlue = new Scalar(130, 255, 255);
-            Scalar lowerBlue = new Scalar(175, 31, 34);
-            Scalar upperBlue = new Scalar(259, 100, 100);
+            Scalar lowerBlue = new Scalar(6, 100, 20);
+            Scalar upperBlue = new Scalar(25, 255, 255);
 
             Mat blueMask = new Mat();
             Core.inRange(hsvFrame, lowerBlue, upperBlue, blueMask);
