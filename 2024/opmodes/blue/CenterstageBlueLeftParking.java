@@ -105,8 +105,8 @@ public class CenterstageBlueLeftParking extends Robot {
     //variables for constants
     //these constants CANNOT be changed unless edited in this declaration and initialization
     public static double FORWARD_DISTANCE = 14;
-    public static double RIGHT_DISTANCE = 9;
-    public static double LEFT_DISTANCE = 7;
+    public static double RIGHT_DISTANCE = 13ne;
+    public static double LEFT_DISTANCE = 13;
     public static double DRIVE_SPEED = 0.6;
     public static double OUTTAKE_DISTANCE = 3;
     public static double OUTTAKE_SPEED = 0.1;
@@ -187,7 +187,6 @@ public class CenterstageBlueLeftParking extends Robot {
         //robot moves to the object in the right
         goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, DRIVE_SPEED);
         goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, DRIVE_SPEED);
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, -DRIVE_SPEED);
 
         //robot moves to the object in the middle
         goMiddleToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, DRIVE_SPEED);
@@ -198,11 +197,11 @@ public class CenterstageBlueLeftParking extends Robot {
 
         //after robot places pixel in the middle position, drives to the parking spot in backstage
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 9, -DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 23, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 26, -DRIVE_SPEED);
 
         //after robot places pixel in the right position, drives to the parking spot in backstage
         goToParkFromRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, RIGHT_DISTANCE, DRIVE_SPEED);
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, -DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 24, -DRIVE_SPEED);
 
         //after robot places pixel in the left position, drives to the parking spot in backstage
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_DISTANCE, -DRIVE_SPEED);

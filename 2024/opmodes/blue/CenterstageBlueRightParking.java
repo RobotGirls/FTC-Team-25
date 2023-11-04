@@ -106,7 +106,7 @@ public class CenterstageBlueRightParking extends Robot {
     //these constants CANNOT be changed unless edited in this declaration and initialization
     public static double FORWARD_DISTANCE = 14;
     public static double RIGHT_DISTANCE = 9;
-    public static double LEFT_DISTANCE = 7;
+    public static double LEFT_DISTANCE = 8;
     public static double DRIVE_SPEED = 0.6;
     public static double OUTTAKE_DISTANCE = 3;
     public static double OUTTAKE_SPEED = 0.1;
@@ -187,8 +187,7 @@ public class CenterstageBlueRightParking extends Robot {
         //robot moves to the object in the right
         //goRightToObject.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 1, -DRIVE_SPEED);
         goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 13, DRIVE_SPEED);
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, DRIVE_SPEED);
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, -DRIVE_SPEED);
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 41, DRIVE_SPEED);
 
         //goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
 
@@ -200,7 +199,9 @@ public class CenterstageBlueRightParking extends Robot {
         goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, -DRIVE_SPEED);
 
         //after robot places pixel in the middle position, drives to the parking spot in backstage
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 55, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 65, -DRIVE_SPEED);
 
         //after robot places pixel in the right position, drives to the parking spot in backstage
         goToParkFromRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_DISTANCE, -DRIVE_SPEED);
@@ -210,7 +211,7 @@ public class CenterstageBlueRightParking extends Robot {
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, RIGHT_DISTANCE, DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 5, -DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 2, -DRIVE_SPEED);
 
         //initializes motorMechTask
 //        outtakeTask = new RunToEncoderValueTask(this, outtake, 0, 0);
