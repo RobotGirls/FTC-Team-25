@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
 import team25core.DeadReckonTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.ObjectDetectionNewTask;
@@ -32,8 +34,7 @@ public class CenterstageAutoAprilTags extends Robot {
     private DcMotor backLeft;
     private DcMotor backRight;
     private FourWheelDirectDrivetrain drivetrain;
-
-    // FIXME Katelyn find out the tag ID of the AprilTag and replace -1 with that number
+    
     private int desiredTagID;     // Choose the tag you want to approach or set to -1 for ANY tag.
 
     private final float APRIL_TAG_DECIMATION = 2;
@@ -90,7 +91,38 @@ public class CenterstageAutoAprilTags extends Robot {
         else {
             desiredTagID = 3; // 6 on red
         }
+        findAprilTagData();
     }
+
+    public AprilTagDetection findAprilTagData() {
+        if (desiredTagID == 1) {
+            while (objDetectionTask.getAprilTag(desiredTagID) == null) {
+                frontLeft.setPower(-0.3);
+                frontRight.setPower(0.3);
+                backLeft.setPower(0.3);
+                backRight.setPower(-0.3);
+            }
+            frontLeft.setPower(0);
+            frontRight.setPower(0);
+            backLeft.setPower(0);
+            backRight.setPower(0);
+        }
+        else if (desiredTagID == 2) {
+            while (objDetectionTask.getAprilTag(desiredTagID) == null) {
+                frontLeft.setPower(0.3);
+                frontRight.setPower(-0.3);
+                backLeft.setPower(-0.3);
+                backRight.setPower(0.3);
+            }
+            frontLeft.setPower(0);
+            frontRight.setPower(0);
+            backLeft.setPower(0);
+            backRight.setPower(0);
+        }
+        return objDetectionTask.getAprilTag(desiredTagID);
+    }
+
+
 
 
     @Override
