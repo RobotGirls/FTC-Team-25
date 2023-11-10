@@ -17,7 +17,7 @@ import team25core.RobotEvent;
 public class CenterstageAutoAprilTags extends Robot {
     private ObjectDetectionNewTask objDetectionTask;
     private final static String TAG = "Prop";
-    final double DESIRED_DISTANCE = 6.0; //  this is how close the camera should get to the target (inches)
+    final double DESIRED_DISTANCE = 2.0; //  this is how close the camera should get to the target (inches)
     //  Set the GAIN constants to control the relationship between the measured position error,
     //  and how much power is applied to the drive motors to correct the error.
     //  Drive = Error * Gain    Make these values smaller for smoother control, or larger
@@ -30,10 +30,10 @@ public class CenterstageAutoAprilTags extends Robot {
     final double MAX_AUTO_STRAFE = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_TURN = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
 
-    private DcMotor frontLeft;
-    private DcMotor frontRight;
-    private DcMotor backLeft;
-    private DcMotor backRight;
+    private DcMotor frontLeft=null;
+    private DcMotor frontRight=null;
+    private DcMotor backLeft=null;
+    private DcMotor backRight=null;
     private FourWheelDirectDrivetrain drivetrain;
 
     private int desiredTagID;     // Choose the tag you want to approach or set to -1 for ANY tag.
@@ -46,6 +46,7 @@ public class CenterstageAutoAprilTags extends Robot {
     public String position = "left"; // this will contain the actual prop position information in final auto
 
     public AprilTagDetection aprilTag;
+    boolean targetFound = false;
 
     @Override
     public void handleEvent(RobotEvent e) {
@@ -101,6 +102,7 @@ public class CenterstageAutoAprilTags extends Robot {
                 backLeft.setPower(-0.3);
                 backRight.setPower(-0.3);
             }
+            targetFound = true;
             frontLeft.setPower(0);
             frontRight.setPower(0);
             backLeft.setPower(0);
@@ -112,6 +114,7 @@ public class CenterstageAutoAprilTags extends Robot {
                 backLeft.setPower(0.3);
                 backRight.setPower(0.3);
             }
+            targetFound = true;
             frontLeft.setPower(0);
             frontRight.setPower(0);
             backLeft.setPower(0);
@@ -124,7 +127,7 @@ public class CenterstageAutoAprilTags extends Robot {
        double drive = 0;
        double strafe = 0;
        double turn = 0;
-        if (objDetectionTask.getAprilTag(desiredTagID) != null) {
+        if (objDetectionTask.getAprilTag(desiredTagID) != null && targetFound) {
 
             double rangeError = (tag.ftcPose.range - DESIRED_DISTANCE);
             double headingError = tag.ftcPose.bearing;
@@ -138,13 +141,14 @@ public class CenterstageAutoAprilTags extends Robot {
 
         // Apply desired axes motions to the drivetrain.
         moveRobot(drive, strafe, turn);
+        sleep(10);
     }
     public void moveRobot(double x, double y, double yaw) {
         // Calculate wheel powers.
-        double leftFrontPower    =  x -y +yaw;
-        double rightFrontPower   =  x +y -yaw;
-        double leftBackPower     =  x +y +yaw;
-        double rightBackPower    =  x -y -yaw;
+        double leftFrontPower    =  x -y -yaw;
+        double rightFrontPower   =  x +y +yaw;
+        double leftBackPower     =  x +y -yaw;
+        double rightBackPower    =  x -y +yaw;
 
         // Normalize wheel powers to be less than 1.0
         double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
@@ -165,6 +169,13 @@ public class CenterstageAutoAprilTags extends Robot {
         backRight.setPower(rightBackPower);
     }
 
+    public final void sleep(long milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 
 
     @Override
@@ -174,6 +185,11 @@ public class CenterstageAutoAprilTags extends Robot {
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
+
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.FORWARD);
     }
    @Override
    public void start(){
