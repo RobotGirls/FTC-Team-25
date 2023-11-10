@@ -43,10 +43,11 @@ public class CenterstageAutoAprilTags extends Robot {
     private final int EXPOSURE_MS = 6;
     private final int GAIN = 250;
 
-    public String position = "left"; // this will contain the actual prop position information in final auto
+    public String position; // this will contain the actual prop position information in final auto
 
     public AprilTagDetection aprilTag;
     boolean targetFound = false;
+    boolean targetReached = false;
 
     @Override
     public void handleEvent(RobotEvent e) {
@@ -127,7 +128,7 @@ public class CenterstageAutoAprilTags extends Robot {
        double drive = 0;
        double strafe = 0;
        double turn = 0;
-        if (objDetectionTask.getAprilTag(desiredTagID) != null && targetFound) {
+        if (objDetectionTask.getAprilTag(desiredTagID) != null) {
 
             double rangeError = (tag.ftcPose.range - DESIRED_DISTANCE);
             double headingError = tag.ftcPose.bearing;
@@ -136,8 +137,13 @@ public class CenterstageAutoAprilTags extends Robot {
             drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
             turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
             strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+            if (rangeError < 0.05 && headingError < 0.05 && yawError < 0.05) {
+                targetReached = true;
+            }
         }
         telemetry.update();
+
 
         // Apply desired axes motions to the drivetrain.
         moveRobot(drive, strafe, turn);
@@ -167,6 +173,7 @@ public class CenterstageAutoAprilTags extends Robot {
         frontRight.setPower(rightFrontPower);
         backLeft.setPower(leftBackPower);
         backRight.setPower(rightBackPower);
+
     }
 
     public final void sleep(long milliseconds) {
@@ -193,11 +200,17 @@ public class CenterstageAutoAprilTags extends Robot {
     }
    @Override
    public void start(){
-        findDesiredID();
-       //desiredTagID = 3;
+        //findDesiredID();
+       desiredTagID = 3;
         findAprilTag();
         aprilTag = findAprilTagData();
         AlignWithAprilTag(aprilTag);
-
+        while (!targetReached) {
+            AlignWithAprilTag(aprilTag);
+        }
+       frontLeft.setPower(0);
+       frontRight.setPower(0);
+       backLeft.setPower(0);
+       backRight.setPower(0);
    }
 }
