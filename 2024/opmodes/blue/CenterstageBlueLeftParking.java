@@ -105,7 +105,7 @@ public class CenterstageBlueLeftParking extends Robot {
     //variables for constants
     //these constants CANNOT be changed unless edited in this declaration and initialization
     public static double FORWARD_DISTANCE = 14;
-    public static double RIGHT_DISTANCE = 13ne;
+    public static double RIGHT_DISTANCE = 13;
     public static double LEFT_DISTANCE = 13;
     public static double DRIVE_SPEED = 0.6;
     public static double OUTTAKE_DISTANCE = 3;
