@@ -47,10 +47,13 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
     private MechanumGearedDrivetrain drivetrain;
 
-    //private DcMotor linearLift;
+    private DcMotor linearLift;
     private Servo rotateShooter;
     private Servo shooter;
     private DcMotor intake;
+    private RunToEncoderValueTask linearLiftTaskLow;
+    private RunToEncoderValueTask linearLiftTaskMiddle;
+    private RunToEncoderValueTask linearLiftTaskHigh;
 
     //  @Override
     public void handleEvent(RobotEvent e) {
@@ -73,6 +76,11 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
         rotateShooter = hardwareMap.servo.get("rotateShooter");
         shooter = hardwareMap.servo.get("shootDrone");
 
+        linearLift = hardwareMap.get(DcMotor.class, "linearLift");
+        linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linearLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -87,6 +95,10 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
         locationTlm = telemetry.addData("location","init");
         targetPositionTlm = telemetry.addData("target Pos","init");
+
+        linearLiftTaskLow = new RunToEncoderValueTask(this,linearLift,1000,0.5);
+        linearLiftTaskMiddle = new RunToEncoderValueTask(this,linearLift,2000,0.5);
+        linearLiftTaskHigh = new RunToEncoderValueTask(this,linearLift,3000,0.5);
     }
 
     public void initIMU()
@@ -124,14 +136,13 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                 }
             }
         });
-/*
-        this.addTask(new OneWheelDriveTaskwLimitSwitch(this, linearLift, true, umbrellaLimitSwitch, true)
+
+/*        this.addTask(new OneWheelDriveTaskwLimitSwitch(this, linearLift, true, umbrellaLimitSwitch, true)
         {
             public void handleEvent(RobotEvent e) {
                 OneWheelDriveTaskwLimitSwitchEvent switchEvent = (OneWheelDriveTaskwLimitSwitchEvent) e;
                 locationTlm.setValue("in gamepad1 handler");
                 switch (switchEvent.kind) {
-
                 }
             }
         });
@@ -170,6 +181,18 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     case BUTTON_X_DOWN:
                         rotateShooter.setPosition(0.5); // up
+                        break;
+                    case LEFT_BUMPER_DOWN:
+                        linearLift.setPower(1);
+                        break;
+                    case LEFT_BUMPER_UP:
+                        linearLift.setPower(0);
+                        break;
+                    case RIGHT_BUMPER_DOWN:
+                        linearLift.setPower(-1);
+                        break;
+                    case RIGHT_BUMPER_UP:
+                        linearLift.setPower(0);
                         break;
                 }
             }
