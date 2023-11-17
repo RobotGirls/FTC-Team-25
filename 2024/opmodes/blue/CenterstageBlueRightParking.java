@@ -378,15 +378,18 @@ public class CenterstageBlueRightParking extends Robot {
 
     public static class BlueBlobDetectionPipeline extends OpenCvPipeline
     {
+        Mat hierarchy = new Mat();
+        Mat hsvFrame = new Mat();
+        Mat blueMask = new Mat();
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
         @Override
         public Mat processFrame(Mat input) {
             // Preprocess the frame to detect blue regions
             Mat blueMask = preprocessFrame(input);
 
+
             // Find contours of the detected blue regions
             List<MatOfPoint> contours = new ArrayList<>();
-            Mat hierarchy = new Mat();
-            hierarchy.release();
             Imgproc.findContours(blueMask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
             // Find the largest blue contour (blob)
@@ -420,20 +423,18 @@ public class CenterstageBlueRightParking extends Robot {
                 Imgproc.putText(input, distanceLabel, new Point(cX + 10, cY + 60), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 255, 0), 2);
             }
             hierarchy.release();
+            blueMask.release();
             return input;
         }
 
         private Mat preprocessFrame(Mat frame) {
-            Mat hsvFrame = new Mat();
             Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
 
             Scalar lowerBlue = new Scalar(6, 100, 20);
             Scalar upperBlue = new Scalar(25, 255, 255);
 
-            Mat blueMask = new Mat();
             Core.inRange(hsvFrame, lowerBlue, upperBlue, blueMask);
 
-            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
             Imgproc.morphologyEx(blueMask, blueMask, Imgproc.MORPH_OPEN, kernel);
             Imgproc.morphologyEx(blueMask, blueMask, Imgproc.MORPH_CLOSE, kernel);
 

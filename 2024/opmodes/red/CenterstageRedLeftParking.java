@@ -379,6 +379,10 @@ public class CenterstageRedLeftParking extends Robot {
 
     public static class RedBlobDetectionPipeline extends OpenCvPipeline
     {
+        Mat hsvFrame = new Mat();
+        Mat redMask = new Mat();
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
+        Mat hierarchy = new Mat();
         @Override
         public Mat processFrame(Mat input) {
             // Preprocess the frame to detect red regions
@@ -386,7 +390,7 @@ public class CenterstageRedLeftParking extends Robot {
 
             // Find contours of the detected red regions
             List<MatOfPoint> contours = new ArrayList<>();
-            Mat hierarchy = new Mat();
+
             Imgproc.findContours(redMask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
             // Find the largest red contour (blob)
@@ -419,21 +423,18 @@ public class CenterstageRedLeftParking extends Robot {
                 Imgproc.putText(input, distanceLabel, new Point(cX + 10, cY + 60), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 255, 0), 2);
             }
             hierarchy.release();
+            redMask.release();
             return input;
         }
-
         private Mat preprocessFrame(Mat frame) {
-            Mat hsvFrame = new Mat();
             Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
 
             Scalar lowerRed = new Scalar(100, 100, 100);
             Scalar upperRed = new Scalar(180, 255, 255);
 
 
-            Mat redMask = new Mat();
             Core.inRange(hsvFrame, lowerRed, upperRed, redMask);
 
-            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
             Imgproc.morphologyEx(redMask, redMask, Imgproc.MORPH_OPEN, kernel);
             Imgproc.morphologyEx(redMask, redMask, Imgproc.MORPH_CLOSE, kernel);
 
