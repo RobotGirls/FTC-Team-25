@@ -52,6 +52,8 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
     private Servo shooter;
     private DcMotor intake;
 
+    private DcMotor linearLift;
+
     //  @Override
     public void handleEvent(RobotEvent e) {
 
@@ -65,6 +67,10 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
         intake=hardwareMap.get(DcMotor.class, "outtake");
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        linearLift=hardwareMap.get(DcMotor.class, "linearLift");
+        linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         /*
         intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -154,6 +160,18 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     case RIGHT_TRIGGER_UP:
                         intake.setPower(0);
+                        break;
+                    case LEFT_BUMPER_DOWN:
+                        linearLift.setPower(0.5); // test this
+                        break;
+                    case RIGHT_BUMPER_DOWN:
+                        linearLift.setPower(-0.5); // test this
+                        break;
+                    case LEFT_BUMPER_UP:
+                        linearLift.setPower(0);
+                        break;
+                    case RIGHT_BUMPER_UP:
+                        linearLift.setPower(0);
                         break;
                     case BUTTON_B_DOWN:
                         shooter.setPosition(0.55); // need to test this
