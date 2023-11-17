@@ -73,13 +73,6 @@ public class CenterstageRedRightParking extends Robot {
     private DcMotor outtake;
     private OneWheelDirectDrivetrain outtakeDrivetrain;
 
-
-    //sensors
-//    private DistanceSensor distanceSensor;
-//    private DistanceSensorCriteria distanceSensorCriteria;
-//    private ColorSensor colorSensor;
-
-
     //paths
     private DeadReckonPath goToPark;
     private DeadReckonPath goStraightToObject;
@@ -171,11 +164,6 @@ public class CenterstageRedRightParking extends Robot {
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
 
-        //initializes the servo
-        //servos are not in initPaths() because they do not get tasks unless a task is created for them in a specified method
-//        servoMech = hardwareMap.servo.get("servoMech");
-
-
         //sets wheel motors to run using the encoders
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -201,11 +189,6 @@ public class CenterstageRedRightParking extends Robot {
         outtakeDrivetrain = new OneWheelDirectDrivetrain(outtake);
         outtakeDrivetrain.resetEncoders();
         outtakeDrivetrain.encodersOn();
-
-
-        //initializes the color sensor and distance sensor for usage
-//        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
-//        distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
 
         //calls method to start the initialization
         initPaths();
@@ -266,24 +249,11 @@ public class CenterstageRedRightParking extends Robot {
         });
     }
 
-    //provides certain movement for servo mechanism and displays telemetry stating robot
-    //executed the servo task
-//    private void setServoMech() {
-//        servoMech.setPosition(0);
-//        whereAmI.setValue("servo moved");
-//    }
-
-
-
     //executes parking and releases pixel
     @Override
     public void start()
     {
         whereAmI.setValue("in Start");
         goToParkAndReleasePixel();
-//        releaseOuttake();
-
-
-
     }
 }

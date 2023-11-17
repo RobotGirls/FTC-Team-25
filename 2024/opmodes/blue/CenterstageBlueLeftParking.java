@@ -84,13 +84,6 @@ public class CenterstageBlueLeftParking extends Robot {
     private DcMotor outtake;
     private OneWheelDirectDrivetrain outtakeDrivetrain;
 
-
-    //sensors
-//    private DistanceSensor distanceSensor;
-//    private DistanceSensorCriteria distanceSensorCriteria;
-//    private ColorSensor colorSensor;
-
-
     //paths
     private DeadReckonPath goToParkFromMiddle;
     private DeadReckonPath goToParkFromRight;
@@ -119,8 +112,6 @@ public class CenterstageBlueLeftParking extends Robot {
     private static final int DELAY = 5000;
 
     public String objectDetectDirection;
-
-    //private OpenCVBlueDetectPipeline detectPipeline;
 
     static double cX = 0;
     static double cY = 0;
@@ -207,8 +198,6 @@ public class CenterstageBlueLeftParking extends Robot {
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_DISTANCE, -DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 20, DRIVE_SPEED);
 
-        //initializes motorMechTask
-//        outtakeTask = new RunToEncoderValueTask(this, outtake, 0, 0);
     }
 
     //initializes the declared motors and servos
@@ -221,11 +210,6 @@ public class CenterstageBlueLeftParking extends Robot {
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
 
-        //initializes the servo
-        //servos are not in initPaths() because they do not get tasks unless a task is created for them in a specified method
-//        servoMech = hardwareMap.servo.get("servoMech");
-
-
         //sets wheel motors to run using the encoders
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -236,9 +220,6 @@ public class CenterstageBlueLeftParking extends Robot {
         drivetrain = new FourWheelDirectDrivetrain(frontRight, backRight, frontLeft, backLeft);
         drivetrain.resetEncoders();
         drivetrain.encodersOn();
-
-        //initializes pipeline for openCV
-        //detectPipeline = new OpenCVBlueDetectPipeline();
 
         //displays telemetry of robot location
         whereAmI = telemetry.addData("location in code", "init");
@@ -254,12 +235,6 @@ public class CenterstageBlueLeftParking extends Robot {
         outtakeDrivetrain = new OneWheelDirectDrivetrain(outtake);
         outtakeDrivetrain.resetEncoders();
         outtakeDrivetrain.encodersOn();
-
-
-        //initializes the color sensor and distance sensor for usage
-//        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
-//        distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
-
 
         initOpenCV();
         FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -391,23 +366,12 @@ public class CenterstageBlueLeftParking extends Robot {
     }
 
 
-
-    //provides certain movement for servo mechanism and displays telemetry stating robot
-    //executed the servo task
-//    private void setServoMech() {
-//        servoMech.setPosition(0);
-//        whereAmI.setValue("servo moved");
-//    }
-
-
-
     //executes parking and releases pixel
     @Override
     public void start()
     {
         whereAmI.setValue("in Start");
         detectObject();
-        //goToPark(goToParkFromMiddle);
     }
 
 
@@ -441,8 +405,6 @@ public class CenterstageBlueLeftParking extends Robot {
                 cX = moments.get_m10() / moments.get_m00();
                 cY = moments.get_m01() / moments.get_m00();
 
-                //String posLabel = "Position: " + findPosition();
-
                 // Draw a dot at the centroid
                 String label = "(" + (int) cX + ", " + (int) cY + ")";
                 Imgproc.putText(input, label, new Point(cX + 10, cY), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(0, 255, 0), 2);
@@ -453,9 +415,9 @@ public class CenterstageBlueLeftParking extends Robot {
                 Imgproc.putText(input, widthLabel, new Point(cX + 10, cY + 20), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 255, 0), 2);
                 //Display the Distance
                 Imgproc.putText(input, distanceLabel, new Point(cX + 10, cY + 60), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 255, 0), 2);
-                // Display the position
-                //Imgproc.putText(input, posLabel, new Point(cX + 10, cY + 75), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(0, 255, 0), 2);
             }
+
+            hierarchy.release();
 
             return input;
         }

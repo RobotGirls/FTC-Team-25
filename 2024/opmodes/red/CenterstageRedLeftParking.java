@@ -85,13 +85,6 @@ public class CenterstageRedLeftParking extends Robot {
     private DcMotor outtake;
     private OneWheelDirectDrivetrain outtakeDrivetrain;
 
-
-    //sensors
-//    private DistanceSensor distanceSensor;
-//    private DistanceSensorCriteria distanceSensorCriteria;
-//    private ColorSensor colorSensor;
-
-
     //paths
     private DeadReckonPath goToParkFromMiddle;
     private DeadReckonPath goToParkFromRight;
@@ -122,7 +115,6 @@ public class CenterstageRedLeftParking extends Robot {
 
     public String objectDetectDirection;
 
-    //private OpenCVRedDetectPipeline detectPipeline;
 
     static double cX = 0;
     static double cY = 0;
@@ -185,10 +177,8 @@ public class CenterstageRedLeftParking extends Robot {
         //addSegment adds a new segment or direction the robot moves into
 
         //robot moves to the object in the right
-       //goRightToObject.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 1, -DRIVE_SPEED);
         goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 13, DRIVE_SPEED);
         goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, DRIVE_SPEED);
-        //goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
 
         //robot moves to the object in the middle
         goMiddleToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 9, DRIVE_SPEED);
@@ -212,8 +202,6 @@ public class CenterstageRedLeftParking extends Robot {
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, RIGHT_DISTANCE, DRIVE_SPEED);
         //goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.TURN, 86, DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, -DRIVE_SPEED);
-        //initializes motorMechTask
-//        outtakeTask = new RunToEncoderValueTask(this, outtake, 0, 0);
     }
 
     //initializes the declared motors and servos
@@ -226,11 +214,6 @@ public class CenterstageRedLeftParking extends Robot {
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
 
-        //initializes the servo
-        //servos are not in initPaths() because they do not get tasks unless a task is created for them in a specified method
-//        servoMech = hardwareMap.servo.get("servoMech");
-
-
         //sets wheel motors to run using the encoders
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -241,9 +224,6 @@ public class CenterstageRedLeftParking extends Robot {
         drivetrain = new FourWheelDirectDrivetrain(frontRight, backRight, frontLeft, backLeft);
         drivetrain.resetEncoders();
         drivetrain.encodersOn();
-
-        //initializes pipeline for openCV
-        //detectPipeline = new OpenCVRedDetectPipeline();
 
         //displays telemetry of robot location
         whereAmI = telemetry.addData("location in code", "init");
@@ -259,12 +239,6 @@ public class CenterstageRedLeftParking extends Robot {
         outtakeDrivetrain = new OneWheelDirectDrivetrain(outtake);
         outtakeDrivetrain.resetEncoders();
         outtakeDrivetrain.encodersOn();
-
-
-        //initializes the color sensor and distance sensor for usage
-//        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
-//        distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
-
 
         initOpenCV();
         FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -312,25 +286,6 @@ public class CenterstageRedLeftParking extends Robot {
                     RobotLog.i("Drove to the object");
                     whereAmI.setValue("At the object");
                     releaseOuttake();
-                    /*
-                    if(findPosition().equals("center"))
-                    {
-                        delay(1000);
-                        goToPark(goToParkFromMiddle);
-                    }
-                    else if(findPosition().equals("right"))
-                    {
-                        delay(1000);
-                        goToPark(goToParkFromRight);
-                    }
-                    else
-                    {
-                        delay(1000);
-                        goToPark(goToParkFromLeft);
-                    }
-//                    delay(0);
-*/
-
                 }
             }
         });
@@ -413,24 +368,12 @@ public class CenterstageRedLeftParking extends Robot {
         });
     }
 
-
-
-    //provides certain movement for servo mechanism and displays telemetry stating robot
-    //executed the servo task
-//    private void setServoMech() {
-//        servoMech.setPosition(0);
-//        whereAmI.setValue("servo moved");
-//    }
-
-
-
     //executes parking and releases pixel
     @Override
     public void start()
     {
         whereAmI.setValue("in Start");
         detectObject();
-        //goToPark(goToParkFromLeft);
     }
 
 
@@ -463,7 +406,6 @@ public class CenterstageRedLeftParking extends Robot {
                 cX = moments.get_m10() / moments.get_m00();
                 cY = moments.get_m01() / moments.get_m00();
 
-                //String posLabel = "Position: " + findPosition();
 
                 // Draw a dot at the centroid
                 String label = "(" + (int) cX + ", " + (int) cY + ")";
@@ -475,10 +417,8 @@ public class CenterstageRedLeftParking extends Robot {
                 Imgproc.putText(input, widthLabel, new Point(cX + 10, cY + 20), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 255, 0), 2);
                 //Display the Distance
                 Imgproc.putText(input, distanceLabel, new Point(cX + 10, cY + 60), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 255, 0), 2);
-                // Display the position
-                //Imgproc.putText(input, posLabel, new Point(cX + 10, cY + 75), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(0, 255, 0), 2);
             }
-
+            hierarchy.release();
             return input;
         }
 
