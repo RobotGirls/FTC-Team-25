@@ -64,7 +64,7 @@ import java.util.List;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 @Config
-@Autonomous(name = "CenterstageRedLeftParking")
+@Autonomous(name = "CenterstageRedRightParking")
 //@Disabled
 
 //if any terms in the program are unknown to you, right click and press Go To > Declarations and Usages
