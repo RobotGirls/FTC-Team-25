@@ -386,7 +386,7 @@ public class CenterstageRedLeftParking extends Robot {
         @Override
         public Mat processFrame(Mat input) {
             // Preprocess the frame to detect red regions
-            Mat redMask = preprocessFrame(input);
+            redMask = preprocessFrame(input);
 
             // Find contours of the detected red regions
             List<MatOfPoint> contours = new ArrayList<>();

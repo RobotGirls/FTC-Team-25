@@ -385,7 +385,7 @@ public class CenterstageBlueRightParking extends Robot {
         @Override
         public Mat processFrame(Mat input) {
             // Preprocess the frame to detect blue regions
-            Mat blueMask = preprocessFrame(input);
+            blueMask = preprocessFrame(input);
 
 
             // Find contours of the detected blue regions
