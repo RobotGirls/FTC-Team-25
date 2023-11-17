@@ -55,8 +55,6 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
     private RunToEncoderValueTask linearLiftTaskMiddle;
     private RunToEncoderValueTask linearLiftTaskHigh;
 
-    private DcMotor linearLift;
-
     //  @Override
     public void handleEvent(RobotEvent e) {
 
@@ -199,18 +197,6 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     case BUTTON_X_DOWN:
                         rotateShooter.setPosition(0.5); // up
-                        break;
-                    case LEFT_BUMPER_DOWN:
-                        linearLift.setPower(1);
-                        break;
-                    case LEFT_BUMPER_UP:
-                        linearLift.setPower(0);
-                        break;
-                    case RIGHT_BUMPER_DOWN:
-                        linearLift.setPower(-1);
-                        break;
-                    case RIGHT_BUMPER_UP:
-                        linearLift.setPower(0);
                         break;
                 }
             }
