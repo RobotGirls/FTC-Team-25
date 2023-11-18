@@ -48,8 +48,6 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
     private MechanumGearedDrivetrain drivetrain;
 
     private DcMotor linearLift;
-    private Servo rotateShooter;
-    private Servo shooter;
     private DcMotor intake;
 
     private Servo box;
@@ -73,9 +71,6 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
         box = hardwareMap.servo.get("pixelBox");
         box.setPosition(0);
-
-        rotateShooter = hardwareMap.servo.get("rotateShooter");
-        shooter = hardwareMap.servo.get("shootDrone");
 
         linearLift = hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -165,23 +160,6 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     case RIGHT_BUMPER_UP:
                         linearLift.setPower(0);
-                        break;
-                    // drone shooter and rotate mech
-                    case BUTTON_B_DOWN:
-                        shooter.setPosition(0.55);
-                        break;
-                    case BUTTON_A_DOWN:
-                        shooter.setPosition(0.9);
-                        break;
-                    case BUTTON_Y_DOWN:
-                         // down
-                        for (int i = 5; i > -1; i--) {
-                            rotateShooter.setPosition(i/10);
-                            delay(500);
-                        }
-                        break;
-                    case BUTTON_X_DOWN:
-                        rotateShooter.setPosition(0.5); // up
                         break;
                     // pixel deployer box
                     case DPAD_UP_DOWN:
