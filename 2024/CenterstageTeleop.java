@@ -51,9 +51,8 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
     private Servo rotateShooter;
     private Servo shooter;
     private DcMotor intake;
-    private RunToEncoderValueTask linearLiftTaskLow;
-    private RunToEncoderValueTask linearLiftTaskMiddle;
-    private RunToEncoderValueTask linearLiftTaskHigh;
+
+    private Servo box;
 
     //  @Override
     public void handleEvent(RobotEvent e) {
@@ -72,10 +71,7 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
         linearLift=hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        /*
-        intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        */
+        box = hardwareMap.servo.get("pixelBox");
 
         rotateShooter = hardwareMap.servo.get("rotateShooter");
         shooter = hardwareMap.servo.get("shootDrone");
@@ -99,10 +95,6 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
         locationTlm = telemetry.addData("location","init");
         targetPositionTlm = telemetry.addData("target Pos","init");
-
-        linearLiftTaskLow = new RunToEncoderValueTask(this,linearLift,1000,0.5);
-        linearLiftTaskMiddle = new RunToEncoderValueTask(this,linearLift,2000,0.5);
-        linearLiftTaskHigh = new RunToEncoderValueTask(this,linearLift,3000,0.5);
     }
 
     public void initIMU()
@@ -141,28 +133,18 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
             }
         });
 
-/*        this.addTask(new OneWheelDriveTaskwLimitSwitch(this, linearLift, true, umbrellaLimitSwitch, true)
-        {
-            public void handleEvent(RobotEvent e) {
-                OneWheelDriveTaskwLimitSwitchEvent switchEvent = (OneWheelDriveTaskwLimitSwitchEvent) e;
-                locationTlm.setValue("in gamepad1 handler");
-                switch (switchEvent.kind) {
-                }
-            }
-        });
-*/
-
         //gamepad2 w /nowheels only mechs
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e) {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
                 locationTlm.setValue("in gamepad2 handler");
                 switch (gamepadEvent.kind) {
+                    // intake in and out
                     case LEFT_TRIGGER_DOWN:
-                        intake.setPower(0.5); // test this
+                        intake.setPower(0.5);
                         break;
                     case RIGHT_TRIGGER_DOWN:
-                        intake.setPower(-0.5); // test this
+                        intake.setPower(-0.5);
                         break;
                     case LEFT_TRIGGER_UP:
                         intake.setPower(0);
@@ -170,6 +152,7 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                     case RIGHT_TRIGGER_UP:
                         intake.setPower(0);
                         break;
+                    // slides up or down
                     case LEFT_BUMPER_DOWN:
                         linearLift.setPower(0.5); // test this
                         break;
@@ -182,11 +165,12 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                     case RIGHT_BUMPER_UP:
                         linearLift.setPower(0);
                         break;
+                    // drone shooter and rotate mech
                     case BUTTON_B_DOWN:
-                        shooter.setPosition(0.55); // need to test this
+                        shooter.setPosition(0.55);
                         break;
                     case BUTTON_A_DOWN:
-                        shooter.setPosition(0.9); // need to test this
+                        shooter.setPosition(0.9);
                         break;
                     case BUTTON_Y_DOWN:
                          // down
@@ -198,6 +182,11 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                     case BUTTON_X_DOWN:
                         rotateShooter.setPosition(0.5); // up
                         break;
+                    // pixel deployer box
+                    case DPAD_UP_DOWN:
+                        box.setPosition(0);
+                    case DPAD_DOWN_DOWN:
+                        box.setPosition(0.5);
                 }
             }
         });
