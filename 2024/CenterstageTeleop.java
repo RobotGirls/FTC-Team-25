@@ -72,6 +72,7 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         box = hardwareMap.servo.get("pixelBox");
+        box.setPosition(0);
 
         rotateShooter = hardwareMap.servo.get("rotateShooter");
         shooter = hardwareMap.servo.get("shootDrone");
@@ -184,9 +185,11 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     // pixel deployer box
                     case DPAD_UP_DOWN:
-                        box.setPosition(0);
+                        box.setPosition(1);
+                        break;
                     case DPAD_DOWN_DOWN:
-                        box.setPosition(0.5);
+                        box.setPosition(0);
+                        break;
                 }
             }
         });
