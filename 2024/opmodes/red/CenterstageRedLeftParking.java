@@ -103,8 +103,8 @@ public class CenterstageRedLeftParking extends Robot {
     public static double RIGHT_DISTANCE = 10;
     public static double LEFT_DISTANCE = 13;
     public static double DRIVE_SPEED = 0.6;
-    public static double OUTTAKE_DISTANCE = 3;
-    public static double OUTTAKE_SPEED = 0.1;
+    public static double OUTTAKE_DISTANCE = 5;
+    public static double OUTTAKE_SPEED = 0.3;
 
 
     //telemetry
@@ -147,9 +147,6 @@ public class CenterstageRedLeftParking extends Robot {
         }
     }
 
-
-
-
     //initializes declared paths/tasks for the robot to do
     public void initPaths()
     {   //initializes the paths
@@ -172,10 +169,9 @@ public class CenterstageRedLeftParking extends Robot {
 
 
         outtakePath = new DeadReckonPath();
-        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, OUTTAKE_SPEED);
+        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, -OUTTAKE_SPEED);
 
         //addSegment adds a new segment or direction the robot moves into
-
         //robot moves to the object in the right
         goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 13, DRIVE_SPEED);
         goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, DRIVE_SPEED);
@@ -188,10 +184,9 @@ public class CenterstageRedLeftParking extends Robot {
         goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, -DRIVE_SPEED);
         //goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
 
-
         //after robot places pixel in the middle position, drives to the parking spot in backstage
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 12, -DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 9, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, DRIVE_SPEED);
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 75, DRIVE_SPEED);
 
         //after robot places pixel in the right position, drives to the parking spot in backstage
@@ -429,7 +424,7 @@ public class CenterstageRedLeftParking extends Robot {
         private Mat preprocessFrame(Mat frame) {
             Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
 
-            Scalar lowerRed = new Scalar(100, 100, 100);
+            Scalar lowerRed = new Scalar(80, 100, 100);
             Scalar upperRed = new Scalar(180, 255, 255);
 
 

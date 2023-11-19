@@ -30,7 +30,7 @@ import team25core.TwoStickMechanumControlScheme;
 //@Disabled
 public class CenterstageTeleop extends StandardFourMotorRobot {
 //new teleop
-
+    public float rotateShooterPos;
     private TeleopDriveTask drivetask;
 
     private enum Direction {
@@ -52,6 +52,9 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
     private Servo box;
 
+    private Servo rotateShooter;
+    private Servo shooter;
+
     //  @Override
     public void handleEvent(RobotEvent e) {
 
@@ -66,11 +69,11 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
         intake=hardwareMap.get(DcMotor.class, "outtake");
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        linearLift=hardwareMap.get(DcMotor.class, "linearLift");
-        linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         box = hardwareMap.servo.get("pixelBox");
         box.setPosition(0);
+
+        rotateShooter = hardwareMap.servo.get("rotateShooter");
+        shooter = hardwareMap.servo.get("shootDrone");
 
         linearLift = hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -88,6 +91,8 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
         drivetrain = new MechanumGearedDrivetrain(motorMap);
         drivetask = new TeleopDriveTask(this, scheme, frontLeft, frontRight, backLeft, backRight);
         drivetask.slowDown(false);
+
+        drivetrain.setNoncanonicalMotorDirection();
 
         locationTlm = telemetry.addData("location","init");
         targetPositionTlm = telemetry.addData("target Pos","init");
@@ -129,6 +134,7 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
             }
         });
 
+        rotateShooterPos = 0;
         //gamepad2 w /nowheels only mechs
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e) {
@@ -137,23 +143,29 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                 switch (gamepadEvent.kind) {
                     // intake in and out
                     case LEFT_TRIGGER_DOWN:
-                        intake.setPower(0.5);
+                        intake.setPower(0.6);
                         break;
                     case RIGHT_TRIGGER_DOWN:
-                        intake.setPower(-0.5);
+                        intake.setPower(-0.6);
                         break;
+                        /*
                     case LEFT_TRIGGER_UP:
                         intake.setPower(0);
                         break;
                     case RIGHT_TRIGGER_UP:
                         intake.setPower(0);
                         break;
+                        */
+
+                    case DPAD_LEFT_DOWN:
+                        intake.setPower(0);
+                        break;
                     // slides up or down
                     case LEFT_BUMPER_DOWN:
-                        linearLift.setPower(0.5); // test this
+                        linearLift.setPower(1); // test this
                         break;
                     case RIGHT_BUMPER_DOWN:
-                        linearLift.setPower(-0.5); // test this
+                        linearLift.setPower(-1); // test this
                         break;
                     case LEFT_BUMPER_UP:
                         linearLift.setPower(0);
@@ -167,6 +179,29 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     case DPAD_DOWN_DOWN:
                         box.setPosition(0);
+                        break;
+                    // drone shooter and rotate mech
+                    case BUTTON_B_DOWN:
+                        shooter.setPosition(0.55); // need to test this
+                        shooter.setPosition(0.55);
+                        break;
+                    case BUTTON_A_DOWN:
+                        shooter.setPosition(0.9); // need to test this
+                        shooter.setPosition(0.9);
+                        break;
+                    case BUTTON_Y_DOWN:
+                        rotateShooter.setPosition(0);
+                        break;
+                        // down
+                    case BUTTON_X_DOWN:
+                        /*
+                        for (int i = 0; i < 6; i++) {
+                            rotateShooterPos += 0.1;
+                            rotateShooter.setPosition(rotateShooterPos);
+                            delay(500);
+                        }
+                        */
+                        rotateShooter.setPosition(0.5);
                         break;
                 }
             }

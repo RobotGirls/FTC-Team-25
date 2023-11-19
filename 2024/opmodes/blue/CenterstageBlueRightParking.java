@@ -100,8 +100,8 @@ public class CenterstageBlueRightParking extends Robot {
     public static double RIGHT_DISTANCE = 9;
     public static double LEFT_DISTANCE = 8;
     public static double DRIVE_SPEED = 0.6;
-    public static double OUTTAKE_DISTANCE = 3;
-    public static double OUTTAKE_SPEED = 0.1;
+    public static double OUTTAKE_DISTANCE = 5;
+    public static double OUTTAKE_SPEED = 0.3;
 
 
     //telemetry
@@ -171,7 +171,7 @@ public class CenterstageBlueRightParking extends Robot {
 
 
         outtakePath = new DeadReckonPath();
-        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, OUTTAKE_SPEED);
+        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, -OUTTAKE_SPEED);
 
         //addSegment adds a new segment or direction the robot moves into
 

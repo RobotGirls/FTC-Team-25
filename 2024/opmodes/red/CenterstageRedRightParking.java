@@ -103,8 +103,8 @@ public class CenterstageRedRightParking extends Robot {
     public static double RIGHT_DISTANCE = 10;
     public static double LEFT_DISTANCE = 10;
     public static double DRIVE_SPEED = 0.6;
-    public static double OUTTAKE_DISTANCE = 3;
-    public static double OUTTAKE_SPEED = 0.1;
+    public static double OUTTAKE_DISTANCE = 5;
+    public static double OUTTAKE_SPEED = 0.3;
 
 
     //telemetry
@@ -172,6 +172,8 @@ public class CenterstageRedRightParking extends Robot {
 
 
         outtakePath = new DeadReckonPath();
+        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, -OUTTAKE_SPEED);
+
         goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 13, DRIVE_SPEED);
         goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 41, DRIVE_SPEED);
 
@@ -291,15 +293,18 @@ public class CenterstageRedRightParking extends Robot {
     {
         if(position.equals("right"))
         {
+            whereAmI.setValue("right");
             moveToObjectAndReleasePixel(goRightToObject);
 
         }
         else if(position.equals("center"))
         {
+            whereAmI.setValue("center");
             moveToObjectAndReleasePixel(goMiddleToObject);
         }
         else
         {
+            whereAmI.setValue("left");
             moveToObjectAndReleasePixel(goLeftToObject);
         }
     }
@@ -462,14 +467,17 @@ public class CenterstageRedRightParking extends Robot {
     private String findPosition(){
         if (cX > 400) {
             position = "right";
+            whereAmI.setValue("right");
             return position;
         }
         else if (cX <= 400 && cX >= 200) {
             position = "center";
+            whereAmI.setValue("center");
             return position;
         }
         else {
             position = "left";
+            whereAmI.setValue("left");
             return position;
         }
     }
