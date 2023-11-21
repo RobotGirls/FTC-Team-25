@@ -424,7 +424,7 @@ public class CenterstageRedLeftParking extends Robot {
         private Mat preprocessFrame(Mat frame) {
             Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
 
-            Scalar lowerRed = new Scalar(80, 100, 100);
+            Scalar lowerRed = new Scalar(120, 100, 100);
             Scalar upperRed = new Scalar(180, 255, 255);
 
 
