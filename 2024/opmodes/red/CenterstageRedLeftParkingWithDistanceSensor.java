@@ -204,7 +204,6 @@ public class CenterstageRedLeftParking extends Robot {
     public void init()
     {
         //initializes the motors for the wheels
-        /*
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
@@ -220,10 +219,10 @@ public class CenterstageRedLeftParking extends Robot {
         drivetrain = new FourWheelDirectDrivetrain(frontRight, backRight, frontLeft, backLeft);
         drivetrain.resetEncoders();
         drivetrain.encodersOn();
-*/
+
         //displays telemetry of robot location
         whereAmI = telemetry.addData("location in code", "init");
-/*
+
         //initializes motor mechanism, returns what motor would do if 0 power behavior was implemented on it,
         //rests encoder, and prepares motors to run on the encoders
         outtake = hardwareMap.get(DcMotor.class, "outtake");
@@ -235,7 +234,7 @@ public class CenterstageRedLeftParking extends Robot {
         outtakeDrivetrain = new OneWheelDirectDrivetrain(outtake);
         outtakeDrivetrain.resetEncoders();
         outtakeDrivetrain.encodersOn();
-*/
+
         initOpenCV();
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
@@ -369,7 +368,7 @@ public class CenterstageRedLeftParking extends Robot {
     public void start()
     {
         whereAmI.setValue("in Start");
-        //detectObject();
+        detectObject();
     }
 
 
@@ -470,12 +469,9 @@ public class CenterstageRedLeftParking extends Robot {
             position = "center";
             return position;
         }
-        else if (cX < 200){
+        else {
             position = "left";
             return position;
-        }
-        else {
-            return "detected nothing";
         }
     }
 }
