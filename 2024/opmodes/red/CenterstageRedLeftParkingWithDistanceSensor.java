@@ -28,11 +28,30 @@ package opmodes.red;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
@@ -42,33 +61,14 @@ import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvPipeline;
-
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-
-import org.opencv.core.*;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.imgproc.Moments;
-
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import team25core.DistanceSensorTask;
 
 @Config
-@Autonomous(name = "CenterstageRedLeftParking")
+@Autonomous(name = "CenterstageRedLeftParkingDS")
 //@Disabled
 
 //if any terms in the program are unknown to you, right click and press Go To > Declarations and Usages
-public class CenterstageRedLeftParking extends Robot {
+public class CenterstageRedLeftParkingWithDistanceSensor extends Robot {
 
 
     //wheels
@@ -79,11 +79,24 @@ public class CenterstageRedLeftParking extends Robot {
     private DcMotor backRight;
     private FourWheelDirectDrivetrain drivetrain;
 
+    private DistanceSensorTask distanceTask;
+    private final static String TAG = "PROP";
+    private DistanceSensor rightSensor;
+    private DistanceSensor leftSensor;
+    private Telemetry.Item tagIdTlm;
+    private Telemetry.Item rightSensorTlm;
+    private Telemetry.Item leftSensorTlm;
 
     //mechs
 //    private Servo servoMech;
     private DcMotor outtake;
     private OneWheelDirectDrivetrain outtakeDrivetrain;
+
+    double rightDistance;
+    double leftDistance;
+
+    double minDistance;
+    double maxDistance;
 
     //paths
     private DeadReckonPath goToParkFromMiddle;
@@ -95,6 +108,8 @@ public class CenterstageRedLeftParking extends Robot {
     private DeadReckonPath goLeftToObject;
 
     private DeadReckonPath outtakePath;
+
+    private DeadReckonPath forwardPath;
 
 
     //variables for constants
@@ -130,6 +145,7 @@ public class CenterstageRedLeftParking extends Robot {
     public static final double focalLength = 728;  // Replace with the focal length of the camera in pixels
 
     public String position;
+    public String DSPosition;
 
     /*
      * The default event handler for the robot.
@@ -170,6 +186,10 @@ public class CenterstageRedLeftParking extends Robot {
 
         outtakePath = new DeadReckonPath();
         outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, -OUTTAKE_SPEED);
+
+        forwardPath = new DeadReckonPath();
+        forwardPath.stop();
+        forwardPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 13, DRIVE_SPEED);
 
         //addSegment adds a new segment or direction the robot moves into
         //robot moves to the object in the right
@@ -242,10 +262,8 @@ public class CenterstageRedLeftParking extends Robot {
 
         telemetry.addData("Coordinate", "(" + (int) cX + ", " + (int) cY + ")");
         telemetry.addData("Distance in Inch", (getDistance(width)));
-        telemetry.addData("Position: ", findPosition());
+        telemetry.addData("Position: ", findPositionOpenCV());
         telemetry.update();
-
-        findPosition();
         //calls method to start the initialization
         initPaths();
 
@@ -286,16 +304,52 @@ public class CenterstageRedLeftParking extends Robot {
         });
     }
 
+    public void approachSpikes() {
+        this.addTask(new DeadReckonTask(this, forwardPath, drivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+                    RobotLog.i("Drove to the object");
+                    whereAmI.setValue("At the object");
+                    detectPropDS();
+                }
+            }
+        });
+    }
+
+    public void detectPropDS() {
+        distanceTask = new DistanceSensorTask(this, rightSensor, leftSensor, telemetry, 20, 33, 15 ,
+                6,false) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DistanceSensorEvent event = (DistanceSensorEvent) e;
+                switch (event.kind) {
+                    case LEFT_DISTANCE:
+                        DSPosition = "right";
+                        break;
+                    case RIGHT_DISTANCE:
+                        DSPosition = "left";
+                        break;
+                    case UNKNOWN:
+                        DSPosition = "center";
+                        break;
+                }
+                chooseSpike();
+            }
+        };
+    }
 
 
-    public void detectObject()
+    public void chooseSpike()
     {
-        if(position.equals("right"))
+        if((position.equals("right")&&DSPosition.equals("right")) || (position.equals("left")&&DSPosition.equals("right")) || (position.equals("center")&&DSPosition.equals("right")))
         {
             moveToObjectAndReleasePixel(goRightToObject);
 
         }
-        else if(position.equals("center"))
+        else if((position.equals("center")&&DSPosition.equals("center")) || (position.equals("left")&&DSPosition.equals("center")) || (position.equals("right")&&DSPosition.equals("center")))
         {
             moveToObjectAndReleasePixel(goMiddleToObject);
         }
@@ -368,7 +422,9 @@ public class CenterstageRedLeftParking extends Robot {
     public void start()
     {
         whereAmI.setValue("in Start");
-        detectObject();
+        telemetry.addData("Position: ", findPositionOpenCV());
+        telemetry.update();
+        approachSpikes();
     }
 
 
@@ -460,7 +516,7 @@ public class CenterstageRedLeftParking extends Robot {
         double distance = (objectWidthInRealWorldUnits * focalLength) / width;
         return distance;
     }
-    private String findPosition(){
+    private String findPositionOpenCV(){
         if (cX > 400) {
             position = "right";
             return position;
