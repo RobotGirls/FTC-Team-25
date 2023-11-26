@@ -70,7 +70,7 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         box = hardwareMap.servo.get("pixelBox");
-        box.setPosition(0);
+        box.setPosition(0.9);
 
         rotateShooter = hardwareMap.servo.get("rotateShooter");
         shooter = hardwareMap.servo.get("shootDrone");
@@ -148,18 +148,19 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                     case RIGHT_TRIGGER_DOWN:
                         intake.setPower(-0.6);
                         break;
-                        /*
+
+//
                     case LEFT_TRIGGER_UP:
                         intake.setPower(0);
                         break;
                     case RIGHT_TRIGGER_UP:
                         intake.setPower(0);
                         break;
-                        */
 
-                    case DPAD_LEFT_DOWN:
-                        intake.setPower(0);
-                        break;
+
+//                    case DPAD_LEFT_DOWN:
+//                        intake.setPower(0);
+//                        break;
                     // slides up or down
                     case LEFT_BUMPER_DOWN:
                         linearLift.setPower(1); // test this
@@ -175,33 +176,29 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     // pixel deployer box
                     case DPAD_UP_DOWN:
-                        box.setPosition(1);
+                        box.setPosition(0);
+                        //deploy pixel
                         break;
                     case DPAD_DOWN_DOWN:
-                        box.setPosition(0);
+                        box.setPosition(0.9);
                         break;
                     // drone shooter and rotate mech
                     case BUTTON_B_DOWN:
-                        shooter.setPosition(0.55); // need to test this
                         shooter.setPosition(0.55);
-                        break;
-                    case BUTTON_A_DOWN:
-                        shooter.setPosition(0.9); // need to test this
-                        shooter.setPosition(0.9);
+                        if (shooter.getPosition() == 0.55) {
+                            shooter.setPosition(0.9);
+                        }
+                        else if (shooter.getPosition() == 0.9) {
+                            shooter.setPosition(0.55);
+                        }
                         break;
                     case BUTTON_Y_DOWN:
-                        rotateShooter.setPosition(0);
-                        break;
-                        // down
-                    case BUTTON_X_DOWN:
-                        /*
-                        for (int i = 0; i < 6; i++) {
-                            rotateShooterPos += 0.1;
-                            rotateShooter.setPosition(rotateShooterPos);
-                            delay(500);
+                        if (rotateShooter.getPosition() == 0.5) {
+                            rotateShooter.setPosition(0);
                         }
-                        */
-                        rotateShooter.setPosition(0.5);
+                        else if (rotateShooter.getPosition() == 0) {
+                            rotateShooter.setPosition(0.5);
+                        }
                         break;
                 }
             }
