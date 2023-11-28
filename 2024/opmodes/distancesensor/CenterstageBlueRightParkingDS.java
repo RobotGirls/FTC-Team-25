@@ -29,11 +29,12 @@ package opmodes.distancesensor;
 //import com.acmerobotics.dashboard.FtcDashboard;
 //import com.acmerobotics.dashboard.config.Config;
 //import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -56,20 +57,19 @@ import java.util.List;
 
 import team25core.DeadReckonPath;
 import team25core.DeadReckonTask;
+import team25core.DistanceSensorTask;
 import team25core.FourWheelDirectDrivetrain;
 import team25core.OneWheelDirectDrivetrain;
 import team25core.Robot;
 import team25core.RobotEvent;
 import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
-import team25core.DistanceSensorTask;
 
 //@Config
-@Autonomous(name = "CenterstageRedLeftParkingDS")
-//@Disabled
+@Autonomous(name = "CenterstageBlueRightParkingDS")
 
 //if any terms in the program are unknown to you, right click and press Go To > Declarations and Usages
-public class CenterstageRedLeftParkingDS extends Robot {
+public class CenterstageBlueRightParkingDS extends Robot {
 
 
     //wheels
@@ -204,21 +204,21 @@ public class CenterstageRedLeftParkingDS extends Robot {
 
         //addSegment adds a new segment or direction the robot moves into
         //robot moves to the object in the right
-        //goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 13, DRIVE_SPEED);
         goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, DRIVE_SPEED);
 
         //robot moves to the object in the middle
         goMiddleToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
 
         //robot moves to the object in the left
-        //goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12, DRIVE_SPEED);
         goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, 45, -DRIVE_SPEED);
-        //goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
 
         //after robot places pixel in the middle position, drives to the parking spot in backstage
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 9, -DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 75, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 18, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.TURN, 48, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 40, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, -DRIVE_SPEED);
 
         //after robot places pixel in the right position, drives to the parking spot in backstage
         goToParkFromRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_DISTANCE, -DRIVE_SPEED);
@@ -309,7 +309,7 @@ public class CenterstageRedLeftParkingDS extends Robot {
         controlHubCam = OpenCvCameraFactory.getInstance().createWebcam(
                 hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        controlHubCam.setPipeline(new RedBlobDetectionPipeline());
+        controlHubCam.setPipeline(new BlueBlobDetectionPipeline());
 
         controlHubCam.openCameraDevice();
         controlHubCam.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
@@ -401,7 +401,7 @@ public class CenterstageRedLeftParkingDS extends Robot {
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
-                    box.setPosition(0);
+                    lift();
                 }
             }
         });
@@ -413,7 +413,7 @@ public class CenterstageRedLeftParkingDS extends Robot {
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
-                    box.setPosition(0.9);
+                    box.setPosition(0);
                 }
             }
         });
@@ -427,7 +427,6 @@ public class CenterstageRedLeftParkingDS extends Robot {
                 SingleShotTimerEvent event = (SingleShotTimerEvent) e;
                 if (event.kind == EventKind.EXPIRED ) {
                     whereAmI.setValue("in delay task");
-
                 }
             }
         });
@@ -477,28 +476,29 @@ public class CenterstageRedLeftParkingDS extends Robot {
     }
 
 
-    public static class RedBlobDetectionPipeline extends OpenCvPipeline
+    public static class BlueBlobDetectionPipeline extends OpenCvPipeline
     {
-        Mat hsvFrame = new Mat();
-        Mat redMask = new Mat();
-        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
         Mat hierarchy = new Mat();
+        Mat hsvFrame = new Mat();
+        Mat blueMask = new Mat();
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
         @Override
         public Mat processFrame(Mat input) {
-            // Preprocess the frame to detect red regions
-            redMask = preprocessFrame(input);
+            // Preprocess the frame to detect blue regions
+            blueMask = preprocessFrame(input);
 
-            // Find contours of the detected red regions
+
+            // Find contours of the detected blue regions
             List<MatOfPoint> contours = new ArrayList<>();
+            Imgproc.findContours(blueMask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-            Imgproc.findContours(redMask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-
-            // Find the largest red contour (blob)
+            // Find the largest blue contour (blob)
             MatOfPoint largestContour = findLargestContour(contours);
 
             if (largestContour != null) {
-                // Draw a red outline around the largest detected object
+                // Draw a blue outline around the largest detected object
                 Imgproc.drawContours(input, contours, contours.indexOf(largestContour), new Scalar(255, 0, 0), 2);
+
                 // Calculate the width of the bounding box
                 width = calculateWidth(largestContour);
 
@@ -509,7 +509,6 @@ public class CenterstageRedLeftParkingDS extends Robot {
                 Moments moments = Imgproc.moments(largestContour);
                 cX = moments.get_m10() / moments.get_m00();
                 cY = moments.get_m01() / moments.get_m00();
-
 
                 // Draw a dot at the centroid
                 String label = "(" + (int) cX + ", " + (int) cY + ")";
@@ -523,9 +522,10 @@ public class CenterstageRedLeftParkingDS extends Robot {
                 Imgproc.putText(input, distanceLabel, new Point(cX + 10, cY + 60), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 255, 0), 2);
             }
             hierarchy.release();
-            redMask.release();
+            blueMask.release();
             return input;
         }
+
         private Mat preprocessFrame(Mat frame) {
             Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
 
@@ -533,12 +533,12 @@ public class CenterstageRedLeftParkingDS extends Robot {
             Scalar upperRed = new Scalar(180, 255, 255);
 
 
-            Core.inRange(hsvFrame, lowerRed, upperRed, redMask);
+            Core.inRange(hsvFrame, lowerRed, upperRed, blueMask);
 
-            Imgproc.morphologyEx(redMask, redMask, Imgproc.MORPH_OPEN, kernel);
-            Imgproc.morphologyEx(redMask, redMask, Imgproc.MORPH_CLOSE, kernel);
+            Imgproc.morphologyEx(blueMask, blueMask, Imgproc.MORPH_OPEN, kernel);
+            Imgproc.morphologyEx(blueMask, blueMask, Imgproc.MORPH_CLOSE, kernel);
 
-            return redMask;
+            return blueMask;
         }
 
         private MatOfPoint findLargestContour(List<MatOfPoint> contours) {
