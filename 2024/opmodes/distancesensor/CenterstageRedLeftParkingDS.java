@@ -29,6 +29,8 @@ package opmodes.distancesensor;
 //import com.acmerobotics.dashboard.FtcDashboard;
 //import com.acmerobotics.dashboard.config.Config;
 //import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -196,7 +198,7 @@ public class CenterstageRedLeftParkingDS extends Robot {
 
         forwardPath = new DeadReckonPath();
         forwardPath.stop();
-        forwardPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, 0.4);
+        forwardPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 17, 0.4);
 
         liftPath = new DeadReckonPath();
         liftPath.stop();
@@ -212,7 +214,7 @@ public class CenterstageRedLeftParkingDS extends Robot {
 
         //robot moves to the object in the left
         //goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12, DRIVE_SPEED);
-        goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, 45, -DRIVE_SPEED);
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, 47, -DRIVE_SPEED);
         //goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
 
         //after robot places pixel in the middle position, drives to the parking spot in backstage
@@ -225,8 +227,9 @@ public class CenterstageRedLeftParkingDS extends Robot {
         goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, DRIVE_SPEED);
 
         //after robot places pixel in the left position, drives to the parking spot in backstage
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, RIGHT_DISTANCE, DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 40, -DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 53, -DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.TURN, 90, -DRIVE_SPEED);
     }
 
@@ -285,11 +288,9 @@ public class CenterstageRedLeftParkingDS extends Robot {
 
         locationTlm = telemetry.addData("prop position", "none");
         initOpenCV();
-        /*
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         FtcDashboard.getInstance().startCameraStream(controlHubCam, 30);
-*/
         telemetry.addData("Coordinate", "(" + (int) cX + ", " + (int) cY + ")");
         telemetry.addData("Distance in Inch", (getDistance(width)));
         telemetry.addData("Position: ", findPositionOpenCV());
@@ -368,9 +369,9 @@ public class CenterstageRedLeftParkingDS extends Robot {
                         locationTlm.setValue("center");
                         break;
                 }
-               // telemetry.addData("DS Position: ", DSPosition);
-                telemetry.update();
                 chooseSpike();
+                telemetry.addData("DS Position: ", DSPosition);
+                telemetry.update();
             }
         };
     }
