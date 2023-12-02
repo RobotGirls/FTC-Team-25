@@ -154,6 +154,8 @@ public class CenterstageBlueLeftParkingDS extends Robot {
 
     private Telemetry.Item locationTlm;
 
+    public String finalPos;
+
     /*
      * The default event handler for the robot.
      */
@@ -197,7 +199,7 @@ public class CenterstageBlueLeftParkingDS extends Robot {
 
         forwardPath = new DeadReckonPath();
         forwardPath.stop();
-        forwardPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, 0.4);
+        forwardPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 14, 0.4);
 
         liftPath = new DeadReckonPath();
         liftPath.stop();
@@ -217,20 +219,16 @@ public class CenterstageBlueLeftParkingDS extends Robot {
         //goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
 
         //after robot places pixel in the middle position, drives to the parking spot in backstage
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, -DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.TURN, 45, -DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 13, -DRIVE_SPEED);
 
         //after robot places pixel in the right position, drives to the parking spot in backstage
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 4, -DRIVE_SPEED);
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.TURN, 80, DRIVE_SPEED);
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 6, DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 18, -DRIVE_SPEED);
 
         //after robot places pixel in the left position, drives to the parking spot in backstage
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 2, -DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, -DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, -DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, -DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 12, DRIVE_SPEED);
     }
 
     //initializes the declared motors and servos
@@ -353,7 +351,7 @@ public class CenterstageBlueLeftParkingDS extends Robot {
 
     public void detectPropDS() {
         distanceTask = new DistanceSensorTask(this, rightSensor, leftSensor, telemetry, 0, 12, 15 ,
-                6,false) {
+                2,false) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DistanceSensorEvent event = (DistanceSensorEvent) e;
@@ -383,15 +381,18 @@ public class CenterstageBlueLeftParkingDS extends Robot {
     {
         if((position.equals("right")&&DSPosition.equals("right")) || (position.equals("left")&&DSPosition.equals("right")) || (position.equals("center")&&DSPosition.equals("right")))
         {
+            finalPos = "right";
             moveToObjectAndReleasePixel(goRightToObject);
 
         }
         else if((position.equals("center")&&DSPosition.equals("center")) || (position.equals("left")&&DSPosition.equals("center")) || (position.equals("right")&&DSPosition.equals("center")))
         {
+            finalPos = "center";
             moveToObjectAndReleasePixel(goMiddleToObject);
         }
         else
         {
+            finalPos = "left";
             moveToObjectAndReleasePixel(goLeftToObject);
         }
     }
@@ -446,12 +447,12 @@ public class CenterstageBlueLeftParkingDS extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     whereAmI.setValue("released purple pixel");
-                    if(position.equals("right"))
+                    if(finalPos.equals("right"))
                     {
                         delay(1000);
                         goToPark(goToParkFromRight);
                     }
-                    else if(position.equals("center"))
+                    else if(finalPos.equals("center"))
                     {
                         delay(1000);
                         goToPark(goToParkFromMiddle);

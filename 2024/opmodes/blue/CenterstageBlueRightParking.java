@@ -29,6 +29,7 @@ package opmodes.blue;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -64,7 +65,6 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 @Config
 @Autonomous(name = "CenterstageBlueRightParking")
-//@Disabled
 
 //if any terms in the program are unknown to you, right click and press Go To > Declarations and Usages
 public class CenterstageBlueRightParking extends Robot {

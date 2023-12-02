@@ -72,7 +72,7 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         box = hardwareMap.servo.get("pixelBox");
-        box.setPosition(0.9);
+        box.setPosition(0.94);
 
         rotateShooter = hardwareMap.servo.get("rotateShooter");
         shooter = hardwareMap.servo.get("shootDrone");
@@ -147,10 +147,10 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                 switch (gamepadEvent.kind) {
                     // intake in and out
                     case LEFT_TRIGGER_DOWN:
-                        intake.setPower(0.6);
+                        intake.setPower(0.75);
                         break;
                     case RIGHT_TRIGGER_DOWN:
-                        intake.setPower(-0.6);
+                        intake.setPower(-0.75);
                         break;
                     case LEFT_TRIGGER_UP:
                         intake.setPower(0);
@@ -180,7 +180,7 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         //deploy pixel
                         break;
                     case DPAD_DOWN_DOWN:
-                        box.setPosition(0.9);
+                        box.setPosition(0.94);
                         break;
                     // drone shooter and rotate mech
                     case BUTTON_B_DOWN:
@@ -200,6 +200,7 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                             rotateShooter.setPosition(0.5);
                         }
                         break;
+                        /*
                     case BUTTON_A_DOWN:
                         cam.setPower(1);
                         break;
@@ -211,6 +212,8 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     case BUTTON_X_UP:
                         cam.setPower(0);
+                        */
+
                 }
             }
         });

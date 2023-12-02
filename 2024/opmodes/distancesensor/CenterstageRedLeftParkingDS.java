@@ -87,8 +87,6 @@ public class CenterstageRedLeftParkingDS extends Robot {
     private DistanceSensor rightSensor;
     private DistanceSensor leftSensor;
     private Telemetry.Item tagIdTlm;
-   // private Telemetry.Item rightSensorTlm;
-   // private Telemetry.Item leftSensorTlm;
 
     private Servo box;
     private DcMotor linearLift;
@@ -121,11 +119,9 @@ public class CenterstageRedLeftParkingDS extends Robot {
     //variables for constants
     //these constants CANNOT be changed unless edited in this declaration and initialization
     public static double FORWARD_DISTANCE = 14;
-    public static double RIGHT_DISTANCE = 10;
     public static double LEFT_DISTANCE = 13;
     public static double DRIVE_SPEED = 0.6;
     public static double OUTTAKE_DISTANCE = 8;
-    public static double OUTTAKE_SPEED = 0.3;
 
 
     //telemetry
@@ -133,9 +129,6 @@ public class CenterstageRedLeftParkingDS extends Robot {
     private RunToEncoderValueTask outtakeTask;
     //integer 5000 represents 5000 milliseconds-change according to how long delay should be
     private static final int DELAY = 5000;
-
-    public String objectDetectDirection;
-
 
     static double cX = 0;
     static double cY = 0;
@@ -154,6 +147,8 @@ public class CenterstageRedLeftParkingDS extends Robot {
     public String DSPosition;
 
     private Telemetry.Item locationTlm;
+
+    public String finalPos;
 
     /*
      * The default event handler for the robot.
@@ -182,6 +177,10 @@ public class CenterstageRedLeftParkingDS extends Robot {
         goRightToObject = new DeadReckonPath();
         goLeftToObject = new DeadReckonPath();
 
+        outtakePath = new DeadReckonPath();
+        forwardPath = new DeadReckonPath();
+        liftPath = new DeadReckonPath();
+
         //removes or clears the action of the paths
         goToParkFromMiddle.stop();
         goToParkFromRight.stop();
@@ -190,18 +189,15 @@ public class CenterstageRedLeftParkingDS extends Robot {
         goMiddleToObject.stop();
         goRightToObject.stop();
         goLeftToObject.stop();
-
-
-        outtakePath = new DeadReckonPath();
-        outtakePath.stop();
-        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, -OUTTAKE_SPEED);
-
-        forwardPath = new DeadReckonPath();
         forwardPath.stop();
-        forwardPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 17, 0.4);
-
-        liftPath = new DeadReckonPath();
         liftPath.stop();
+
+        outtakePath.stop();
+
+        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, 0.6);
+
+        forwardPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 14, 0.4);
+
         liftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, 0.6);
 
         //addSegment adds a new segment or direction the robot moves into
@@ -218,7 +214,7 @@ public class CenterstageRedLeftParkingDS extends Robot {
         //goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
 
         //after robot places pixel in the middle position, drives to the parking spot in backstage
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 9, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 2, -DRIVE_SPEED);
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, DRIVE_SPEED);
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 75, DRIVE_SPEED);
 
@@ -227,9 +223,10 @@ public class CenterstageRedLeftParkingDS extends Robot {
         goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, DRIVE_SPEED);
 
         //after robot places pixel in the left position, drives to the parking spot in backstage
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, RIGHT_DISTANCE, DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 9, DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 53, -DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 13, -DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.TURN, 90, -DRIVE_SPEED);
     }
 
@@ -287,6 +284,7 @@ public class CenterstageRedLeftParkingDS extends Robot {
         detectPropDS();
 
         locationTlm = telemetry.addData("prop position", "none");
+
         initOpenCV();
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
@@ -297,7 +295,6 @@ public class CenterstageRedLeftParkingDS extends Robot {
         telemetry.update();
         //calls method to start the initialization
         initPaths();
-
     }
 
     private void initOpenCV() {
@@ -350,8 +347,8 @@ public class CenterstageRedLeftParkingDS extends Robot {
     }
 
     public void detectPropDS() {
-        distanceTask = new DistanceSensorTask(this, rightSensor, leftSensor, telemetry, 0, 12, 15 ,
-                6,false) {
+        distanceTask = new DistanceSensorTask(this, rightSensor, leftSensor, telemetry, 0, 12, 15,
+                2,false) {
             @Override
             public void handleEvent(RobotEvent e) {
                 DistanceSensorEvent event = (DistanceSensorEvent) e;
@@ -369,9 +366,9 @@ public class CenterstageRedLeftParkingDS extends Robot {
                         locationTlm.setValue("center");
                         break;
                 }
-                chooseSpike();
                 telemetry.addData("DS Position: ", DSPosition);
                 telemetry.update();
+                chooseSpike();
             }
         };
     }
@@ -381,15 +378,18 @@ public class CenterstageRedLeftParkingDS extends Robot {
     {
         if((position.equals("right")&&DSPosition.equals("right")) || (position.equals("left")&&DSPosition.equals("right")) || (position.equals("center")&&DSPosition.equals("right")))
         {
+            finalPos = "right";
             moveToObjectAndReleasePixel(goRightToObject);
 
         }
         else if((position.equals("center")&&DSPosition.equals("center")) || (position.equals("left")&&DSPosition.equals("center")) || (position.equals("right")&&DSPosition.equals("center")))
         {
+            finalPos = "center";
             moveToObjectAndReleasePixel(goMiddleToObject);
         }
         else
         {
+            finalPos = "left";
             moveToObjectAndReleasePixel(goLeftToObject);
         }
     }
@@ -402,7 +402,7 @@ public class CenterstageRedLeftParkingDS extends Robot {
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
-                    box.setPosition(0);
+                    //box.setPosition(0);
                 }
             }
         });
@@ -443,13 +443,14 @@ public class CenterstageRedLeftParkingDS extends Robot {
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
+                    /*
                     whereAmI.setValue("released purple pixel");
-                    if(position.equals("right"))
+                    if(finalPos.equals("right"))
                     {
                         delay(1000);
                         goToPark(goToParkFromRight);
                     }
-                    else if(position.equals("center"))
+                    else if(finalPos.equals("center"))
                     {
                         delay(1000);
                         goToPark(goToParkFromMiddle);
@@ -459,6 +460,7 @@ public class CenterstageRedLeftParkingDS extends Robot {
                         delay(1000);
                         goToPark(goToParkFromLeft);
                     }
+                    */
 
                 }
             }
