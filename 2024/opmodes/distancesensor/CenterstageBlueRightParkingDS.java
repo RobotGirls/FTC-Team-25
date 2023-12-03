@@ -224,7 +224,7 @@ public class CenterstageBlueRightParkingDS extends Robot {
         //after robot places pixel in the middle position, drives to the parking spot in backstage
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 8, DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 9, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, DRIVE_SPEED);
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 40, -DRIVE_SPEED);
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.TURN, 42, DRIVE_SPEED);
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 13, DRIVE_SPEED);
@@ -324,6 +324,19 @@ public class CenterstageBlueRightParkingDS extends Robot {
 
         controlHubCam.openCameraDevice();
         controlHubCam.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
+    }
+
+    public void outtakeInBackstage() {
+        this.addTask(new DeadReckonTask(this, backstageOuttake, outtakeDrivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+
+                }
+            }
+        });
     }
 
     //moves to detected object and releases the pixel

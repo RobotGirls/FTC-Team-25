@@ -108,6 +108,8 @@ public class CenterstageRedRightParkingDS extends Robot {
 
     private DeadReckonPath forwardPath;
 
+    private DeadReckonPath backstageOuttake;
+
 
     //variables for constants
     //these constants CANNOT be changed unless edited in this declaration and initialization
@@ -190,13 +192,14 @@ public class CenterstageRedRightParkingDS extends Robot {
         goRightToObject.stop();
         goLeftToObject.stop();
 
+        backstageOuttake = new DeadReckonPath();
+        backstageOuttake.stop();
+        backstageOuttake.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, -OUTTAKE_SPEED);
 
         outtakePath = new DeadReckonPath();
         outtakePath.stop();
         outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, OUTTAKE_SPEED);
-
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 13, DRIVE_SPEED);
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 41, DRIVE_SPEED);
+        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -OUTTAKE_SPEED);
 
         forwardPath = new DeadReckonPath();
         forwardPath.stop();
@@ -204,31 +207,38 @@ public class CenterstageRedRightParkingDS extends Robot {
 
         liftPath = new DeadReckonPath();
         liftPath.stop();
-        liftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, 0.6);
+        liftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 9, 0.6);
 
         //robot moves to the object in the right
         goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, DRIVE_SPEED);
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.4, -DRIVE_SPEED);
 
         //robot moves to the object in the middle
         goMiddleToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
 
         //robot moves to the object in the left
         goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, 45, -DRIVE_SPEED);
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.8, DRIVE_SPEED);
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.8, -DRIVE_SPEED);
 
         //after robot places pixel in the middle position, drives to the parking spot in backstage
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, DRIVE_SPEED);
-        // goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, DRIVE_SPEED);
-        // goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 75, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.TURN, 45, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 19, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 0.9, DRIVE_SPEED);
 
         //after robot places pixel in the right position, drives to the parking spot in backstage
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -DRIVE_SPEED);
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, DRIVE_SPEED);
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 21, -0.4);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, DRIVE_SPEED);
 
         //after robot places pixel in the left position, drives to the parking spot in backstage
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 5, -DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 15, -DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 10, -DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.15, -DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 13, DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.TURN, 91, -DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.2, DRIVE_SPEED);
     }
 
     //initializes the declared motors and servos
@@ -319,6 +329,19 @@ public class CenterstageRedRightParkingDS extends Robot {
         controlHubCam.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
     }
 
+    public void outtakeInBackstage() {
+        this.addTask(new DeadReckonTask(this, backstageOuttake, outtakeDrivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE)
+                {
+
+                }
+            }
+        });
+    }
+
     //moves to detected object and releases the pixel
     public void moveToObjectAndReleasePixel(DeadReckonPath path)
     {
@@ -406,7 +429,7 @@ public class CenterstageRedRightParkingDS extends Robot {
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
-                    box.setPosition(0.9);
+                    box.setPosition(0);
                 }
             }
         });
@@ -421,7 +444,8 @@ public class CenterstageRedRightParkingDS extends Robot {
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
-                    box.setPosition(0);
+                   // outtakeInBackstage();
+                    lift();
                 }
             }
         });
