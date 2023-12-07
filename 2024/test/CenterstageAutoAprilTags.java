@@ -49,6 +49,10 @@ public class CenterstageAutoAprilTags extends Robot {
     boolean targetFound = false;
     boolean targetReached = false;
 
+    private AprilTagDetection foundAprilTag;
+
+    private int foundAprilTagId;
+
     @Override
     public void handleEvent(RobotEvent e) {
         /*
@@ -66,8 +70,10 @@ public class CenterstageAutoAprilTags extends Robot {
             public void handleEvent(RobotEvent e) {
                 TagDetectionEvent event = (TagDetectionEvent) e;
                 switch (event.kind) {
-                    case OBJECTS_DETECTED:
-                        RobotLog.ii(TAG, "Object detected");
+                    case APRIL_TAG_DETECTED:
+                        RobotLog.ii(TAG, "AprilTag detected");
+                        foundAprilTag = event.aprilTag;
+                        foundAprilTagId = foundAprilTag.id;
                         break;
                 }
             }
@@ -121,33 +127,41 @@ public class CenterstageAutoAprilTags extends Robot {
             backLeft.setPower(0);
             backRight.setPower(0);
         }
+        // FIXME later do the assignment of the AprilTag detection in
+        //  the while loop to reduce redundancy
         return objDetectionTask.getAprilTag(desiredTagID);
     }
 
-    public void AlignWithAprilTag(AprilTagDetection tag) {
-       double drive = 0;
-       double strafe = 0;
-       double turn = 0;
-        if (objDetectionTask.getAprilTag(desiredTagID) != null) {
+    public void alignWithAprilTag(AprilTagDetection tag) {
+        double drive = 0;
+        double strafe = 0;
+        double turn = 0;
 
-            double rangeError = (tag.ftcPose.range - DESIRED_DISTANCE);
-            double headingError = tag.ftcPose.bearing;
-            double yawError = tag.ftcPose.yaw;
+        AprilTagDetection myTagDetection;
 
-            drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-            turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
-            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+        while (!targetReached) {
+            if ((myTagDetection = objDetectionTask.getAprilTag(desiredTagID)) != null) {
 
-            if (rangeError < 0.05 && headingError < 0.05 && yawError < 0.05) {
-                targetReached = true;
+                double rangeError = (tag.ftcPose.range - DESIRED_DISTANCE);
+                double headingError = tag.ftcPose.bearing;
+                double yawError = tag.ftcPose.yaw;
+
+                drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+                turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+                strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+                telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+
+                if (rangeError < 0.05 && headingError < 0.05 && yawError < 0.05) {
+                    targetReached = true;
+                    break;
+                } // FIXME print rangeError, headingError, and yawErrer
             }
+            telemetry.update();
+            // Apply desired axes motions to the drivetrain.
+            moveRobot(drive, strafe, turn);
+            sleep(10);
         }
-        telemetry.update();
-
-
-        // Apply desired axes motions to the drivetrain.
-        moveRobot(drive, strafe, turn);
-        sleep(10);
     }
     public void moveRobot(double x, double y, double yaw) {
         // Calculate wheel powers.
@@ -201,12 +215,12 @@ public class CenterstageAutoAprilTags extends Robot {
    @Override
    public void start(){
         //findDesiredID();
-       desiredTagID = 3;
+        desiredTagID = 3;
         findAprilTag();
         aprilTag = findAprilTagData();
-        AlignWithAprilTag(aprilTag);
+        alignWithAprilTag(aprilTag);
         while (!targetReached) {
-            AlignWithAprilTag(aprilTag);
+            alignWithAprilTag(aprilTag);
         }
        frontLeft.setPower(0);
        frontRight.setPower(0);
