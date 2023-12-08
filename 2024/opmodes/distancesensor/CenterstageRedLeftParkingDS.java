@@ -118,7 +118,28 @@ public class CenterstageRedLeftParkingDS extends Robot {
     //these constants CANNOT be changed unless edited in this declaration and initialization
     public static double FORWARD_DISTANCE = 14;
     public static double LEFT_DISTANCE = 13;
+
+    //path to object distance values
+    public static double TO_OBJECT_DISTANCE = 1;
+    public static double TO_OBJECT_TURN_DISTANCE = 47;
+
+    //middle path distance values
+    public static double MIDDLE_PARK_LEFT_DISTANCE = 2;
+    public static double MIDDLE_PARK_FORWARD_DISTANCE = 15;
+    public static double MIDDLE_PARK_RIGHT_DISTANCE = 75;
+
+    //right path distance values
+    public static double RIGHT_PARK_FORWARD_DISTANCE = 50;
+
+    //left path distance values
+    public static double LEFT_PARK_FORWARD_DISTANCE = 1;
+    public static double LEFT_PARK_RIGHT_DISTANCE = 11;
+    public static double LEFT_PARK_BACKWARD_DISTANCE = 45;
+    public static double LEFT_PARK_LEFT_DISTANCE = 13;
+    public static double LEFT_PARK_TURN_DISTANCE = 90;
+
     public static double DRIVE_SPEED = 0.6;
+    public static double LIFT_DISTANCE = 3;
     public static double OUTTAKE_DISTANCE = 8;
 
 
@@ -194,42 +215,43 @@ public class CenterstageRedLeftParkingDS extends Robot {
 
         backstageOuttake = new DeadReckonPath();
         backstageOuttake.stop();
-        backstageOuttake.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, -0.6);
+        backstageOuttake.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, -DRIVE_SPEED);
 
-        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, 0.3);
-        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, -0.3);
+        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, DRIVE_SPEED);
+        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, -DRIVE_SPEED);
 
-        forwardPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 14, 0.4);
+        forwardPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_DISTANCE, DRIVE_SPEED);
 
-        liftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 9, 0.6);
+        liftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, LIFT_DISTANCE, DRIVE_SPEED);
 
         //addSegment adds a new segment or direction the robot moves into
         //robot moves to the object in the right
         //goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 13, DRIVE_SPEED);
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, DRIVE_SPEED);
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, TO_OBJECT_TURN_DISTANCE, DRIVE_SPEED);
 
         //robot moves to the object in the middle
-        goMiddleToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
+        goMiddleToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, TO_OBJECT_DISTANCE, -DRIVE_SPEED);
 
         //robot moves to the object in the left
-        goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, 47, -DRIVE_SPEED);
-        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, DRIVE_SPEED);
-        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.25, -DRIVE_SPEED);
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, TO_OBJECT_TURN_DISTANCE, -DRIVE_SPEED);
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, TO_OBJECT_DISTANCE, DRIVE_SPEED);
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, TO_OBJECT_DISTANCE, -DRIVE_SPEED);
 
         //after robot places pixel in the middle position, drives to the parking spot in backstage
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 6, -DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 75, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, MIDDLE_PARK_LEFT_DISTANCE, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, MIDDLE_PARK_FORWARD_DISTANCE, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, MIDDLE_PARK_RIGHT_DISTANCE, DRIVE_SPEED);
 
         //after robot places pixel in the right position, drives to the parking spot in backstage
         goToParkFromRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_DISTANCE, -DRIVE_SPEED);
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, RIGHT_PARK_FORWARD_DISTANCE, DRIVE_SPEED);
 
         //after robot places pixel in the left position, drives to the parking spot in backstage
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.4, DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 11, DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 40, -DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 18, -DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, LEFT_PARK_FORWARD_DISTANCE, DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_PARK_RIGHT_DISTANCE, DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, LEFT_PARK_BACKWARD_DISTANCE, -DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_PARK_LEFT_DISTANCE, -DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.TURN, LEFT_PARK_TURN_DISTANCE, -DRIVE_SPEED);
     }
 
     //initializes the declared motors and servos
@@ -430,7 +452,7 @@ public class CenterstageRedLeftParkingDS extends Robot {
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
-                    box.setPosition(0.1);
+                    box.setPosition(0.9);
                 }
             }
         });

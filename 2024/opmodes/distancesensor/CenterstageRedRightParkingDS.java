@@ -140,7 +140,7 @@ public class CenterstageRedRightParkingDS extends Robot {
     public static double OUTTAKE_DISTANCE = 5;
     public static double OUTTAKE_SPEED = 0.3;
     public static double LIFT_DISTANCE = 9;
-    public static double LIFT_SPEED = 0.6;
+    public static double LIFT_SPEED = 0.5;
 
 
     //telemetry
