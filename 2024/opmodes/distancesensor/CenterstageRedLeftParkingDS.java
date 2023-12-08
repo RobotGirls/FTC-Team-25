@@ -196,12 +196,12 @@ public class CenterstageRedLeftParkingDS extends Robot {
         backstageOuttake.stop();
         backstageOuttake.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, -0.6);
 
-        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, 0.6);
-        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, -0.6);
+        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, 0.3);
+        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, -0.3);
 
         forwardPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 14, 0.4);
 
-        liftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, 0.6);
+        liftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 9, 0.6);
 
         //addSegment adds a new segment or direction the robot moves into
         //robot moves to the object in the right
@@ -214,10 +214,10 @@ public class CenterstageRedLeftParkingDS extends Robot {
         //robot moves to the object in the left
         goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, 47, -DRIVE_SPEED);
         goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, DRIVE_SPEED);
-        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1.25, -DRIVE_SPEED);
 
         //after robot places pixel in the middle position, drives to the parking spot in backstage
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 2, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 6, -DRIVE_SPEED);
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, DRIVE_SPEED);
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 75, DRIVE_SPEED);
 
@@ -226,11 +226,10 @@ public class CenterstageRedLeftParkingDS extends Robot {
         goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 50, DRIVE_SPEED);
 
         //after robot places pixel in the left position, drives to the parking spot in backstage
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.4, DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 11, DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 45, -DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 13, -DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.TURN, 90, -DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 40, -DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 18, -DRIVE_SPEED);
     }
 
     //initializes the declared motors and servos
@@ -431,7 +430,7 @@ public class CenterstageRedLeftParkingDS extends Robot {
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
-                    box.setPosition(0.9);
+                    box.setPosition(0.1);
                 }
             }
         });
