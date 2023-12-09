@@ -80,7 +80,6 @@ public class CenterstageRedRightParkingDS extends Robot {
     private DcMotor backRight;
     private FourWheelDirectDrivetrain drivetrain;
 
-
     //mechs
 //    private Servo servoMech;
     private DcMotor outtake;
@@ -116,9 +115,32 @@ public class CenterstageRedRightParkingDS extends Robot {
     public static double FORWARD_DISTANCE = 14;
     public static double RIGHT_DISTANCE = 10;
     public static double LEFT_DISTANCE = 10;
+    public static double LEFT_TO_OBJECT_DISTANCE = 0.8;
+    public static double MIDDLE_TO_OBJECT_DISTANCE = 1;
+    public static double RIGHT_TO_OBJECT_DISTANCE = 0.4;
+    public static double RIGHT_TO_OBJECT_TURN_DISTANCE = 43;
+    public static double LEFT_PARK_BACKWARDS_DISTANCE = 21;
+    public static double LEFT_PARK_BACKWARDS_SPEED = -0.4;
+    public static double LEFT_PARK_RIGHT_DISTANCE = 3;
+    public static double MIDDLE_PARK_BACKWARD_DISTANCE = 0.5;
+    public static double MIDDLE_PARK_BACKWARD_DISTANCE_2 = 19;
+    public static double MIDDLE_PARK_RIGHT_DISTANCE = 0.9;
+    public static double RIGHT_PARK_BACKWARD_DISTANCE = 0.15;
+    public static double RIGHT_PARK_RIGHT_DISTANCE = 13;
+    public static double RIGHT_PARK_TURN_DISTANCE = 91;
+    public static double RIGHT_PARK_BACKWARD_DISTANCE_2 = 15;
+    public static double RIGHT_PARK_RIGHT_DISTANCE_2 = 10;
+    public static double RIGHT_PARK_BACKWARD_DISTANCE_3 = 3;
+    public static double RIGHT_PARK_FORWARD_DISTANCE = 0.2;
+    public static double FORWARD_PATH_DISTANCE = 14;
+    public static double FORWARD_PATH_SPEED = 0.4;
+    public static double OUTTAKE_PATH_DISTANCE = 3;
+    public static double TURN_DISTANCE = 45;
     public static double DRIVE_SPEED = 0.6;
     public static double OUTTAKE_DISTANCE = 5;
     public static double OUTTAKE_SPEED = 0.3;
+    public static double LIFT_DISTANCE = 9;
+    public static double LIFT_SPEED = 0.5;
 
 
     //telemetry
@@ -199,46 +221,46 @@ public class CenterstageRedRightParkingDS extends Robot {
         outtakePath = new DeadReckonPath();
         outtakePath.stop();
         outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_DISTANCE, OUTTAKE_SPEED);
-        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -OUTTAKE_SPEED);
+        outtakePath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, OUTTAKE_PATH_DISTANCE, -OUTTAKE_SPEED);
 
         forwardPath = new DeadReckonPath();
         forwardPath.stop();
-        forwardPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 14, 0.4);
+        forwardPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, FORWARD_PATH_DISTANCE, FORWARD_PATH_SPEED);
 
         liftPath = new DeadReckonPath();
         liftPath.stop();
-        liftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 9, 0.6);
+        liftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, LIFT_DISTANCE, LIFT_SPEED);
 
         //robot moves to the object in the right
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, 43, DRIVE_SPEED);
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.4, -DRIVE_SPEED);
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, RIGHT_TO_OBJECT_DISTANCE, DRIVE_SPEED);
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, RIGHT_TO_OBJECT_TURN_DISTANCE, -DRIVE_SPEED);
 
         //robot moves to the object in the middle
-        goMiddleToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 1, -DRIVE_SPEED);
+        goMiddleToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, MIDDLE_TO_OBJECT_DISTANCE, -DRIVE_SPEED);
 
         //robot moves to the object in the left
-        goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, 45, -DRIVE_SPEED);
-        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.8, DRIVE_SPEED);
-        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.8, -DRIVE_SPEED);
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.TURN, TURN_DISTANCE, -DRIVE_SPEED);
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, LEFT_TO_OBJECT_DISTANCE, DRIVE_SPEED);
+        goLeftToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, LEFT_TO_OBJECT_DISTANCE, -DRIVE_SPEED);
 
         //after robot places pixel in the middle position, drives to the parking spot in backstage
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.5, -DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.TURN, 45, -DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 19, -DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 0.9, DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, MIDDLE_PARK_BACKWARD_DISTANCE, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.TURN, TURN_DISTANCE, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, MIDDLE_PARK_BACKWARD_DISTANCE_2, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, MIDDLE_PARK_RIGHT_DISTANCE, DRIVE_SPEED);
 
         //after robot places pixel in the right position, drives to the parking spot in backstage
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 21, -0.4);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 3, DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, LEFT_PARK_BACKWARDS_DISTANCE, LEFT_PARK_BACKWARDS_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_PARK_RIGHT_DISTANCE, DRIVE_SPEED);
 
         //after robot places pixel in the left position, drives to the parking spot in backstage
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.15, -DRIVE_SPEED);
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 13, DRIVE_SPEED);
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.TURN, 91, -DRIVE_SPEED);
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 15, -DRIVE_SPEED);
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, 10, DRIVE_SPEED);
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 3, -DRIVE_SPEED);
-        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 0.2, DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, RIGHT_PARK_BACKWARD_DISTANCE, -DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, RIGHT_PARK_RIGHT_DISTANCE, DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.TURN, RIGHT_PARK_TURN_DISTANCE, -DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, RIGHT_PARK_BACKWARD_DISTANCE_2, -DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, RIGHT_PARK_RIGHT_DISTANCE_2, DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, RIGHT_PARK_BACKWARD_DISTANCE_3, -DRIVE_SPEED);
+        goToParkFromRight.addSegment(DeadReckonPath.SegmentType.STRAIGHT, RIGHT_PARK_FORWARD_DISTANCE, DRIVE_SPEED);
     }
 
     //initializes the declared motors and servos
