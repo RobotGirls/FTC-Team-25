@@ -66,10 +66,12 @@ public class CameraCalibrationAprilTags extends LinearOpMode
     /*
      * EDIT THESE PARAMETERS AS NEEDED
      */
-    final boolean USING_WEBCAM = false;
+    final boolean USING_WEBCAM = true;
     final BuiltinCameraDirection INTERNAL_CAM_DIR = BuiltinCameraDirection.BACK;
-    final int RESOLUTION_WIDTH = 640;
-    final int RESOLUTION_HEIGHT = 480;
+    //webcam currently being used is C920
+    //NOTE: based on resolution, there is a callibration called "teamwebcamcallibration.xml" under TeamCode>res>xml
+    final int RESOLUTION_WIDTH = 1920;
+    final int RESOLUTION_HEIGHT = 1080;
 
     // Internal state
     boolean lastX;
