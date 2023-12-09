@@ -13,7 +13,7 @@ import team25core.ObjectDetectionNewTask;
 import team25core.Robot;
 import team25core.RobotEvent;
 
-@Autonomous(name = "AprilTagAuto")
+@Autonomous(name = "AprilTagAuto1")
 public class CenterstageAutoAprilTags extends Robot {
     private ObjectDetectionNewTask objDetectionTask;
     private final static String TAG = "Prop";
@@ -104,11 +104,14 @@ public class CenterstageAutoAprilTags extends Robot {
     public AprilTagDetection findAprilTagData() {
         if (desiredTagID == 1) {
             while (objDetectionTask.getAprilTag(desiredTagID) == null) {
-                frontLeft.setPower(0.3);
-                frontRight.setPower(0.3);
-                backLeft.setPower(-0.3);
-                backRight.setPower(-0.3);
+                //telemetry.addData("inside findAprilTagData looking for ID ", desiredTagID);
+
+                frontLeft.setPower(-0.3);
+                frontRight.setPower(-0.3);
+                backLeft.setPower(0.3);
+                backRight.setPower(0.3);
             }
+            //telemetry.addData("inside findAprilTagData found ID ", desiredTagID);
             targetFound = true;
             frontLeft.setPower(0);
             frontRight.setPower(0);
@@ -116,16 +119,23 @@ public class CenterstageAutoAprilTags extends Robot {
             backRight.setPower(0);
         } else if (desiredTagID == 3) {
             while (objDetectionTask.getAprilTag(desiredTagID) == null) {
-                frontLeft.setPower(-0.3);
-                frontRight.setPower(-0.3);
-                backLeft.setPower(0.3);
-                backRight.setPower(0.3);
+
+                //telemetry.addData("inside findAprilTagData looking for ID ", desiredTagID);
+
+                frontLeft.setPower(0.3);
+                frontRight.setPower(0.3);
+                backLeft.setPower(-0.3);
+                backRight.setPower(-0.3);
             }
+            //telemetry.addData("inside findAprilTagData found ID ", desiredTagID);
             targetFound = true;
             frontLeft.setPower(0);
             frontRight.setPower(0);
             backLeft.setPower(0);
             backRight.setPower(0);
+        } else {
+            //telemetry.addData("inside findAprilTagData looking for ID ", desiredTagID);
+            //targetFound = true;
         }
         // FIXME later do the assignment of the AprilTag detection in
         //  the while loop to reduce redundancy
@@ -152,10 +162,10 @@ public class CenterstageAutoAprilTags extends Robot {
 
                 telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
 
-                if (rangeError < 0.05 && headingError < 0.05 && yawError < 0.05) {
+                if (rangeError < 0.1 && headingError < 0.1 && yawError < 0.1) {
                     targetReached = true;
                     break;
-                } // FIXME print rangeError, headingError, and yawErrer
+                } // FIXME print rangeError, headingError, and yawError
             }
             telemetry.update();
             // Apply desired axes motions to the drivetrain.
@@ -175,13 +185,15 @@ public class CenterstageAutoAprilTags extends Robot {
         max = Math.max(max, Math.abs(leftBackPower));
         max = Math.max(max, Math.abs(rightBackPower));
 
+        telemetry.addData("Auto", "leftFrontPower %5.2f, leftBackPower %5.2f, rightBackPower %5.2f, rightFrontPower %5.2f", leftFrontPower, leftBackPower, rightBackPower, rightFrontPower);
+
         if (max > 1.0) {
             leftFrontPower /= max;
             rightFrontPower /= max;
             leftBackPower /= max;
             rightBackPower /= max;
         }
-
+        telemetry.update();
         // Send powers to the wheels.
         frontLeft.setPower(leftFrontPower);
         frontRight.setPower(rightFrontPower);
@@ -200,31 +212,28 @@ public class CenterstageAutoAprilTags extends Robot {
 
 
     @Override
-   public void init(){
+    public void init(){
         //initializes the motors for the wheels
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
 
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.FORWARD);
     }
-   @Override
-   public void start(){
+    @Override
+    public void start(){
         //findDesiredID();
         desiredTagID = 3;
         findAprilTag();
         aprilTag = findAprilTagData();
         alignWithAprilTag(aprilTag);
-        while (!targetReached) {
-            alignWithAprilTag(aprilTag);
-        }
-       frontLeft.setPower(0);
-       frontRight.setPower(0);
-       backLeft.setPower(0);
-       backRight.setPower(0);
-   }
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
 }
