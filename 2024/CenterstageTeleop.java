@@ -82,7 +82,6 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
         linearLift = hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         linearLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        linearLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -163,10 +162,16 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 //                        break;
                     // slides up or down
                     case LEFT_BUMPER_DOWN:
-                        linearLift.setPower(1); // test this
+                        linearLift.setPower(1);
                         break;
                     case RIGHT_BUMPER_DOWN:
-                        linearLift.setPower(-1); // test this
+                        linearLift.setPower(-1);
+                        if (linearLift.getCurrentPosition() < 11) {
+                            box.setPosition(0.85);
+                        }
+                        else {
+                            box.setPosition(0.94);
+                        }
                         break;
                     case LEFT_BUMPER_UP:
                         linearLift.setPower(0);
@@ -200,7 +205,6 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                             rotateShooter.setPosition(0.5);
                         }
                         break;
-                        /*
                     case BUTTON_A_DOWN:
                         cam.setPower(1);
                         break;
@@ -212,8 +216,6 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     case BUTTON_X_UP:
                         cam.setPower(0);
-                        */
-
                 }
             }
         });
