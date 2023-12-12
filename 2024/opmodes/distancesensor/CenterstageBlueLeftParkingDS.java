@@ -117,6 +117,8 @@ public class CenterstageBlueLeftParkingDS extends Robot {
     private DeadReckonPath forwardPath;
 
     private DeadReckonPath backstageOuttake;
+    private DeadReckonPath downLiftPath;
+
 
 
     //variables for constants
@@ -129,30 +131,34 @@ public class CenterstageBlueLeftParkingDS extends Robot {
 
 
     //path to object distance values
-    public static double RIGHT_TO_OBJECT_BACKWARD_DISTANCE = 0.6;
-    public static double MIDDLE_TO_OBJECT_BACKWARD_DISTANCE = 0.7;
+    public static double RIGHT_TO_OBJECT_BACKWARD_DISTANCE = 0.15;
+    public static double RIGHT_TO_OBJECT_SIDEWAYS_DISTANCE = 0.9;
+    public static double MIDDLE_TO_OBJECT_FORWARD_DISTANCE = 1;
+    public static double MIDDLE_TO_OBJECT_BACKWARD_DISTANCE = 1.8;
     public static double LEFT_TO_OBJECT_FORWARD_DISTANCE = 1;
     public static double LEFT_TO_OBJECT_BACKWARD_DISTANCE = 1.25;
 
     //middle path distance values
+    public static double MIDDLE_PARK_SIDEWAYS_DISTANCE = 0.9;
     public static double MIDDLE_PARK_BACKWARD_DISTANCE = 0.5;
     public static double MIDDLE_PARK_BACKWARD_DISTANCE_2 = 16;
-    public static double MIDDLE_PARK_FORWARD_DISTANCE = 1;
+    public static double MIDDLE_PARK_FORWARD_DISTANCE = 0.3;
 
     //right path distance values
     public static double RIGHT_PARK_BACKWARD_DISTANCE = 18;
-    public static double RIGHT_PARK_FORWARD_DISTANCE = 1;
+    public static double RIGHT_PARK_FORWARD_DISTANCE = 0.4;
 
     //left path distance values
     public static double LEFT_PARK_LEFT_DISTANCE = 13;
     public static double LEFT_PARK_TURN_DISTANCE = 100;
     public static double LEFT_PARK_BACKWARD_DISTANCE = 15;
+    public static double LEFT_PARK_LEFT_DISTANCE_2 = 11;
     public static double LEFT_PARK_BACKWARD_DISTANCE_2 = 3.5;
-    public static double LEFT_PARK_FORWARD_DISTANCE = 1;
+    public static double LEFT_PARK_FORWARD_DISTANCE = 0.4;
 
     public static double OUTTAKE_DISTANCE = 5;
     public static double OUTTAKE_SPEED = 0.3;
-    public static double LIFT_DISTANCE = 7;
+    public static double LIFT_DISTANCE = 14;
 
 
     //telemetry
@@ -237,13 +243,19 @@ public class CenterstageBlueLeftParkingDS extends Robot {
         liftPath.stop();
         liftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, LIFT_DISTANCE, DRIVE_SPEED);
 
+        downLiftPath = new DeadReckonPath();
+        downLiftPath.stop();
+        downLiftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, 0.6);
+
         //addSegment adds a new segment or direction the robot moves into
         //robot moves to the object in the right
 
         goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, TURN_DISTANCE, DRIVE_SPEED);
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, RIGHT_TO_OBJECT_SIDEWAYS_DISTANCE, -DRIVE_SPEED);
         goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, RIGHT_TO_OBJECT_BACKWARD_DISTANCE, -DRIVE_SPEED);
 
         //robot moves to the object in the middle
+        goMiddleToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, MIDDLE_TO_OBJECT_FORWARD_DISTANCE, DRIVE_SPEED);
         goMiddleToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, MIDDLE_TO_OBJECT_BACKWARD_DISTANCE, -DRIVE_SPEED);
 
 
@@ -257,7 +269,7 @@ public class CenterstageBlueLeftParkingDS extends Robot {
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, MIDDLE_PARK_BACKWARD_DISTANCE, -DRIVE_SPEED);
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.TURN, TURN_DISTANCE, DRIVE_SPEED);
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, MIDDLE_PARK_BACKWARD_DISTANCE_2, -DRIVE_SPEED);
-        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, MIDDLE_PARK_BACKWARD_DISTANCE, -DRIVE_SPEED);
+        goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, MIDDLE_PARK_SIDEWAYS_DISTANCE, -DRIVE_SPEED);
         goToParkFromMiddle.addSegment(DeadReckonPath.SegmentType.STRAIGHT, MIDDLE_PARK_FORWARD_DISTANCE, DRIVE_SPEED);
 
         //after robot places pixel in the right position, drives to the parking spot in backstage
@@ -269,7 +281,7 @@ public class CenterstageBlueLeftParkingDS extends Robot {
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_PARK_LEFT_DISTANCE, -DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.TURN, LEFT_PARK_TURN_DISTANCE, -DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, LEFT_PARK_BACKWARD_DISTANCE, -DRIVE_SPEED);
-        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_PARK_LEFT_DISTANCE, -DRIVE_SPEED);
+        goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.SIDEWAYS, LEFT_PARK_LEFT_DISTANCE_2, -DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, LEFT_PARK_BACKWARD_DISTANCE_2, -DRIVE_SPEED);
         goToParkFromLeft.addSegment(DeadReckonPath.SegmentType.STRAIGHT, LEFT_PARK_FORWARD_DISTANCE, DRIVE_SPEED);
 
@@ -476,6 +488,19 @@ public class CenterstageBlueLeftParkingDS extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     box.setPosition(0);
+                    liftDown();
+                }
+            }
+        });
+    }
+
+    public void liftDown() {
+        this.addTask(new DeadReckonTask(this, downLiftPath, liftDrivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+
                 }
             }
         });

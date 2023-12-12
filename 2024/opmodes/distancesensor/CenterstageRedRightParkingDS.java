@@ -105,6 +105,8 @@ public class CenterstageRedRightParkingDS extends Robot {
 
     private DeadReckonPath liftPath;
 
+    private DeadReckonPath downLiftPath;
+
     private DeadReckonPath forwardPath;
 
     private DeadReckonPath backstageOuttake;
@@ -230,6 +232,10 @@ public class CenterstageRedRightParkingDS extends Robot {
         liftPath = new DeadReckonPath();
         liftPath.stop();
         liftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, LIFT_DISTANCE, LIFT_SPEED);
+
+        downLiftPath = new DeadReckonPath();
+        downLiftPath.stop();
+        downLiftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, 0.6);
 
         //robot moves to the object in the right
         goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, RIGHT_TO_OBJECT_DISTANCE, DRIVE_SPEED);
@@ -452,6 +458,19 @@ public class CenterstageRedRightParkingDS extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     box.setPosition(0);
+                    liftDown();
+                }
+            }
+        });
+    }
+
+    public void liftDown() {
+        this.addTask(new DeadReckonTask(this, downLiftPath, liftDrivetrain ){
+            @Override
+            public void handleEvent(RobotEvent e) {
+                DeadReckonEvent path = (DeadReckonEvent) e;
+                if (path.kind == EventKind.PATH_DONE) {
+
                 }
             }
         });
