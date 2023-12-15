@@ -458,6 +458,8 @@ public class CenterstageRedRightParkingDS extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     box.setPosition(0);
+                    delay(1000);
+                    box.setPosition(0.94);
                     liftDown();
                 }
             }

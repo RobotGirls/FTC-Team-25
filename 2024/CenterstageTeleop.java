@@ -53,8 +53,8 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
     private DcMotor cam;
 
     private Servo box;
-
-    private Servo rotateShooter;
+    private Servo pixelRelease;
+    private Servo releaseHanger;
     private Servo shooter;
 
     //  @Override
@@ -72,16 +72,22 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         box = hardwareMap.servo.get("pixelBox");
-        box.setPosition(0.94);
+        box.setPosition(0.58);
 
-        rotateShooter = hardwareMap.servo.get("rotateShooter");
-        shooter = hardwareMap.servo.get("shootDrone");
+        pixelRelease = hardwareMap.servo.get("pixelRelease");
+        pixelRelease.setPosition(0.5);
+
+        //releaseHanger = hardwareMap.servo.get("releaseHanger");
+        //shooter = hardwareMap.servo.get("shootDrone");
 
         cam = hardwareMap.get(DcMotor.class, "cam");
+
+
 
         linearLift = hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         linearLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -167,10 +173,10 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                     case RIGHT_BUMPER_DOWN:
                         linearLift.setPower(-1);
                         if (linearLift.getCurrentPosition() < 11) {
-                            box.setPosition(0.85);
+                            box.setPosition(0.59);
                         }
                         else {
-                            box.setPosition(0.94);
+                            box.setPosition(0.58);
                         }
                         break;
                     case LEFT_BUMPER_UP:
@@ -185,25 +191,20 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         //deploy pixel
                         break;
                     case DPAD_DOWN_DOWN:
-                        box.setPosition(0.94);
+                        box.setPosition(0.58);
+                        break;
+                    case DPAD_LEFT_DOWN:
+                        pixelRelease.setPosition(0);
+                        break;
+                    case DPAD_RIGHT_DOWN:
+                        pixelRelease.setPosition(0.5);
                         break;
                     // drone shooter and rotate mech
                     case BUTTON_B_DOWN:
-                        shooter.setPosition(0.55);
-                        if (shooter.getPosition() == 0.55) {
-                            shooter.setPosition(0.9);
-                        }
-                        else if (shooter.getPosition() == 0.9) {
-                            shooter.setPosition(0.55);
-                        }
+                       // releaseHanger.setPosition(0.7);
                         break;
                     case BUTTON_Y_DOWN:
-                        if (rotateShooter.getPosition() == 0.5) {
-                            rotateShooter.setPosition(0);
-                        }
-                        else if (rotateShooter.getPosition() == 0) {
-                            rotateShooter.setPosition(0.5);
-                        }
+                        //releaseHanger.setPosition(0);
                         break;
                     case BUTTON_A_DOWN:
                         cam.setPower(1);
