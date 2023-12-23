@@ -1,34 +1,22 @@
-//package opmodes;
+package opmodes;//package opmodes;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import team25core.DeadReckonPath;
-import team25core.DistanceSensorCriteria;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
-import team25core.OneWheelDirectDrivetrain;
-import team25core.OneWheelDriveTaskwLimitSwitch;
 import team25core.RobotEvent;
-import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
 import team25core.StandardFourMotorRobot;
 import team25core.TeleopDriveTask;
 import team25core.TwoStickMechanumControlScheme;
 
-@TeleOp(name = "CenterstageTeleop")
+@TeleOp(name = "CenterstageTeleopDriveOnly")
 //@Disabled
-public class CenterstageTeleop extends StandardFourMotorRobot {
+public class CenterstageTeleopDriveOnly extends StandardFourMotorRobot {
 //new teleop
     public float rotateShooterPos;
     private TeleopDriveTask drivetask;
@@ -67,30 +55,6 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
         super.init();
         initIMU();
-
-        intake=hardwareMap.get(DcMotor.class, "outtake");
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        box = hardwareMap.servo.get("pixelBox");
-        box.setPosition(0.64);
-
-        pixelRelease = hardwareMap.servo.get("pixelRelease");
-        pixelRelease.setPosition(0.25);
-
-        //releaseHanger = hardwareMap.servo.get("releaseHanger");
-        //shooter = hardwareMap.servo.get("shootDrone");
-
-        cam = hardwareMap.get(DcMotor.class, "cam");
-
-        releaseHanger = hardwareMap.servo.get("releaseHanger");
-        releaseHanger.setPosition(0.95);
-
-
-
-        linearLift = hardwareMap.get(DcMotor.class, "linearLift");
-        linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        linearLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        linearLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -146,7 +110,6 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
             }
         });
 
-        rotateShooterPos = 0;
         //gamepad2 w /nowheels only mechs
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e) {
@@ -154,72 +117,7 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                 locationTlm.setValue("in gamepad2 handler");
                 switch (gamepadEvent.kind) {
                     // intake in and out
-                    case LEFT_TRIGGER_DOWN:
-                        intake.setPower(0.6);
-                        break;
-                    case RIGHT_TRIGGER_DOWN:
-                        intake.setPower(-0.6);
-                        break;
-                    case LEFT_TRIGGER_UP:
-                        intake.setPower(0);
-                        break;
-                    case RIGHT_TRIGGER_UP:
-                        intake.setPower(0);
-                        break;
-//                    case DPAD_LEFT_DOWN:
-//                        intake.setPower(0);
-//                        break;
-                    // slides up or down
-                    case LEFT_BUMPER_DOWN:
-                        linearLift.setPower(1);
-                        break;
-                    case RIGHT_BUMPER_DOWN:
-                        linearLift.setPower(-1);
-                        if (linearLift.getCurrentPosition() < 11) {
-                            //box.setPosition(0.59);
-                        }
-                        else {
-                            //box.setPosition(0.58);
-                        }
-                        break;
-                    case LEFT_BUMPER_UP:
-                        linearLift.setPower(0);
-                        break;
-                    case RIGHT_BUMPER_UP:
-                        linearLift.setPower(0);
-                        break;
-                    // pixel deployer box
-                    case DPAD_UP_DOWN:
-                        box.setPosition(0.03);
-                        //deploy pixel
-                        break;
-                    case DPAD_DOWN_DOWN:
-                        box.setPosition(0.63);
-                        break;
-                    case DPAD_LEFT_DOWN:
-                        pixelRelease.setPosition(0.2);
-                        break;
-                    case DPAD_RIGHT_DOWN:
-                        pixelRelease.setPosition(0.5);
-                        break;
-                    // drone shooter and rotate mech
-                    case BUTTON_B_DOWN:
-                        releaseHanger.setPosition(0.95);
-                        break;
-                    case BUTTON_Y_DOWN:
-                        releaseHanger.setPosition(0.5);
-                        break;
-                    case BUTTON_A_DOWN:
-                        cam.setPower(1);
-                        break;
-                    case BUTTON_A_UP:
-                        cam.setPower(0);
-                        break;
-                    case BUTTON_X_DOWN:
-                        cam.setPower(-1);
-                        break;
-                    case BUTTON_X_UP:
-                        cam.setPower(0);
+
                 }
             }
         });
