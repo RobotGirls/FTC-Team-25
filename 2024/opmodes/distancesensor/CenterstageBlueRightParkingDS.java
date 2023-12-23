@@ -91,6 +91,7 @@ public class CenterstageBlueRightParkingDS extends Robot {
    // private Telemetry.Item leftSensorTlm;
 
     private Servo box;
+    private Servo pixelRelease;
     private DcMotor linearLift;
     private DcMotor outtake;
     private OneWheelDirectDrivetrain outtakeDrivetrain;
@@ -159,6 +160,8 @@ public class CenterstageBlueRightParkingDS extends Robot {
     private Telemetry.Item locationTlm;
 
     public String finalPos;
+
+    private Servo releaseHanger;
 
     /*
      * The default event handler for the robot.
@@ -290,6 +293,12 @@ public class CenterstageBlueRightParkingDS extends Robot {
         box = hardwareMap.servo.get("pixelBox");
         box.setPosition(0.95);
 
+        pixelRelease = hardwareMap.servo.get("pixelRelease");
+        pixelRelease.setPosition(0.5);
+
+        releaseHanger = hardwareMap.servo.get("releaseHanger");
+        releaseHanger.setPosition(1);
+
         linearLift = hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         linearLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -302,6 +311,7 @@ public class CenterstageBlueRightParkingDS extends Robot {
         detectPropDS();
 
         locationTlm = telemetry.addData("prop position", "none");
+        /*
         initOpenCV();
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
@@ -310,6 +320,8 @@ public class CenterstageBlueRightParkingDS extends Robot {
         telemetry.addData("Distance in Inch", (getDistance(width)));
         telemetry.addData("Position: ", findPositionOpenCV());
         telemetry.update();
+
+         */
         //calls method to start the initialization
         initPaths();
 
@@ -446,7 +458,9 @@ public class CenterstageBlueRightParkingDS extends Robot {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
                     box.setPosition(0);
-                    delay(1000);
+                    pixelRelease.setPosition(0);
+                    delay(500);
+                    pixelRelease.setPosition(0.5);
                     box.setPosition(0.94);
                     liftDown();
                 }

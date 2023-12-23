@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -86,6 +87,8 @@ public class CenterstageRedRightParkingDS extends Robot {
     private OneWheelDirectDrivetrain outtakeDrivetrain;
 
     private Servo box;
+
+    private Servo pixelRelease;
     private DcMotor linearLift;
     private OneWheelDirectDrivetrain liftDrivetrain;
 
@@ -117,9 +120,9 @@ public class CenterstageRedRightParkingDS extends Robot {
     public static double FORWARD_DISTANCE = 14;
     public static double RIGHT_DISTANCE = 10;
     public static double LEFT_DISTANCE = 10;
-    public static double LEFT_TO_OBJECT_DISTANCE = 0.8;
-    public static double MIDDLE_TO_OBJECT_DISTANCE = 1;
-    public static double RIGHT_TO_OBJECT_DISTANCE = 0.4;
+    public static double LEFT_TO_OBJECT_DISTANCE = 0.6;
+    public static double MIDDLE_TO_OBJECT_DISTANCE = 0.4;
+    public static double RIGHT_TO_OBJECT_DISTANCE = 0.8;
     public static double RIGHT_TO_OBJECT_TURN_DISTANCE = 43;
     public static double LEFT_PARK_BACKWARDS_DISTANCE = 21;
     public static double LEFT_PARK_BACKWARDS_SPEED = -0.4;
@@ -129,7 +132,7 @@ public class CenterstageRedRightParkingDS extends Robot {
     public static double MIDDLE_PARK_RIGHT_DISTANCE = 0.9;
     public static double RIGHT_PARK_BACKWARD_DISTANCE = 0.15;
     public static double RIGHT_PARK_RIGHT_DISTANCE = 13;
-    public static double RIGHT_PARK_TURN_DISTANCE = 91;
+    public static double RIGHT_PARK_TURN_DISTANCE = 94;
     public static double RIGHT_PARK_BACKWARD_DISTANCE_2 = 15;
     public static double RIGHT_PARK_RIGHT_DISTANCE_2 = 10;
     public static double RIGHT_PARK_BACKWARD_DISTANCE_3 = 3;
@@ -137,12 +140,13 @@ public class CenterstageRedRightParkingDS extends Robot {
     public static double FORWARD_PATH_DISTANCE = 14;
     public static double FORWARD_PATH_SPEED = 0.4;
     public static double OUTTAKE_PATH_DISTANCE = 3;
-    public static double TURN_DISTANCE = 45;
+    public static double TURN_DISTANCE = 49;
     public static double DRIVE_SPEED = 0.6;
     public static double OUTTAKE_DISTANCE = 5;
     public static double OUTTAKE_SPEED = 0.3;
-    public static double LIFT_DISTANCE = 9;
+    public static double LIFT_DISTANCE = 14;
     public static double LIFT_SPEED = 0.5;
+    private Servo releaseHanger;
 
 
     //telemetry
@@ -235,11 +239,11 @@ public class CenterstageRedRightParkingDS extends Robot {
 
         downLiftPath = new DeadReckonPath();
         downLiftPath.stop();
-        downLiftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, 0.6);
+        downLiftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, -0.6);
 
         //robot moves to the object in the right
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, RIGHT_TO_OBJECT_DISTANCE, DRIVE_SPEED);
-        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, RIGHT_TO_OBJECT_TURN_DISTANCE, -DRIVE_SPEED);
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.TURN, RIGHT_TO_OBJECT_TURN_DISTANCE, DRIVE_SPEED);
+        goRightToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, RIGHT_TO_OBJECT_DISTANCE, -DRIVE_SPEED);
 
         //robot moves to the object in the middle
         goMiddleToObject.addSegment(DeadReckonPath.SegmentType.STRAIGHT, MIDDLE_TO_OBJECT_DISTANCE, -DRIVE_SPEED);
@@ -309,7 +313,13 @@ public class CenterstageRedRightParkingDS extends Robot {
         leftSensor = hardwareMap.get(DistanceSensor.class, "leftSensor");
 
         box = hardwareMap.servo.get("pixelBox");
-        box.setPosition(0.9);
+        box.setPosition(0.645);
+
+        pixelRelease = hardwareMap.servo.get("pixelRelease");
+        pixelRelease.setPosition(0.5);
+
+        releaseHanger = hardwareMap.servo.get("releaseHanger");
+        releaseHanger.setPosition(1);
 
         linearLift = hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -323,7 +333,7 @@ public class CenterstageRedRightParkingDS extends Robot {
         detectPropDS();
 
         locationTlm = telemetry.addData("prop position", "none");
-
+/*
         initOpenCV();
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
@@ -335,6 +345,7 @@ public class CenterstageRedRightParkingDS extends Robot {
         telemetry.update();
 
         //findPositionOpenCV();
+        */
         //calls method to start the initialization
         initPaths();
 
@@ -457,9 +468,12 @@ public class CenterstageRedRightParkingDS extends Robot {
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
-                    box.setPosition(0);
-                    delay(1000);
-                    box.setPosition(0.94);
+                    ElapsedTime localtimer1 = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+                    while(localtimer1.time() < 500) {}
+                    box.setPosition(0.04);
+                    pixelRelease.setPosition(0);
+                    pixelRelease.setPosition(0.5);
+                    box.setPosition(0.645);
                     liftDown();
                 }
             }
@@ -502,7 +516,17 @@ public class CenterstageRedRightParkingDS extends Robot {
                 SingleShotTimerEvent event = (SingleShotTimerEvent) e;
                 if (event.kind == EventKind.EXPIRED ) {
                     whereAmI.setValue("in delay task");
-
+                }
+            }
+        });
+    }
+    private void delayPark(int delayInMsec) {
+        this.addTask(new SingleShotTimerTask(this, delayInMsec) {
+            @Override
+            public void handleEvent(RobotEvent e) {
+                SingleShotTimerEvent event = (SingleShotTimerEvent) e;
+                if (event.kind == EventKind.EXPIRED ) {
+                    whereAmI.setValue("in delay task");
                 }
             }
         });
@@ -519,17 +543,14 @@ public class CenterstageRedRightParkingDS extends Robot {
                     whereAmI.setValue("released purple pixel");
                     if(finalPos.equals("right"))
                     {
-                        delay(1000);
                         goToPark(goToParkFromRight);
                     }
                     else if(finalPos.equals("center"))
                     {
-                        delay(1000);
                         goToPark(goToParkFromMiddle);
                     }
                     else
                     {
-                        delay(1000);
                         goToPark(goToParkFromLeft);
                     }
 
@@ -537,6 +558,8 @@ public class CenterstageRedRightParkingDS extends Robot {
             }
         });
     }
+
+
 
     //executes parking and releases pixel
     @Override

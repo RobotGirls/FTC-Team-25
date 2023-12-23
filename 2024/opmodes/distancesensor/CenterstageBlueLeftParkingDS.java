@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -90,6 +91,7 @@ public class CenterstageBlueLeftParkingDS extends Robot {
    // private Telemetry.Item leftSensorTlm;
 
     private Servo box;
+    private Servo pixelRelease;
     private DcMotor linearLift;
     private DcMotor outtake;
     private OneWheelDirectDrivetrain outtakeDrivetrain;
@@ -190,6 +192,8 @@ public class CenterstageBlueLeftParkingDS extends Robot {
 
     public String finalPos;
 
+    private Servo releaseHanger;
+
     /*
      * The default event handler for the robot.
      */
@@ -245,7 +249,7 @@ public class CenterstageBlueLeftParkingDS extends Robot {
 
         downLiftPath = new DeadReckonPath();
         downLiftPath.stop();
-        downLiftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, 0.6);
+        downLiftPath.addSegment(DeadReckonPath.SegmentType.STRAIGHT, 8, -0.6);
 
         //addSegment adds a new segment or direction the robot moves into
         //robot moves to the object in the right
@@ -327,7 +331,13 @@ public class CenterstageBlueLeftParkingDS extends Robot {
         leftSensor = hardwareMap.get(DistanceSensor.class, "leftSensor");
 
         box = hardwareMap.servo.get("pixelBox");
-        box.setPosition(0.9);
+        box.setPosition(0.63);
+
+        pixelRelease = hardwareMap.servo.get("pixelRelease");
+        pixelRelease.setPosition(0.5);
+
+        releaseHanger = hardwareMap.servo.get("releaseHanger");
+        releaseHanger.setPosition(1);
 
         linearLift = hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -341,7 +351,7 @@ public class CenterstageBlueLeftParkingDS extends Robot {
         detectPropDS();
 
         locationTlm = telemetry.addData("prop position", "none");
-        initOpenCV();
+        //initOpenCV();
         /*
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
@@ -487,9 +497,12 @@ public class CenterstageBlueLeftParkingDS extends Robot {
             public void handleEvent(RobotEvent e) {
                 DeadReckonEvent path = (DeadReckonEvent) e;
                 if (path.kind == EventKind.PATH_DONE) {
-                    box.setPosition(0);
-                    delay(1000);
-                    box.setPosition(0.94);
+                    ElapsedTime localtimer1 = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+                    while(localtimer1.time() < 500) {}
+                    box.setPosition(0.03);
+                    pixelRelease.setPosition(0.2);
+                    pixelRelease.setPosition(0.5);
+                    box.setPosition(0.63);
                     liftDown();
                 }
             }
@@ -534,24 +547,22 @@ public class CenterstageBlueLeftParkingDS extends Robot {
                     whereAmI.setValue("released purple pixel");
                     if(finalPos.equals("right"))
                     {
-                        delay(1000);
+
                         goToPark(goToParkFromRight);
                     }
                     else if(finalPos.equals("center"))
                     {
-                        delay(1000);
+
                         goToPark(goToParkFromMiddle);
                     }
                     else
                     {
-                        delay(1000);
+
                         goToPark(goToParkFromLeft);
                     }
 
                 }
             }
-
-
         });
     }
 
