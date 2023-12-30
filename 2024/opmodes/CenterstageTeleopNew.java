@@ -1,36 +1,23 @@
-//package opmodes;
+package opmodes;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import team25core.DeadReckonPath;
-import team25core.DistanceSensorCriteria;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
-import team25core.OneWheelDirectDrivetrain;
-import team25core.OneWheelDriveTaskwLimitSwitch;
 import team25core.RobotEvent;
-import team25core.RunToEncoderValueTask;
 import team25core.SingleShotTimerTask;
 import team25core.StandardFourMotorRobot;
 import team25core.TeleopDriveTask;
 import team25core.TwoStickMechanumControlScheme;
 
-@TeleOp(name = "CenterstageTeleop")
+@TeleOp(name = "CenterstageTeleopNew")
 //@Disabled
-public class CenterstageTeleop extends StandardFourMotorRobot {
+public class CenterstageTeleopNew extends StandardFourMotorRobot {
 //new teleop
-    public float rotateShooterPos;
     private TeleopDriveTask drivetask;
 
     private enum Direction {
@@ -50,12 +37,15 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
     private DcMotor linearLift;
     private DcMotor intake;
 
-    private DcMotor cam;
-
     private Servo box;
     private Servo pixelRelease;
-    private Servo releaseHanger;
-    private Servo shooter;
+
+    private DcMotor rightHang;
+    private DcMotor leftHang;
+
+    private Servo rotateClaw;
+    private Servo leftClaw;
+    private Servo rightClaw;
 
     //  @Override
     public void handleEvent(RobotEvent e) {
@@ -77,12 +67,18 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
         pixelRelease = hardwareMap.servo.get("pixelRelease");
         pixelRelease.setPosition(0.5);
 
-        //releaseHanger = hardwareMap.servo.get("releaseHanger");
-        //shooter = hardwareMap.servo.get("shootDrone");
+        rotateClaw = hardwareMap.servo.get("rotateClaw");
+        rotateClaw.setPosition(1); // FIXME figure out servo positions
 
-        cam = hardwareMap.get(DcMotor.class, "cam");
+        rightHang = hardwareMap.get(DcMotor.class, "rightHang");
+        rightHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightHang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
+        leftHang = hardwareMap.get(DcMotor.class, "leftHang");
+        leftHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftHang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         linearLift = hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -143,7 +139,6 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
             }
         });
 
-        rotateShooterPos = 0;
         //gamepad2 w /nowheels only mechs
         this.addTask(new GamepadTask(this, GamepadTask.GamepadNumber.GAMEPAD_2) {
             public void handleEvent(RobotEvent e) {
@@ -163,21 +158,12 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                     case RIGHT_TRIGGER_UP:
                         intake.setPower(0);
                         break;
-//                    case DPAD_LEFT_DOWN:
-//                        intake.setPower(0);
-//                        break;
                     // slides up or down
                     case LEFT_BUMPER_DOWN:
                         linearLift.setPower(1);
                         break;
                     case RIGHT_BUMPER_DOWN:
                         linearLift.setPower(-1);
-                        if (linearLift.getCurrentPosition() < 11) {
-                            box.setPosition(0.59);
-                        }
-                        else {
-                            box.setPosition(0.58);
-                        }
                         break;
                     case LEFT_BUMPER_UP:
                         linearLift.setPower(0);
@@ -201,22 +187,31 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     // drone shooter and rotate mech
                     case BUTTON_B_DOWN:
-                       // releaseHanger.setPosition(0.7);
+                        if (rotateClaw.getPosition() == 1) {
+                            rotateClaw.setPosition(0);
+                        }
+                        else if (rotateClaw.getPosition() == 0) {
+                            rotateClaw.setPosition(1);
+                        }
                         break;
+                        // hanger up
                     case BUTTON_Y_DOWN:
-                        //releaseHanger.setPosition(0);
+                        leftHang.setPower(1);
+                        rightHang.setPower(-1);
                         break;
+                    case BUTTON_Y_UP:
+                        leftHang.setPower(0);
+                        rightHang.setPower(0);
+                        break;
+                        // hanger down
                     case BUTTON_A_DOWN:
-                        cam.setPower(1);
+                        leftHang.setPower(-1);
+                        rightHang.setPower(1);
                         break;
                     case BUTTON_A_UP:
-                        cam.setPower(0);
+                        leftHang.setPower(0);
+                        rightHang.setPower(0);
                         break;
-                    case BUTTON_X_DOWN:
-                        cam.setPower(-1);
-                        break;
-                    case BUTTON_X_UP:
-                        cam.setPower(0);
                 }
             }
         });
