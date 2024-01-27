@@ -62,13 +62,13 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         box = hardwareMap.servo.get("pixelBox");
-        box.setPosition(0.58);
+       // box.setPosition(0.58);
 
         pixelRelease = hardwareMap.servo.get("pixelRelease");
-        pixelRelease.setPosition(0.5);
+        //pixelRelease.setPosition(0.5);
 
-        rotateClaw = hardwareMap.servo.get("rotateClaw");
-        rotateClaw.setPosition(1); // FIXME figure out servo positions
+        //rotateClaw = hardwareMap.servo.get("rotateClaw");
+       // rotateClaw.setPosition(1); // FIXME figure out servo positions
 
         rightHang = hardwareMap.get(DcMotor.class, "rightHang");
         rightHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -186,6 +186,7 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
                         pixelRelease.setPosition(0.5);
                         break;
                     // drone shooter and rotate mech
+                    /*
                     case BUTTON_B_DOWN:
                         if (rotateClaw.getPosition() == 1) {
                             rotateClaw.setPosition(0);
@@ -194,6 +195,8 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
                             rotateClaw.setPosition(1);
                         }
                         break;
+
+                     */
                         // hanger up
                     case BUTTON_Y_DOWN:
                         leftHang.setPower(1);
@@ -211,6 +214,18 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
                     case BUTTON_A_UP:
                         leftHang.setPower(0);
                         rightHang.setPower(0);
+                        break;
+                    case BUTTON_X_DOWN:
+                        leftHang.setPower(1);
+                        break;
+                    case BUTTON_X_UP:
+                        leftHang.setPower(0);
+                        break;
+                    case BUTTON_B_DOWN:
+                        leftHang.setPower(-1);
+                        break;
+                    case BUTTON_B_UP:
+                        leftHang.setPower(0);
                         break;
                 }
             }
