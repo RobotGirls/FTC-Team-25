@@ -2,12 +2,16 @@ package opmodes;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import java.util.HashMap;
+
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
+import team25core.MotorPackage;
 import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
 import team25core.StandardFourMotorRobot;
@@ -55,7 +59,21 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
     @Override
     public void init() {
 
-        super.init();
+        //super.init();
+        motorMap = new HashMap<>();
+
+        frontLeft = hardwareMap.get(DcMotorEx.class, "leftFront");
+        motorMap.put(MotorPackage.MotorLocation.FRONT_LEFT, new MotorPackage(frontLeft));
+
+        frontRight = hardwareMap.get(DcMotorEx.class, "rightFront");
+        motorMap.put(MotorPackage.MotorLocation.FRONT_RIGHT, new MotorPackage(frontRight));
+
+        backLeft = hardwareMap.get(DcMotorEx.class, "leftRear");
+        motorMap.put(MotorPackage.MotorLocation.BACK_LEFT, new MotorPackage(backLeft));
+
+        backRight = hardwareMap.get(DcMotorEx.class, "rightRear");
+        motorMap.put(MotorPackage.MotorLocation.BACK_RIGHT, new MotorPackage(backRight));
+
         initIMU();
 
         intake=hardwareMap.get(DcMotor.class, "outtake");
@@ -65,7 +83,7 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
        // box.setPosition(0.58);
 
         pixelRelease = hardwareMap.servo.get("pixelRelease");
-        //pixelRelease.setPosition(0.5);
+        pixelRelease.setPosition(0.5);
 
         //rotateClaw = hardwareMap.servo.get("rotateClaw");
        // rotateClaw.setPosition(1); // FIXME figure out servo positions
@@ -173,17 +191,17 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
                         break;
                     // pixel deployer box
                     case DPAD_UP_DOWN:
-                        box.setPosition(0);
+                        box.setPosition(0.02);
                         //deploy pixel
                         break;
                     case DPAD_DOWN_DOWN:
-                        box.setPosition(0.58);
+                        box.setPosition(0.8);
                         break;
                     case DPAD_LEFT_DOWN:
                         pixelRelease.setPosition(0);
                         break;
                     case DPAD_RIGHT_DOWN:
-                        pixelRelease.setPosition(0.5);
+                        pixelRelease.setPosition(1);
                         break;
                     // drone shooter and rotate mech
                     /*
