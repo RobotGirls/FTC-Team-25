@@ -81,7 +81,7 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
 
         // flip mechanism
         box = hardwareMap.servo.get("pixelBox");
-        box.setPosition(0.08);
+        box.setPosition(0.1);
 
         // pixel release mechanism (mounted on box)
         pixelRelease = hardwareMap.servo.get("pixelRelease");
@@ -151,7 +151,15 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
                 locationTlm.setValue("in gamepad1 handler");
                 switch (gamepadEvent.kind) {
-
+                    case DPAD_UP_DOWN:
+                        // flip box up and block pixels from falling
+                        pixelRelease.setPosition(0.8);
+                        box.setPosition(0.9);
+                        break;
+                    case DPAD_DOWN_DOWN:
+                        // box down
+                        box.setPosition(0.1);
+                        break;
                 }
             }
         });
@@ -188,25 +196,17 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
                     case RIGHT_BUMPER_UP:
                         linearLift.setPower(0);
                         break;
-                    // pixel deployer box
-                    case DPAD_UP_DOWN:
-                        box.setPosition(0.08);
-                        //deploy pixel
-                        break;
-                    case DPAD_DOWN_DOWN:
-                        box.setPosition(0.9);
-                        break;
                     case DPAD_LEFT_DOWN:
+                        // block one side
                         pixelRelease.setPosition(0.95);
                         break;
-                    case DPAD_LEFT_UP:
-                        pixelRelease.setPosition(0.8);
+                    case DPAD_UP_DOWN:
+                        // block nothing
+                        pixelRelease.setPosition(0.3);
                         break;
                     case DPAD_RIGHT_DOWN:
+                        // block other side
                         pixelRelease.setPosition(0.7);
-                        break;
-                    case DPAD_RIGHT_UP:
-                        pixelRelease.setPosition(0.8);
                         break;
                         // hanger up
                     case BUTTON_Y_DOWN:
