@@ -79,15 +79,14 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
         intake=hardwareMap.get(DcMotor.class, "outtake");
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        // flip mechanism
         box = hardwareMap.servo.get("pixelBox");
-       // box.setPosition(0.58);
+        box.setPosition(0.08);
 
+        // pixel release mechanism (mounted on box)
         pixelRelease = hardwareMap.servo.get("pixelRelease");
-        pixelRelease.setPosition(0.5);
-
-        //rotateClaw = hardwareMap.servo.get("rotateClaw");
-       // rotateClaw.setPosition(1); // FIXME figure out servo positions
-
+        pixelRelease.setPosition(0.8);
+        
         rightHang = hardwareMap.get(DcMotor.class, "rightHang");
         rightHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -191,30 +190,24 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
                         break;
                     // pixel deployer box
                     case DPAD_UP_DOWN:
-                        box.setPosition(0.02);
+                        box.setPosition(0.08);
                         //deploy pixel
                         break;
                     case DPAD_DOWN_DOWN:
-                        box.setPosition(0.8);
+                        box.setPosition(0.9);
                         break;
                     case DPAD_LEFT_DOWN:
-                        pixelRelease.setPosition(0);
+                        pixelRelease.setPosition(0.95);
+                        break;
+                    case DPAD_LEFT_UP:
+                        pixelRelease.setPosition(0.8);
                         break;
                     case DPAD_RIGHT_DOWN:
-                        pixelRelease.setPosition(1);
+                        pixelRelease.setPosition(0.7);
                         break;
-                    // drone shooter and rotate mech
-                    /*
-                    case BUTTON_B_DOWN:
-                        if (rotateClaw.getPosition() == 1) {
-                            rotateClaw.setPosition(0);
-                        }
-                        else if (rotateClaw.getPosition() == 0) {
-                            rotateClaw.setPosition(1);
-                        }
+                    case DPAD_RIGHT_UP:
+                        pixelRelease.setPosition(0.8);
                         break;
-
-                     */
                         // hanger up
                     case BUTTON_Y_DOWN:
                         leftHang.setPower(1);
