@@ -47,9 +47,13 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
     private DcMotor rightHang;
     private DcMotor leftHang;
 
-    private Servo rotateClaw;
-    private Servo leftClaw;
-    private Servo rightClaw;
+    private Servo shooter;
+
+    private final double BLOCK_NOTHING = 0.05;
+    private final double BLOCK_BOTH = 0.8;
+    //private final double BLOCK_LEFT = 0.2;
+    //private final double BLOCK_RIGHT = 0.2;
+
 
     //  @Override
     public void handleEvent(RobotEvent e) {
@@ -85,7 +89,10 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
 
         // pixel release mechanism (mounted on box)
         pixelRelease = hardwareMap.servo.get("pixelRelease");
-        pixelRelease.setPosition(0.8);
+        pixelRelease.setPosition(BLOCK_BOTH);
+
+        shooter = hardwareMap.servo.get("droneShooter");
+        shooter.setPosition(0.3);
         
         rightHang = hardwareMap.get(DcMotor.class, "rightHang");
         rightHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -153,13 +160,22 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
                 switch (gamepadEvent.kind) {
                     case DPAD_UP_DOWN:
                         // flip box up and block pixels from falling
-                        pixelRelease.setPosition(0.8);
+                        pixelRelease.setPosition(BLOCK_BOTH);
                         box.setPosition(0.9);
                         break;
                     case DPAD_DOWN_DOWN:
-                        // box down
+                        // box down and block neither pixel
                         box.setPosition(0.1);
+                        pixelRelease.setPosition(BLOCK_BOTH);
+                        pixelRelease.setPosition(BLOCK_NOTHING);
                         break;
+                    case BUTTON_Y_DOWN:
+                        // shoot drone
+                        shooter.setPosition(0.1);
+                        break;
+                    case BUTTON_A_DOWN:
+                        // hold drone
+                        shooter.setPosition(0.7);
                 }
             }
         });
@@ -202,11 +218,15 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
                         break;
                     case DPAD_UP_DOWN:
                         // block nothing
-                        pixelRelease.setPosition(0.3);
+                        pixelRelease.setPosition(BLOCK_NOTHING);
                         break;
                     case DPAD_RIGHT_DOWN:
                         // block other side
                         pixelRelease.setPosition(0.7);
+                        break;
+                    case DPAD_DOWN_DOWN:
+                        // block other side
+                        pixelRelease.setPosition(BLOCK_BOTH);
                         break;
                         // hanger up
                     case BUTTON_Y_DOWN:
