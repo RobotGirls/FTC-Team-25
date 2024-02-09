@@ -6,12 +6,15 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
@@ -23,19 +26,25 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 public class RRAutoTest extends LinearOpMode {
     public static double DISTANCE = 30; // in
     private DcMotor intake;
+    private DistanceSensor distanceSensor;
+    private DistanceSensor distanceSensor2;
 
     @Override
     public void runOpMode() throws InterruptedException {
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        //FIXME un comment when using competition robot
+        //intake = hardwareMap.get(DcMotor.class, "testMotor");
+        //intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        intake = hardwareMap.get(DcMotor.class, "testMotor");
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
 
-
+        // you can also cast this to a Rev2mDistanceSensor if you want to use added
+        // methods associated with the Rev2mDistanceSensor class.
+        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) distanceSensor;
 
         TrajectorySequence traj1 = drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
                 .splineTo(new Vector2d(36, 36), Math.toRadians(0))
@@ -62,7 +71,20 @@ public class RRAutoTest extends LinearOpMode {
         telemetry.update();
  */
 
-        while (!isStopRequested() && opModeIsActive()) ;
+        while (!isStopRequested() && opModeIsActive()) {
+            // generic DistanceSensor methods.
+            telemetry.addData("deviceName", distanceSensor.getDeviceName() );
+            telemetry.addData("range", String.format("%.01f mm", distanceSensor.getDistance(DistanceUnit.MM)));
+            telemetry.addData("range", String.format("%.01f cm", distanceSensor.getDistance(DistanceUnit.CM)));
+            telemetry.addData("range", String.format("%.01f m", distanceSensor.getDistance(DistanceUnit.METER)));
+            telemetry.addData("range", String.format("%.01f in", distanceSensor.getDistance(DistanceUnit.INCH)));
+
+            // Rev2mDistanceSensor specific methods.
+            telemetry.addData("ID", String.format("%x", sensorTimeOfFlight.getModelID()));
+            telemetry.addData("did time out", Boolean.toString(sensorTimeOfFlight.didTimeoutOccur()));
+
+            telemetry.update();
+        }
     }
 
     public void testMotor() {
