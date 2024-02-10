@@ -1,6 +1,7 @@
 package opmodes;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -92,7 +93,6 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
         pixelRelease.setPosition(BLOCK_BOTH);
 
         shooter = hardwareMap.servo.get("droneShooter");
-        shooter.setPosition(0.3);
         
         rightHang = hardwareMap.get(DcMotor.class, "rightHang");
         rightHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -171,11 +171,14 @@ public class CenterstageTeleopNew extends StandardFourMotorRobot {
                         break;
                     case BUTTON_Y_DOWN:
                         // shoot drone
-                        shooter.setPosition(0.1);
+                        shooter.setPosition(0.4);
+                        locationTlm.setValue("drone button y pressed");
                         break;
                     case BUTTON_A_DOWN:
                         // hold drone
-                        shooter.setPosition(0.7);
+                        shooter.setPosition(0.8);
+                        locationTlm.setValue("drone button a pressed");
+                        break;
                 }
             }
         });
