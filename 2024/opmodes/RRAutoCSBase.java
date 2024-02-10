@@ -21,35 +21,34 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Autonomous(name = "RRAutoBlueLeft")
 public class RRAutoCSBase extends LinearOpMode {
     public static double DISTANCE = 30; // in
-    private DistanceSensor distanceSensor;
-    private DistanceSensor distanceSensor2;
-
-    private String propPosition = "center";
 
     private final double BLOCK_NOTHING = 0.05;
     private final double BLOCK_BOTH = 0.8;
 
-    // FIXME distance sensor code here (figuring out which spike the prop is on)
+    private final double PROP_DIST = 6; // cm
+    CenterstageSampleMecanumDrive drive;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
+        drive = new CenterstageSampleMecanumDrive(hardwareMap);
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        CenterstageSampleMecanumDrive drive = new CenterstageSampleMecanumDrive(hardwareMap);
-
-        distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
 
         // you can also cast this to a Rev2mDistanceSensor if you want to use added
         // methods associated with the Rev2mDistanceSensor class.
-        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) distanceSensor;
+        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) drive.distanceSensor1;
 
-        TrajectorySequence leftSpike = drive.trajectorySequenceBuilder(new Pose2d(0,0,Math.toRadians(270)))
+        TrajectorySequence toSpikes = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(270)))
+                // APPROACHING SPIKES
+                .build();
+
+        TrajectorySequence leftSpike = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(270)))
                 // LEFT SPIKE PATH
                 .build();
-        TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(new Pose2d(0,0,Math.toRadians(270)))
+        TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(270)))
                 // CENTER SPIKE PATH
                 .build();
-        TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(new Pose2d(0,0,Math.toRadians(270)))
+        TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(270)))
                 // RIGHT SPIKE PATH
                 .build();
 
@@ -58,10 +57,13 @@ public class RRAutoCSBase extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        if (propPosition == "left") {
+        drive.followTrajectorySequence(toSpikes);
+
+
+        if (detectProp() == "left") {
             drive.followTrajectorySequence(leftSpike);
         }
-        else if (propPosition == "center") {
+        else if (detectProp() == "center") {
             drive.followTrajectorySequence(centerSpike);
         }
         else {
@@ -71,17 +73,28 @@ public class RRAutoCSBase extends LinearOpMode {
 
         while (!isStopRequested() && opModeIsActive()) {
             // generic DistanceSensor methods.
-            telemetry.addData("deviceName", distanceSensor.getDeviceName() );
-            telemetry.addData("range", String.format("%.01f mm", distanceSensor.getDistance(DistanceUnit.MM)));
-            telemetry.addData("range", String.format("%.01f cm", distanceSensor.getDistance(DistanceUnit.CM)));
-            telemetry.addData("range", String.format("%.01f m", distanceSensor.getDistance(DistanceUnit.METER)));
-            telemetry.addData("range", String.format("%.01f in", distanceSensor.getDistance(DistanceUnit.INCH)));
+            telemetry.addData("deviceName", drive.distanceSensor1.getDeviceName() );
+            telemetry.addData("range", String.format("%.01f mm", drive.distanceSensor1.getDistance(DistanceUnit.MM)));
+            telemetry.addData("range", String.format("%.01f cm", drive.distanceSensor1.getDistance(DistanceUnit.CM)));
+            telemetry.addData("range", String.format("%.01f m", drive.distanceSensor1.getDistance(DistanceUnit.METER)));
+            telemetry.addData("range", String.format("%.01f in", drive.distanceSensor1.getDistance(DistanceUnit.INCH)));
 
             // Rev2mDistanceSensor specific methods.
             telemetry.addData("ID", String.format("%x", sensorTimeOfFlight.getModelID()));
             telemetry.addData("did time out", Boolean.toString(sensorTimeOfFlight.didTimeoutOccur()));
 
             telemetry.update();
+        }
+    }
+
+    public String detectProp() {
+        if (drive.distanceSensor1.getDistance(DistanceUnit.CM) < PROP_DIST) {
+            // prop is on the left spike
+            return "left";
+        } else if (drive.distanceSensor2.getDistance(DistanceUnit.CM) < PROP_DIST){
+            return "right";
+        } else {
+            return "center";
         }
     }
 }
