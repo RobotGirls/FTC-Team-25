@@ -7,16 +7,17 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
+import java.util.Queue;
+
 @Config
-@Autonomous(name = "RRAutoBlueLeft")
-public class RRAutoCSBlueLeft extends LinearOpMode {
+@Autonomous(name = "RRAutoRedRight")
+public class RRAutoCSRedRight extends LinearOpMode {
     public static double DISTANCE = 30; // in
 
     private final double BLOCK_NOTHING = 0.05;
@@ -35,51 +36,45 @@ public class RRAutoCSBlueLeft extends LinearOpMode {
         // methods associated with the Rev2mDistanceSensor class.
         Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) drive.distanceSensor1;
 
-        TrajectorySequence toSpikes = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(270)))
+        TrajectorySequence toSpikes = drive.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                 // APPROACHING SPIKES
-                .forward(26)
+                .forward(32)
                 .build();
-        TrajectorySequence leftSpike = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(270)))
+        TrajectorySequence leftSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // LEFT SPIKE PATH
                 .turn(Math.toRadians(90))
                 // * deploy purple pixel
-                .addDisplacementMarker(() -> {
-                    // release purple pixel
-                    //drive.intake.setTargetPosition(80);
-                    //drive.intake.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    drive.intake.setPower(0.2);
-                })
+                .UNSTABLE_addTemporalMarkerOffset(1, () -> {drive.intake.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(0.2);})
+                .waitSeconds(1)
                 .forward(-3)
-                .addDisplacementMarker(() -> {
-                    drive.intake.setPower(0);
-                })
                 .strafeLeft(25)
-                .lineToLinearHeading(new Pose2d(50, 36, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(50, -33, Math.toRadians(180)))
                 // * deploy yellow pixel
+                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {drive.linearLift.setPower(0);})
                 .addDisplacementMarker(() -> {
-                    //drive.linearLift.setTargetPosition(30);
-                    //drive.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     drive.linearLift.setPower(0.6);
-                    try {
-                        wait(1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    drive.linearLift.setPower(0);
                     drive.box.setPosition(0.9);
                     drive.pixelRelease.setPosition(0.7);
                 })
                 .build();
-        TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(270)))
+        TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // CENTER SPIKE PATH
-                .forward(26)
+                .forward(-6)
                 // * deploy purple pixel
-                .forward(-25)
-                .lineToLinearHeading(new Pose2d(50, 36, Math.toRadians(180)))
+                .UNSTABLE_addTemporalMarkerOffset(1, () -> {drive.intake.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(0.2);})
+                .waitSeconds(1)
+                .forward(-20)
+                .lineToLinearHeading(new Pose2d(50, -33, Math.toRadians(180)))
                 // * deploy yellow pixel
                 .build();
-        TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(270)))
+        TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // RIGHT SPIKE PATH
+                .forward(26)
+                .turn(Math.toRadians(-90))
+                .forward(-3)
+                .lineToLinearHeading(new Pose2d(50, 36, Math.toRadians(180)))
                 .build();
 
 
@@ -87,17 +82,22 @@ public class RRAutoCSBlueLeft extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        drive.followTrajectorySequence(toSpikes);
+        Queue<TrajectorySequence> trajectoryQueue = null;
 
+        trajectoryQueue.add(toSpikes);
 
         if (detectProp() == "left") {
-            drive.followTrajectorySequence(leftSpike);
+            trajectoryQueue.add(leftSpike);
         }
         else if (detectProp() == "center") {
-            drive.followTrajectorySequence(centerSpike);
+            trajectoryQueue.add(centerSpike);
         }
         else {
-            drive.followTrajectorySequence(rightSpike);
+            trajectoryQueue.add(rightSpike);
+        }
+
+        while(!trajectoryQueue.isEmpty()) {
+            drive.followTrajectorySequence(trajectoryQueue.poll());
         }
 
 
@@ -112,6 +112,8 @@ public class RRAutoCSBlueLeft extends LinearOpMode {
             // Rev2mDistanceSensor specific methods.
             telemetry.addData("ID", String.format("%x", sensorTimeOfFlight.getModelID()));
             telemetry.addData("did time out", Boolean.toString(sensorTimeOfFlight.didTimeoutOccur()));
+
+            telemetry.addData("prop position", detectProp());
 
             telemetry.update();
         }
