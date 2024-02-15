@@ -7,7 +7,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -15,8 +14,8 @@ import org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Config
-@Autonomous(name = "RRAutoBlueLeft")
-public class RRAutoCSBlueLeft extends LinearOpMode {
+@Autonomous(name = "RRAutoBlueRight")
+public class RRAutoCSBlueRight extends LinearOpMode {
     public static double DISTANCE = 30; // in
 
     private final double BLOCK_NOTHING = 0.05;
@@ -43,6 +42,7 @@ public class RRAutoCSBlueLeft extends LinearOpMode {
                 // LEFT SPIKE PATH
                 .forward(-1.5)
                 .turn(Math.toRadians(90))
+                .forward(-0.1)
                 // * deploy purple pixel
                 .UNSTABLE_addTemporalMarkerOffset(2, () -> {drive.intake.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {drive.intake.setPower(0.3);})
@@ -50,8 +50,9 @@ public class RRAutoCSBlueLeft extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.3);})
                 .waitSeconds(3.2)
                 .forward(-3)
-                .strafeLeft(20)
-                .lineToLinearHeading(new Pose2d(28, 40, Math.toRadians(270))) // x 26
+                .strafeRight(21)
+                .forward(50)
+                .lineToLinearHeading(new Pose2d(20, 85, Math.toRadians(270))) // x 26
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -72,7 +73,7 @@ public class RRAutoCSBlueLeft extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.3);})
                 .waitSeconds(3.4)
                 .forward(-20)
-                .lineToLinearHeading(new Pose2d(25, 38, Math.toRadians(270))) // x 26
+                .lineToLinearHeading(new Pose2d(25, 85, Math.toRadians(270))) // x 26
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -93,7 +94,7 @@ public class RRAutoCSBlueLeft extends LinearOpMode {
                 .waitSeconds(3.5)
                 .forward(-0.8)
                 .strafeRight(20)
-                .lineToLinearHeading(new Pose2d(32, 38, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(28, 85, Math.toRadians(270)))
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
