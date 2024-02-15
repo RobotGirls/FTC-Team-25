@@ -8,18 +8,15 @@ import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Config
 @Autonomous(name = "RRAutoBlueLeft")
-public class RRAutoCSBase extends LinearOpMode {
+public class RRAutoCSBlueLeft extends LinearOpMode {
     public static double DISTANCE = 30; // in
 
     private final double BLOCK_NOTHING = 0.05;
@@ -38,18 +35,70 @@ public class RRAutoCSBase extends LinearOpMode {
         // methods associated with the Rev2mDistanceSensor class.
         Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) drive.distanceSensor1;
 
-        TrajectorySequence toSpikes = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(270)))
+        TrajectorySequence toSpikes = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(0)))
                 // APPROACHING SPIKES
+                .forward(33)
                 .build();
-
-        TrajectorySequence leftSpike = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(270)))
+        TrajectorySequence leftSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // LEFT SPIKE PATH
+                .forward(-1.5)
+                .turn(Math.toRadians(90))
+                // * deploy purple pixel
+                .UNSTABLE_addTemporalMarkerOffset(2, () -> {drive.intake.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {drive.intake.setPower(0.3);})
+                .UNSTABLE_addTemporalMarkerOffset(0.7, () -> {drive.intake.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.3);})
+                .waitSeconds(3.2)
+                .forward(-3)
+                .strafeLeft(20)
+                .lineToLinearHeading(new Pose2d(28, 40, Math.toRadians(270))) // x 26
+                // * deploy yellow pixel
+                .UNSTABLE_addTemporalMarkerOffset(7.5, () -> {drive.box.setPosition(0.9);})
+                .UNSTABLE_addTemporalMarkerOffset(0.8, () -> {drive.linearLift.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
+                .waitSeconds(2)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(0.95);})
+                .forward(2)
                 .build();
-        TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(270)))
+        TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // CENTER SPIKE PATH
+                .forward(-6.5)
+                // * deploy purple pixel
+                .UNSTABLE_addTemporalMarkerOffset(2.25, () -> {drive.intake.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {drive.intake.setPower(0.26);})
+                .UNSTABLE_addTemporalMarkerOffset(0.7, () -> {drive.intake.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.3);})
+                .waitSeconds(3.4)
+                .forward(-20)
+                .lineToLinearHeading(new Pose2d(25, 38, Math.toRadians(270))) // x 26
+                // * deploy yellow pixel
+                .UNSTABLE_addTemporalMarkerOffset(0.8, () -> {drive.linearLift.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
+                .waitSeconds(2)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(0.9);})
+                .waitSeconds(4)
+                .UNSTABLE_addTemporalMarkerOffset(2, () -> {drive.pixelRelease.setPosition(0.95);})
+                .forward(1)
                 .build();
-        TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(270)))
+        TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // RIGHT SPIKE PATH
+                .forward(-2.5)
+                .turn(Math.toRadians(-90))
+                .UNSTABLE_addTemporalMarkerOffset(2.25, () -> {drive.intake.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {drive.intake.setPower(0.26);})
+                .UNSTABLE_addTemporalMarkerOffset(0.7, () -> {drive.intake.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.26);})
+                .waitSeconds(3.4)
+                .forward(-0.8)
+                .strafeRight(20)
+                .lineToLinearHeading(new Pose2d(29, 38, Math.toRadians(270)))
+                // * deploy yellow pixel
+                .UNSTABLE_addTemporalMarkerOffset(7.5, () -> {drive.box.setPosition(0.9);})
+                .UNSTABLE_addTemporalMarkerOffset(0.8, () -> {drive.linearLift.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
+                .waitSeconds(2)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(0.95);})
+                .forward(1.5)
                 .build();
 
 
