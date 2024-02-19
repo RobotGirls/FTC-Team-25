@@ -86,11 +86,11 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
         // flip mechanism
         box = hardwareMap.servo.get("pixelBox");
-        box.setPosition(0.15);
+        box.setPosition(0.115);
 
         // pixel release mechanism (mounted on box)
         pixelRelease = hardwareMap.servo.get("pixelRelease");
-        pixelRelease.setPosition(BLOCK_BOTH);
+        pixelRelease.setPosition(BLOCK_NOTHING);
 
         shooter = hardwareMap.servo.get("droneShooter");
 
@@ -165,7 +165,7 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     case DPAD_DOWN_DOWN:
                         // box down and block neither pixel
-                        box.setPosition(0.15);
+                        box.setPosition(0.115);
                         pixelRelease.setPosition(BLOCK_BOTH);
                         pixelRelease.setPosition(BLOCK_NOTHING);
                         break;
@@ -191,10 +191,12 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                 switch (gamepadEvent.kind) {
                     // intake in and out
                     case LEFT_TRIGGER_DOWN:
-                        intake.setPower(0.7);
+                        // outtake
+                        intake.setPower(0.8);
                         break;
                     case RIGHT_TRIGGER_DOWN:
-                        intake.setPower(-0.7);
+                        // intake
+                        intake.setPower(-0.9);
                         break;
                     case LEFT_TRIGGER_UP:
                         intake.setPower(0);

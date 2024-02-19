@@ -43,35 +43,34 @@ public class RRAutoCSBlueLeft extends LinearOpMode {
                 // LEFT SPIKE PATH
                 .forward(-2.5)
                 .turn(Math.toRadians(90))
-                .forward(-0.001)
+                .forward(0.5)
+                .forward(-0.2)
                 // * deploy purple pixel
                 .UNSTABLE_addTemporalMarkerOffset(2, () -> {drive.intake.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {drive.intake.setPower(0.3);})
                 .UNSTABLE_addTemporalMarkerOffset(0.7, () -> {drive.intake.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.3);})
-                .waitSeconds(3.2)
-                .forward(-0.15)
+                .waitSeconds(3)
                 .strafeLeft(25)
                 .forward(25)
-                .lineToLinearHeading(new Pose2d(21, 38, Math.toRadians(270))) // x 26
+                .lineToLinearHeading(new Pose2d(21.5, 38, Math.toRadians(270))) // x 26
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
-                .waitSeconds(2)
+                .waitSeconds(1.3)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(0.9);})
                 .waitSeconds(2)
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {drive.linearLift.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
+                .waitSeconds(1)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(0.95);})
                 .waitSeconds(2)
-                .UNSTABLE_addTemporalMarkerOffset(2, () -> {drive.pixelRelease.setPosition(0.95);})
-                .waitSeconds(1.5)
                 .forward(1)
-                .waitSeconds(2)
-                .forward(2)
+                .strafeRight(18)
                 .build();
         TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // CENTER SPIKE PATH
-                .forward(-6.5)
+                .forward(-7.5)
                 // * deploy purple pixel
                 .UNSTABLE_addTemporalMarkerOffset(2.25, () -> {drive.intake.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {drive.intake.setPower(0.26);})
@@ -79,29 +78,30 @@ public class RRAutoCSBlueLeft extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.3);})
                 .waitSeconds(3.4)
                 .forward(-20)
-                .lineToLinearHeading(new Pose2d(25, 39.5, Math.toRadians(270))) // x 26
+                .lineToLinearHeading(new Pose2d(25, 39, Math.toRadians(270))) // x 26
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
-                .waitSeconds(2)
+                .waitSeconds(1.4)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(0.9);})
                 .waitSeconds(2)
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {drive.linearLift.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
-                .waitSeconds(2)
-                .UNSTABLE_addTemporalMarkerOffset(2, () -> {drive.pixelRelease.setPosition(0.95);})
+                .waitSeconds(1)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(0.95);})
                 .forward(1)
-                .waitSeconds(2.5)
+                .waitSeconds(1)
                 .forward(2)
-                .strafeRight(15)
+                .strafeRight(22)
                 .build();
         TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // RIGHT SPIKE PATH
                 .forward(-5)
                 .strafeLeft(0.8)
                 .turn(Math.toRadians(-90))
+                // * release purple pixel
                 .UNSTABLE_addTemporalMarkerOffset(2.4, () -> {drive.intake.setPower(0);})
-                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {drive.intake.setPower(0.26);})
+                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {drive.intake.setPower(0.24);})
                 .UNSTABLE_addTemporalMarkerOffset(0.7, () -> {drive.intake.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.26);})
                 .waitSeconds(3.5)
@@ -111,17 +111,17 @@ public class RRAutoCSBlueLeft extends LinearOpMode {
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
-                .waitSeconds(2)
+                .waitSeconds(1.3)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(0.9);})
                 .waitSeconds(2)
-                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {drive.linearLift.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
-                .waitSeconds(2)
-                .UNSTABLE_addTemporalMarkerOffset(2, () -> {drive.pixelRelease.setPosition(0.95);})
+                .waitSeconds(1)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(0.95);})
                 .forward(1)
-                .waitSeconds(2.5)
+                .waitSeconds(1)
                 .forward(2)
-                .strafeRight(27)
+                .strafeRight(32)
                 .build();
 
 
