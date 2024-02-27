@@ -1,7 +1,6 @@
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -20,9 +19,9 @@ import team25core.StandardFourMotorRobot;
 import team25core.TeleopDriveTask;
 import team25core.TwoStickMechanumControlScheme;
 
-@TeleOp(name = "CenterstageTeleopNew")
+@TeleOp(name = "liftTestONLY")
 //@Disabled
-public class CenterstageTeleop extends StandardFourMotorRobot {
+public class liftTestONLY extends StandardFourMotorRobot {
     //new teleop
     private TeleopDriveTask drivetask;
 
@@ -59,9 +58,6 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
     //private final double BLOCK_LEFT = 0.2;
     //private final double BLOCK_RIGHT = 0.2;
 
-    private boolean intakeOn;
-    private boolean outtakeOn;
-
 
     //  @Override
     public void handleEvent(RobotEvent e) {
@@ -88,32 +84,32 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
         initIMU();
 
-        intake=hardwareMap.get(DcMotor.class, "outtake");
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        intake=hardwareMap.get(DcMotor.class, "outtake");
+//        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //purple pixel servo
         purplePixel = hardwareMap.servo.get("purplePixel");
 
         // flip mechanism
         box = hardwareMap.servo.get("pixelBox");
-        box.setPosition(0.0975);
+//        box.setPosition(0.0975);
 
         // pixel release mechanism (mounted on box)
-        pixelRelease = hardwareMap.servo.get("pixelRelease");
-        pixelRelease.setPosition(BLOCK_BOTH);
+//        pixelRelease = hardwareMap.servo.get("pixelRelease");
+//        pixelRelease.setPosition(BLOCK_BOTH);
+//
+//        shooter = hardwareMap.servo.get("droneShooter");
+//        shooter.setPosition(0.45);
 
-        shooter = hardwareMap.servo.get("droneShooter");
-        shooter.setPosition(0.45);
-
-        rightHang = hardwareMap.get(DcMotor.class, "rightHang");
-        rightHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightHang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        leftHang = hardwareMap.get(DcMotor.class, "leftHang");
-        leftHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftHang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        rightHang = hardwareMap.get(DcMotor.class, "rightHang");
+//        rightHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        rightHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        rightHang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//
+//        leftHang = hardwareMap.get(DcMotor.class, "leftHang");
+//        leftHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        leftHang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        leftHang.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         linearLift = hardwareMap.get(DcMotor.class, "linearLift");
         linearLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -172,38 +168,26 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
                 locationTlm.setValue("in gamepad1 handler");
                 switch (gamepadEvent.kind) {
-                    case RIGHT_BUMPER_DOWN:
-                        //intake pixels
-                        if(intakeOn == false) {
-                            intake.setPower(-0.9);
-                            intakeOn = true;
-                        }
-                        else {
-                            intake.setPower(0);
-                            intakeOn = false;
-                        }
+                    case DPAD_UP_DOWN:
+                        // flip box up and block pixels from falling
+                        pixelRelease.setPosition(BLOCK_BOTH);
+                        box.setPosition(0.9);
                         break;
-                    case LEFT_BUMPER_DOWN:
-                        //outtake pixels
-                        if(outtakeOn == false) {
-                            intake.setPower(0.8);
-                            outtakeOn = true;
-                        }
-                        else {
-                            intake.setPower(0);
-                            outtakeOn = false;
-                        }
+                    case DPAD_DOWN_DOWN:
+                        // box down and block pixels
+                        box.setPosition(0.0975);
+                        pixelRelease.setPosition(BLOCK_BOTH);
                         break;
-                    case BUTTON_Y_DOWN:
-                        // shoot drone
-                        shooter.setPosition(0.45);
-                        locationTlm.setValue("drone button y pressed");
-                        break;
-                    case BUTTON_A_DOWN:
-                        // hold drone
-                        shooter.setPosition(0.15);
-                        locationTlm.setValue("drone button a pressed");
-                        break;
+//                    case BUTTON_Y_DOWN:
+//                        // shoot drone
+//                        shooter.setPosition(0.45);
+//                        locationTlm.setValue("drone button y pressed");
+//                        break;
+//                    case BUTTON_A_DOWN:
+//                        // hold drone
+//                        shooter.setPosition(0.15);
+//                        locationTlm.setValue("drone button a pressed");
+//                        break;
                     case BUTTON_X_DOWN:
                         // purple pixel
                         purplePixel.setPosition(0.95);
@@ -229,23 +213,41 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                 GamepadEvent gamepadEvent = (GamepadEvent) e;
                 locationTlm.setValue("in gamepad2 handler");
                 switch (gamepadEvent.kind) {
+                    // intake in and out
+//                    case LEFT_TRIGGER_DOWN:
+//                        // outtake
+//                        intake.setPower(0.8);
+//                        break;
+//                    case RIGHT_TRIGGER_DOWN:
+//                        // intake
+//                        intake.setPower(-0.9);
+//                        break;
+//                    case LEFT_TRIGGER_UP:
+//                        intake.setPower(0);
+//                        break;
+//                    case RIGHT_TRIGGER_UP:
+//                        intake.setPower(0);
+//                        break;
+                    // slides up or down
                     case LEFT_BUMPER_DOWN:
-                        // flip box up and block pixels from falling
-                        pixelRelease.setPosition(BLOCK_BOTH);
-                        box.setPosition(0.9);
+                        linearLift.setPower(1);
                         break;
-                    case LEFT_TRIGGER_DOWN:
-                        // box down and block pixels
-                        box.setPosition(0.0975);
-                        pixelRelease.setPosition(BLOCK_BOTH);
+                    case RIGHT_BUMPER_DOWN:
+                        linearLift.setPower(-1);
+                        break;
+                    case LEFT_BUMPER_UP:
+                        linearLift.setPower(0);
+                        break;
+                    case RIGHT_BUMPER_UP:
+                        linearLift.setPower(0);
                         break;
                     case DPAD_UP_DOWN:
-                        // block pixels in box
-                        pixelRelease.setPosition(BLOCK_BOTH);
+                        // block nothing
+                        pixelRelease.setPosition(BLOCK_NOTHING);
                         break;
                     case DPAD_DOWN_DOWN:
-                        // pixel box is open
-                        pixelRelease.setPosition(BLOCK_NOTHING);
+                        // block other side
+                        pixelRelease.setPosition(BLOCK_BOTH);
                         break;
                     // hanger up
                     case BUTTON_Y_DOWN:
