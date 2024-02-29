@@ -14,8 +14,8 @@ import org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Config
-@Autonomous(name = "RR_BLUELEFT")
-public class RRAutoCSBlueLeftV2 extends LinearOpMode {
+@Autonomous(name = "RR_BLUERIGHT")
+public class RRAutoCSBlueRightV2 extends LinearOpMode {
     public static double DISTANCE = 30; // in
 
     private final double BLOCK_NOTHING = 0.05;
@@ -52,9 +52,9 @@ public class RRAutoCSBlueLeftV2 extends LinearOpMode {
                 .forward(-0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(1)
-                .forward(3)
-                //.strafeLeft(24)
-                .lineToLinearHeading(new Pose2d(-15, 0, Math.toRadians(90)))
+                .forward(5)
+                .lineToLinearHeading(new Pose2d(-43, 0, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-40, -23, Math.toRadians(90)))
                 .lineToLinearHeading(new Pose2d(-21.5, -38, Math.toRadians(90))) // x 26   --- constant name :
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
@@ -76,7 +76,10 @@ public class RRAutoCSBlueLeftV2 extends LinearOpMode {
                 // * deploy purple pixel
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(0.5)
-                .forward(8)
+                .forward(4)
+                .lineToLinearHeading(new Pose2d(-30, 15, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-49, 15, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-45, -25, Math.toRadians(0)))
                 .lineToLinearHeading(new Pose2d(-26, -39, Math.toRadians(90))) // x 26
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
@@ -100,7 +103,9 @@ public class RRAutoCSBlueLeftV2 extends LinearOpMode {
                 // * release purple pixel
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(1)
-                .forward(3)
+                .forward(1)
+                .strafeRight(15)
+                .lineToLinearHeading(new Pose2d(-45, -25, Math.toRadians(270)))
                 .lineToLinearHeading(new Pose2d(-33, -39, Math.toRadians(90)))
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
