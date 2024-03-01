@@ -11,9 +11,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -25,7 +27,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Autonomous(name = "RRAutoTest")
 public class RRAutoTest extends LinearOpMode {
     public static double DISTANCE = 30; // in
-    private DcMotor intake;
+    private DcMotorEx intake;
     private DistanceSensor distanceSensor;
     private DistanceSensor distanceSensor2;
 
@@ -34,11 +36,10 @@ public class RRAutoTest extends LinearOpMode {
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        //FIXME un comment when using competition robot
-        //intake = hardwareMap.get(DcMotor.class, "testMotor");
-        //intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intake = hardwareMap.get(DcMotorEx.class, "testMotor");
+        intake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        intake.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        intake.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
 
@@ -50,6 +51,16 @@ public class RRAutoTest extends LinearOpMode {
                 .splineTo(new Vector2d(36, 36), Math.toRadians(0))
                 .addDisplacementMarker(25, () -> {
                     intake.setPower(0.5);
+                    while (intake.getCurrent(CurrentUnit.MILLIAMPS) < 300 && opModeIsActive()) {
+
+                    }
+                    try {
+                        Thread.sleep(350);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    intake.setPower(0);
+
                 })
                 .setReversed(true)
                 .splineTo(new Vector2d(0, 0), Math.toRadians(180))
