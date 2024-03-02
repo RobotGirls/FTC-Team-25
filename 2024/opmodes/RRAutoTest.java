@@ -94,11 +94,10 @@ public class RRAutoTest extends LinearOpMode {
             telemetry.addData("ID", String.format("%x", sensorTimeOfFlight.getModelID()));
             telemetry.addData("did time out", Boolean.toString(sensorTimeOfFlight.didTimeoutOccur()));
 
+            // intake motor current telemetry
+            telemetry.addData("Intake Current: ", intake.getCurrent(CurrentUnit.MILLIAMPS));
+
             telemetry.update();
         }
-    }
-
-    public void testMotor() {
-        intake.setPower(0.5);
     }
 }
