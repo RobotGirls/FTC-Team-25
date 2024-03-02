@@ -1,5 +1,8 @@
 package opmodes;
 
+import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.FLIP_UP;
+import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.RELEASE_PIXELS;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -61,7 +64,6 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
     final double MAX_AUTO_TURN  = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
     final double DESIRED_DISTANCE = 4.0; //  this is how close the camera should get to the target (inches)
 
-
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new CenterstageSampleMecanumDrive(hardwareMap);
@@ -76,7 +78,6 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
 
         TrajectorySequence toSpikes = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(0)))
                 // APPROACHING SPIKES
-                //.forward(-33)
                 .lineToLinearHeading(new Pose2d(-29, 0, Math.toRadians(0)))
                 .build();
         TrajectorySequence leftSpike = drive.trajectorySequenceBuilder(toSpikes.end())
@@ -93,12 +94,12 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0.8, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
                 .waitSeconds(1.3)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(0.4);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_UP);})
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(0.4);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
                 .forward(1)
                 .waitSeconds(1)
                 .forward(2)
@@ -117,12 +118,12 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0.8, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
                 .waitSeconds(1.3)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(0.4);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_UP);})
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(0.4);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
                 .forward(1)
                 .waitSeconds(1)
                 .forward(2)
@@ -143,12 +144,12 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0.9, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
                 .waitSeconds(1.3)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(0.4);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_UP);})
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(0.4);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
                 .waitSeconds(1)
                 .forward(3)
                 .strafeLeft(20)

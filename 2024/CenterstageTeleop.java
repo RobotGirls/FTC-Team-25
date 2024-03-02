@@ -52,6 +52,12 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
     private Servo shooter;
 
+    public static double FLIP_UP = 0.4;
+    public static double FLIP_DOWN = 0.8;
+
+    public static double BLOCK_PIXELS = 0.05;
+    public static double RELEASE_PIXELS = 0.45;
+
     //  @Override
     public void handleEvent(RobotEvent e) {
 
@@ -85,11 +91,11 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
         // flip mechanism
         box = hardwareMap.servo.get("pixelBox");
-        box.setPosition(0.8);
+        box.setPosition(FLIP_DOWN);
 
         // pixel release mechanism (mounted on box)
         pixelRelease = hardwareMap.servo.get("pixelRelease");
-        pixelRelease.setPosition(0.05);
+        pixelRelease.setPosition(BLOCK_PIXELS);
 
         shooter = hardwareMap.servo.get("droneShooter");
         shooter.setPosition(0.45);
@@ -160,13 +166,13 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                 switch (gamepadEvent.kind) {
                     case DPAD_UP_DOWN:
                         // flip box up and block pixels from falling
-                        pixelRelease.setPosition(0.45);
-                        box.setPosition(0.4);
+                        pixelRelease.setPosition(BLOCK_PIXELS);
+                        box.setPosition(FLIP_UP);
                         break;
                     case DPAD_DOWN_DOWN:
                         // box down and block pixels
-                        box.setPosition(0.8);
-                        pixelRelease.setPosition(0.4);
+                        box.setPosition(FLIP_DOWN);
+                        pixelRelease.setPosition(RELEASE_PIXELS);
                         break;
                     case BUTTON_Y_DOWN:
                         // shoot drone
@@ -231,12 +237,12 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     case DPAD_UP_DOWN:
                         // block both pixels
-                        pixelRelease.setPosition(0.05);
+                        pixelRelease.setPosition(BLOCK_PIXELS);
                         //0.2
                         break;
                     case DPAD_DOWN_DOWN:
                         // release
-                        pixelRelease.setPosition(0.4);
+                        pixelRelease.setPosition(RELEASE_PIXELS);
                         //0.8
                         break;
                     // hanger up

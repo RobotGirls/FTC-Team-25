@@ -1,5 +1,8 @@
 package opmodes;
 
+import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.FLIP_UP;
+import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.RELEASE_PIXELS;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -60,12 +63,12 @@ public class RRAutoCSBlueLeftV2 extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
                 .waitSeconds(1)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(0.4);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_UP);})
                 .waitSeconds(1)
                 .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .waitSeconds(1)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(0.4);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
                 .waitSeconds(1)
                 .forward(1)
                 .strafeRight(18)
@@ -82,12 +85,12 @@ public class RRAutoCSBlueLeftV2 extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
                 .waitSeconds(1)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(0.4);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_UP);})
                 .waitSeconds(1)
                 .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .waitSeconds(0.4)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(0.4);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
                 .waitSeconds(0.5)
                 .forward(2)
                 .strafeRight(22)
@@ -106,12 +109,12 @@ public class RRAutoCSBlueLeftV2 extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
                 .waitSeconds(1.3)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(0.4);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_UP);})
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(0.4);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
                 .forward(1)
                 .waitSeconds(1)
                 .forward(2)
