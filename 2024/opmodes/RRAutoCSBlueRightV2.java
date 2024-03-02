@@ -51,11 +51,11 @@ public class RRAutoCSBlueRightV2 extends LinearOpMode {
                 .turn(Math.toRadians(90))
                 .forward(-0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
-                .waitSeconds(1)
-                .forward(5)
-                .lineToLinearHeading(new Pose2d(-43, 0, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-40, -23, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-21.5, -38, Math.toRadians(90))) // x 26   --- constant name :
+                .waitSeconds(0.5)
+                .forward(6)
+                .lineToLinearHeading(new Pose2d(-50, 11, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-50, -45, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-24, -87, Math.toRadians(90))) //  --- constant name :
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -67,7 +67,7 @@ public class RRAutoCSBlueRightV2 extends LinearOpMode {
                 .waitSeconds(1)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(0.45);})
                 .waitSeconds(1)
-                .forward(1)
+                .forward(2)
                 .strafeRight(18)
                 .build();
         TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(toSpikes.end())
@@ -76,11 +76,11 @@ public class RRAutoCSBlueRightV2 extends LinearOpMode {
                 // * deploy purple pixel
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(0.5)
-                .forward(4)
-                .lineToLinearHeading(new Pose2d(-30, 15, Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(-49, 15, Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(-45, -25, Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(-26, -39, Math.toRadians(90))) // x 26
+                .forward(8)
+                .lineToLinearHeading(new Pose2d(-22, 15, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-50, 15, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-50, -43, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-30, -87, Math.toRadians(90))) // x 26
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -101,12 +101,13 @@ public class RRAutoCSBlueRightV2 extends LinearOpMode {
                 .forward(3.5)
                 .turn(Math.toRadians(-90))
                 // * release purple pixel
+                .forward(-1.3)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
-                .waitSeconds(1)
-                .forward(1)
-                .strafeRight(15)
-                .lineToLinearHeading(new Pose2d(-45, -25, Math.toRadians(270)))
-                .lineToLinearHeading(new Pose2d(-33, -39, Math.toRadians(90)))
+                .waitSeconds(0.5)
+                .forward(1.3)
+                .strafeRight(27)
+                .lineToLinearHeading(new Pose2d(-47, -55, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-34, -87, Math.toRadians(90)))
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
