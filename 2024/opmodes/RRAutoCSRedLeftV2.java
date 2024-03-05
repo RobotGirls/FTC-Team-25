@@ -1,5 +1,6 @@
 package opmodes;
 
+import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.FLIP_DOWN;
 import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.FLIP_UP;
 import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.RELEASE_PIXELS;
 
@@ -54,8 +55,8 @@ public class RRAutoCSRedLeftV2 extends LinearOpMode {
                 .waitSeconds(0.5)
                 .forward(5)
                 .lineToLinearHeading(new Pose2d(-50, 11, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-50, -45, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-24, 87, Math.toRadians(90))) //  --- constant name :
+                .lineToLinearHeading(new Pose2d(-50, 45, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-24, 87, Math.toRadians(270))) //  --- constant name :
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -69,6 +70,7 @@ public class RRAutoCSRedLeftV2 extends LinearOpMode {
                 .waitSeconds(1)
                 .forward(2)
                 .strafeRight(18)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
         TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // CENTER SPIKE PATH
@@ -77,10 +79,10 @@ public class RRAutoCSRedLeftV2 extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(0.5)
                 .forward(8)
-                .lineToLinearHeading(new Pose2d(-22, 15, Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(-50, 15, Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(-50, -43, Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(-30, 87, Math.toRadians(90))) // x 26
+                .lineToLinearHeading(new Pose2d(-22, -15, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-50, -15, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-50, 43, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-27, 87, Math.toRadians(270))) // x 26
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -95,6 +97,7 @@ public class RRAutoCSRedLeftV2 extends LinearOpMode {
                 .waitSeconds(1)
                 .forward(2)
                 .strafeRight(22)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
         TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // RIGHT SPIKE PATH
@@ -106,8 +109,8 @@ public class RRAutoCSRedLeftV2 extends LinearOpMode {
                 .waitSeconds(0.5)
                 .forward(1.3)
                 .strafeRight(27)
-                .lineToLinearHeading(new Pose2d(-47, -55, Math.toRadians(270)))
-                .lineToLinearHeading(new Pose2d(-34, 87, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-47, 55, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-34, 87, Math.toRadians(270)))
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -122,6 +125,7 @@ public class RRAutoCSRedLeftV2 extends LinearOpMode {
                 .waitSeconds(1)
                 .forward(2)
                 .strafeRight(32)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
         waitForStart();
 

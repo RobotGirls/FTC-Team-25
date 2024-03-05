@@ -1,5 +1,6 @@
 package opmodes;
 
+import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.FLIP_DOWN;
 import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.FLIP_UP;
 import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.RELEASE_PIXELS;
 
@@ -69,8 +70,6 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
         drive = new CenterstageSampleMecanumDrive(hardwareMap);
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        initAprilTag();
-
         // you can also cast this to a Rev2mDistanceSensor if you want to use added
         // methods associated with the Rev2mDistanceSensor class.
         Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) drive.distanceSensor1;
@@ -96,7 +95,7 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
                 .waitSeconds(1.3)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_UP);})
                 .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {drive.linearLift.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
@@ -104,6 +103,7 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
                 .waitSeconds(1)
                 .forward(2)
                 .strafeLeft(27)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
         TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // CENTER SPIKE PATH
@@ -120,7 +120,7 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
                 .waitSeconds(1.3)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_UP);})
                 .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {drive.linearLift.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
@@ -128,6 +128,7 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
                 .waitSeconds(1)
                 .forward(2)
                 .strafeLeft(20)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
         TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // RIGHT SPIKE PATH
@@ -138,7 +139,7 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(0.5)
                 .forward(4)
-                .lineToLinearHeading(new Pose2d(-15, -2, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-13, -2, Math.toRadians(270)))
                 .lineToLinearHeading(new Pose2d(-18, 41, Math.toRadians(270)))
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.9, () -> {drive.linearLift.setPower(0);})
@@ -146,13 +147,14 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
                 .waitSeconds(1.3)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_UP);})
                 .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {drive.linearLift.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
                 .waitSeconds(1)
-                .forward(3)
+                .forward(4)
                 .strafeLeft(20)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
 
 
@@ -196,8 +198,6 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
             telemetry.addData("heading", poseEstimate.getHeading());
 
 */
-            foundTarget = findAprilTag(desiredTagID);
-            driveToAprilTag(foundTarget);
 
             telemetry.update();
         }
@@ -215,193 +215,5 @@ public class RRAutoCSRedRightV2 extends LinearOpMode {
             desiredTagID = RED_MIDDLE_TAG_ID;
             return "center";
         }
-    }
-
-    private void initAprilTag() {
-        // Create the AprilTag processor by using a builder.
-
-        aprilTag = new AprilTagProcessor.Builder().build();
-
-        // Adjust Image Decimation to trade-off detection-range for detection-rate.
-
-        // eg: Some typical detection data using a Logitech C920 WebCam
-
-        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
-
-        aprilTag.setDecimation(2);
-
-        // Create the vision portal by using a builder.
-
-        if (USE_WEBCAM) {
-            visionPortal = new VisionPortal.Builder()
-                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                    .addProcessor(aprilTag)
-                    .build();
-        } else {
-            visionPortal = new VisionPortal.Builder()
-                    .setCamera(BuiltinCameraDirection.BACK)
-                    .addProcessor(aprilTag)
-                    .build();
-        }
-    }
-
-    private void setManualExposure(int exposureMS, int gain) {
-        // Wait for the camera to be open, then use the controls
-        if (visionPortal == null) {
-            return;
-        }
-
-        // Make sure camera is streaming before we try to set the exposure controls
-        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
-            telemetry.addData("Camera", "Waiting");
-            telemetry.update();
-            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
-                sleep(20);
-            }
-            telemetry.addData("Camera", "Ready");
-            telemetry.update();
-        }
-
-        // Set camera controls unless we are stopping.
-        if (!isStopRequested())
-        {
-            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
-
-            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
-                exposureControl.setMode(ExposureControl.Mode.Manual);
-                sleep(50);
-            }
-            exposureControl.setExposure((long)exposureMS, TimeUnit.MILLISECONDS);
-            sleep(20);
-            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
-            gainControl.setGain(gain);
-            sleep(20);
-        }
-    }
-
-    public boolean findAprilTag(int myDesiredTagID) {
-
-        targetFound = false;
-        desiredTag  = null;
-
-        // Step through the list of detected tags and look for a matching tag
-
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-
-        for (AprilTagDetection detection : currentDetections) {
-
-            // Look to see if we have size info on this tag.
-            if (detection.metadata != null) {
-                //  Check to see if we want to track towards this tag.
-                if ((myDesiredTagID < 0) || (detection.id == myDesiredTagID)) {
-                    // Yes, we want to use this tag.
-                    targetFound = true;
-                    desiredTag = detection;
-                    break;  // don't look any further.
-                } else {
-                    // This tag is in the library, but we do not want to track it right now.
-                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
-                }
-            } else {
-                // This tag is NOT in the library, so we don't have enough information to track to it.
-                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
-
-            }
-
-        }
-
-        // Tell the driver what we see, and what to do.
-
-        if (targetFound) {
-
-            telemetry.addData("\n>","HOLD Left-Bumper to Drive to Target\n");
-
-            telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
-
-            telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
-
-            telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
-
-            telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
-
-        } else {
-            telemetry.addData("\n>","Drive using joysticks to find valid target\n");
-        }
-        return targetFound;
-    }
-
-    public void driveToAprilTag(boolean myTargetFound) {
-        // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
-
-        if (gamepad1.left_bumper && targetFound) {
-            // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-            double  rangeError      = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
-            double  headingError    = desiredTag.ftcPose.bearing;
-            double  yawError        = desiredTag.ftcPose.yaw;
-
-            // Use the speed and turn "gains" to calculate how we want the robot to move.
-            myDrive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-            turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN) ;
-            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-            telemetry.addData("Auto","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", myDrive, strafe, turn);
-
-        } else {
-            // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
-            myDrive  = -gamepad1.left_stick_y  / 2.0;  // Reduce drive rate to 50%.
-            strafe = -gamepad1.left_stick_x  / 2.0;  // Reduce strafe rate to 50%.
-            turn   = -gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
-            telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", myDrive, strafe, turn);
-
-        }
-
-        telemetry.update();
-
-
-        // Apply desired axes motions to the drivetrain.
-
-        moveRobot(myDrive, strafe, turn);
-
-    }
-
-    /**
-
-     * Move robot according to desired axes motions
-
-     * <p>
-
-     * Positive X is forward
-
-     * <p>
-
-     * Positive Y is strafe left
-
-     * <p>
-
-     * Positive Yaw is counter-clockwise
-
-     */
-
-    public void moveRobot(double x, double y, double yaw) {
-
-        // Calculate wheel powers.
-        double leftFrontPower    =  x -y -yaw;
-        double rightFrontPower   =  x +y +yaw;
-        double leftBackPower     =  x +y -yaw;
-        double rightBackPower    =  x -y +yaw;
-
-        // Normalize wheel powers to be less than 1.0
-        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
-
-        if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftBackPower /= max;
-            rightBackPower /= max;
-        }
-        // Send powers to the wheels.
-        drive.setMotorPowers(leftFrontPower, leftBackPower, rightBackPower, rightFrontPower);
-
     }
 }

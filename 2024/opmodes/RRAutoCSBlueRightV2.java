@@ -1,5 +1,6 @@
 package opmodes;
 
+import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.FLIP_DOWN;
 import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.FLIP_UP;
 import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.RELEASE_PIXELS;
 
@@ -69,6 +70,7 @@ public class RRAutoCSBlueRightV2 extends LinearOpMode {
                 .waitSeconds(1)
                 .forward(2)
                 .strafeRight(18)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
         TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // CENTER SPIKE PATH
@@ -95,6 +97,7 @@ public class RRAutoCSBlueRightV2 extends LinearOpMode {
                 .waitSeconds(1)
                 .forward(2)
                 .strafeRight(22)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
         TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // RIGHT SPIKE PATH
@@ -122,6 +125,7 @@ public class RRAutoCSBlueRightV2 extends LinearOpMode {
                 .waitSeconds(1)
                 .forward(2)
                 .strafeRight(32)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
         waitForStart();
 
