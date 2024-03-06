@@ -13,13 +13,23 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Config
-@Autonomous(name = "RR_REDLEFT")
-public class RRAutoCSRedLeftV2 extends LinearOpMode {
+@Autonomous(name = "AT_RR_REDLEFT")
+public class ATRRAutoCSRedLeftV2 extends LinearOpMode {
     public static double DISTANCE = 30; // in
 
     private final double BLOCK_NOTHING = 0.05;
@@ -32,6 +42,27 @@ public class RRAutoCSRedLeftV2 extends LinearOpMode {
 
     private final double initialForward = -33;
 
+    private static int AT_TIMEOUT = 25;
+    private Telemetry.Item locationTlm;
+
+    private AprilTagProcessor aprilTag;
+
+    private VisionPortal visionPortal;
+
+    private static final boolean USE_WEBCAM = true;
+
+    private int desiredTagID = -1;
+
+    private static final int BLUE_LEFT_TAG_ID = 1;
+    private static final int BLUE_MIDDLE_TAG_ID = 2;
+    private static final int BLUE_RIGHT_TAG_ID = 3;
+
+    private boolean AprilTagsFound;
+    boolean AprilTag1Found = false;
+    boolean AprilTag2Found = false;
+    boolean AprilTag3Found = false;
+
+
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new CenterstageSampleMecanumDrive(hardwareMap);
@@ -40,6 +71,8 @@ public class RRAutoCSRedLeftV2 extends LinearOpMode {
         // you can also cast this to a Rev2mDistanceSensor if you want to use added
         // methods associated with the Rev2mDistanceSensor class.
         Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) drive.distanceSensor1;
+
+        initAprilTag();
 
         TrajectorySequence toSpikes = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(0)))
                 // APPROACHING SPIKES
@@ -54,10 +87,9 @@ public class RRAutoCSRedLeftV2 extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(0.5)
                 .forward(5)
-                .lineToLinearHeading(new Pose2d(-50, 11, Math.toRadians(90))) // strafe to center
-                .turn(180)
-                .lineToLinearHeading(new Pose2d(-50, 45, Math.toRadians(270))) // go across
-                .lineToLinearHeading(new Pose2d(-24, 89, Math.toRadians(270))) //  --- constant name :
+                .lineToLinearHeading(new Pose2d(-50, 11, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-50, 45, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-24, 87, Math.toRadians(270))) //  --- constant name :
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -75,33 +107,29 @@ public class RRAutoCSRedLeftV2 extends LinearOpMode {
                 .build();
         TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // CENTER SPIKE PATH
-                .forward(2.5)
+                .forward(3)
                 // * deploy purple pixel
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(0.5)
                 .forward(8)
                 .lineToLinearHeading(new Pose2d(-22, -15, Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(-52.5, -15, Math.toRadians(270)))
-                //.turn(Math.toRadians(-90))
-                .lineToLinearHeading(new Pose2d(-47.5, 59, Math.toRadians(270)))
-                .lineToLinearHeading(new Pose2d(-22, 59, Math.toRadians(270)))
-                .lineToLinearHeading(new Pose2d(-22, 83, Math.toRadians(270)))
-                //.lineToLinearHeading(new Pose2d(-22, 83, Math.toRadians(270))) // diagonal to backdrop
+                .lineToLinearHeading(new Pose2d(-50, -15, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-50, 43, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-27, 87, Math.toRadians(270))) // x 26
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
                 .waitSeconds(1)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_UP);})
-                .waitSeconds(1)
+                .waitSeconds(2)
                 .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
-                .waitSeconds(0.5)
+                .waitSeconds(1)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
-                .waitSeconds(0.5)
-                .forward(3)
+                .forward(1)
                 .waitSeconds(1)
                 .forward(2)
-                .strafeLeft(22)
+                .strafeRight(22)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
         TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(toSpikes.end())
@@ -115,7 +143,7 @@ public class RRAutoCSRedLeftV2 extends LinearOpMode {
                 .forward(1.3)
                 .strafeRight(27)
                 .lineToLinearHeading(new Pose2d(-47, 55, Math.toRadians(270)))
-                .lineToLinearHeading(new Pose2d(-34, 89, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-34, 87, Math.toRadians(270)))
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -149,6 +177,28 @@ public class RRAutoCSRedLeftV2 extends LinearOpMode {
             drive.followTrajectorySequence(rightSpike);
         }
 
+        while(opModeIsActive() && (getRuntime() < AT_TIMEOUT)) {
+            if(findAprilTags() == true) {
+                locationTlm.setValue("Can see all AprilTags");
+                break;
+            }
+            else {
+                locationTlm.setValue("Cannot see all AprilTags");
+                wait(250);
+            }
+        }
+/*
+        if (detectProp() == "left") {
+            drive.followTrajectorySequence(toBackdropLeft);
+        }
+        else if (detectProp() == "center") {
+            drive.followTrajectorySequence(toBackdropMiddle);
+        }
+        else {
+            drive.followTrajectorySequence(toBackdropRight);
+        }
+
+*/
         while (!isStopRequested() && opModeIsActive()) {
             // generic DistanceSensor methods.
             telemetry.addData("deviceName", drive.distanceSensor1.getDeviceName() );
@@ -174,5 +224,111 @@ public class RRAutoCSRedLeftV2 extends LinearOpMode {
         } else {
             return "center";
         }
+    }
+
+    /**
+     * Initialize the AprilTag processor.
+     */
+    private void initAprilTag() {
+        // Create the AprilTag processor by using a builder.
+        aprilTag = new AprilTagProcessor.Builder().build();
+        locationTlm = telemetry.addData("location","init");
+
+        // Adjust Image Decimation to trade-off detection-range for detection-rate.
+        // eg: Some typical detection data using a Logitech C920 WebCam
+        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
+        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
+        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second
+        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second
+        // Note: Decimation can be changed on-the-fly to adapt during a match.
+        aprilTag.setDecimation(2);
+
+        // Create the vision portal by using a builder.
+        if (USE_WEBCAM) {
+            visionPortal = new VisionPortal.Builder()
+                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                    .addProcessor(aprilTag)
+                    .build();
+        } else {
+            visionPortal = new VisionPortal.Builder()
+                    .setCamera(BuiltinCameraDirection.BACK)
+                    .addProcessor(aprilTag)
+                    .build();
+        }
+    }
+
+    /*
+    Manually set the camera gain and exposure.
+    This can only be called AFTER calling initAprilTag(), and only works for Webcams;
+   */
+    private void setManualExposure(int exposureMS, int gain) {
+        // Wait for the camera to be open, then use the controls
+
+        if (visionPortal == null) {
+            return;
+        }
+
+        // Make sure camera is streaming before we try to set the exposure controls
+        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            telemetry.addData("Camera", "Waiting");
+            telemetry.update();
+            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                sleep(20);
+            }
+            telemetry.addData("Camera", "Ready");
+            telemetry.update();
+        }
+
+        // Set camera controls unless we are stopping.
+        if (!isStopRequested())
+        {
+            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+            exposureControl.setExposure((long)exposureMS, TimeUnit.MILLISECONDS);
+            sleep(20);
+            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
+            gainControl.setGain(gain);
+            sleep(20);
+        }
+    }
+
+    public boolean findAprilTags() {
+
+        AprilTagsFound = false;
+
+        // Step through the list of detected tags and look for a matching tag
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            // Look to see if we have size info on this tag.
+            if (detection.metadata != null) {
+                //  Check to see if we want to track towards this tag.
+                if (detection.id == 1) {
+                    // Can it detect AprilTag 1?
+                    AprilTag1Found = true;
+                }
+                if (detection.id == 2) {
+                    // Can it detect AprilTag 2?
+                    AprilTag2Found = true;
+                }
+                if (detection.id == 3) {
+                    // Can it detect AprilTag 3?
+                    AprilTag3Found = true;
+                }
+            } else {
+                // This tag is NOT in the library, so we don't have enough information to track to it.
+                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+                telemetry.update();
+            }
+        }
+
+        // Displays on driver station if all AprilTags are detected
+        if (AprilTag1Found && AprilTag2Found && AprilTag3Found) {
+            AprilTagsFound = true;
+        }
+
+        return AprilTagsFound;
     }
 }

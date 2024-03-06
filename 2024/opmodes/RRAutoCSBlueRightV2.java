@@ -56,14 +56,14 @@ public class RRAutoCSBlueRightV2 extends LinearOpMode {
                 .forward(6)
                 .lineToLinearHeading(new Pose2d(-50, 11, Math.toRadians(90)))
                 .lineToLinearHeading(new Pose2d(-50, -45, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-24, -87, Math.toRadians(90))) //  --- constant name :
+                .lineToLinearHeading(new Pose2d(-24, -89, Math.toRadians(90))) //  --- constant name :
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
                 .waitSeconds(1)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_UP);})
                 .waitSeconds(1)
-                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .waitSeconds(1)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
@@ -80,9 +80,9 @@ public class RRAutoCSBlueRightV2 extends LinearOpMode {
                 .waitSeconds(0.5)
                 .forward(8)
                 .lineToLinearHeading(new Pose2d(-22, 15, Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(-50, 15, Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(-50, -43, Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(-30, -87, Math.toRadians(90))) // x 26
+                .lineToLinearHeading(new Pose2d(-51, 15, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-51, -43, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-37, -89, Math.toRadians(90))) // x 26
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -121,10 +121,10 @@ public class RRAutoCSBlueRightV2 extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .waitSeconds(1)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
-                .forward(1)
                 .waitSeconds(1)
                 .forward(2)
-                .strafeRight(32)
+                .waitSeconds(1)
+                .strafeRight(27)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
         waitForStart();
