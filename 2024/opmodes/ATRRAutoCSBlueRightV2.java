@@ -87,13 +87,13 @@ public class ATRRAutoCSBlueRightV2 extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(0.5)
                 .forward(6)
-                .lineToLinearHeading(new Pose2d(-50, 11, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-50, -45, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-38, -70, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-50, 15, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-50, -43, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-50, -61, Math.toRadians(110)))
                 .build();
         TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // CENTER SPIKE PATH
-                .forward(3)
+                .forward(2)
                 // * deploy purple pixel
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(0.5)
@@ -101,7 +101,7 @@ public class ATRRAutoCSBlueRightV2 extends LinearOpMode {
                 .lineToLinearHeading(new Pose2d(-22, 15, Math.toRadians(0)))
                 .lineToLinearHeading(new Pose2d(-50, 15, Math.toRadians(0)))
                 .lineToLinearHeading(new Pose2d(-50, -43, Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(-38, -70, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-50, -61, Math.toRadians(110))) // WORKING POSITION to see apriltag 2
                 .build();
         TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // RIGHT SPIKE PATH
@@ -112,14 +112,14 @@ public class ATRRAutoCSBlueRightV2 extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(0.5)
                 .forward(1.3)
-                .strafeRight(27)
-                .lineToLinearHeading(new Pose2d(-47, -55, Math.toRadians(270)))
-                .lineToLinearHeading(new Pose2d(-38, -70, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-50, -1, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-50, -43, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-50, -61, Math.toRadians(110)))
                 .build();
-        TrajectorySequence toBackdropLeft = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(0)))
+        TrajectorySequence toBackdropLeft = drive.trajectorySequenceBuilder(leftSpike.end())
                 // APPROACHING SPIKES
                 //.forward(initialForward)   // going forward
-                .lineToLinearHeading(new Pose2d(-24, -87, Math.toRadians(90))) //  --- constant name :
+                .lineToLinearHeading(new Pose2d(-21, -87, Math.toRadians(90))) //  --- constant name :
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -135,27 +135,25 @@ public class ATRRAutoCSBlueRightV2 extends LinearOpMode {
                 .strafeRight(18)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
-        TrajectorySequence toBackdropMiddle = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(0)))
-                // APPROACHING SPIKES
-                //.forward(initialForward)   // going forward
+        TrajectorySequence toBackdropMiddle = drive.trajectorySequenceBuilder(centerSpike.end())
                 .lineToLinearHeading(new Pose2d(-30, -87, Math.toRadians(90))) // x 26
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
-                .waitSeconds(1)
+                .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_UP);})
-                .waitSeconds(2)
-                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .waitSeconds(1)
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {drive.linearLift.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
+                .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
                 .forward(1)
-                .waitSeconds(1)
+                .waitSeconds(0.5)
                 .forward(2)
                 .strafeRight(22)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
-        TrajectorySequence toBackdropRight = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(0)))
+        TrajectorySequence toBackdropRight = drive.trajectorySequenceBuilder(rightSpike.end())
                 // APPROACHING SPIKES
                 //.forward(initialForward)   // going forward
                 .lineToLinearHeading(new Pose2d(-34, -87, Math.toRadians(90)))
@@ -181,7 +179,6 @@ public class ATRRAutoCSBlueRightV2 extends LinearOpMode {
 
         drive.followTrajectorySequence(toSpikes);
 
-
         if (detectProp() == "left") {
             drive.followTrajectorySequence(leftSpike);
         }
@@ -192,16 +189,8 @@ public class ATRRAutoCSBlueRightV2 extends LinearOpMode {
             drive.followTrajectorySequence(rightSpike);
         }
 
-        while(opModeIsActive() && (getRuntime() < AT_TIMEOUT)) {
-            if(findAprilTags() == true) {
-                locationTlm.setValue("Can see all AprilTags");
-                break;
-            }
-            else {
-                locationTlm.setValue("Cannot see all AprilTags");
-                wait(250);
-            }
-        }
+        // see if apriltags are in view
+        aprilTagLoop();
 
         if (detectProp() == "left") {
             drive.followTrajectorySequence(toBackdropLeft);
@@ -240,6 +229,19 @@ public class ATRRAutoCSBlueRightV2 extends LinearOpMode {
         } else {
             desiredTagID = BLUE_MIDDLE_TAG_ID;
             return "center";
+        }
+    }
+
+    public void aprilTagLoop() throws InterruptedException {
+        while(opModeIsActive() && (getRuntime() < AT_TIMEOUT)) {
+            if(findAprilTags() == true) {
+                locationTlm.setValue("Can see all AprilTags");
+                break;
+            }
+            else {
+                locationTlm.setValue("Cannot see all AprilTags");
+                sleep(250);
+            }
         }
     }
 
@@ -340,12 +342,15 @@ public class ATRRAutoCSBlueRightV2 extends LinearOpMode {
                 telemetry.update();
             }
         }
-
+/*
         // Displays on driver station if all AprilTags are detected
         if (AprilTag1Found && AprilTag2Found && AprilTag3Found) {
             AprilTagsFound = true;
         }
-
+*/
+        if (AprilTag2Found) {
+            AprilTagsFound = true;
+        }
         return AprilTagsFound;
     }
 }

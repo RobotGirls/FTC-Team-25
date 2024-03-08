@@ -210,7 +210,7 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     case BUTTON_A_DOWN:
                         // hold drone
-                        shooter.setPosition(0.05);
+                        shooter.setPosition(0.45);
                         locationTlm.setValue("drone button a pressed");
                         break;
                     case BUTTON_X_DOWN:
