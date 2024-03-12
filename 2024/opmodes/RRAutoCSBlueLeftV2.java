@@ -59,7 +59,7 @@ public class RRAutoCSBlueLeftV2 extends LinearOpMode {
                 .forward(3)
                 //.strafeLeft(24)
                 .lineToLinearHeading(new Pose2d(-15, 0, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-22, -38.6, Math.toRadians(90))) // x 26   --- constant name :
+                .lineToLinearHeading(new Pose2d(-26.5, -38.6, Math.toRadians(90))) // x 26   --- constant name :
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -107,7 +107,7 @@ public class RRAutoCSBlueLeftV2 extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(0.5)
                 .forward(3)
-                .lineToLinearHeading(new Pose2d(-37, -39, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-37.5, -39, Math.toRadians(90)))
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
