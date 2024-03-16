@@ -53,6 +53,8 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
     private Servo shooter;
 
+    private Servo linkage;
+
     private final double BLOCK_NOTHING = 0.25;
     private final double BLOCK_BOTH = 0.05;
     //private final double BLOCK_LEFT = 0.2;
@@ -103,6 +105,9 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
 
         shooter = hardwareMap.servo.get("droneShooter");
         shooter.setPosition(0.45);
+
+        linkage = hardwareMap.servo.get("linkage");
+        linkage.setPosition(0.1);
 
         rightHang = hardwareMap.get(DcMotor.class, "rightHang");
         rightHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -215,12 +220,12 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         break;
                     case BUTTON_X_DOWN:
                         // purple pixel
-                        purplePixel.setPosition(0.95);
+                        linkage.setPosition(0.5);
                         locationTlm.setValue("purple pixel pressed");
                         break;
                     case BUTTON_B_DOWN:
                         // purple pixel
-                        purplePixel.setPosition(0.5);
+                        linkage.setPosition(0.1);
                         locationTlm.setValue("purple pixel pressed");
                         break;
 
