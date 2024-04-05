@@ -1,4 +1,4 @@
-package opmodes;
+package opmodes.stack;
 
 import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.FLIP_DOWN;
 import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.FLIP_UP;
@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Config
-@Autonomous(name = "RR_BLUERIGHT_WSTACK")
+@Autonomous(name = "RR_BLUERIGHT_WORLDS")
 public class RRAutoCSBlueRightV2Stack extends LinearOpMode {
     public static double DISTANCE = 30; // in
 
@@ -41,10 +41,13 @@ public class RRAutoCSBlueRightV2Stack extends LinearOpMode {
         // methods associated with the Rev2mDistanceSensor class.
         Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) drive.distanceSensor1;
 
-        TrajectorySequence toSpikes = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(0)))
+        Pose2d startPose = new Pose2d(-35, 58, Math.toRadians(90));
+        drive.setPoseEstimate(startPose);
+
+        TrajectorySequence toSpikes = drive.trajectorySequenceBuilder(startPose)
                 // APPROACHING SPIKES
                 //.forward(initialForward)   // going forward
-                .lineToLinearHeading(new Pose2d(-30, 0, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-35,32, Math.toRadians(90)))
                 .build();
         TrajectorySequence leftSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // LEFT SPIKE PATH
@@ -56,36 +59,11 @@ public class RRAutoCSBlueRightV2Stack extends LinearOpMode {
                 .forward(6)
                 .lineToLinearHeading(new Pose2d(-47, 11, Math.toRadians(90)))
                 .lineToLinearHeading(new Pose2d(-47, 26, Math.toRadians(90)))
-                .UNSTABLE_addTemporalMarkerOffset(1, () -> {drive.intake.setPower(0);})
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(0.95);})
-                .forward(-2)
-                .strafeLeft(1)
-                .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(4, () -> {drive.intake.setPower(0);})
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.95);})
-                .forward(-4)
-                .forward(7)
-                /*
-                .UNSTABLE_addTemporalMarkerOffset(1, () -> {drive.intake.setPower(0);})
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(0.95);})
-                .forward(-2)
-                .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(3, () -> {drive.intake.setPower(0);})
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.95);})
-                 */
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    if (findColor() == "black") {
-                        drive.intake.setPower(-0.95);
-                    }
-                    else {
-                        drive.intake.setPower(0.95);
-                    }
-                })
-                .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(0);})
+                // check for color change from black to yellow
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.9);})
                 .lineToLinearHeading(new Pose2d(-53, 0, Math.toRadians(90)))
                 .lineToLinearHeading(new Pose2d(-53, -43, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-24, -88, Math.toRadians(90))) //  --- constant name :
+                .lineToLinearHeading(new Pose2d(-24, -88, Math.toRadians(90)))
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -103,33 +81,21 @@ public class RRAutoCSBlueRightV2Stack extends LinearOpMode {
                 .build();
         TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // CENTER SPIKE PATH
-                .forward(3)
+                .forward(4)
                 // * deploy purple pixel
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(0.3)
                 .forward(5)
+                .lineToLinearHeading(new Pose2d(-58, 35, Math.toRadians(180)))
+                // * INTAKE FROM STACK
+                /*
                 .lineToLinearHeading(new Pose2d(-22, 15, Math.toRadians(0)))
                 .lineToLinearHeading(new Pose2d(-48, 15, Math.toRadians(0)))
                 .turn(Math.toRadians(90))
                 .lineToLinearHeading(new Pose2d(-47, 27, Math.toRadians(90)))
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {drive.intake.setPower(0);})
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(0.85);})
-                .forward(-2)
-                .strafeLeft(1)
-                .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(4, () -> {drive.intake.setPower(0);})
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.95);})
-                .forward(-4)
-                .forward(7)
-                /*
-                .UNSTABLE_addTemporalMarkerOffset(1, () -> {drive.intake.setPower(0);})
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(0.95);})
-                .forward(-2)
-                .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(3, () -> {drive.intake.setPower(0);})
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.95);})
-
-                 */
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.9);})
+                .forward(-7)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     if (findColor() == "black") {
                         drive.intake.setPower(-0.95);
@@ -158,6 +124,8 @@ public class RRAutoCSBlueRightV2Stack extends LinearOpMode {
                 .forward(2)
                 .strafeRight(22)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
+
+                 */
                 .build();
         TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // RIGHT SPIKE PATH

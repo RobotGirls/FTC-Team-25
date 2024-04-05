@@ -1,7 +1,8 @@
-package opmodes;
+package opmodes.colorsensor;
 
 import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.FLIP_DOWN;
 import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.FLIP_UP;
+import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.LINKAGE_ONE_PIXEL;
 import static org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive.RELEASE_PIXELS;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -41,14 +42,10 @@ public class ColorSensorIntakeTest extends LinearOpMode {
         drive = new CenterstageSampleMecanumDrive(hardwareMap);
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        // you can also cast this to a Rev2mDistanceSensor if you want to use added
-        // methods associated with the Rev2mDistanceSensor class.
-        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) drive.distanceSensor1;
-        Rev2mDistanceSensor sensorTimeOfFlight2 = (Rev2mDistanceSensor) drive.distanceSensor2;
-
         TrajectorySequence intake = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(0)))
-                // APPROACHING SPIKES
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> { drive.linkage.setPosition(LINKAGE_ONE_PIXEL); })
                 .forward(1)
+
                 /*
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     while (true) {
@@ -63,15 +60,21 @@ public class ColorSensorIntakeTest extends LinearOpMode {
                     }
                 })
                 .UNSTABLE_addTemporalMarkerOffset(10, () -> {drive.intake.setPower(0);})
-
                  */
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     while (drive.colorSensor.red()<300 && drive.colorSensor.green()<400 && drive.colorSensor.blue()<300) {
-                        // color is black
+                        // color is black --> intake
                         drive.intake.setPower(-0.9);
                     }
+                    // after color is not black (meaning it's yellow), stop intaking
                     drive.intake.setPower(0);
                 })
+                .waitSeconds(1)
+                // outtake while driving backwards
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    drive.intake.setPower(0.9);
+                })
+                .forward(-10)
                 .build();
 
 
@@ -79,10 +82,7 @@ public class ColorSensorIntakeTest extends LinearOpMode {
         telemetry.addData("location: ", "started program");
         telemetry.update();
         if (isStopRequested()) return;
-        telemetry.addData("location: ", "starting toSpikes");
-        telemetry.update();
         drive.followTrajectorySequence(intake);
-        telemetry.update();
 
 
         while (!isStopRequested() && opModeIsActive()) {
