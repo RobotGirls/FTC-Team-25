@@ -1,3 +1,5 @@
+package opmodes.teleop;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.HashMap;
 
-import opmodes.FieldCentricDriveScheme;
+import opmodes.old.FieldCentricDriveScheme;
 import team25core.GamepadTask;
 import team25core.MechanumGearedDrivetrain;
 import team25core.MotorPackage;
@@ -17,9 +19,8 @@ import team25core.RobotEvent;
 import team25core.SingleShotTimerTask;
 import team25core.StandardFourMotorRobot;
 import team25core.TeleopDriveTask;
-import team25core.TwoStickMechanumControlScheme;
 
-@TeleOp(name = "CenterstageTeleopNew")
+@TeleOp(name = "CenterstageTeleopFC")
 //@Disabled
 public class CenterstageTeleopFieldCentric extends StandardFourMotorRobot {
     //new teleop
@@ -46,6 +47,8 @@ public class CenterstageTeleopFieldCentric extends StandardFourMotorRobot {
     private Servo box;
     private Servo pixelRelease;
 
+    private Servo linkage;
+
     private Servo purplePixel;
 
     private DcMotor rightHang;
@@ -55,8 +58,11 @@ public class CenterstageTeleopFieldCentric extends StandardFourMotorRobot {
 
     private final double BLOCK_NOTHING = 0.25;
     private final double BLOCK_BOTH = 0.05;
-    //private final double BLOCK_LEFT = 0.2;
-    //private final double BLOCK_RIGHT = 0.2;
+
+    private final double LINKAGE_UP = 0.65;
+    private final double LINKAGE_DOWN = 0.2;
+    private final double LINKAGE_ONE_PIXEL = 0.48; // getting top pixel from stack of 5
+    private final double LINKAGE_TWO_PIXELS = 0.45; // getting top pixel from stack of 4
 
     private boolean intakeOn;
     private boolean outtakeOn;
@@ -103,6 +109,9 @@ public class CenterstageTeleopFieldCentric extends StandardFourMotorRobot {
 
         shooter = hardwareMap.servo.get("droneShooter");
         shooter.setPosition(0.45);
+
+        linkage = hardwareMap.servo.get("linkage");
+        linkage.setPosition(LINKAGE_UP);
 
         rightHang = hardwareMap.get(DcMotor.class, "rightHang");
         rightHang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -214,18 +223,25 @@ public class CenterstageTeleopFieldCentric extends StandardFourMotorRobot {
                         locationTlm.setValue("drone button a pressed");
                         break;
                     case BUTTON_X_DOWN:
-                        // purple pixel
-                        purplePixel.setPosition(0.95);
-                        locationTlm.setValue("purple pixel pressed");
+                        // intake linkage
+                        linkage.setPosition(LINKAGE_UP);
+                        locationTlm.setValue("intake linkage up");
                         break;
                     case BUTTON_B_DOWN:
-                        // purple pixel
-                        purplePixel.setPosition(0.5);
-                        locationTlm.setValue("purple pixel pressed");
+                        // intake linkage
+                        linkage.setPosition(LINKAGE_DOWN);
+                        locationTlm.setValue("intake linkage down");
                         break;
-
-
-
+                    case DPAD_LEFT_DOWN:
+                        // intake one pixel from stack of 5
+                        linkage.setPosition(LINKAGE_ONE_PIXEL);
+                        locationTlm.setValue("intake linkage at height of top pixel");
+                        break;
+                    case DPAD_RIGHT_DOWN:
+                        // intake one pixel from stack of 4
+                        linkage.setPosition(LINKAGE_TWO_PIXELS);
+                        locationTlm.setValue("intake linkage at height of 2nd pixel");
+                        break;
                 }
             }
         });

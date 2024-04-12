@@ -1,4 +1,4 @@
-package opmodes;
+package opmodes.colorsensor;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;

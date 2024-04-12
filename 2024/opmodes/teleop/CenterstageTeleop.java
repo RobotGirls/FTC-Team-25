@@ -1,3 +1,5 @@
+package opmodes.teleop;
+
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_ACCEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
 
@@ -64,10 +66,10 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
     private final double BLOCK_NOTHING = 0.25;
     private final double BLOCK_BOTH = 0.05;
 
-    private final double LINKAGE_UP = 0.9; // up is 0.5
-    private final double LINKAGE_DOWN = 0.2;
-    private final double LINKAGE_ONE_PIXEL = 0.9; // getting top pixel from stack of 5
-    private final double LINKAGE_TWO_PIXELS = 0.45; // getting top pixel from stack of 4
+    private final double LINKAGE_UP = 0.74; // up is 0.8 (make lower)
+    private final double LINKAGE_DOWN = 0.35;
+    private final double LINKAGE_ONE_PIXEL = 0.5; // getting top pixel from stack of 5 (good)
+    private final double LINKAGE_TWO_PIXELS = 0.45; // getting top pixel from stack of 4 (make higher)
 
     private boolean intakeOn;
     private boolean outtakeOn;
@@ -206,7 +208,7 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                     case DPAD_DOWN_DOWN:
                         // flip box to original position block pixels from falling
                         pixelRelease.setPosition(BLOCK_BOTH);
-                        box.setPosition(0.85);
+                        box.setPosition(0.89);
                         break;
                     case BUTTON_Y_DOWN:
                         // shoot drone
@@ -278,26 +280,26 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                         intake.setPower(0);
                         intakeOn = false;
                         break;
-//                    case RIGHT_BUMPER_DOWN:
-//                        // intake linkage
-//                        linkage.setPosition(LINKAGE_UP);
-//                        locationTlm.setValue("intake linkage up");
-//                        break;
-//                    case LEFT_BUMPER_DOWN:
-//                        // intake linkage
-//                        linkage.setPosition(LINKAGE_DOWN);
-//                        locationTlm.setValue("intake linkage down");
-//                        break;
-//                    case RIGHT_TRIGGER_DOWN:
-//                        // intake one pixel from stack of 5
-//                        linkage.setPosition(LINKAGE_ONE_PIXEL);
-//                        locationTlm.setValue("intake linkage at height of top pixel");
-//                        break;
-//                    case LEFT_TRIGGER_DOWN:
-//                        // intake one pixel from stack of 4
-//                        linkage.setPosition(LINKAGE_TWO_PIXELS);
-//                        locationTlm.setValue("intake linkage at height of 2nd pixel");
-//                        break;
+                    case RIGHT_BUMPER_DOWN:
+                        // intake linkage
+                        linkage.setPosition(LINKAGE_UP);
+                        locationTlm.setValue("intake linkage up");
+                        break;
+                    case LEFT_BUMPER_DOWN:
+                        // intake linkage
+                        linkage.setPosition(LINKAGE_DOWN);
+                        locationTlm.setValue("intake linkage down");
+                        break;
+                    case RIGHT_TRIGGER_DOWN:
+                        // intake one pixel from stack of 5
+                        linkage.setPosition(LINKAGE_ONE_PIXEL);
+                        locationTlm.setValue("intake linkage at height of top pixel");
+                        break;
+                    case LEFT_TRIGGER_DOWN:
+                        // intake one pixel from stack of 4
+                        linkage.setPosition(LINKAGE_TWO_PIXELS);
+                        locationTlm.setValue("intake linkage at height of 2nd pixel");
+                        break;
                 }
             }
         });
