@@ -38,6 +38,9 @@ public class RRAutoCSRedLeftV2Stack extends LinearOpMode {
         // methods associated with the Rev2mDistanceSensor class.
         Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) drive.distanceSensor1;
 
+        Pose2d startPose = new Pose2d(-35, 58, Math.toRadians(90));
+        drive.setPoseEstimate(startPose);
+
         TrajectorySequence toSpikes = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(0)))
                 // APPROACHING SPIKES
                 //.forward(initialForward)   // going forward

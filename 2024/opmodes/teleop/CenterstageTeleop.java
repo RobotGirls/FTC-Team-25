@@ -200,7 +200,7 @@ public class CenterstageTeleop extends StandardFourMotorRobot {
                             outtakeOn = false;
                         }
                         break;
-                    case DPAD_UP_DOWN:
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            case DPAD_UP_DOWN:
                         // box up to score and block pixels
                         box.setPosition(0.465);
                         pixelRelease.setPosition(BLOCK_BOTH);

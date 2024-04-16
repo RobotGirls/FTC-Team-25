@@ -80,6 +80,7 @@ public class RRAutoCSBlueLeftV2Stack extends LinearOpMode {
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(BLOCK_PIXELS);})
                 .setTangent(90)
                 .splineToConstantHeading(new Vector2d(30,55),Math.toRadians(180))
                 .waitSeconds(0.5)
@@ -89,6 +90,7 @@ public class RRAutoCSBlueLeftV2Stack extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linkage.setPosition(0.4);})
                 .waitSeconds(1)
                 // intake stack pixels
+                .forward(-1)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     while (drive.colorSensor.red()<300 && drive.colorSensor.green()<400 && drive.colorSensor.blue()<300) {
                     // color is black --> intake
@@ -97,7 +99,6 @@ public class RRAutoCSBlueLeftV2Stack extends LinearOpMode {
                     }
                     // after color is not black (meaning it's yellow), stop intaking
                     drive.intake.setPower(0);})
-                .back(3)
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {drive.intake.setPower(0.9);})
                 .waitSeconds(2)
                 .UNSTABLE_addTemporalMarkerOffset(4, () -> {drive.intake.setPower(0);})
@@ -145,15 +146,16 @@ public class RRAutoCSBlueLeftV2Stack extends LinearOpMode {
                 .forward(5)
                 .waitSeconds(1)
                 // intake stack pixels
-                .UNSTABLE_addTemporalMarkerOffset(3, () -> {drive.intake.setPower(0);})
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.9);})
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linkage.setPosition(0.25);})
-                .waitSeconds(1.5)
-                .back(3)
-                .UNSTABLE_addTemporalMarkerOffset(4, () -> {drive.intake.setPower(0);})
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(0.9);})
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    while (drive.colorSensor.red()<300 && drive.colorSensor.green()<400 && drive.colorSensor.blue()<300) {
+                        // color is black --> intake
+                        drive.intake.setPower(-0.9);
+                    }
+                    // after color is not black (meaning it's yellow), stop intaking
+                    drive.intake.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(1, () -> {drive.intake.setPower(0.9);})
                 .waitSeconds(2)
-                .UNSTABLE_addTemporalMarkerOffset(7, () -> {drive.intake.setPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(4, () -> {drive.intake.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.9);})
                 .setTangent(0)
                 .splineToConstantHeading(new Vector2d(-34,54),Math.toRadians(0))
@@ -163,7 +165,7 @@ public class RRAutoCSBlueLeftV2Stack extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0.7, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
                 .UNSTABLE_addTemporalMarkerOffset(6, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
-                .splineToConstantHeading(new Vector2d(53, 34), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(53.7, 34), Math.toRadians(0))
                 .build();
         TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // RIGHT SPIKE PATH
@@ -249,6 +251,7 @@ public class RRAutoCSBlueLeftV2Stack extends LinearOpMode {
 
 
         while (!isStopRequested() && opModeIsActive()) {
+
             // generic DistanceSensor methods.
             telemetry.addData("dist sensor 1 range", String.format("%.01f cm", drive.distanceSensor1.getDistance(DistanceUnit.CM)));
             telemetry.addData("dist sensor 2 range", String.format("%.01f cm", drive.distanceSensor2.getDistance(DistanceUnit.CM)));
@@ -270,4 +273,5 @@ public class RRAutoCSBlueLeftV2Stack extends LinearOpMode {
             return "center";
         }
     }
+
 }
