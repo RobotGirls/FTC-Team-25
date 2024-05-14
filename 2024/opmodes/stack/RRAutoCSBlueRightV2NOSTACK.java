@@ -55,11 +55,12 @@ public class RRAutoCSBlueRightV2NOSTACK extends LinearOpMode {
                 // LEFT SPIKE PATH
                 .forward(2)
                 .turn(Math.toRadians(90))
-                .forward(-3)
+                .forward(-4)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(0.5)
                 .forward(2)
                 .lineToLinearHeading(new Pose2d(-35,55, Math.toRadians(180)))
+                .waitSeconds(5)
                 .lineToLinearHeading(new Pose2d(30, 55, Math.toRadians(180)))
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
@@ -70,12 +71,13 @@ public class RRAutoCSBlueRightV2NOSTACK extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .waitSeconds(1)
-                .lineToLinearHeading(new Pose2d(54, 31, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(54, 35, Math.toRadians(180)))
                 .waitSeconds(1)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
                 .waitSeconds(0.5)
                 .forward(5)
-                .strafeRight(30) // park toward middle: 18
+                .strafeRight(30)
+                //.strafeLeft(18) //middle park
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
         TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(toSpikes.end())
@@ -87,7 +89,7 @@ public class RRAutoCSBlueRightV2NOSTACK extends LinearOpMode {
                 .forward(5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linkage.setPosition(0.475);})
                 .lineToLinearHeading(new Pose2d(-45, 55, Math.toRadians(180)))
-                .waitSeconds(1)
+                .waitSeconds(5)
                 .lineToLinearHeading(new Pose2d(30, 55, Math.toRadians(180)))
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
@@ -103,33 +105,35 @@ public class RRAutoCSBlueRightV2NOSTACK extends LinearOpMode {
                 .waitSeconds(1)
                 .forward(5)
                 .strafeRight(30)
+                //.strafeLeft(20)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
         TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // RIGHT SPIKE PATH
                 .turn(Math.toRadians(-90))
-                .forward(-2)
-                .waitSeconds(1)
+                .forward(-4)
+                .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(1, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
                 .waitSeconds(1)
-                .forward(2)
-                .lineToLinearHeading(new Pose2d(-36,55,Math.toRadians(0)))
+                .forward(4)
+                .lineToLinearHeading(new Pose2d(-41,56.8,Math.toRadians(0)))
                 .turn(Math.toRadians(180))
-                .lineToLinearHeading(new Pose2d(25,55,Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(25,56.8,Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
-                .waitSeconds(1.3)
+                .waitSeconds(1)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_UP);})
-                .waitSeconds(2)
+                .waitSeconds(1)
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
-                .waitSeconds(1)
-                .splineToConstantHeading(new Vector2d(54, 35), Math.toRadians(0))
+                .waitSeconds(0.4)
+                .splineToConstantHeading(new Vector2d(54, 37.8), Math.toRadians(0))
                 // * deploy yellow pixel
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
                 .waitSeconds(1)
                 .forward(5)
                 .strafeRight(30)
+                //.strafeLeft(19)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .build();
         waitForStart();
@@ -164,7 +168,7 @@ public class RRAutoCSBlueRightV2NOSTACK extends LinearOpMode {
             telemetry.update();
         }
     }
-
+    // detect which spike mark the team prop is on using the distance sensors
     public String detectProp() {
         if (drive.distanceSensor2.getDistance(DistanceUnit.CM) < PROP_DIST) {
             // prop is on the left spike
@@ -173,15 +177,6 @@ public class RRAutoCSBlueRightV2NOSTACK extends LinearOpMode {
             return "right";
         } else {
             return "center";
-        }
-    }
-
-    public String findColor() {
-        if (drive.colorSensor.red()<300 && drive.colorSensor.green()<400 && drive.colorSensor.blue()<300) {
-            return "black";
-        }
-        else {
-            return "yellow";
         }
     }
 }

@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-
+//autonomous for red audience side with no stack pickup
 @Config
 @Autonomous(name = "RR_REDLEFT_MECH")
 public class RRAutoCSRedLeftV2MECH extends LinearOpMode {
@@ -157,7 +157,7 @@ public class RRAutoCSRedLeftV2MECH extends LinearOpMode {
             telemetry.update();
         }
     }
-
+    // detect which spike mark the team prop is on using the distance sensors
     public String detectProp() {
         if (drive.distanceSensor2.getDistance(DistanceUnit.CM) < PROP_DIST) {
             // prop is on the left spike

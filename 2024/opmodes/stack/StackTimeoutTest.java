@@ -275,7 +275,7 @@ public class StackTimeoutTest extends LinearOpMode {
             return "center";
         }
     }
-
+    // trying to make the robot intake two white pixels instead of one
     public void intakeStack() {
         while (drive.colorSensor.red()<300 && drive.colorSensor.green()<400 && drive.colorSensor.blue()<300 && System.currentTimeMillis() < STACK_TIMEOUT) {
             // color is black --> intake

@@ -78,7 +78,8 @@ public class RRAutoCSBlueLeftV2NOSTACK extends LinearOpMode {
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .forward(5)
-                .strafeRight(27)
+                .strafeRight(30)
+                .forward(-5)
                 .build();
         TrajectorySequence centerSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // CENTER SPIKE PATH
@@ -101,7 +102,9 @@ public class RRAutoCSBlueLeftV2NOSTACK extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.box.setPosition(FLIP_DOWN);})
                 .waitSeconds(0.5)
                 .forward(5)
-                .strafeRight(27)
+                .strafeRight(32)
+                //.strafeLeft()
+                .forward(-5)
                 .build();
         TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // RIGHT SPIKE PATH
@@ -124,7 +127,9 @@ public class RRAutoCSBlueLeftV2NOSTACK extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
                 .waitSeconds(1)
                 .forward(5)
-                .strafeRight(27)
+                .strafeRight(32)
+                //.strafeLeft(18)
+                .forward(-5)
                 .build();
         waitForStart();
 
@@ -162,6 +167,7 @@ public class RRAutoCSBlueLeftV2NOSTACK extends LinearOpMode {
         }
     }
 
+    // detect which spike mark the team prop is on using the distance sensors
     public String detectProp() {
         if (drive.distanceSensor2.getDistance(DistanceUnit.CM) < PROP_DIST) {
             // prop is on the left spike

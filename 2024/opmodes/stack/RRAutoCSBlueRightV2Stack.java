@@ -64,7 +64,7 @@ public class RRAutoCSBlueRightV2Stack extends LinearOpMode {
                     drive.linkage.setPosition(0.47);
                     drive.pixelRelease.setPosition(BLOCK_PIXELS);
                 })
-                .lineToLinearHeading(new Pose2d(-54, 34, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-53, 34, Math.toRadians(180)))
                 // intake and check for color change from black to yellow
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     while (drive.colorSensor.red()<300 && drive.colorSensor.green()<400 && drive.colorSensor.blue()<300) {
@@ -106,7 +106,7 @@ public class RRAutoCSBlueRightV2Stack extends LinearOpMode {
                 .waitSeconds(0.3)
                 .forward(5)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linkage.setPosition(0.475);})
-                .lineToLinearHeading(new Pose2d(-55.5, 33, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-55, 33, Math.toRadians(180)))
                 // * INTAKE FROM STACK
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     while (drive.colorSensor.red()<300 && drive.colorSensor.green()<400 && drive.colorSensor.blue()<300) {
@@ -146,8 +146,8 @@ public class RRAutoCSBlueRightV2Stack extends LinearOpMode {
                 .build();
         TrajectorySequence rightSpike = drive.trajectorySequenceBuilder(toSpikes.end())
                 // RIGHT SPIKE PATH
-                .splineToConstantHeading(new Vector2d(-52,20),Math.toRadians(180))
-                .lineToLinearHeading(new Pose2d(-60,38,Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-52,20,Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-60,36,Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     while (drive.colorSensor.red()<300 && drive.colorSensor.green()<400 && drive.colorSensor.blue()<300) {
                         // color is black --> intake
@@ -165,10 +165,11 @@ public class RRAutoCSBlueRightV2Stack extends LinearOpMode {
                     drive.intake.setPower(0.9);
                 })
                 .lineToLinearHeading(new Pose2d(-55,33,Math.toRadians(180)))
-                .waitSeconds(0.2)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
-                .waitSeconds(0.5)
-                .splineToConstantHeading(new Vector2d(-41,59),Math.toRadians(360))
+                .waitSeconds(1)
+                .UNSTABLE_addTemporalMarkerOffset(1, () -> {drive.purple.setPosition(PURPLE_RELEASE);})
+                .waitSeconds(3)
+                .forward(1)
+                .lineToLinearHeading(new Pose2d(-55,59,Math.toRadians(180)))
                 .lineToLinearHeading(new Pose2d(35,59,Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0.85, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -218,7 +219,7 @@ public class RRAutoCSBlueRightV2Stack extends LinearOpMode {
             telemetry.update();
         }
     }
-
+    // detect which spike mark the team prop is on using the distance sensors
     public String detectProp() {
         if (drive.distanceSensor2.getDistance(DistanceUnit.CM) < PROP_DIST) {
             // prop is on the left spike

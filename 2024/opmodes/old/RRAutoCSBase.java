@@ -1,4 +1,4 @@
-package opmodes;
+package opmodes.old;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;

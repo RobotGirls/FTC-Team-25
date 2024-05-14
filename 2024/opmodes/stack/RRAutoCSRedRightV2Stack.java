@@ -75,9 +75,9 @@ public class RRAutoCSRedRightV2Stack extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(BLOCK_BOTH);})
                 .setTangent(180)
-                .splineToConstantHeading(new Vector2d(30,-58),Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(30,-57),Math.toRadians(180))
                 .waitSeconds(1)
-                .lineToLinearHeading(new Pose2d(-34,-58,Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-34,-57,Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linkage.setPosition(0.4);})
                 .lineToLinearHeading(new Pose2d(-58, -37,Math.toRadians(153)))
                 // intake stack pixels
@@ -90,9 +90,9 @@ public class RRAutoCSRedRightV2Stack extends LinearOpMode {
                     drive.intake.setPower(0);
                 })
                 .waitSeconds(0.5)
-                .lineToLinearHeading(new Pose2d(-34, -58,Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-34, -57,Math.toRadians(180)))
                 .waitSeconds(1)
-                .lineToLinearHeading(new Pose2d(30,-58,Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(30,-57,Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0.8, () -> {drive.box.setPosition(FLIP_UP);})
                 .UNSTABLE_addTemporalMarkerOffset(0.7, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -123,9 +123,9 @@ public class RRAutoCSRedRightV2Stack extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(BLOCK_BOTH);})
                 .setTangent(90)
-                .splineToConstantHeading(new Vector2d(30,-58),Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(30,-57),Math.toRadians(180))
                 .waitSeconds(0.5)
-                .lineToLinearHeading(new Pose2d(-34,-58,Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-34,-57,Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linkage.setPosition(0.49);})
                 .splineToConstantHeading(new Vector2d(-47,-34),Math.toRadians(180))
                 .forward(5)
@@ -144,9 +144,9 @@ public class RRAutoCSRedRightV2Stack extends LinearOpMode {
                 .waitSeconds(2)
                 .UNSTABLE_addTemporalMarkerOffset(4, () -> {drive.intake.setPower(0);})
                 .setTangent(270)
-                .splineToConstantHeading(new Vector2d(-40,-58.8),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(-40,-58),Math.toRadians(0))
                 .waitSeconds(0.5)
-                .lineToLinearHeading(new Pose2d(30,-58.8,Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(30,-58,Math.toRadians(180)))
                 .setTangent(0)
                 .UNSTABLE_addTemporalMarkerOffset(0.8, () -> {drive.box.setPosition(FLIP_UP);})
                 .UNSTABLE_addTemporalMarkerOffset(0.9, () -> {drive.linearLift.setPower(0);})
@@ -180,9 +180,9 @@ public class RRAutoCSRedRightV2Stack extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(BLOCK_BOTH);})
                 .setTangent(180)
-                .splineToConstantHeading(new Vector2d(30,-59),Math.toRadians(270))
+                .splineToConstantHeading(new Vector2d(30,-58),Math.toRadians(270))
                 .waitSeconds(0.5)
-                .lineToLinearHeading(new Pose2d(-34,-59,Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-34,-58,Math.toRadians(180)))
                 .splineToConstantHeading(new Vector2d(-48,-36),Math.toRadians(180))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linkage.setPosition(0.5);})
                 .forward(5)
@@ -198,8 +198,8 @@ public class RRAutoCSRedRightV2Stack extends LinearOpMode {
                 })
                 .waitSeconds(0.5)
                 .setTangent(270)
-                .splineToConstantHeading(new Vector2d(-40,-59),Math.toRadians(0))
-                .lineToLinearHeading(new Pose2d(30,-59,Math.toRadians(180)))
+                .splineToConstantHeading(new Vector2d(-40,-58),Math.toRadians(0))
+                .lineToLinearHeading(new Pose2d(30,-58,Math.toRadians(180)))
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0.8, () -> {drive.box.setPosition(FLIP_UP);})
                 .UNSTABLE_addTemporalMarkerOffset(0.7, () -> {drive.linearLift.setPower(0);})
@@ -237,7 +237,7 @@ public class RRAutoCSRedRightV2Stack extends LinearOpMode {
             telemetry.update();
         }
     }
-
+    // detect which spike mark the team prop is on using the distance sensors
     public String detectProp() {
         if (drive.distanceSensor2.getDistance(DistanceUnit.CM) < PROP_DIST) {
             // prop is on the left spike

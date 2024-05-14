@@ -70,8 +70,8 @@ public class RRAutoCSBlueLeftV2Stack extends LinearOpMode {
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(-0.4);})
-                .lineToLinearHeading(new Pose2d(14,40,Math.toRadians(180)))
-                .splineToConstantHeading(new Vector2d(55, 40), Math.toRadians(360))
+                .lineToLinearHeading(new Pose2d(14,41,Math.toRadians(180)))
+                .splineToConstantHeading(new Vector2d(55, 41), Math.toRadians(360))
                 // * deploy yellow pixel
                 .waitSeconds(1)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.pixelRelease.setPosition(RELEASE_PIXELS);})
@@ -104,8 +104,8 @@ public class RRAutoCSBlueLeftV2Stack extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(4, () -> {drive.intake.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.intake.setPower(-0.9);})
                 .setTangent(0)
-                .splineToConstantHeading(new Vector2d(-34,55.5),Math.toRadians(0))
-                .lineToLinearHeading(new Pose2d(30,55.5,Math.toRadians(180)))
+                .splineToConstantHeading(new Vector2d(-34,56),Math.toRadians(0))
+                .lineToLinearHeading(new Pose2d(30,56,Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0.8, () -> {drive.box.setPosition(FLIP_UP);})
                 .UNSTABLE_addTemporalMarkerOffset(0.7, () -> {drive.linearLift.setPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {drive.linearLift.setPower(0.4);})
@@ -262,7 +262,7 @@ public class RRAutoCSBlueLeftV2Stack extends LinearOpMode {
             telemetry.update();
         }
     }
-
+    // detect which spike mark the team prop is on using the distance sensors
     public String detectProp() {
         if (drive.distanceSensor2.getDistance(DistanceUnit.CM) < PROP_DIST) {
             // prop is on the left spike
