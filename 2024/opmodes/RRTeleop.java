@@ -14,12 +14,18 @@ import org.firstinspires.ftc.teamcode.drive.CenterstageSampleMecanumDrive;
 
 @TeleOp(name = "Roadrunner Teleop")
 public class RRTeleop extends LinearOpMode {
+
+    private final double BLOCK_NOTHING = 0.25;
+    private final double BLOCK_BOTH = 0.05;
+
     @Override
     public void runOpMode() throws InterruptedException {
         CenterstageSampleMecanumDrive drive = new CenterstageSampleMecanumDrive(hardwareMap);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         Pose2d startPose = new Pose2d(0, 0, Math.toRadians(0));
+
+
 
         drive.setPoseEstimate(startPose);
 
@@ -48,6 +54,13 @@ public class RRTeleop extends LinearOpMode {
                     )
             );
 
+            if (gamepad2.dpad_up) {
+                drive.pixelRelease.setPosition(BLOCK_BOTH);
+            }
+            else if (gamepad2.dpad_down) {
+                // pixel box is open
+                drive.pixelRelease.setPosition(BLOCK_NOTHING);
+            }
             // Update everything. Odometry. Etc.
             drive.update();
 
