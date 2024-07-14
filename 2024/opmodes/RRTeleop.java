@@ -109,6 +109,11 @@ public class RRTeleop extends LinearOpMode {
             else if (gamepad2.left_bumper) {
                 drive.linkage.setPosition(drive.LINKAGE_DOWN);
             }
+            else if (gamepad2.dpad_right) {
+                drive.intake.setPower(0);
+                intakeOn = false;
+            }
+            drive.linearLift.setPower(gamepad2.left_stick_y);
 
             if (gamepad1.right_bumper) {
                 if(intakeOn == false) {
@@ -144,7 +149,6 @@ public class RRTeleop extends LinearOpMode {
                 drive.box.setPosition(0.465);
                 drive.pixelRelease.setPosition(BLOCK_BOTH);
             }
-
 
             // Update everything. Odometry. Etc.
             drive.update();
