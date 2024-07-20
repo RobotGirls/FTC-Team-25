@@ -110,12 +110,15 @@ public class RRTeleop extends LinearOpMode {
                 drive.linkage.setPosition(drive.LINKAGE_DOWN);
             }
             else if (gamepad2.dpad_right) {
+                //turn off intake
                 drive.intake.setPower(0);
                 intakeOn = false;
             }
             drive.linearLift.setPower(gamepad2.left_stick_y);
 
             if (gamepad1.right_bumper) {
+
+                // turn on intake if it's currently off; turn off intake if it's currently on
                 if(intakeOn == false) {
                     drive.intake.setPower(-0.9);
                     intakeOn = true;
