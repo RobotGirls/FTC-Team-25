@@ -27,7 +27,7 @@ import team25core.StandardFourMotorRobot;
 import team25core.TeleopDriveTask;
 import team25core.TwoStickMechanumControlScheme;
 
-@TeleOp(name = "CenterstageTeleopNew")
+@TeleOp(name = "CenterstageTeleop")
 //@Disabled
 public class CenterstageTeleop extends StandardFourMotorRobot {
     //new teleop
