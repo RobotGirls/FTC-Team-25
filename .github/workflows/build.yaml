@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: RobotGirls/FtcRobotController
-          ref: master-25-rr
+          ref: master-25-rr-new
           path: ws/FtcRobotController
 
       - name: Show dir
